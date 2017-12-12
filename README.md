@@ -4,7 +4,7 @@ my linux programming environment managed by Vundle(for vim plugins) now.
 # File List
 * autoUpdate.sh: shell for automation of self enviroment setup.
 * confirm: It is a dir, containing the files to be stored.
-* haha: test dir for 'sh autoUpdate.sh restore', replace home directory.
+* trial: test dir for 'sh autoUpdate.sh restore', replace home directory.
 
 # Features
 add feature or fix bug for autoUpdate.sh

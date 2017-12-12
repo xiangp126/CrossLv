@@ -13,7 +13,7 @@ bk_files=(
     ".vim/bundle/snipMate/snippets/c.snippets"
     ".vim/bundle/snipMate/snippets/cpp.snippets"
 )
-restore_dir=./haha
+restore_dir=./trial
 cfm_dir=./confirm
 
 # traversal of the array. [@] get the full array elements.
