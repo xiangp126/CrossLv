@@ -3,6 +3,7 @@ my linux programming environment managed by Vundle(for vim plugins) now.
 
 # File List
 * autoUpdate.sh: shell for automation of self enviroment setup.
+* bashrc.basic: basic .bashrc suitable for all platform.
 * confirm: It is a dir, containing the files to be stored.
 * trial: test dir for 'sh autoUpdate.sh restore', replace home directory.
 
