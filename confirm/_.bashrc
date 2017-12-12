@@ -143,7 +143,8 @@ export http_proxy=socks5://127.0.0.1:8080
 #export http_proxy=http://proxy.esl.cisco.com:80
 #export https_proxy=http://proxy.esl.cisco.com:80
 
-if [ -z "$TMUX" ]; then
-    tmux
-fi
-
+# if [ -z "$TMUX" ]; then
+#     tmux
+# fi
+echo "> tmux ls"
+tmux ls

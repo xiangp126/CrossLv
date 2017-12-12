@@ -8,10 +8,13 @@ backup_dir="widget"
 bk_files=(
     ".vimrc"
     ".bashrc"
+    ".tmux.conf"
     ".vim/colors/corsair.vim"
     ".vim/bundle/snipMate/snippets/c.snippets"
     ".vim/bundle/snipMate/snippets/cpp.snippets"
 )
+restore_dir=./haha
+cfm_dir=./confirm
 
 # traversal of the array. [@] get the full array elements.
 # echo ${#bk_files[@]}  => get the length of whole array.
@@ -64,17 +67,16 @@ case $1 in
     ;;
 
     'restore')
-        restore_dir=./hehe
-        cfm_dir=./confirm
         # mv .vimrc  => .vimrc.git.bak
-        bk_postfix=git.bak
+        # backup postfix, need not the first '.'
+        bk_postfix=old
         # check if exist cfm_dir && restore_dir.
         if [ ! -d ${cfm_dir} ]; then
-            echo Have No Confirm Directory, Abort Now ...
+            echo missing confirm directory, please make it first ...
             exit
         fi
         if [ ! -d ${restore_dir} ]; then
-            echo Have No Restore Directory, Abort Now ...
+            echo missing restore directory, please make it first ...
             exit
         fi
 
@@ -87,23 +89,23 @@ case $1 in
             file_path=`echo ${file%/*}`      # ./.vim/colors 
             file_name=`echo ${file##*/}`     # corsair.vim
 
-            # check if target dir exists, if not just abort.
+            # check if target dir exists, if not make a new one.
             if [ ! -d ${restore_dir}/${file_path} ]; then
-                echo -n "There is No Dir ${file_path} under ${restore_dir}, "
-                echo    "Abort Now ..."
-                exit
+                echo "[Warning]: No dir ${file_path} under ${restore_dir}, so make a new one ..."
+                echo mkdir -p ${restore_dir}/${file_path}
+                mkdir -p ${restore_dir}/${file_path}
             fi
 
             cd ${restore_dir}/${file_path}
             echo "Entering Directory `pwd`"
-            # check if target file exists, if not just omit it.
+            # check if target file exists, if not make a new one.
             if [ ! -f ${file_name} ]; then
-                echo There is No $file_name under ${restore_dir}/${file_path}, omit $file_name ... 
-                continue
+                echo "[Warning]: No $file_name under ${restore_dir}/${file_path}, so make a new one ..."
+            else
+                echo mv $file_name ${file_name}.${bk_postfix}
+                mv $file_name ${file_name}.${bk_postfix}
             fi
 
-            echo mv $file_name ${file_name}.${bk_postfix}
-            mv $file_name ${file_name}.${bk_postfix}
             echo cp ${mainWd}/${cfm_dir}/_${file_name} ${file_name}
             cp ${mainWd}/${cfm_dir}/_${file_name} ${file_name}
 
@@ -112,18 +114,35 @@ case $1 in
             echo "Going Back to Main Working Directory `pwd`"
             echo
         done
-        echo Congratulations! Key Files Has Been Restored ...
+
+        echo "------------------------------------------------------"
+        echo find ${restore_dir} -type f
+        echo "------------------------------------------------------"
+        find ${restore_dir} -type f
+        echo "------------------------------------------------------"
+        # echo Congratulations! Key Files Has Been Restored ...
     ;;
 
     'confirm')
+        if [ ! -d $backup_dir ]; then
+            echo "missing backup directory, run '$0 backup' first."
+            exit
+        fi
+
         # confirm directory.
         mkdir -p ${cfm_dir}
         # find widget/ -regextype posix-extended -regex '.*' -type f -exec ls -l {} +
         # echo -ne "find ${backup_dir} -regextype posix-basic -regex '^.*' "
         # echo -e "-type f | xargs -i cp {} ${cfm_dir}"
+        echo "start to copying files from ${backup_dir} to ${cfm_dir} ..."
         find ${backup_dir} -regextype posix-basic -regex '^.*' -type f | xargs -i cp {} ${cfm_dir}
-        ls -l ${cfm_dir}
-        echo "Congratulations! These Files Copied ..."
+        # echo "Congratulations! These Files Are Copied ..."
+
+        echo "------------------------------------------------------"
+        echo find ${cfm_dir} -type f
+        echo "------------------------------------------------------"
+        find ${cfm_dir} -type f
+        echo "------------------------------------------------------"
     ;;
 
     'clean')
