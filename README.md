@@ -51,7 +51,7 @@ Plugin 'snipMate'
 
 # Usage
 ```bash
-sh autoUpdate.sh
+> sh autoUpdate.sh
 [NAME]
     autoUpdate.sh -- auto backup/restore key files of my linux env.
 
