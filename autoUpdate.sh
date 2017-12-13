@@ -141,10 +141,19 @@ mainWd=`pwd`
 
 case $1 in
     'backup')
-        if [ -d "${backup_dir}/.vim/colors" ]; then
+        # makedir in case it not exist.
+        # -p , --parent, no error if existing, make parent directories as needed
+        mkdir -p $backup_dir
+
+        # test if backup_dir was trully not empty, backup it first if so.
+        # ls -A .
+        #    -A, --almost-all
+        #       do not list implied . and ..
+        if [ "`ls -A $backup_dir`" != "" ]; then
             echo mv ${backup_dir} ${backup_dir}.`date +"%Y-%m-%d-%H:%M:%S"`
             mv ${backup_dir} ${backup_dir}.`date +"%Y-%m-%d-%H:%M:%S"`
         fi
+
         echo mkdir -p ${backup_dir}/.vim/colors
         mkdir -p ${backup_dir}/.vim/colors
         echo mkdir -p ${backup_dir}/.vim/bundle/snipMate/snippets
@@ -158,9 +167,20 @@ case $1 in
             file_path=`echo ${file%/*}`      # ./.vim/colors 
             file_name=`echo ${file##*/}`     # corsair.vim
             backup_subdir=${backup_dir}/${file_path}
+            if [ ! -f ${base_dir}/$file ]; then
+                echo [Warning]: There was no ${base_dir}/${file}, omitting it ...
+                continue
+
+            fi
             echo "Backup ${base_dir}/${file} to ${backup_subdir}/_${file_name} ..."
             cp ${base_dir}/${file} ${backup_subdir}/_${file_name}
         done
+
+        echo "------------------------------------------------------"
+        echo Finding Files Backuped Successfully ...
+        echo "------------------------------------------------------"
+        find $backup_dir -type f
+        echo "------------------------------------------------------"
     # ;; act as break.
     ;;
 
