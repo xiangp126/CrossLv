@@ -3,7 +3,7 @@ my linux programming environment managed by Vundle(for vim plugins) now.
 
 # File List
 * autoUpdate.sh: shell for automation of self enviroment setup.
-* bashrc.basic: basic .bashrc suitable for all platform.
+* _.bashrc: basic .bashrc suitable for all platform.
 * confirm/: containing the files to be stored.
 * widget/: dir to backup key files of this linux environment.
 * trial/: test dir for restore mode, dry mode.
@@ -13,6 +13,8 @@ add feature or fix bug for autoUpdate.sh
 
 V2.1
 * for 'backup' mode, add mechanism to check if file to be backuped exists.
+* add alias for 'grep'
+* change name autoUpdate.sh => autoHandle.sh
 
 V2.0
 * add dry mode and re-format code logic.
