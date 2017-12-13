@@ -13,7 +13,37 @@ add feature or fix bug for autoUpdate.sh
 ## V1.0
 * user-friendly manipulate for backup | restore | confirm | clean .
 
-# USAGE
+# Quick Start
+## Install Vndle
+better to make dir .vim under home '~' clean.
+
+mv ~/.vim ~/.vim.old may be well.
+```bash
+> git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+```
+## Setup Plugins
+```bash
+# replace .vimrc with it from this git repository.
+> sh autoUpdate.sh restore
+...
+
+> vim
+# source .vimrc first.
+:source ~/.vimrc
+:PluginInstall
+:PluginList
+-------------------------------------------------
+" My Plugins                               |  1
+Plugin 'VundleVim/Vundle.vim'              |~
+Plugin 'L9'                                |~
+Plugin 'The-NERD-tree'                     |~
+Plugin 'Tagbar'                            |~
+Plugin 'OmniCppComplete'                   |~
+Plugin 'snipMate' 
+
+```
+
+# Usage
 ```bash
 > sh autoUpdate.sh
 usage: autoUpdate.sh backup | restore | confirm | clean
