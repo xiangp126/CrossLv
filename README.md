@@ -10,6 +10,10 @@ my linux programming environment managed by Vundle(for vim plugins) now.
 
 # Features
 
+V3.0 
+* reformat function call for some 'case' switch.
+* add regret mode for autoHandle script.
+
 V2.1
 * for 'backup' mode, add mechanism to check if file to be backuped exists.
 * add alias for 'grep'
@@ -74,20 +78,20 @@ Plugin 'snipMate'
 
 # Usage
 ```bash
-> sh autoUpdate.sh
+> sh autoHandle.sh
 [NAME]
-    autoUpdate.sh -- auto backup/restore key files of my linux env.
+    autoHandle.sh -- auto backup/restore key files of my linux env.
 
 [SYNOPSIS]
-    sh autoUpdate.sh backup | dry | restore | confirm | clean
+    sh autoHandle.sh backup | dry | restore | regret | confirm | clean
 
 [EXAMPLE]
-    sh autoUpdate.sh backup
-    sh autoUpdate.sh dry
-    sh autoUpdate.sh restore
+    sh autoHandle.sh backup
+    sh autoHandle.sh dry
+    sh autoHandle.sh restore
 
 [TROUBLESHOOTING]
-    # sh autoUpdate.sh can not be excuted.
+    # sh autoHandle.sh can not be excuted.
     > ll /bin/sh
     lrwxrwxrwx 1 root root 9 Dec  7 01:00 /bin/sh -> /bin/bash*
     # on some distribution, sh was linked to dash, not bash.
@@ -98,11 +102,12 @@ Plugin 'snipMate'
     backup  -> backup key files under environment to ./widget/
     dry     -> run restore in dry mode, thought trial/ as ~/
     restore -> restore key files to environment from ./confirm/
+    regret  -> regret previous 'restore'/'dry' action.
     confirm -> confirm to copy files in ./widget/ to ./confirm/
     clean   -> clean ./widget.*/, but reserve main backup dir
 
 > sh autoUpdate.sh restore
-missing restore directory, please make it first ...
+missing restore directory, please check it first ...
 
 > mkdir haha
 > sh autoUpdate.sh restore
