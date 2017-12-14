@@ -43,13 +43,25 @@ simply run 'sh install.sh' to quick start vundle.
 > git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 ```
 
+## Replace Configurations
+```bash
+# replace key files like .vimrc with them under confirm/
+> mv confirm/_.vimrc ~/.vim/.vimrc
+```
+
 ## Setup Plugins
 ```bash
-> vim
-# source .vimrc first.
-:source ~/.vimrc
-:PluginInstall
-:PluginList
+------------------------------------------------------
+Please open a vim and excute command
+    :source haha/.vim/.vimrc
+    :PluginInstall
+
+Brief help
+    :PluginList       - lists configured plugins
+    :PluginInstall    - installs plugins; append  to update or just :PluginUpdate
+    :PluginSearch foo - searches for foo; append  to refresh local cache
+    :PluginClean      - confirms removal of unused plugins; append  to auto-approve removal
+
 -------------------------------------------------
 " My Plugins                               |  1
 Plugin 'VundleVim/Vundle.vim'              |~
@@ -59,12 +71,6 @@ Plugin 'Tagbar'                            |~
 Plugin 'OmniCppComplete'                   |~
 Plugin 'snipMate' 
 
-```
-
-## Replace Configurations
-```bash
-# replace key files like .vimrc with them under confirm/
-> sh autoUpdate.sh restore
 ```
 
 # Usage
