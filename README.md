@@ -9,7 +9,6 @@ my linux programming environment managed by Vundle(for vim plugins) now.
 * trial/: test dir for restore mode, dry mode.
 
 # Features
-add feature or fix bug for autoUpdate.sh
 
 V2.1
 * for 'backup' mode, add mechanism to check if file to be backuped exists.
