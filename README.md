@@ -24,20 +24,22 @@ V1.0
 * user-friendly manipulate for backup | restore | confirm | clean .
 
 # Quick Start
-## Install Vndle
-better to make dir .vim under home '~' clean.
+better letting ~/.vim/ clean and backup original configurations first.
 
+## Backup First
 ```bash
 > mv ~/.vim ~/.vim.old
-# it will make '~/.vim' if it not exist.
+> sh autoUpdate.sh backup
+```
+
+## Install Vndle
+```bash
+# will make new '~/.vim/' if it not exist.
 > git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 ```
+
 ## Setup Plugins
 ```bash
-# replace .vimrc with it from this git repository.
-> sh autoUpdate.sh restore
-...
-
 > vim
 # source .vimrc first.
 :source ~/.vimrc
@@ -52,6 +54,12 @@ Plugin 'Tagbar'                            |~
 Plugin 'OmniCppComplete'                   |~
 Plugin 'snipMate' 
 
+```
+
+## Replace Configurations
+```bash
+# replace key files like .vimrc with them under confirm/
+> sh autoUpdate.sh restore
 ```
 
 # Usage
@@ -122,3 +130,7 @@ find ./confirm -type f
 ------------------------------------------------------
 
 ```
+
+# Reference
+[Vundle Introduction Guide](http://www.jianshu.com/p/8d416ac4ad11)
+
