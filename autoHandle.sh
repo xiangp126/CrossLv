@@ -1,8 +1,9 @@
-# Copyright by Peng. xiangp126@sjtu.edu.cn.
-# Dec 07, 2017 last edit.
+#!/bin/bash
+# Copyright by Peng, 2017. xiangp126@sjtu.edu.cn.
 # sudo ln -s /bin/bash /bin/sh, make sure sh linked to bash.
 # > ll /bin/sh lrwxrwxrwx 1 root root 9 Dec  7 01:00 /bin/sh -> /bin/bash*
-#!/bin/bash
+
+# basic parameters set.
 base_dir=~
 backup_dir=./widget
 bk_files=(

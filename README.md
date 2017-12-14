@@ -24,7 +24,12 @@ V1.0
 * user-friendly manipulate for backup | restore | confirm | clean .
 
 # Quick Start
-better letting ~/.vim/ clean and backup original configurations first.
+simply run 'sh install.sh' to quick start vundle.
+
+```bash
+> sh install.sh
+# which did the following things for you.
+```
 
 ## Backup First
 ```bash
