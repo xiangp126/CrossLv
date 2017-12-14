@@ -3,10 +3,44 @@
 # sudo ln -s /bin/bash /bin/sh, make sure sh linked to bash.
 # > ll /bin/sh lrwxrwxrwx 1 root root 9 Dec  7 01:00 /bin/sh -> /bin/bash*
 
-# basic parameters set.
-baseDir=haha
+# global parameters.
+baseDir=virtual
 bkDir=.vim
 bkPostfix=old
+
+usage() {
+cat << _EOF
+[NAME]
+    $0 -- auto install Vundle(vim plugin handler)
+
+[USAGE]
+    sh $0 dry | root
+
+[EXAMPLE]
+    sh $0 dry : use $baseDir for dry try.
+    sh $0 root: install to ~/
+_EOF
+
+}    
+
+case $1 in 
+    'dry')
+        echo Using default $baseDir/ ...
+    ;;
+
+    'root')
+        baseDir=~
+    ;;
+
+    *)
+        usage
+        exit
+    ;;
+
+esac
+
+echo mkdir -p $baseDir
+mkdir -p $baseDir
 # absolute file path.
 abPath=${baseDir}/${bkDir}
 
@@ -41,3 +75,4 @@ Brief help
     :PluginSearch foo - searches for foo; append `!` to refresh local cache
     :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
 _EOF
+

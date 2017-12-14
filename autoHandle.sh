@@ -32,7 +32,7 @@ bk_postfix=old
 usage() {
 cat << _EOF
 [NAME]
-    $0 -- auto backup/restore key files of my linux env.
+    $0 -- auto backup/restore key files of current linux env.
 
 [SYNOPSIS]
     sh $0 backup | dry | restore | regret | confirm | clean
@@ -61,10 +61,11 @@ _EOF
 }
 
 # if no parameters input, print usage() and exit.
-if [ $# -le 0 ]; then
-    usage
-    exit
-fi
+# move this check to 'default' branch of case.
+# if [ $# -le 0 ]; then
+#     usage
+#     exit
+# fi
 
 backup() {
     # make dir in case it not exist.
@@ -305,5 +306,12 @@ case $1 in
         echo rm -rf ${backup_dir}.*
         rm -rf ${backup_dir}.*
     ;;
+
+    # 'default' branch of case
+    *)
+        usage
+        exit
+    ;;
+
 esac
 
