@@ -19,6 +19,8 @@ dry_dir=./trial
 cfm_dir=./confirm
 # array to store file names that was trully processed.
 bkk_array=()
+# backup postfix, need not the first '.'
+bk_postfix=old
 
 # traversal of the array. [@] get the full array elements.
 # echo ${#bk_files[@]}  => get the length of whole array.
@@ -52,7 +54,7 @@ cat << _EOF
     backup  -> backup key files under environment to ${backup_dir}/
     dry     -> run restore in dry mode, thought trial/ as ~/
     restore -> restore key files to environment from ${cfm_dir}/
-    regret  -> regret previous 'restore' action.
+    regret  -> regret previous 'restore'/'dry' action.
     confirm -> confirm to copy files in ${backup_dir}/ to ${cfm_dir}/
     clean   -> clean ${backup_dir}.*/, but reserve main backup dir
 _EOF
@@ -101,7 +103,7 @@ backup() {
     done
 
     echo "------------------------------------------------------"
-    echo Finding Files Backuped Successfully ...
+    echo Finding files backuped successfully ...
     echo "------------------------------------------------------"
     find $backup_dir -type f
     echo "------------------------------------------------------"
@@ -110,11 +112,9 @@ backup() {
 restore() {
     # get restore dir from parameter $1 (the first para passed).
     restore_dir=$1
-    # backup postfix, need not the first '.'
-    bk_postfix=old
     # check if exist cfm_dir && restore_dir.
     if [ ! -d ${cfm_dir} ]; then
-        echo [Error]: missing confirm directory, please make it first ...
+        echo [Error]: missing confirm $cfm_dir/, please check it first ...
         exit
     fi
     mkdir -p $dry_dir
@@ -159,7 +159,7 @@ restore() {
     done
 
     echo "------------------------------------------------------"
-    echo Finding Files Copied Successfully ...
+    echo Finding files copied successfully ...
     echo "------------------------------------------------------"
     # loop again to print echo messages.
     for file in ${bk_files[@]}
@@ -180,6 +180,76 @@ restore() {
     # find ${restore_dir} -type f
     # echo "------------------------------------------------------"
     # echo Congratulations! Key Files Has Been Restored ...
+}
+
+regret() {
+    # get regret dir from parameter $1 (the first para passed).
+    regret_dir=$1
+    # check if exist cfm_dir && regret_dir.
+    if [ ! -d ${regret_dir} ]; then
+        echo [Error]: missing regret $regret_dir/, please check it first ...
+        exit
+    fi
+    # mkdir -p $dry_dir
+
+    # i for bkk_array
+    index=0
+    # loop to regret bk_file.
+    for file in ${bk_files[@]}
+    do
+        # ".vim/colors/corsair.vim"
+        file=./${file}
+        # Exp: ./.vim/colors/corsair.vim
+        file_path=`echo ${file%/*}`      # ./.vim/colors 
+        file_name=`echo ${file##*/}`     # corsair.vim
+        # backuped file name.
+        bk_filename=${file_name}.$bk_postfix
+
+        # check if target dir exists, if not make a new one.
+        if [ ! -d ${regret_dir}/${file_path} ]; then
+            echo "[Warning]: No ${file_path}/ under ${regret_dir}/, omitting this one ..."
+            continue
+        fi
+
+        cd ${regret_dir}/${file_path}
+        echo "Entering Directory `pwd`"
+        # check if target file exists, if not make a new one.
+        if [ ! -f ${bk_filename} ]; then
+            echo "[Warning]: No $bk_filename under ${regret_dir}/${file_path}/, omitting this one ..."
+            # go back to the main working directory for next cd.
+            cd $mainWd
+            echo -e "Going Back to Main Working Directory `pwd`\n"
+            continue
+        fi
+
+        echo mv $bk_filename ${file_name}
+        mv $bk_filename ${file_name}
+
+        # go back to the main working directory for next cd.
+        cd $mainWd
+        echo -e "Going Back to Main Working Directory `pwd`\n"
+        bkk_array[i++]="`find ${regret_dir}/$file -name $file_name`"
+
+    done
+
+
+    # get the length of array
+    if [ "${#bkk_array[@]}" = '0' ]; then
+        echo "------------------------------------------------------"
+        echo Sorry, Nothing can be regretted ...
+        echo "------------------------------------------------------"
+        exit
+    fi
+
+    echo "------------------------------------------------------"
+    echo Finding files regretted successfully ...
+    echo "------------------------------------------------------"
+    # loop again to print echo messages.
+    for file in ${bkk_array[@]}
+    do
+        echo $file
+    done
+    echo "------------------------------------------------------"
 }
 
 confirm() {
@@ -221,6 +291,10 @@ case $1 in
 
     'restore')
         restore ~
+    ;;
+
+    'regret')
+        regret $dry_dir
     ;;
 
     'confirm')
