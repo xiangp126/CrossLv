@@ -39,8 +39,12 @@ case $1 in
 
 esac
 
-echo mkdir -p $baseDir
-mkdir -p $baseDir
+if [ ! -d $baseDir ]; then
+    echo mkdir -p $baseDir
+    mkdir -p $baseDir
+
+fi
+
 # absolute file path.
 abPath=${baseDir}/${bkDir}
 
@@ -65,8 +69,8 @@ cp ./confirm/_.vimrc ${baseDir}/.vimrc
 
 cat << _EOF
 ------------------------------------------------------
-Please open a vim and excute command
-    :source ${abPath}/.vimrc
+
+[STEP 1]: Open a vim and excute follow command. :source ${abPath}/.vimrc if needed
     :PluginInstall
 
 Brief help
@@ -74,5 +78,19 @@ Brief help
     :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
     :PluginSearch foo - searches for foo; append `!` to refresh local cache
     :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
+------------------------------------------------------
+
+[STEP 2]: Run follow command once vim plugins installation done
+
+     _________
+    /        /\      _    ___ ___  ___
+   /  LE    /  \    | |  | __|   \| __|
+  /    DE  /    \   | |__| _|| |) | _|
+ /________/  LE  \  |____|___|___/|___|            > sh autoHandle.sh restore
+ \        \   DE /
+  \    LE  \    /  -----------------------------------------------------------
+   \  DE    \  /    corsair (Pirate of the bay, Shanghai)
+    \________\/    -----------------------------------------------------------
+
 _EOF
 
