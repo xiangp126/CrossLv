@@ -10,14 +10,16 @@ bkPostfix=old
 # absolute file path.
 abPath=${baseDir}/${bkDir}
 
+echo mv ${abPath} ${abPath}.old
+# remove .old files before mv overwrite.
+rm -rf ${abPath}.$bkPostfix
+mv ${abPath} ${abPath}.$bkPostfix 2>/dev/null
+
 cat << _EOF
 ------------------------------------------------------
-Backup Original Files First ...
+Run backup routine now ...
 ------------------------------------------------------
 _EOF
-echo mv ${abPath} ${abPath}.old
-mv ${abPath} ${abPath}.old 2>/dev/null
-
 echo sh autoHandle.sh backup
 sh autoHandle.sh backup
 
@@ -39,4 +41,3 @@ Brief help
     :PluginSearch foo - searches for foo; append `!` to refresh local cache
     :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
 _EOF
-
