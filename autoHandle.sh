@@ -295,7 +295,7 @@ case $1 in
     ;;
 
     'regret')
-        regret $dry_dir
+        regret ~
     ;;
 
     'confirm')
