@@ -14,8 +14,8 @@ bk_files=(
     ".vim/bundle/snipMate/snippets/cpp.snippets"
 )
 # global parameters.
-backup_dir=./widget
-dry_dir=./trial
+backup_dir=./backup
+dry_dir=./dry_restore
 cfm_dir=./confirm
 # array to store file names that was trully processed.
 bkk_array=()
@@ -261,7 +261,7 @@ confirm() {
 
     # confirm directory.
     mkdir -p ${cfm_dir}
-    # find widget/ -regextype posix-extended -regex '.*' -type f -exec ls -l {} +
+    # find backup/ -regextype posix-extended -regex '.*' -type f -exec ls -l {} +
     # echo -ne "find ${backup_dir} -regextype posix-basic -regex '^.*' "
     # echo -e "-type f | xargs -i cp {} ${cfm_dir}"
     echo "start to copying files from ${backup_dir}/ to ${cfm_dir}/ ..."

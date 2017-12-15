@@ -1,6 +1,7 @@
 *.swp
 *.swo
-widget/
-widget.*/
-trial/
+backup/
+backup.*/
+dry_install/
+dry_restore/
 virtual/

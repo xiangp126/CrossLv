@@ -4,7 +4,7 @@
 # > ll /bin/sh lrwxrwxrwx 1 root root 9 Dec  7 01:00 /bin/sh -> /bin/bash*
 
 # global parameters.
-baseDir=virtual
+baseDir=dry_install
 bkDir=.vim
 bkPostfix=old
 
@@ -67,7 +67,7 @@ git clone https://github.com/VundleVim/Vundle.vim.git ${abPath}/bundle/Vundle.vi
 echo Replacing Current ${abPath}/.vimrc with standard version ...
 cp ./confirm/_.vimrc ${baseDir}/.vimrc
 
-cat << _EOF
+cat <<\_EOF
 ------------------------------------------------------
 
 [STEP 1]: Open a vim and excute follow command. :source ${abPath}/.vimrc if needed
