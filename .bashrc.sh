@@ -128,15 +128,20 @@ export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:~/.usr/lib
 # export https_proxy=socks5://127.0.0.1:8080
 # export http_proxy=socks5://127.0.0.1:8080
 
-# if [ -z "$TMUX" ]; then
-#     tmux
-# fi
 
 # test if command 'tmux' exist.
-if [ -n `which tmux` ]; then
-    echo "> tmux ls"
-    tmux ls
-else 
-    echo "tmux does not exist."
+if [ ! -n `which tmux` ]; then
+    echo "No Tmux on this machine ..."
+    exit
 fi
 
+if [ -z "$TMUX" ]; then
+    echo "> tmux ls"
+    tmux ls
+fi
+
+cat << _EOF
+
+
+
+_EOF

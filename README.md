@@ -148,4 +148,5 @@ find ./confirm -type f
 
 # Reference
 [Vundle Introduction Guide](http://www.jianshu.com/p/8d416ac4ad11)
+[how dows cat eof work in bash](https://stackoverflow.com/questions/2500436/how-does-cat-eof-work-in-bash)
 
