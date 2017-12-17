@@ -10,6 +10,11 @@ my linux programming environment managed by Vundle(for vim plugins) now.
 
 # Features
 
+V3.1 
+* use tmux plugin manager for Tmux plugins.
+* add tmux-resurrect and update install.sh
+* update .tmux.conf and files associated
+
 V3.0 
 * reformat function call for some 'case' switch.
 * add regret mode for autoHandle script.
