@@ -1,5 +1,5 @@
 """""""""""""""""""""""""""""
-" Basic Config
+" BASIC CONFIG
 """"""""""""""""""""""""""""""
 syntax on
 set ignorecase
@@ -22,7 +22,7 @@ set fencs=utf8,gbk,gb2312,gb18030
 :colorscheme corsair
 
 """"""""""""""""""""""""""""""
-" Vim Bundle 
+" VIM BUNDLE 
 """"""""""""""""""""""""""""""
 set nocompatible              " be iMproved, required
 filetype off                  " required
@@ -79,7 +79,7 @@ filetype plugin indent on    " required
 " Put your non-Plugin stuff after this line
 
 """"""""""""""""""""""""""""""
-" Set VIM SHELL
+" SET VIM SHELL
 """"""""""""""""""""""""""""""
 " Set default shell for vim, resolving below problem
 " Error detected while processing function <SNR>33_Tlist_Window_Toggle..
@@ -89,15 +89,15 @@ filetype plugin indent on    " required
 set shell=/bin/bash
 
 """"""""""""""""""""""""""""""
-" Set tags file 
+" SET TAGS FILE 
 """"""""""""""""""""""""""""""" 
 " set autochdir " did not auto change pwd value
-set tags=/usr/include/system-include.tags " 1st tag use '=' not '+='
-" if you will jump across different source dircetory
-set tags+=./tags
+" set tags=/usr/include/system-include.tags " 1st tag use '=' not '+='
+" " if you will jump across different source dircetory
+" set tags+=./tags
 
 """"""""""""""""""""""""""""""
-" Config Cscope
+" CONFIG CSCOPE
 """"""""""""""""""""""""""""""
 if has("cscope")
     set cscopetag   " let only support Ctrl+] & Ctrl+t to jump between
@@ -127,7 +127,7 @@ if has("cscope")
     endif
 
 """"""""""""""""""""""""""""""
-" Config MiniBufExplpp 
+" CONFIG MINIBUFEXPLPP 
 """"""""""""""""""""""""""""""
 let g:miniBufExplMapWindowNavVim = 1   
 let g:miniBufExplMapWindowNavArrows = 1   
@@ -145,7 +145,7 @@ highlight MBEVisibleActiveNormal  ctermfg=5
 highlight MBEVisibleActiveChanged cterm=underline ctermfg=5
 
 """"""""""""""""""""""""""""""
-" Config NERDTree 
+" CONFIG NERDTREE 
 """"""""""""""""""""""""""""""
 " When pressed F3, toggle nerd tree
 nnoremap <silent> <F3> :NERDTreeToggle<CR>
@@ -155,7 +155,7 @@ let g:NERDTreeWinSize = 28 " default 30
 let g:NERDTreeWinPos = 'left' " only left or right
 
 """"""""""""""""""""""""""""""
-" Config TagBar
+" CONFIG TAGBAR
 """"""""""""""""""""""""""""""
 " When pressed F5, toggle tagbar window
 nnoremap <silent> <F5> :call TagbarMyOpen()<CR><CR>
@@ -171,13 +171,13 @@ function! TagbarMyOpen()
 endfunction
 
 """"""""""""""""""""""""""""""
-" Config Auto-ComplPop
+" CONFIG AUTO-COMPLPOP
 """"""""""""""""""""""""""""""
 " disables auto-popup at startup, if needed use :AcpEnable manually
 let g:acp_enableAtStartup = 0 
 
 """"""""""""""""""""""""""""""
-" Config OmniCppComplete
+" CONFIG OMNICPPCOMPLETE
 """"""""""""""""""""""""""""""
 " ctags --c-kinds=+px --c++-kinds=+px --fields=+iafksS --extra=+qf -R /usr/include/*
 " map <C-F12> :!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .<CR>
@@ -193,4 +193,3 @@ let OmniCpp_DefaultNamespaces = ["std", "_GLIBCXX_STD"]
 let OmniCpp_SelectFirstItem = 2
 let OmniCpp_DisplayMode = 1
 au CursorMovedI,InsertLeave * if pumvisible() == 0|silent! pclose|endif
-

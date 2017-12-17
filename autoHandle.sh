@@ -76,10 +76,11 @@ backup() {
     # ls -A .
     #    -A, --almost-all
     #       do not list implied . and ..
-    if [ "`ls -A $backup_dir`" != "" ]; then
-        echo mv ${backup_dir} ${backup_dir}.`date +"%Y-%m-%d-%H:%M:%S"`
-        mv ${backup_dir} ${backup_dir}.`date +"%Y-%m-%d-%H:%M:%S"`
-    fi
+
+    # if [ "`ls -A $backup_dir`" != "" ]; then
+    #     echo mv ${backup_dir} ${backup_dir}.`date +"%Y-%m-%d-%H:%M:%S"`
+    #     mv ${backup_dir} ${backup_dir}.`date +"%Y-%m-%d-%H:%M:%S"`
+    # fi
 
     echo mkdir -p ${backup_dir}/.vim/colors
     mkdir -p ${backup_dir}/.vim/colors
