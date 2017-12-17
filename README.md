@@ -2,11 +2,11 @@
 my linux programming environment managed by Vundle(for vim plugins) now.
 
 # File List
-* autoUpdate.sh: shell for automation of self enviroment setup.
-* _.bashrc: basic .bashrc suitable for all platform.
 * confirm/: containing the files to be stored.
-* widget/: dir to backup key files of this linux environment.
-* trial/: test dir for restore mode, dry mode.
+* _.bashrc: basic .bashrc suitable for all platform.
+* autoUpdate.sh: shell for automation of self enviroment setup.
+* install.sh: install script for bundle manager.
+* tools/: some useful scripts for auto set up env. 
 
 # Features
 
