@@ -2,13 +2,18 @@
 my linux programming environment managed by Vundle(for vim plugins) now.
 
 # File List
-* autoUpdate.sh: shell for automation of self enviroment setup.
-* _.bashrc: basic .bashrc suitable for all platform.
 * confirm/: containing the files to be stored.
-* widget/: dir to backup key files of this linux environment.
-* trial/: test dir for restore mode, dry mode.
+* _.bashrc: basic .bashrc suitable for all platform.
+* autoUpdate.sh: shell for automation of self enviroment setup.
+* install.sh: install script for bundle manager.
+* tools/: some useful scripts for auto set up env. 
 
 # Features
+
+V3.1 
+* use tmux plugin manager for Tmux plugins.
+* add tmux-resurrect and update install.sh
+* update .tmux.conf and files associated
 
 V3.0 
 * reformat function call for some 'case' switch.

@@ -5,7 +5,10 @@
 
 # global parameters.
 baseDir=dry_install
-bkDir=.vim
+tackleDir=(
+    ".vim"
+    ".tmux"
+)
 bkPostfix=old
 
 usage() {
@@ -46,12 +49,15 @@ if [ ! -d $baseDir ]; then
 fi
 
 # absolute file path.
-abPath=${baseDir}/${bkDir}
-
-echo mv ${abPath} ${abPath}.old
-# remove .old files before mv overwrite.
-rm -rf ${abPath}.$bkPostfix
-mv ${abPath} ${abPath}.$bkPostfix 2>/dev/null
+for tdir in ${tackleDir[@]}
+do
+    abPath=${baseDir}/${tdir}
+    
+    echo mv ${abPath} ${abPath}.old
+    # remove .old files before mv overwrite.
+    rm -rf ${abPath}.$bkPostfix
+    mv ${abPath} ${abPath}.$bkPostfix 2>/dev/null
+done
 
 cat << _EOF
 ------------------------------------------------------
@@ -61,36 +67,61 @@ _EOF
 echo sh autoHandle.sh backup
 sh autoHandle.sh backup
 
-echo git clone https://github.com/VundleVim/Vundle.vim.git ${abPath}/bundle/Vundle.vim
-git clone https://github.com/VundleVim/Vundle.vim.git ${abPath}/bundle/Vundle.vim
+echo "Installing VIM-PLUGIN manager ..."
+echo ------------------------------------------------------
+echo git clone https://github.com/VundleVim/Vundle.vim.git ${baseDir}/${tackleDir[0]}/bundle/Vundle.vim
+git clone https://github.com/VundleVim/Vundle.vim.git ${baseDir}/${tackleDir[0]}/bundle/Vundle.vim
 
-echo Replacing Current ${abPath}/.vimrc with standard version ...
-cp ./confirm/_.vimrc ${baseDir}/.vimrc
+echo ------------------------------------------------------
+echo "Installing TMUX-PLUGIN manager ..."
+echo ------------------------------------------------------
+git clone https://github.com/tmux-plugins/tpm ${baseDir}/${tackleDir[1]}/plugins/tpm
+
+echo ------------------------------------------------------
+echo Replacing CURRENT ${baseDir}/${tackleDir[0]}/.vimrc with STANDARD version ...
+echo ------------------------------------------------------
+cp ./confirm/_.vimrc ${baseDir}/${tackleDir[0]}/.vimrc
 
 cat << "_EOF"
-------------------------------------------------------
+=======
+    cat << "_EOF"
 
-[STEP 1]: Open a vim and excute follow command. :source ${abPath}/.vimrc if needed
-    :PluginInstall
+------------------------------------------------------
+VIM PLUGIN MANAGER INSTRUTION
+>>>>>>> FETCH_HEAD
+------------------------------------------------------
+__     __  ___   __  __
+\ \   / / |_ _| |  \/  |
+ \ \ / /   | |  | |\/| |
+  \ V /    | |  | |  | |
+   \_/    |___| |_|  |_|
+
+# source ~/.vimrc if needed
+:PluginInstall
+$ sh autoHandle.sh restore
 
 Brief help
     :PluginList       - lists configured plugins
     :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
     :PluginSearch foo - searches for foo; append `!` to refresh local cache
     :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
+
 ------------------------------------------------------
+TMUX PLUGIN MANAGER INSTRUCTION
+------------------------------------------------------
+ _____   __  __   _   _  __  __
+|_   _| |  \/  | | | | | \ \/ /
+  | |   | |\/| | | | | |  \  /
+  | |   | |  | | | |_| |  /  \
+  |_|   |_|  |_|  \___/  /_/\_\
 
-[STEP 2]: Run follow command once vim plugins installation done
+$ tmux
+=> Type 'send-prefix + I' (shift + i)
 
-     _________
-    /        /\      _    ___ ___  ___
-   /  LE    /  \    | |  | __|   \| __|
-  /    DE  /    \   | |__| _|| |) | _|
- /________/  LE  \  |____|___|___/|___|            > sh autoHandle.sh restore
- \        \   DE /
-  \    LE  \    /  -----------------------------------------------------------
-   \  DE    \  /    corsair (Pirate of the bay, Shanghai)
-    \________\/    -----------------------------------------------------------
+Brief help
+    send-prefix + I        # install
+    send-prefix + U        # update
+    send-prefix + Alt-u    # uninstall plugins not on the plugin list
 
 _EOF
 

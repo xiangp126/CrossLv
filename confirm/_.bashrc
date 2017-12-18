@@ -81,19 +81,6 @@ if [ -x /usr/bin/dircolors ]; then
     alias egrep='egrep --color=auto'
 fi
 
-# some more ls aliases
-alias ll='ls -alF'
-alias rm='rm -i'
-alias mv='mv -i'
-alias cp='cp -i'
-#alias sed='sed -n'
-alias gdb='gdb -q'
-alias cgdb='cgdb -q'
-alias netstat='netstat -tuanp'
-alias cdgit='cd /home/virl/penxiang/myGit'
-alias cdtmp='cd /home/virl/penxiang/tmp'
-alias cdsrc='cd /usr/local/src'
-
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
@@ -114,11 +101,52 @@ if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
 
-#Section for unity
-export UBUNTU_MENUPROXY=0
-export SWT_GTK3=0
-export LC_ALL=C
+# BELOW IS MYSELF CONFIGURATION.
+# MY USEFUL HANDY ALIAS. 
+alias ll='ls -alF'
+alias rm='rm -i'
+alias mv='mv -i'
+alias cp='cp -i'
+alias grep='grep --color=auto'
+#alias sed='sed -n'
+alias gdb='gdb -q'
+alias cgdb='cgdb -q'
+alias netstat='netstat -tuanp'
+alias cdgit='cd ~/myGit'
+alias cdsrc='cd /usr/local/src'
 
+# SET LOCAL USEFUL VARIABLES.
+export LC_ALL=C
+export SHELL=/bin/bash
+export EDITOR=vim
+# SET PATH VARIABLES.
+export PATH=~/.bin:~/.usr/bin:$PATH
+export PKG_CONFIG_PATH=~/.usr/lib/pkgconfig:$PKG_CONFIG_PATH
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:~/.usr/lib
+
+# SET HTTP/HTTPS PROXY.
+# ssh -vv -ND 8080 [proxy_ip] [port]
+# export https_proxy=socks5://127.0.0.1:8080
+# export http_proxy=socks5://127.0.0.1:8080
+
+# TEST IF COMMAND 'TMUX' EXIST.
+if [[ "`which tmux` != """ ]]; then
+    if [[ "$TMUX" = "" ]]; then
+        cat << "_EOF"
+ _____   __  __   _   _  __  __
+|_   _| |  \/  | | | | | \ \/ /
+  | |   | |\/| | | | | |  \  /
+  | |   | |  | | | |_| |  /  \
+  |_|   |_|  |_|  \___/  /_/\_\
+
+_EOF
+        tmux ls
+    fi
+else 
+    echo "tmux does not exist."
+fi
+
+<<<<<<< HEAD
 #Begin virl section
 export OS_PROJECT_NAME=admin
 export OS_USERNAME=admin
@@ -148,3 +176,5 @@ if [ -z "$TMUX" ]; then
     tmux ls
 fi
 
+=======
+>>>>>>> FETCH_HEAD

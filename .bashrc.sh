@@ -101,7 +101,8 @@ if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
 
-# my useful handy alias.
+# BELOW IS MYSELF CONFIGURATION.
+# MY USEFUL HANDY ALIAS. 
 alias ll='ls -alF'
 alias rm='rm -i'
 alias mv='mv -i'
@@ -114,34 +115,33 @@ alias netstat='netstat -tuanp'
 alias cdgit='cd ~/myGit'
 alias cdsrc='cd /usr/local/src'
 
-# set local useful variables.
+# SET LOCAL USEFUL VARIABLES.
 export LC_ALL=C
 export SHELL=/bin/bash
 export EDITOR=vim
-# set path variables.
+# SET PATH VARIABLES.
 export PATH=~/.bin:~/.usr/bin:$PATH
 export PKG_CONFIG_PATH=~/.usr/lib/pkgconfig:$PKG_CONFIG_PATH
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:~/.usr/lib
 
-# set http/https proxy.
+# SET HTTP/HTTPS PROXY.
 # ssh -vv -ND 8080 [proxy_ip] [port]
 # export https_proxy=socks5://127.0.0.1:8080
 # export http_proxy=socks5://127.0.0.1:8080
 
-
-# test if command 'tmux' exist.
-if [ ! -n `which tmux` ]; then
-    echo "No Tmux on this machine ..."
-    exit
-fi
-
-if [ -z "$TMUX" ]; then
-    echo "> tmux ls"
-    tmux ls
-fi
-
-cat << _EOF
-
-
+# TEST IF COMMAND 'TMUX' EXIST.
+if [[ "`which tmux` != """ ]]; then
+    if [[ "$TMUX" = "" ]]; then
+        cat << "_EOF"
+ _____   __  __   _   _  __  __
+|_   _| |  \/  | | | | | \ \/ /
+  | |   | |\/| | | | | |  \  /
+  | |   | |  | | | |_| |  /  \
+  |_|   |_|  |_|  \___/  /_/\_\
 
 _EOF
+        tmux ls
+    fi
+else 
+    echo "tmux does not exist."
+fi
