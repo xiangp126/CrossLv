@@ -43,18 +43,18 @@ cat << _EOF
     sh $0 restore
 
 [TROUBLESHOOTING]
-    # sh $0 can not be excuted.
-    > ll `which sh`
+    if 'sh $0' can not be excuted.
+    $ ll `which sh`
     lrwxrwxrwx 1 root root 9 Dec  7 01:00 /bin/sh -> /bin/bash*
     # on some distribution, sh was linked to dash, not bash.
     # you have to excute following command mannually. -f if needed.
-    > ln -s /bin/bash /bin/sh
+    $ ln -s /bin/bash /bin/sh
 
 [DESCRIPTION]
     backup  -> backup key files under environment to ${backup_dir}/
-    dry     -> run restore in dry mode, thought trial/ as ~/
+    dry     -> run restore in dry mode, thought $dry_dir/ as ~/
     restore -> restore key files to environment from ${cfm_dir}/
-    regret  -> regret previous 'restore'/'dry' action.
+    regret  -> regret previous 'restore' or 'dry' action.
     confirm -> confirm to copy files in ${backup_dir}/ to ${cfm_dir}/
     clean   -> clean ${backup_dir}.*/, but reserve main backup dir
 _EOF

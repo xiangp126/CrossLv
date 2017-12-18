@@ -145,36 +145,3 @@ _EOF
 else 
     echo "tmux does not exist."
 fi
-
-<<<<<<< HEAD
-#Begin virl section
-export OS_PROJECT_NAME=admin
-export OS_USERNAME=admin
-export OS_PASSWORD=password
-export OS_TENANT_NAME=admin
-export OS_AUTH_URL=http://172.16.10.250:35357/v2.0
-export OS_SERVICE_ENDPOINT=http://172.16.10.250:35357/v2.0
-export OS_SERVICE_TOKEN=fkgjhsdflkjh
-export OS_IMAGE_API_VERSION=2
-export no_proxy_defaults="controller,virl,localhost,127.0.1.1,127.0.0.1,localaddress,.localdomain.com"
-export no_proxy=$no_proxy_defaults,172.16.10.250
-export OS_ENDPOINT_TYPE=internalURL
-
-export LIBVIRT_DEFAULT_URI='qemu:///system'
-#End virl section
-
-export PATH=~/penxiang/.usr/bin/:~/.bin:$PATH
-export LS_COLORS=$LS_COLORS:'ex=01,34'
-
-export https_proxy=socks5://127.0.0.1:8080
-export http_proxy=socks5://127.0.0.1:8080
-#export http_proxy=http://proxy.esl.cisco.com:80
-#export https_proxy=http://proxy.esl.cisco.com:80
-
-if [ -z "$TMUX" ]; then
-    echo "> tmux ls"
-    tmux ls
-fi
-
-=======
->>>>>>> FETCH_HEAD

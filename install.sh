@@ -80,15 +80,13 @@ git clone https://github.com/tmux-plugins/tpm ${baseDir}/${tackleDir[1]}/plugins
 echo ------------------------------------------------------
 echo Replacing CURRENT ${baseDir}/${tackleDir[0]}/.vimrc with STANDARD version ...
 echo ------------------------------------------------------
+echo cp ./confirm/_.vimrc ${baseDir}/${tackleDir[0]}/.vimrc
 cp ./confirm/_.vimrc ${baseDir}/${tackleDir[0]}/.vimrc
 
 cat << "_EOF"
-=======
-    cat << "_EOF"
 
 ------------------------------------------------------
 VIM PLUGIN MANAGER INSTRUTION
->>>>>>> FETCH_HEAD
 ------------------------------------------------------
 __     __  ___   __  __
 \ \   / / |_ _| |  \/  |
@@ -97,6 +95,12 @@ __     __  ___   __  __
    \_/    |___| |_|  |_|
 
 # source ~/.vimrc if needed
+$ vim
+Error detected while processing /home/virl/.vimrc:
+line   22:
+E185: Cannot find color scheme 'corsair'
+Press ENTER or type command to continue
+
 :PluginInstall
 $ sh autoHandle.sh restore
 
@@ -118,10 +122,12 @@ TMUX PLUGIN MANAGER INSTRUCTION
 $ tmux
 => Type 'send-prefix + I' (shift + i)
 
+TMUX environment reloaded.
+Done, press ENTER to continue.
+
 Brief help
     send-prefix + I        # install
     send-prefix + U        # update
     send-prefix + Alt-u    # uninstall plugins not on the plugin list
 
 _EOF
-
