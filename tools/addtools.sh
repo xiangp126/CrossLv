@@ -3,7 +3,7 @@
 
 mytools=(
     "figlet"            
-    "tldr"
+#    "tldr"
     "shellcheck"
     "mosh"      # mobile ssh tool
     "htop"
@@ -22,14 +22,24 @@ mysource=(
 
 exec=apt-get
 
+logo() {
+    cat << "_EOF"
+           _     _ _              _
+  __ _  __| | __| | |_ ___   ___ | |___
+ / _` |/ _` |/ _` | __/ _ \ / _ \| / __|
+| (_| | (_| | (_| | || (_) | (_) | \__ \
+ \__,_|\__,_|\__,_|\__\___/ \___/|_|___/
+
+_EOF
+}
 usage() {
     cat << _EOF
 [NAME]
     $0 -- install usefule tools from source-list directly 
-        - run this script may need root privilege
+        - do not use sudo to run this script
 
 [SYNOPSIS] 
-    sudo sh $0 [install | remove | help]
+    sh $0 [install | uninstall | source | help]
 _EOF
     cat << "_EOF"
 
@@ -42,7 +52,6 @@ _EOF
      |_| |_|\___|_|_|\___/     \_/\_/ \___/|_|  |_|\__,_|
 
      $ shellcheck ~/.bashrc
-
 _EOF
 }
 
@@ -90,15 +99,8 @@ cat << "_EOF"
     $ dpkg -S `which mv`
     coreutils: /bin/mv
     $ apt-get source coreutils
-
-[LOCATION]
-    __                   ___                 _      __
-   / /   _ ___ _ __     / / | ___   ___ __ _| |    / /__ _ __ ___
-  / / | | / __| '__|   / /| |/ _ \ / __/ _` | |   / / __| '__/ __|
- / /| |_| \__ \ |     / / | | (_) | (_| (_| | |  / /\__ \ | | (__
-/_/  \__,_|___/_|    /_/  |_|\___/ \___\__,_|_| /_/ |___/_|  \___|
-
 _EOF
+    logo
 }
 
 parseInput() {
@@ -107,7 +109,7 @@ parseInput() {
             doJobInstall install
         ;;
 
-        'remove')
+        'uninstall')
             doJobInstall remove
         ;;
 
