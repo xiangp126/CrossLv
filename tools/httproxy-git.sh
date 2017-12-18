@@ -5,7 +5,7 @@
 usage() {
     echo "purpose: git clone using proxy socks5://127.0.0.0:8080 establisned by SSH reverse tunnel."
     echo "ensure first: ssh -vv -ND 8080 midman_server -l log_name"
-    echo "syntax: $0 enable | disable"
+    echo "syntax: $0 install | uninstall"
 }
 
 proxyAddr="socks5://127.0.0.1:8080"
@@ -21,14 +21,14 @@ fi
 # export https_proxy=socks5://127.0.0.1:8080
 
 case $1 in
-    'enable')
+    'install')
         echo "start enabling http.proxy ..."
         git config --global http.proxy ${proxyAddr}
         echo "start enabling https.proxy ..."
         git config --global https.proxy ${proxyAddr}
     ;;
 
-    'disable')
+    'uninstall')
         echo "start disabling http.proxy ..."
         git config --global --unset http.proxy
         echo "start disabling https.proxy ..."

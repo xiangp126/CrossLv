@@ -23,7 +23,7 @@ cat << _EOF
     $0 -- setup proxy for ssh connection from socks5 proxy
 
 [SYNOPSIS]
-    sh $0 [enable | disable | help]
+    sh $0 [install | uninstall | help]
 
 [DESCRIPTION]
     git push using proxy through SSH reverse tunnel.
@@ -60,7 +60,7 @@ Host *
 EOF
 }
 
-disable() {
+uninstall() {
     if [ -f $cfgFilePath ]; then
         echo "Found $cfgFile file, Moving $cfgFile to ${cfgFile}.bak"
         cd ~/.ssh
@@ -73,7 +73,7 @@ disable() {
     fi
 }
 
-enable() {
+install() {
     if [ -f ${cfgFilePath} ]; then
         echo "Found $cfgFile file, backup $cfgFile to ${cfgFile}.bak"
         cd ~/.ssh
@@ -93,12 +93,12 @@ enable() {
 }
 
 case $1 in
-    'enable')
-        enable
+    'install')
+        install
     ;;
 
-    'disable')
-        disable
+    'uninstall')
+        uninstall
     ;;
 esac;
 
