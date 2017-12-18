@@ -4,8 +4,8 @@ my linux programming environment managed by Vundle(for vim plugins) now.
 # File List
 * confirm/: standard files contained to be restored.
 * _.bashrc: basic .bashrc suitable for all platform.
+* install.sh: key install script for bundle-manager.
 * autoUpdate.sh: shell for automation of programming enviroment setup.
-* install.sh: install script for bundle-manager.
 * tools/: some useful scripts for auto set up env. 
 
 # Features

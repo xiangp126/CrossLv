@@ -48,8 +48,23 @@ if [ ! -d $baseDir ]; then
 
 fi
 
+# run backup first of all.
+cat << _EOF
+------------------------------------------------------
+Run backup routine first of all now ...
+sh autoHandle.sh backup
+------------------------------------------------------
+_EOF
+sh autoHandle.sh backup
+
 # absolute file path.
-for tdir in ${tackleDir[@]}
+cat << _EOF
+
+------------------------------------------------------
+Moving old Dir to Dir.$bkPostfix ...
+------------------------------------------------------
+_EOF
+for tdir in "${tackleDir[@]}"
 do
     abPath=${baseDir}/${tdir}
     
@@ -59,32 +74,41 @@ do
     mv ${abPath} ${abPath}.$bkPostfix 2>/dev/null
 done
 
-cat << _EOF
+cat << "_EOF"
+
 ------------------------------------------------------
-Run backup routine now ...
+"Installing VIM-PLUGIN manager ..."
 ------------------------------------------------------
 _EOF
-echo sh autoHandle.sh backup
-sh autoHandle.sh backup
-
-echo "Installing VIM-PLUGIN manager ..."
-echo ------------------------------------------------------
 echo git clone https://github.com/VundleVim/Vundle.vim.git ${baseDir}/${tackleDir[0]}/bundle/Vundle.vim
 git clone https://github.com/VundleVim/Vundle.vim.git ${baseDir}/${tackleDir[0]}/bundle/Vundle.vim
 
-echo ------------------------------------------------------
-echo "Installing TMUX-PLUGIN manager ..."
+cat << "_EOF"
+
+------------------------------------------------------
+"Installing TMUX-PLUGIN manager ..."
+_EOF
 echo ------------------------------------------------------
 git clone https://github.com/tmux-plugins/tpm ${baseDir}/${tackleDir[1]}/plugins/tpm
 
-echo ------------------------------------------------------
-echo Replacing CURRENT ${baseDir}/${tackleDir[0]}/.vimrc with STANDARD version ...
-echo ------------------------------------------------------
-echo cp ./confirm/_.vimrc ${baseDir}/${tackleDir[0]}/.vimrc
-cp ./confirm/_.vimrc ${baseDir}/${tackleDir[0]}/.vimrc
+cat << _EOF
+------------------------------------------------------
+Replacing some key files first ...
+------------------------------------------------------
+_EOF
+echo cp -f ./confirm/_.vimrc ${baseDir}/.vimrc
+cp -f ./confirm/_.vimrc ${baseDir}/.vimrc
+# replace corsair.vim ahead of whole restore
+echo mkdir -p ${baseDir}/${tackleDir[0]}/colors
+mkdir -p ${baseDir}/${tackleDir[0]}/colors
+echo cp -f ./confirm/_corsair.vim ${baseDir}/${tackleDir[0]}/colors/corsair.vim
+cp -f ./confirm/_corsair.vim ${baseDir}/${tackleDir[0]}/colors/corsair.vim
 
 cat << "_EOF"
 
+******************************************************
+*    NEED YOU DO MANUALLY  --  COPYRIGHT BY PENG     *
+******************************************************
 ------------------------------------------------------
 VIM PLUGIN MANAGER INSTRUTION
 ------------------------------------------------------
