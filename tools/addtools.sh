@@ -4,6 +4,7 @@
 mytools=(
     "figlet"            
 #    "tldr"
+    "xclip"
     "shellcheck"
     "mosh"      # mobile ssh tool
     "htop"
