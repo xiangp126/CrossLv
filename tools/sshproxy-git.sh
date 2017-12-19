@@ -55,7 +55,8 @@ cat << EOF > $1
 # Should be placed at ~/.ssh/config, make it if not exist. 
 # or you should edit line at /etc/ssh/ssh_config
 # 49 #   ProxyCommand ssh -q -W %h:%p gateway.example.com
-Host *
+Host github.com
+    Hostname github.com
     ProxyCommand netcat -x 127.0.0.1:8080 %h %p
 EOF
 }
