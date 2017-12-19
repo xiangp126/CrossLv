@@ -34,13 +34,14 @@ logo() {
 _EOF
 }
 usage() {
+    exeName=${0##*/}
     cat << _EOF
 [NAME]
-    $0 -- install usefule tools from source-list directly 
+    $exeName -- install usefule tools from source-list directly 
         - do not use sudo to run this script
 
 [SYNOPSIS] 
-    sh $0 [install | uninstall | source | help]
+    sh $exeName [install | uninstall | source | help]
 _EOF
     cat << "_EOF"
 

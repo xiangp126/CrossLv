@@ -17,6 +17,12 @@ bind-key    -T prefix       !                 break-pane
 :join-pane -s virl:2.1
 
 ************************************************************
+*                      MAXIMUM PANE                        *
+************************************************************
+bind-key    -T prefix       x                 close current pane
+bind-key    -T prefix       X                 toggle maximum pane
+
+************************************************************
 *                       SPLIT WINDOW                       *
 ************************************************************
 bind-key    -T prefix       -                 split-window -v
