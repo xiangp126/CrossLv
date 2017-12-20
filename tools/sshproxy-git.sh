@@ -18,16 +18,17 @@ _EOF
 }
 
 usage() {
-cat << _EOF
+    exeName=${0##*/}
+    cat << _EOF
 [NAME]
-    $0 -- setup proxy for ssh connection from socks5 proxy
+    $exeName -- setup proxy for ssh connection from socks5 proxy
 
 [SYNOPSIS]
-    sh $0 [install | uninstall | help]
+    sh $exeName [install | uninstall | help]
 
 [DESCRIPTION]
     git push using proxy through SSH reverse tunnel.
-    proxy => socks5://127.0.0.0:8080 
+    proxy => socks5://127.0.0.1:8080 
 
 [PREREQUISITE]
    pls ensure first: ssh -vv -ND 8080 -l [loginName] [midmanServer]
