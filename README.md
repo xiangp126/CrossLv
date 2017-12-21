@@ -1,5 +1,7 @@
 # mylx_vundle
-my linux programming environment managed by Vundle(for vim plugins) now.
+easily setup my working environment through some small scripts.
+
+use plugins manager for VIM and TMUX
 
 # File List
 * confirm/: standard files contained to be restored.
