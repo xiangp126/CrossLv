@@ -22,6 +22,7 @@ $ sh install.sh
            |___/
 
 $ sh install.sh home
+```
 
 # File List
 * install.sh: key install script for bundle-managers.
@@ -29,7 +30,6 @@ $ sh install.sh home
 * confirm/: standard files contained to be restored.
 * _.bashrc: basic .bashrc suitable for all platform.
 * tools/: some useful scripts for auto set up env. 
-```
 
 # Guide
 ## Backup First
