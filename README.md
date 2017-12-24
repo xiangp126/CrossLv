@@ -1,9 +1,6 @@
-# mylx_vundle
-easily setup my working environment through some small scripts.
-
+# Installation Guide
 use plugins manager for VIM and TMUX
 
-# Installation Guide
 verified on MacOS | Ubuntu | CentOS
 
 ```bash
