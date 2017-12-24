@@ -31,6 +31,25 @@ $ sh install.sh home
 * _.bashrc: basic .bashrc suitable for all platform.
 * tools/: some useful scripts for auto set up env. 
 
+# Features
+
+V3.1 
+* use tmux plugin manager for Tmux plugins.
+* add tmux-resurrect and update install.sh
+* update .tmux.conf and files associated
+* reformat function call for some 'case' switch.
+* add regret mode for autoHandle script.
+
+V2.1
+* for 'backup' mode, add mechanism to check if file to be backuped exists.
+* add alias for 'grep'
+* change name autoUpdate.sh => autoHandle.sh
+* add dry mode and re-format code logic.
+* use cat << instead of many echo for this script.
+
+V1.0
+* user-friendly manipulate for backup | restore | confirm | clean .
+
 # Guide
 ## Backup First
 ```bash
@@ -143,25 +162,6 @@ find ./confirm -type f
 ------------------------------------------------------
 
 ```
-
-# Features
-
-V3.1 
-* use tmux plugin manager for Tmux plugins.
-* add tmux-resurrect and update install.sh
-* update .tmux.conf and files associated
-* reformat function call for some 'case' switch.
-* add regret mode for autoHandle script.
-
-V2.1
-* for 'backup' mode, add mechanism to check if file to be backuped exists.
-* add alias for 'grep'
-* change name autoUpdate.sh => autoHandle.sh
-* add dry mode and re-format code logic.
-* use cat << instead of many echo for this script.
-
-V1.0
-* user-friendly manipulate for backup | restore | confirm | clean .
 
 # Reference
 [Vundle Introduction Guide](http://www.jianshu.com/p/8d416ac4ad11)
