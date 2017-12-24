@@ -11,19 +11,32 @@ tackleDir=(
 )
 bkPostfix=old
 
+logo() {
+    cat << "_EOF"
+                   _     _
+ _ __ ___  _   _  | |   (_)_ __  _   ___  __
+| '_ ` _ \| | | | | |   | | '_ \| | | \ \/ /
+| | | | | | |_| | | |___| | | | | |_| |>  <
+|_| |_| |_|\__, | |_____|_|_| |_|\__,_/_/\_\
+           |___/
+
+_EOF
+}
+
 usage() {
 cat << _EOF
 [NAME]
-    $0 -- auto install Vundle(vim plugin handler)
+    $0 -- auto install plugin managers (vim & tmux)
 
 [USAGE]
-    sh $0 [dry | root]
+    sh $0 [dry | home | home]
 
 [EXAMPLE]
     sh $0 dry : use $baseDir for dry try.
-    sh $0 root: install to ~/
+    sh $0 home: install to ~/
 _EOF
 
+    logo
 }    
 
 case $1 in 
@@ -31,7 +44,7 @@ case $1 in
         echo Using default $baseDir/ ...
     ;;
 
-    'root')
+    'home')
         baseDir=~
     ;;
 
@@ -110,7 +123,7 @@ cat << "_EOF"
 *    NEED YOU DO MANUALLY  --  COPYRIGHT BY PENG     *
 ******************************************************
 ------------------------------------------------------
-VIM PLUGIN MANAGER INSTRUTION
+STEP 1 -- VIM PLUGIN MANAGER INSTRUTION
 ------------------------------------------------------
 __     __  ___   __  __
 \ \   / / |_ _| |  \/  |
@@ -120,11 +133,6 @@ __     __  ___   __  __
 
 # source ~/.vimrc if needed
 $ vim
-Error detected while processing /home/virl/.vimrc:
-line   22:
-E185: Cannot find color scheme 'corsair'
-Press ENTER or type command to continue
-
 :PluginInstall
 $ sh autoHandle.sh restore
 
@@ -135,7 +143,7 @@ Brief help
     :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
 
 ------------------------------------------------------
-TMUX PLUGIN MANAGER INSTRUCTION
+STEP 2 -- TMUX PLUGIN MANAGER INSTRUCTION
 ------------------------------------------------------
  _____   __  __   _   _  __  __
 |_   _| |  \/  | | | | | \ \/ /

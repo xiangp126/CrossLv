@@ -3,44 +3,38 @@ easily setup my working environment through some small scripts.
 
 use plugins manager for VIM and TMUX
 
-# File List
-* confirm/: standard files contained to be restored.
-* _.bashrc: basic .bashrc suitable for all platform.
-* install.sh: key install script for bundle-manager.
-* autoUpdate.sh: shell for automation of programming enviroment setup.
-* tools/: some useful scripts for auto set up env. 
-
-# Features
-
-V3.1 
-* use tmux plugin manager for Tmux plugins.
-* add tmux-resurrect and update install.sh
-* update .tmux.conf and files associated
-
-V3.0 
-* reformat function call for some 'case' switch.
-* add regret mode for autoHandle script.
-
-V2.1
-* for 'backup' mode, add mechanism to check if file to be backuped exists.
-* add alias for 'grep'
-* change name autoUpdate.sh => autoHandle.sh
-
-V2.0
-* add dry mode and re-format code logic.
-* use cat << instead of many echo for this script.
-
-V1.0
-* user-friendly manipulate for backup | restore | confirm | clean .
-
-# Quick Start
-simply run 'sh install.sh' to quick start vundle.
+# Installation Guide
+verified on MacOS | Ubuntu | CentOS
 
 ```bash
-> sh install.sh
-# which did the following things for you.
+$ sh install.sh
+[NAME]
+    install.sh -- auto install plugin managers (vim & tmux)
+
+[USAGE]
+    sh install.sh [dry | home | home]
+
+[EXAMPLE]
+    sh install.sh dry : use dry_install for dry try.
+    sh install.sh home: install to ~/
+                   _     _
+ _ __ ___  _   _  | |   (_)_ __  _   ___  __
+| '_ ` _ \| | | | | |   | | '_ \| | | \ \/ /
+| | | | | | |_| | | |___| | | | | |_| |>  <
+|_| |_| |_|\__, | |_____|_|_| |_|\__,_/_/\_\
+           |___/
+
+$ sh install.sh home
+
+# File List
+* install.sh: key install script for bundle-managers.
+* autoUpdate.sh: automation of programming enviroment setup.
+* confirm/: standard files contained to be restored.
+* _.bashrc: basic .bashrc suitable for all platform.
+* tools/: some useful scripts for auto set up env. 
 ```
 
+# Guide
 ## Backup First
 ```bash
 > mv ~/.vim ~/.vim.old
@@ -152,6 +146,25 @@ find ./confirm -type f
 ------------------------------------------------------
 
 ```
+
+# Features
+
+V3.1 
+* use tmux plugin manager for Tmux plugins.
+* add tmux-resurrect and update install.sh
+* update .tmux.conf and files associated
+* reformat function call for some 'case' switch.
+* add regret mode for autoHandle script.
+
+V2.1
+* for 'backup' mode, add mechanism to check if file to be backuped exists.
+* add alias for 'grep'
+* change name autoUpdate.sh => autoHandle.sh
+* add dry mode and re-format code logic.
+* use cat << instead of many echo for this script.
+
+V1.0
+* user-friendly manipulate for backup | restore | confirm | clean .
 
 # Reference
 [Vundle Introduction Guide](http://www.jianshu.com/p/8d416ac4ad11)
