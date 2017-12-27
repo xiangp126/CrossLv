@@ -29,7 +29,7 @@ cat << _EOF
     $0 -- auto install plugin managers (vim & tmux)
 
 [USAGE]
-    sh $0 [dry | home | home]
+    sh $0 [dry | home | help]
 
 [EXAMPLE]
     sh $0 dry : use $baseDir for dry try.
