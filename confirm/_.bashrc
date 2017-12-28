@@ -129,6 +129,11 @@ export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:~/.usr/lib
 # export https_proxy=socks5://127.0.0.1:8080
 # export http_proxy=socks5://127.0.0.1:8080
 
+gitCompletionBashPath=~/.git-completion.bash
+if [[ -f "$gitCompletionBashPath" ]]; then
+    source $gitCompletionBashPath
+fi
+
 # TEST IF COMMAND 'TMUX' EXIST.
 if [[ "`which tmux` != """ ]]; then
     if [[ "$TMUX" = "" ]]; then
