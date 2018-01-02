@@ -22,7 +22,7 @@ usage() {
     $0 -- make linke to $installDir/ from $handleDir/
 
 [USAGE]
-    ssh $0 [install | uninstall | help]
+    sh $0 [install | uninstall | help]
 
 [DEPENDS]
     make sure $installDir was in PATH

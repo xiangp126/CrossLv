@@ -119,11 +119,13 @@ restore() {
         echo [Error]: missing confirm $cfm_dir/, please check it first ...
         exit
     fi
-    mkdir -p $dry_dir
-    # if [ ! -d ${restore_dir} ]; then
-    #     echo missing restore directory, please make it first ...
-    #     exit
-    # fi
+
+    # mkdir -p $restore_dir
+    if [[ "$restore_dir" != "$base_dir" ]]; then
+        if [ ! -d ${restore_dir} ]; then
+            mkdir -p $restore_dir
+        fi
+    fi
 
     # loop to restore bk_file.
     for file in ${bk_files[@]}
