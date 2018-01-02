@@ -122,8 +122,8 @@ export EDITOR=vim
 PATH=~/.usr/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin
 export PATH
 # export PKG_CONFIG_PATH=~/.usr/lib/pkgconfig:$PKG_CONFIG_PATH
-export PKG_CONFIG_PATH=~/.usr/lib/pkgconfig
-export LD_LIBRARY_PATH=~/.usr/lib
+export PKG_CONFIG_PATH=~/.usr/lib/pkgconfig:/usr/local/lib/pkgconfig
+export LD_LIBRARY_PATH=~/.usr/lib:/usr/local/lib
 
 # SET HTTP/HTTPS PROXY.
 # ssh -vv -ND 8080 [proxy_ip] [port]

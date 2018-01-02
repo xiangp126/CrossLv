@@ -108,7 +108,6 @@ alias rm='rm -i'
 alias mv='mv -i'
 alias cp='cp -i'
 alias grep='grep --color=auto'
-#alias sed='sed -n'
 alias gdb='gdb -q'
 alias cgdb='cgdb -q'
 alias netstat='netstat -tuanp'
@@ -120,17 +119,24 @@ export LC_ALL=C
 export SHELL=/bin/bash
 export EDITOR=vim
 # SET PATH VARIABLES.
-export PATH=~/.bin:~/.usr/bin:$PATH
-export PKG_CONFIG_PATH=~/.usr/lib/pkgconfig:$PKG_CONFIG_PATH
-export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:~/.usr/lib
+PATH=~/.usr/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin
+export PATH
+# export PKG_CONFIG_PATH=~/.usr/lib/pkgconfig:$PKG_CONFIG_PATH
+export PKG_CONFIG_PATH=~/.usr/lib/pkgconfig:/usr/local/lib/pkgconfig
+export LD_LIBRARY_PATH=~/.usr/lib:/usr/local/lib
 
 # SET HTTP/HTTPS PROXY.
 # ssh -vv -ND 8080 [proxy_ip] [port]
 # export https_proxy=socks5://127.0.0.1:8080
 # export http_proxy=socks5://127.0.0.1:8080
 
+gitCompletionBashPath=~/.git-completion.bash
+if [[ -f "$gitCompletionBashPath" ]]; then
+    source $gitCompletionBashPath
+fi
+
 # TEST IF COMMAND 'TMUX' EXIST.
-if [[ "`which tmux` != """ ]]; then
+if [[ "`which tmux`" != "" ]]; then
     if [[ "$TMUX" = "" ]]; then
         cat << "_EOF"
  _____   __  __   _   _  __  __
