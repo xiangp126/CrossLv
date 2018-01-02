@@ -14,6 +14,8 @@ swap-window -s 3 -t 1          # swap window No.3 with No.1
 swap-window -t 1               # swap current window with No.1
 move-window -t 1               # move current window to No.1 
                                # (No.1 must not be used now)
+attach-session -c /usr/local/     # set new pane default path
+attach -c "#{pane_current_path}"  
 
 ------------------------------------------------------------
 -          JOIN-PANE AND BREAK PANE TO WINDOW              -
@@ -43,11 +45,4 @@ bind-key    -T prefix       R       run-shell ~/.tmux/plugins/tmux-resurrect/scr
 bind-key    -T prefix       U       run-shell ~/.tmux/plugins/tpm/bindings/update_plugins
 
 ------------------------------------------------------------
- _                        _          _
-| |_ _ __ ___  _   ___  _| |__   ___| |_ __
-| __| '_ ` _ \| | | \ \/ / '_ \ / _ \ | '_ \
-| |_| | | | | | |_| |>  <| | | |  __/ | |_) |
- \__|_| |_| |_|\__,_/_/\_\_| |_|\___|_| .__/
-                                      |_|
-
 _EOF
