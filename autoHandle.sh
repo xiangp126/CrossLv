@@ -268,7 +268,15 @@ confirm() {
     # echo -ne "find ${backup_dir} -regextype posix-basic -regex '^.*' "
     # echo -e "-type f | xargs -i cp {} ${cfm_dir}"
     echo "start to copying files from ${backup_dir}/ to ${cfm_dir}/ ..."
-    find ${backup_dir} -regextype posix-basic -regex '^.*' -type f | xargs -i cp {} ${cfm_dir}
+    # change below syntax becase MAC did not support
+    # find ${backup_dir} -regextype posix-basic -regex '^.*' -type f | xargs -i cp {} ${cfm_dir}
+    for file in `find $backup_dir -type f`
+    do
+        cpiedName=`basename $file`
+        echo cp -f $file ${cfm_dir}/$cpiedName ...
+        cp -f $file ${cfm_dir}/$cpiedName
+    done
+
     # echo "Congratulations! These Files Are Copied ..."
 
     echo "------------------------------------------------------"

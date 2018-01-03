@@ -151,7 +151,7 @@ highlight MBEVisibleActiveChanged cterm=underline ctermfg=5
 nnoremap <silent> <F3> :NERDTreeToggle<CR>
 let g:NERDTree_title = "[NERDTree]"
 let g:NERDTreeShowBookmarks = 0
-let g:NERDTreeWinSize = 28 " default 30
+let g:NERDTreeWinSize = 20 " default 30
 let g:NERDTreeWinPos = 'left' " only left or right
 
 """"""""""""""""""""""""""""""
@@ -160,9 +160,9 @@ let g:NERDTreeWinPos = 'left' " only left or right
 " When pressed F5, toggle tagbar window
 nnoremap <silent> <F5> :call TagbarMyOpen()<CR><CR>
 let g:Tagbar_title = "[Tagbar]"
-let g:tagbar_ctags_bin = "/usr/bin/ctags"
+" let g:tagbar_ctags_bin = "/usr/bin/ctags"
 let g:tagbar_left = 0
-let g:tagbar_width = 28
+let g:tagbar_width = 20
 " originally Yellow value 11
 highlight Search ctermbg=88
 highlight TagbarSignature ctermfg=68

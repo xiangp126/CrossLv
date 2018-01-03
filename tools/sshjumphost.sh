@@ -47,8 +47,12 @@ cfgFilePath=~/.ssh/$cfgFile
 jumpHost="sha-srg-edit7"
 # below names can be DNS lookup on jumpHostt
 dstServer=(
-    "sjc-marsbu-019"
+    "sjc-marsbu-010"
+    "sjc-marsbu-011"
     "sjc-marsbu-012"
+    "sjc-marsbu-013"
+    "sjc-marsbu-014"
+    "sjc-marsbu-019"
 )
 # ssh port of jumpHost
 jHostPort=22
