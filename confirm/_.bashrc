@@ -136,7 +136,7 @@ if [[ "`which tmux`" != "" ]]; then
     if [[ "$TMUX" == "" ]]; then
         tmuxSession=`tmux ls`
         firstSession=`echo ${tmuxSession%%:*}`
-        tmux attach -t $firstSession
+        echo "tmux attach -t $firstSession"
     fi
 else 
     echo "tmux does not exist."
