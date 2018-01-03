@@ -1,7 +1,3 @@
-# ~/.bashrc: executed by bash(1) for non-login shells.
-# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
-# for examples
-
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
@@ -137,16 +133,10 @@ fi
 
 # TEST IF COMMAND 'TMUX' EXIST.
 if [[ "`which tmux`" != "" ]]; then
-    if [[ "$TMUX" = "" ]]; then
-        cat << "_EOF"
- _____   __  __   _   _  __  __
-|_   _| |  \/  | | | | | \ \/ /
-  | |   | |\/| | | | | |  \  /
-  | |   | |  | | | |_| |  /  \
-  |_|   |_|  |_|  \___/  /_/\_\
-
-_EOF
-        tmux ls
+    if [[ "$TMUX" == "" ]]; then
+        tmuxSession=`tmux ls`
+        firstSession=`echo ${tmuxSession%%:*}`
+        tmux attach -t $firstSession
     fi
 else 
     echo "tmux does not exist."
