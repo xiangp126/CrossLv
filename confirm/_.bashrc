@@ -134,6 +134,14 @@ fi
 # TEST IF COMMAND 'TMUX' EXIST.
 if [[ "`which tmux`" != "" ]]; then
     if [[ "$TMUX" == "" ]]; then
+        cat << "_EOF"
+ _____   __  __   _   _  __  __
+|_   _| |  \/  | | | | | \ \/ /
+  | |   | |\/| | | | | |  \  /
+  | |   | |  | | | |_| |  /  \
+  |_|   |_|  |_|  \___/  /_/\_\
+
+_EOF
         tmuxSession=`tmux ls`
         firstSession=`echo ${tmuxSession%%:*}`
         echo "tmux attach -t $firstSession"
