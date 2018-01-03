@@ -15,7 +15,7 @@ swap-window -t 1               # swap current window with No.1
 move-window -t 1               # move current window to No.1 
                                # (No.1 must not be used now)
 attach-session -c /usr/local/     # set new pane default path
-attach -c "#{pane_current_path}"  
+attach-session -c "#{pane_current_path}"  
 
 ------------------------------------------------------------
 -          JOIN-PANE AND BREAK PANE TO WINDOW              -
