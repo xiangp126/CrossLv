@@ -134,7 +134,7 @@ if [[ -f "$gitCompletionBashPath" ]]; then
     source $gitCompletionBashPath
 fi
 # bash-completion for tmux
-tmuxCompletionBashPath=~/.git-completion.bash
+tmuxCompletionBashPath=~/.tmux-completion.bash
 if [[ -f "$tmuxCompletionBashPath" ]]; then
     source $tmuxCompletionBashPath
 fi
