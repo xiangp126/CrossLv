@@ -37,7 +37,7 @@ makeLink() {
     cd $handleDir
     echo Entering into $handleDir/ ...
 
-    handleFiles=`find . -regex ".*.sh" -type f`
+    handleFiles=`find . -regex ".*.[sh|py]" -type f`
 
     for file in ${handleFiles[@]}
     # ./sshproxy.sh
