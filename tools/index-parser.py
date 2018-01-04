@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import sys, binascii
+import os, sys, binascii
 from datetime import datetime
 
 def parseIndex(myfile):
@@ -231,9 +231,9 @@ def printAppendix():
     print("--------------------", end = ' ')
 
 if __name__ == "__main__":
-    if len(sys.argv) == 1:
+    indexPath = "./.git/index"
+    if os.path.exists(indexPath):
+        parseIndex(indexPath)
+    else:
         print("Usage: ./parse_index.py index_file")
         exit(1)
-
-    parseIndex(sys.argv[1])
-

@@ -10,12 +10,13 @@ bind-key    -T prefix       }                 swap-pane -D
 ------------------------------------------------------------
 -              SWAP AND MOVE FOR WINDOW                    -
 ------------------------------------------------------------
-swap-window -s 3 -t 1          # swap window No.3 with No.1
-swap-window -t 1               # swap current window with No.1
-move-window -t 1               # move current window to No.1 
-                               # (No.1 must not be used now)
-attach-session -c /usr/local/     # set new pane default path
-attach-session -c "#{pane_current_path}"  
+:swap-window [-s src-client] -t dst-window  # swap window src with dst
+:swap-window -t dst-window                  # swap current window with dst
+:move-window [-s src-window] -t dst-window  # move current window to No.1 
+:move-window -t [dst-client]                # move current window to dst-client
+
+:attach-session -c /usr/local/     # set new pane default path
+:attach-session -c "#{pane_current_path}"  
 
 ------------------------------------------------------------
 -          JOIN-PANE AND BREAK PANE TO WINDOW              -
@@ -43,6 +44,5 @@ bind-key    -T prefix       |                 split-window -h
 bind-key    -T prefix       S       run-shell ~/.tmux/plugins/tmux-resurrect/scripts/save.sh
 bind-key    -T prefix       R       run-shell ~/.tmux/plugins/tmux-resurrect/scripts/restore.sh
 bind-key    -T prefix       U       run-shell ~/.tmux/plugins/tpm/bindings/update_plugins
-
 ------------------------------------------------------------
 _EOF

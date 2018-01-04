@@ -4,4 +4,4 @@ backup/
 backup.*/
 dry_install/
 dry_restore/
-xx.txt
+__pycache__/
