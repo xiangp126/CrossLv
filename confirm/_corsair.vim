@@ -1,8 +1,5 @@
 " My Vim Default color file: corsair.vim, work together with self-.vimrc
 " placed under ~/.vim/colors, that not influence other's.
-" > mkdir -p ~/.vim/colors/
-" Maintainer:	Peng <xiangp126@sjtu.edu.cn>
-" Last Change:	2017 dec 07
 
 " This is the default color scheme.  It doesn't define the Normal
 " highlighting, it uses whatever the colors used to be.

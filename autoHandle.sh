@@ -122,6 +122,11 @@ restore() {
         fi
     fi
 
+    cat << _EOF
+------------------------------------------------------
+Start to copying common key files ...
+------------------------------------------------------
+_EOF
     # already copied file path stored in this array.
     cpied_path_array=()
     index=0

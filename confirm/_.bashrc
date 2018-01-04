@@ -99,6 +99,9 @@ if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
 fi
 
 # BELOW IS MYSELF CONFIGURATION.
+# SET LS COLOR
+# export LS_COLORS=$LS_COLORS:'di=0;35:':'ex=0;0'
+export LS_COLORS=$LS_COLORS:'ex=0;0'
 # MY USEFUL HANDY ALIAS. 
 alias ll='ls -lF'
 alias ll.='ls -alF'
