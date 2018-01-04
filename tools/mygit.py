@@ -1,5 +1,4 @@
-#!/usr/bin/python3
-
+#!/usr/bin/env python3
 import sys, os, zlib, struct, math, argparse, time, operator
 import getopt, hashlib, collections, binascii, stat, difflib
 

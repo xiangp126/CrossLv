@@ -17,6 +17,8 @@ bk_files=(
 backup_dir=./backup
 dry_dir=./dry_restore
 cfm_dir=./confirm
+# bash completion 
+complete_dir=./completion
 # array to store file names that was trully processed.
 bkk_array=()
 # backup postfix, need not the first '.'
@@ -54,18 +56,11 @@ cat << _EOF
     backup  -> backup key files under environment to ${backup_dir}/
     dry     -> run restore in dry mode, thought $dry_dir/ as ~/
     restore -> restore key files to environment from ${cfm_dir}/
-    regret  -> regret previous 'restore' or 'dry' action.
+    regret  -> regret previous 'restore' action as medicine
     confirm -> confirm to copy files in ${backup_dir}/ to ${cfm_dir}/
     clean   -> clean ${backup_dir}.*/, but reserve main backup dir
 _EOF
 }
-
-# if no parameters input, print usage() and exit.
-# move this check to 'default' branch of case.
-# if [ $# -le 0 ]; then
-#     usage
-#     exit
-# fi
 
 backup() {
     # make dir in case it not exist.
@@ -127,6 +122,9 @@ restore() {
         fi
     fi
 
+    # already copied file path stored in this array.
+    cpied_path_array=()
+    index=0
     # loop to restore bk_file.
     for file in ${bk_files[@]}
     do
@@ -135,6 +133,9 @@ restore() {
         # Exp: ./.vim/colors/corsair.vim
         file_path=`echo ${file%/*}`      # ./.vim/colors 
         file_name=`echo ${file##*/}`     # corsair.vim
+
+        # fill in cpied_path_array
+        cpied_path_array[((index++))]=$file
 
         # check if target dir exists, if not make a new one.
         if [ ! -d ${restore_dir}/${file_path} ]; then
@@ -162,28 +163,29 @@ restore() {
         echo
     done
 
-    echo "------------------------------------------------------"
-    echo Finding files copied successfully ...
-    echo "------------------------------------------------------"
-    # loop again to print echo messages.
-    for file in ${bk_files[@]}
+    cat << _EOF
+------------------------------------------------------
+Start to copying bash completion files ...
+------------------------------------------------------
+_EOF
+    for file in `find $complete_dir -type f`
     do
-        # ".vim/colors/corsair.vim"
-        file=./${file}
-        # Exp: ./.vim/colors/corsair.vim
-        file_path=`echo ${file%/*}`      # ./.vim/colors 
-        file_name=`echo ${file##*/}`     # corsair.vim
-
-        find ${restore_dir}/${file} -name $file_name
+        cpiedName=`basename $file`
+        echo cp -f $file ${restore_dir}/.$cpiedName
+        cp -f $file ${restore_dir}/.$cpiedName
+        cpied_path_array[((index++))]=./.$cpiedName
     done
-    echo "------------------------------------------------------"
 
-    # echo "------------------------------------------------------"
-    # echo find ${restore_dir} -type f
-    # echo "------------------------------------------------------"
-    # find ${restore_dir} -type f
-    # echo "------------------------------------------------------"
-    # echo Congratulations! Key Files Has Been Restored ...
+    cat << _EOF
+------------------------------------------------------
+Finding files copied successfully ...
+------------------------------------------------------
+_EOF
+    # loop again to print echo messages.
+    for file in ${cpied_path_array[@]}
+    do
+        echo $restore_dir/${file#*/}
+    done
 }
 
 regret() {

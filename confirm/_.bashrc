@@ -1,3 +1,4 @@
+#!/bin/bash
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
@@ -99,7 +100,8 @@ fi
 
 # BELOW IS MYSELF CONFIGURATION.
 # MY USEFUL HANDY ALIAS. 
-alias ll='ls -alF'
+alias ll='ls -lF'
+alias ll.='ls -alF'
 alias rm='rm -i'
 alias mv='mv -i'
 alias cp='cp -i'
@@ -126,9 +128,15 @@ export LD_LIBRARY_PATH=~/.usr/lib:/usr/local/lib
 # export https_proxy=socks5://127.0.0.1:8080
 # export http_proxy=socks5://127.0.0.1:8080
 
+# bash-completion for git
 gitCompletionBashPath=~/.git-completion.bash
 if [[ -f "$gitCompletionBashPath" ]]; then
     source $gitCompletionBashPath
+fi
+# bash-completion for tmux
+tmuxCompletionBashPath=~/.git-completion.bash
+if [[ -f "$tmuxCompletionBashPath" ]]; then
+    source $tmuxCompletionBashPath
 fi
 
 # TEST IF COMMAND 'TMUX' EXIST.
