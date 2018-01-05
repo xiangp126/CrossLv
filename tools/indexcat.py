@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-import os, sys, binascii
+import os, sys, binascii, math
 from datetime import datetime
 
+# https://github.com/git/git/blob/master/Documentation/technical/index-format.txt
 def parseIndex(myfile):
     ''' Parse Index File.
           | 0           | 4            | 8           | C              |
@@ -104,15 +105,11 @@ def parseIndex(myfile):
                 Included 4-bit object type
                 valid values in binary are 1000 (regular file), 1010 (symbolic link)
                 and 1110 (gitlink). '''
-            byte = fRd.read(2)
-            byte = fRd.read(2)
+            byte = fRd.read(2)              # 16-bit high, zero
+            byte = fRd.read(2)              # 16-bit low, 4 + 3 + 9
             if byte != b"":
                 val = int.from_bytes(byte, byteorder = "big")
-                objType = (val >> 12) & 0b1111
-                unixPerm = val & 0b0000000111111111
-    
-                checkObjType(objType)
-                print("Unix Permission: %d" %unixPerm)
+                checkModeField(val)
     
             ''' 32-bit uid
                 this is stat(2) data. '''
@@ -147,32 +144,31 @@ def parseIndex(myfile):
             byte = fRd.read(2)
             if byte != b"":
                 val = int.from_bytes(byte, byteorder = 'big')
-                validFlag = val & 0b1000000000000000
+                validFlag    = val & 0b1000000000000000
                 extendedFlag = val & 0b0100000000000000
-                stage = val & 0b0011000000000000
-                length = val & 0b0000111111111111
+                stage        = val & 0b0011000000000000
+                fileNameLen  = val & 0b0000111111111111
                 print("Valid Flag: %d" %validFlag)
                 print("Extended Flag: %d" %extendedFlag)
                 print("Stage : %d" %stage)
-                print("Length: %d" %length)
+                print("File Name Length: %d" %fileNameLen)
     
             ''' file name (variable), ended with 0x0000. '''
-            byte = fRd.read(length)
+            byte = fRd.read(fileNameLen)
             if byte != b'':
                 print("File Name: %s" %byte.decode('ascii'))
     
             ''' 1-8 nul bytes as necessary to pad the entry to a multiple
                 of eight bytes while keeping the name NUL-terminated. '''
-            while 1:
-                byte = fRd.read(1)
-                val = int.from_bytes(byte, byteorder = "big")
-                if val == 0:
-                    continue
-                else:
-                    break
-    
-            ''' back one byte from current position. '''
-            fRd.seek(-1, 1)
+            ''' only entry, header(DIRC + Ver + File-Count) not included. ''' 
+            entryDataLen = 10 * 4 + 20 + 2 
+            entryPlusFileLen = entryDataLen + fileNameLen
+            # calculate how many b'\x00' be appended after file name.
+            trueLen = (math.floor(entryPlusFileLen / 8) + 1) * 8
+            paddedLen = trueLen - entryPlusFileLen
+
+            ''' skip null-padding for file name '''
+            byte = fRd.read(paddedLen)
             if loop == fileCount - 1:
                 stepInto = 0
                 try:
@@ -216,16 +212,24 @@ def parseIndex(myfile):
 
         fRd.close()
 
-def checkObjType(type):
+def checkModeField(val):
+    objType = (val >> 12) & 0b1111
+    unixPerm = val & 0b0000000111111111
+
     print("File Type:", end = ' ')
-    if type == 8:
+    if objType == 8:
         print("Regular File")
-    elif type == 10:
+        # print("Unix Permission: %d" %unixPerm)
+        print("Unix Permission: 0644 (%d)" %unixPerm)
+    elif objType == 10:
         print("Symbolic Link")
-    elif type == 14:
+        print("Unix Permission: 0")
+    elif objType == 14:
         print("Gitlink")
+        print("Unix Permission: 0")
     else:
         print("Unknown Type")
+        print("Unix Permission: Unknown")
 
 def printAppendix():
     print("--------------------", end = ' ')
