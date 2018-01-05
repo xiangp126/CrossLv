@@ -169,41 +169,52 @@ def parseIndex(myfile):
 
             ''' skip null-padding for file name '''
             byte = fRd.read(paddedLen)
+
             if loop == fileCount - 1:
-                stepInto = 0
-                try:
-                    ''' - Extensions
-                         4-byte extension signature. If the first byte is 'A'..
-                         'Z' the extension is optional and can be ignored. 
-                    '''
-                    byte = fRd.read(4)
-                    stepInto += 4
-                    if byte != b'':
-                        str(byte, 'utf-8')
-                        print("Ext Sign: %s" %byte.decode('ascii'))
-    
+                print("-------------------- Extensions  --------------------")
+                ''' - Extensions
+                     4-byte extension signature. If the first byte is 'A'..
+                     'Z' the extension is optional and can be ignored. 
+                '''
+                byte = fRd.read(4)
+                if byte != b'':
+                    extSign = byte.decode('ascii')
+                    print("Extension Signature: %s" %extSign)
+
+                # parse different extersion signature
+                if extSign == 'TREE':
                     ''' 32-bit size of the extension. '''
                     byte = fRd.read(4)
-                    stepInto += 4
                     if byte != b"":
                         extSize = int.from_bytes(byte, byteorder = "big")
-                        print("Ext Size: %d" %extSize)
-    
+                        print("Extension Size: %d" %extSize)
+
                     ''' Ext Data. End of Extension. '''
-                    byte = fRd.read(extSize)
-                    stepInto += extSize
-                    if byte != b'':
-                        # val = int.from_bytes(byte, byteorder = "big")
-                        # print("Ext Data: %x" %val)
-                        print("SHA-1: {}".format(binascii.hexlify(byte).decode('utf-8')))
-                except ValueError:
-                    fRd.seek(-stepInto, 1)
+                    ''' NUL-terminated path component (relative to its 
+                                            parent directory) '''
+                    # byte = fRd.read(1)
                     
-            ''' 160 - bit CheckSum, Common Section. '''
-            byte = fRd.read(20)
-            if byte != b'':
-                val = int.from_bytes(byte, byteorder = "big")
-                print("CheckSum: %x" %val)
+                    # skip reading extension data
+                    byte = fRd.read(extSize)
+                    if byte != b'':
+                        # print("SHA-1: {}".format(binascii.hexlify(byte).decode('utf-8')))
+                        pass
+                elif extSign == 'REUC':
+                    pass
+                else:
+                    pass
+                ''' 160-bit SHA-1 over the content of the index file 
+                                            before this checksum  '''
+                byte = fRd.read(20)
+                if byte != b'':
+                    val = int.from_bytes(byte, byteorder = "big")
+                    print("CheckSum: %x" %val)
+            else:
+                 # skip 20 bytes, originally know as checksum
+                 byte = fRd.read(20)
+                 if byte != b'':
+                     val = int.from_bytes(byte, byteorder = "big")
+                     # print("Partial CheckSum: %x" %val)
 
         printAppendix()
         print("End of Parse ", end = "")
