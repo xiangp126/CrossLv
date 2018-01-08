@@ -255,8 +255,10 @@ if __name__ == "__main__":
     elif len(sys.argv) == 2:
         indexPath = sys.argv[1]
     else:
-        print("Usage: ./parse_index.py index_file")
-        exit(1)
+        pass
     # tackle parse routine
     if os.path.exists(indexPath):
         parseIndex(indexPath)
+    else:
+        print("Usage: ./parse_index.py [index_file]")
+        exit(1)
