@@ -1,6 +1,7 @@
 *.swp
 *.swo
 backup/
+vim/
 backup.*/
 dry_install/
 dry_restore/
