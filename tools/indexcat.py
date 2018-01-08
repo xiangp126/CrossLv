@@ -171,7 +171,6 @@ def parseIndex(myfile):
             byte = fRd.read(paddedLen)
 
             if loop == fileCount - 1:
-                print("-------------------- Extensions  --------------------")
                 ''' - Extensions
                      4-byte extension signature. If the first byte is 'A'..
                      'Z' the extension is optional and can be ignored. 
@@ -179,10 +178,12 @@ def parseIndex(myfile):
                 byte = fRd.read(4)
                 if byte != b'':
                     extSign = byte.decode('ascii')
-                    print("Extension Signature: %s" %extSign)
 
                 # parse different extersion signature
                 if extSign == 'TREE':
+                    # print message here to be compatible with mygit
+                    print("-------------------- Extensions  --------------------")
+                    print("Extension Signature: %s" %extSign)
                     ''' 32-bit size of the extension. '''
                     byte = fRd.read(4)
                     if byte != b"":
@@ -202,13 +203,16 @@ def parseIndex(myfile):
                 elif extSign == 'REUC':
                     pass
                 else:
-                    pass
+                    print("-----------------------------------------------------")
+                    fRd.seek(-4, 1)
+
                 ''' 160-bit SHA-1 over the content of the index file 
                                             before this checksum  '''
                 byte = fRd.read(20)
                 if byte != b'':
                     val = int.from_bytes(byte, byteorder = "big")
                     print("CheckSum: %x" %val)
+                    
             else:
                  # skip 20 bytes, originally know as checksum
                  byte = fRd.read(20)
@@ -246,9 +250,13 @@ def printAppendix():
     print("--------------------", end = ' ')
 
 if __name__ == "__main__":
-    indexPath = "./.git/index"
-    if os.path.exists(indexPath):
-        parseIndex(indexPath)
+    if len(sys.argv) < 2:
+        indexPath = "./.git/index"
+    elif len(sys.argv) == 2:
+        indexPath = sys.argv[1]
     else:
         print("Usage: ./parse_index.py index_file")
         exit(1)
+    # tackle parse routine
+    if os.path.exists(indexPath):
+        parseIndex(indexPath)
