@@ -100,11 +100,16 @@ _EOF
     # absolute file path.
     for tdir in "${tackleDir[@]}"
     do
+        #~/.tmux
         abPath=${baseDir}/${tdir}
+        bkAbPath=${abPath}.${bkPostfix}
         # remove .old files before mv overwrite.
-        rm -rf ${abPath}.$bkPostfix
-        echo mv ${abPath} ${abPath}.$bkPostfix 2>/dev/null
-        mv ${abPath} ${abPath}.$bkPostfix 2>/dev/null
+        if [[ -d "$bkAbPath" ]]; then
+            rm -rf $bkAbPath
+        fi
+        if [[ -d "$abPath" ]]; then
+            cp -r ${abPath} $bkAbPath 
+        fi
     done
 
     cat << "_EOF"
@@ -210,6 +215,10 @@ _EOF
     #find python2 & python3 config dir
 	python2Config=`python2-config --configdir 2> /dev/null`
 	python3Config=`python3-config --configdir 2> /dev/null`
+    if [[ "$python2Config" == "" && "$python3Config" == "" ]]; then
+        echo [Error]: Not found python2 or python3, please install either of them ...
+        exit
+    fi
 
 	./configure --prefix=$vimInstDir \
 			--with-features=huge \
@@ -307,16 +316,16 @@ _EOF
     sh -x $tmuxInstallScript
 
     #tmux rescover plugin
-    newResurrectDir=~/.tmux/resurrect
-    oldResurrectDir=~/.tmux.old/resurrect
-    if [[ -d "$oldResurrectDir" ]]; then
-        cat << "_EOF"
-------------------------------------------------------
-COPY BACK TMUX-RESURRECT OLD FILES ...
-------------------------------------------------------
-_EOF
-        mv $oldResurrectDir $newResurrectDir
-    fi
+#     newResurrectDir=~/.tmux/resurrect
+#     oldResurrectDir=~/.tmux.old/resurrect
+#     if [[ -d "$oldResurrectDir" ]]; then
+#         cat << "_EOF"
+# ------------------------------------------------------
+# COPY BACK TMUX-RESURRECT OLD FILES ...
+# ------------------------------------------------------
+# _EOF
+#         mv $oldResurrectDir $newResurrectDir
+#     fi
 }
 
 installSummary() {

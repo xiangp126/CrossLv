@@ -21,7 +21,7 @@ usage() {
     exeName=${0##*/}
     cat << _EOF
 [NAME]
-    $exeName -- setup proxy for ssh connection from socks5 proxy
+    $exeName -- setup git proxy from ssh connection 
 
 [SYNOPSIS]
     sh $exeName [install | uninstall | help]

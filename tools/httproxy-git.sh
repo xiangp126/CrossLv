@@ -3,9 +3,21 @@
 # but no ssh-key.
 
 usage() {
-    echo "purpose: git clone using proxy socks5://127.0.0.0:8080 establisned by SSH reverse tunnel."
-    echo "ensure first: ssh -vv -ND 8080 midman_server -l log_name"
-    echo "syntax: $0 install | uninstall"
+    exeName=${0##*/}
+    cat << _EOF
+[NAME]
+    $exeName -- setup http/https proxy for git (clone)
+
+[SYNOPSIS]
+    sh $exeName [install | uninstall | help]
+
+[DESCRIPTION]
+    git clone using proxy through SSH reverse tunnel.
+    proxy => socks5://127.0.0.1:8080 
+
+[PREREQUISITE]
+   pls ensure first: ssh -vv -ND 8080 -l [loginName] [midmanServer]
+_EOF
 }
 
 proxyAddr="socks5://127.0.0.1:8080"
@@ -44,4 +56,3 @@ echo -e 'At last echo $http_proxy and $https_proxy'
 echo -e "-----------------------------------------"
 echo http_proxy  = $http_proxy
 echo https_proxy = $https_proxy
-
