@@ -93,7 +93,7 @@ _EOF
     cd $untarName
 
     #download extra packages fixing depends
-    #./contrib/download_prerequisites
+    ./contrib/download_prerequisites
     #for ubuntu has privilege, use apt-get install libmpc-dev fix error.
 	if [[ $? != 0 ]]; then
 		echo [error]: fix depends returns error, quiting now ...
