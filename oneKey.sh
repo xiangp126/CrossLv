@@ -273,6 +273,11 @@ _EOF
 }
 
 installTmuxPlugins() {
+    cmakePath=`which cmake 2> /dev/null`
+    if [[ "$cmakePath" == "" ]]; then
+        echo [Error]: Missing cmake, please install cmake first ...
+        exit
+    fi
     cat << "_EOF"
 ------------------------------------------------------
 STEP : INSTALLING TMUX PLUGINS ...
