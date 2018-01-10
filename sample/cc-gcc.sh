@@ -2,27 +2,28 @@
 set -x
 # this shell start dir, normally original path
 startDir=`pwd`
-# main work directory, usually ~/myGit
+# main work directory
 mainWd=$startDir
 
-# GCC install
+# Gcc install
 # common install dir for home | root mode
 homeInstDir=~/.usr
 rootInstDir=/usr/local
 # default is home mode
 commInstdir=$homeInstDir
 #sudo or empty
-execPrefix=""
+execPrefix=""      
 #how many cpus os has, used for make -j 
 osCpus=1
 
 logo() {
     cat << "_EOF"
-  ____  ____ ____
- / ___|/ ___/ ___|
-| |  _| |  | |
-| |_| | |__| |___
- \____|\____\____|
+             _   _
+ _ __  _   _| |_| |__   ___  _ __
+| '_ \| | | | __| '_ \ / _ \| '_ \
+| |_) | |_| | |_| | | | (_) | | | |
+| .__/ \__, |\__|_| |_|\___/|_| |_|
+|_|    |___/
 
 _EOF
 }
@@ -31,7 +32,7 @@ usage() {
     exeName=${0##*/}
     cat << _EOF
 [NAME]
-    $exeName -- setup newly Gcc 5.0
+    $exeName -- setup newly python3 
 
 [SYNOPSIS]
     $exeName [home | root | help]
@@ -61,68 +62,65 @@ checkOsCpus() {
 installGcc() {
     cat << "_EOF"
 ------------------------------------------------------
-STEP : INSTALLING VIM ...
+STEP : INSTALLING GCC5 ...
 ------------------------------------------------------
 _EOF
-    vimInstDir=$commInstdir
+    gccInstDir=$commInstdir
     $execPrefix mkdir -p $commInstdir
-    # comm attribute to get source 'vim'
-    vimClonePath=https://github.com/vim/vim
-    clonedName=vim
-    checkoutVersion=v8.0.1428
+    # comm attribute to get source 'gcc'
+    wgetLink=http://ftp.tsukuba.wide.ad.jp/software/gcc/releases/gcc-5.5.0
+    tarName=gcc-5.5.0.tar.gz
+    untarName=gcc-5.5.0
 
-    # rename download package
+    # rename download package if needed
     cd $startDir
     # check if already has this tar ball.
-    if [[ -d $clonedName ]]; then
-        echo [Warning]: target $clonedName/ already exists, Omitting now ...
+    if [[ -f $tarName ]]; then
+        echo [Warning]: Tar Ball $tarName already exists, Omitting wget ...
     else
-        git clone ${vimClonePath} $clonedName
-        # check if git clone returns successfully
+        wget --no-cookies \
+            --no-check-certificate \
+            --header "Cookie: oraclelicense=accept-securebackup-cookie" \
+            "${wgetLink}/${tarName}" \
+            -O $tarName
+        # check if wget returns successfully
         if [[ $? != 0 ]]; then
-            echo [Error]: git clone returns error, quitting now ...
+            echo [Error]: wget returns error, quiting now ...
             exit
         fi
     fi
+    tar -zxv -f $tarName
+    cd $untarName
 
-    cd $clonedName
-    # if need checkout
-    git checkout $checkoutVersion
-	# clean before ./configure
-	make distclean
-	# python2Config=`python2-config --configdir`
-	# python3Config='/usr/lib/python3.4/config-3.4m-x86_64-linux-gnu/'
-	./configure --prefix=$vimInstDir \
-			--with-features=huge \
-            --enable-multibyte \
-            --enable-rubyinterp=yes \
-            --enable-pythoninterp=yes \
-            --enable-python3interp=yes \
-            --enable-perlinterp=yes \
-            --enable-luainterp=yes \
-    		--enable-gui=gtk2 \
-			--enable-cscope
-    # ./configure --prefix=$vimInstDir --enable-pythoninterp=yes --enable-python3interp=yes
+    #download extra packages fixing depends
+    #./contrib/download_prerequisites
+    #for ubuntu has privilege, use apt-get install libmpc-dev fix error.
+	if [[ $? != 0 ]]; then
+		echo [error]: fix depends returns error, quiting now ...
+		exit
+	fi
+
+    ./configure --prefix=$gccInstDir \
+                --disable-multilib
     make -j $osCpus
-    # check if make returns successfully
-    if [[ $? != 0 ]]; then
-        echo [Error]: make returns error, quitting now ...
-        exit
-    fi
+	# check if make returns successfully
+	if [[ $? != 0 ]]; then
+		echo [error]: make returns error, quiting now ...
+		exit
+	fi
     $execPrefix make install
-    cd $startDir
-
+    
     cat << _EOF
 ------------------------------------------------------
-INSTALLING VIM DONE ...
-`$vimInstDir/bin/vim --version`
-vim path = $vimInstDir/bin/
+INSTALLING GCC DONE ...
+`$gccInstDir/bin/gcc --version`
+GCC path = $gccInstDir/bin/
 ------------------------------------------------------
 _EOF
 }
 
 install() {
-    checkOsCpus
+	checkOsCpus
     installGcc
 }
 
