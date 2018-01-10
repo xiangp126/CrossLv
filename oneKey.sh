@@ -20,6 +20,8 @@ rootInstDir=/usr/local
 commInstdir=$homeInstDir
 execPrefix=""
 # VIM install
+#how many cpus os has, used for make -j 
+osCpus=1
 
 logo() {
     cat << "_EOF"
@@ -66,6 +68,19 @@ _EOF
 set +x
     logo
 }    
+
+checkOsCpus() {
+    if [[ "`which lscpu 2> /dev/null`" == "" ]]; then
+        echo [Warning]: OS has no lscpu installed, omitting this ...
+        return
+    fi
+    #set new os cpus
+    osCpus=`lscpu | grep -i "^CPU(s):" | tr -s " " | cut -d " " -f 2`
+    if [[ "$osCpus" == "" ]]; then
+        osCpus=1
+    fi
+    echo "OS has CPU(S): $osCpus"
+}
 
 #install vim and tmux
 installBone() {
@@ -204,10 +219,11 @@ _EOF
     		--enable-gui=gtk2 \
 			--enable-cscope
     # ./configure --prefix=$vimInstDir --enable-pythoninterp=yes --enable-python3interp=yes
-    make -j
+    make -j $checkOsCpus
     # check if make returns successfully
     if [[ $? != 0 ]]; then
-        echo [Error]: make returns error, quitting now ...
+        echo [Error]: make returns error, try below commands ...
+        echo "sudo yum -y install perl-devel perl-ExtUtils-Embed"
         exit
     fi
     $execPrefix make install
@@ -328,6 +344,7 @@ _EOF
 }
 
 install() {
+    checkOsCpus
     installBone
     installVimPlugins 
     installVim8
