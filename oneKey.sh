@@ -1,22 +1,25 @@
 #!/bin/bash
-# Copyright by Peng, 2018. xiangp126@sjtu.edu.cn.
-# sudo ln -s /bin/bash /bin/sh, make sure sh linked to bash.
-# > ll /bin/sh lrwxrwxrwx 1 root root 9 Dec  7 01:00 /bin/sh -> /bin/bash*
+# COPYRIGHT BY PENG, 2018. XIANGP126@SJTU.EDU.CN.
 set -x
+# this shell start dir, normally original path
+startDir=`pwd`
+# main work directory, usually ~/myGit
+mainWd=$startDir
 # global parameters.
-baseDir=~
+baseDir=~        # .vim/.tmux installation dir
 bkPostfix=old
 tackleDir=(
     ".vim"
     ".tmux"
 )
+# VIM install
 # common install dir for home | root mode
 homeInstDir=~/.usr
 rootInstDir=/usr/local
-#default install vim to home directory
-passedPara="home"
-#get this value from install VIM script
-vimInstDir=$homeInstDir
+# default is home mode
+commInstdir=$homeInstDir
+execPrefix=""
+# VIM install
 
 logo() {
     cat << "_EOF"
@@ -56,6 +59,9 @@ usage() {
     home -- build VIM to $homeInstDir/
     root -- build VIM to $rootInstDir/
 
+[TROUBLESHOOTING]
+    sudo ln -s /bin/bash /bin/sh, make sure sh linked to bash.
+    $ ll /bin/sh lrwxrwxrwx 1 root root 9 Dec  7 01:00 /bin/sh -> /bin/bash*
 _EOF
 set +x
     logo
@@ -107,11 +113,6 @@ _EOF
 
     cat << "_EOF"
 ------------------------------------------------------
-INSTALLING VIM-PLUGIN MANAGER DONE
-_EOF
-
-    cat << "_EOF"
-------------------------------------------------------
 STEP : INSTALLING TMUX-PLUGIN MANAGER
 ------------------------------------------------------
 _EOF
@@ -130,13 +131,8 @@ _EOF
         fi
     fi
 
-    cat << "_EOF"
-------------------------------------------------------
-INSTALLING TMUX-PLUGIN MANAGER DONE
-------------------------------------------------------
-_EOF
-
     cat << _EOF
+------------------------------------------------------
 REPLACING SOME KEY FILES FIRST ...
 ------------------------------------------------------
 _EOF
@@ -146,7 +142,13 @@ _EOF
     cp -f ./confirm/_corsair.vim ${baseDir}/${tackleDir[0]}/colors/corsair.vim
 }
 
+# install VIM plugins using old version.
 installVimPlugins() {
+    cat << "_EOF"
+------------------------------------------------------
+STEP : INSTALLING VIM PLUGINS ...
+------------------------------------------------------
+_EOF
  	#81 Plugin 'Valloric/YouCompleteMe'
 	tackleFile=~/.vimrc
 	# comment YouCompleteMe in ~/.vimrc
@@ -155,31 +157,132 @@ installVimPlugins() {
 
     # source ~/.vimrc if needed
     vim +"source ~/.vimrc" +PluginInstall +qall
+	# run restore routine
     sh autoHandle.sh restore
+}
 
+installVim8() {
     cat << "_EOF"
 ------------------------------------------------------
-INSTALL NEWLY VIM AND COMPILE YCM ...
+STEP : INSTALLING NEWLY VIM ...
 ------------------------------------------------------
 _EOF
-	vimYcmScript=cc-ycm.sh
-    #vimInstDir=`sh $vimYcmScript $passedPara`
-    if [[ "$vimInstDir" == "" ]]; then
-        echo "[Error]: Not fould self-compiled VIM, quitting now ..."
-        exit
+    vimInstDir=$commInstdir
+    $execPrefix mkdir -p $commInstdir
+    # comm attribute to get source 'vim'
+    vimClonePath=https://github.com/vim/vim
+    clonedName=vim
+    checkoutVersion=v8.0.1428
+    # rename download package
+    cd $startDir
+    # check if already has this tar ball.
+    if [[ -d $clonedName ]]; then
+        echo [Warning]: target $clonedName/ already exists, Omitting now ...
+    else
+        git clone ${vimClonePath} $clonedName
+        # check if git clone returns successfully
+        if [[ $? != 0 ]]; then
+            echo [Error]: git clone returns error, quitting now ...
+            exit
+        fi
     fi
-
-    sh $vimYcmScript $passedPara
-    # check if command returns successfully
+    cd $clonedName
+	# if need checkout
+    git checkout $checkoutVersion
+	# clean before ./configure
+	make distclean
+	# python2Config=`python2-config --configdir`
+	# python3Config='/usr/lib/python3.4/config-3.4m-x86_64-linux-gnu/'
+	./configure --prefix=$vimInstDir \
+			--with-features=huge \
+            --enable-multibyte \
+            --enable-rubyinterp=yes \
+            --enable-pythoninterp=yes \
+            --enable-python3interp=yes \
+            --enable-perlinterp=yes \
+            --enable-luainterp=yes \
+    		--enable-gui=gtk2 \
+			--enable-cscope
+    # ./configure --prefix=$vimInstDir --enable-pythoninterp=yes --enable-python3interp=yes
+    make -j
+    # check if make returns successfully
     if [[ $? != 0 ]]; then
-        echo [Error]: $vimYcmScript returns error, quiting now ...
+        echo [Error]: make returns error, quitting now ...
         exit
     fi
-	echo "INSTALL NEWLY VIM AND COMPILE YCM DONE... "
+    $execPrefix make install
+	# go back to start directory.
+    cd $startDir
+
+    cat << _EOF
+------------------------------------------------------
+INSTALLING VIM DONE ...
+`$vimInstDir/bin/vim --version`
+vim path = $vimInstDir/bin/
+------------------------------------------------------
+_EOF
 
 	# uncomment YouCompleteMe in ~/.vimrc, no need after run 'restore'
 	#sed -i --regexp-extended "s/\" (Plugin 'Valloric)/\1/" confirm/_.vimrc
+}
 
+# compile YouCompleteMe
+compileYcm() {
+    cmakePath=`which cmake 2> /dev/null`
+    if [[ "$cmakePath" == "" ]]; then
+        echo [Error]: Missing cmake, please install it first ...
+        exit
+    fi
+    cat << "_EOF"
+------------------------------------------------------
+STEP : COMPILING YOUCOMPLETEME ...
+------------------------------------------------------
+_EOF
+    # comm attribute for getting source ycm
+    repoLink=https://github.com/Valloric
+	repoName=YouCompleteMe
+    ycmDir=~/.vim/bundle/YouCompleteMe
+    if [[ -d $ycmDir ]]; then
+        echo [Warning]: already has YCM installed, omitting now ...
+    else
+        git clone $repoLink/$repoName $ycmDir
+        # check if clone returns successfully
+        if [[ $? != 0 ]]; then
+            echo [Error]: git clone returns error, quiting now ...
+            exit
+        fi
+    fi
+    cd $ycmDir
+	git submodule update --init --recursive
+    ./install.py --clang-completer
+    # check if install returns successfully
+    if [[ $? != 0 ]]; then
+        echo [Error]: install fails, quitting now ...
+        exit
+    fi
+    cat << "_EOF"
+------------------------------------------------------
+INSTALLING .ycm_extra_conf.py TO HOME ...
+------------------------------------------------------
+_EOF
+    cd $startDir
+    sampleDir=./sample
+    sampleFile=ycm_extra_conf.py
+    echo cp ${sampleDir}/$sampleFile ~/.$sampleFile
+    cp ${sampleDir}/$sampleFile ~/.$sampleFile
+}
+
+installTmuxPlugins() {
+    cat << "_EOF"
+------------------------------------------------------
+STEP : INSTALLING TMUX PLUGINS ...
+------------------------------------------------------
+_EOF
+    tmuxInstallScript=~/.tmux/plugins/tpm/bin/install_plugins
+    sh -x $tmuxInstallScript
+}
+
+installSummary() {
 	cat << "_EOF"
 ------------------------------------------------------
 VIM PLUGIN MANAGER INSTRUTION
@@ -195,13 +298,7 @@ Brief help
     :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
     :PluginSearch foo - searches for foo; append `!` to refresh local cache
     :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
-_EOF
-}
 
-installTmuxPlugins() {
-    tmuxInstallScript=~/.tmux/plugins/tpm/bin/install_plugins
-    sh -x $tmuxInstallScript
-    cat << "_EOF"
 ------------------------------------------------------
 TMUX PLUGIN MANAGER INSTRUCTION
 ------------------------------------------------------
@@ -215,14 +312,9 @@ Brief help
     send-prefix + I        # install
     send-prefix + U        # update
     send-prefix + Alt-u    # uninstall plugins not on the plugin list
+    [ctrl +x] +r             # :source ~/.tmux.conf
 
 _EOF
-}
-
-install() {
-    installBone
-    installVimPlugins 
-    installTmuxPlugins
     cat << _EOF
 ------------------------------------------------------
 VIM path = $vimInstDir/bin/
@@ -230,16 +322,25 @@ VIM path = $vimInstDir/bin/
 _EOF
 }
 
+install() {
+    installBone
+    installVimPlugins 
+    installVim8
+    compileYcm
+    installTmuxPlugins
+    installSummary
+}
+
 case $1 in 
     'home')
-		passedPara="home"
-        vimInstDir=$homeInstDir
+		commInstdir=$homeInstDir
+        execPrefix=""
         install 
     ;;
 
     'root')
-		passedPara="root"
-        vimInstDir=$rootInstDir
+		commInstdir=$rootInstDir
+        execPrefix=sudo
         install
     ;;
 

@@ -4,16 +4,23 @@ use plugins manager for VIM and TMUX
 verified on MacOS | Ubuntu | CentOS
 
 ```bash
-$ sh install.sh
+$ sh oneKey.sh
 [NAME]
-    install.sh -- auto install plugin managers (vim & tmux)
+    oneKey.sh -- onekey to setup my working environment | - tmux
+    | - vim | - vundle -- youcompleteme -- supertab -- vim-snippets
+             -- ultisnips -- nerdtree -- auto-pairs
 
-[USAGE]
-    sh install.sh [dry | home | home]
+[SYNOPSIS]
+    oneKey.sh [home | root | help]
 
-[EXAMPLE]
-    sh install.sh dry : use dry_install for dry try.
-    sh install.sh home: install to ~/
+[DESCRIPTION]
+    home -- build VIM to /home/corsair/.usr/
+    root -- build VIM to /usr/local/
+
+[TROUBLESHOOTING]
+    sudo ln -s /bin/bash /bin/sh, make sure sh linked to bash.
+    $ ll /bin/sh lrwxrwxrwx 1 root root 9 Dec  7 01:00 /bin/sh -> /bin/bash*
+
                    _     _
  _ __ ___  _   _  | |   (_)_ __  _   ___  __
 | '_ ` _ \| | | | | |   | | '_ \| | | \ \/ /
@@ -21,17 +28,12 @@ $ sh install.sh
 |_| |_| |_|\__, | |_____|_|_| |_|\__,_/_/\_\
            |___/
 
-$ sh install.sh home
 ```
 
-# File List
-* install.sh: key install script for bundle-managers.
-* autoUpdate.sh: automation of programming enviroment setup.
-* confirm/: standard files contained to be restored.
-* _.bashrc: basic .bashrc suitable for all platform.
-* tools/: some useful scripts for auto set up env. 
-
 # Features
+V3.9
+* use oneKey.sh replace of some small scripts
+* add YouCompleteMe
 
 V3.1 
 * use tmux plugin manager for Tmux plugins.
@@ -50,7 +52,7 @@ V2.1
 V1.0
 * user-friendly manipulate for backup | restore | confirm | clean .
 
-# Guide
+# Manual Guide
 ## Backup First
 ```bash
 > mv ~/.vim ~/.vim.old

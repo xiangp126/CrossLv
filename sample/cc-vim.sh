@@ -5,13 +5,13 @@ startDir=`pwd`
 # main work directory, usually ~/myGit
 mainWd=$startDir
 
+# VIM install
 # common install dir for home | root mode
 homeInstDir=~/.usr
 rootInstDir=/usr/local
 # default is home mode
 commInstdir=$homeInstDir
 execPrefix=""
-retVal=""
 # VIM install
 
 logo() {
@@ -29,7 +29,7 @@ usage() {
     exeName=${0##*/}
     cat << _EOF
 [NAME]
-    $exeName -- setup newly Vim through one script
+    $exeName -- setup newly Vim and compile YCM (optional)
 
 [SYNOPSIS]
     $exeName [home | root | help]
@@ -71,7 +71,7 @@ _EOF
     fi
 
     cd $clonedName
-    # checkout to v2.15.0
+    # if need checkout
     git checkout $checkoutVersion
 	# clean before ./configure
 	make distclean
@@ -114,10 +114,9 @@ vim path = $vimInstDir/bin/
 _EOF
 }
 
-# compile YCM if plugin already cloned.
+# compile YouCompleteMe
 compileYCM() {
     cat << "_EOF"
-    
 ------------------------------------------------------
 STEP : COMPILING YCM ...
 ------------------------------------------------------
@@ -131,7 +130,7 @@ _EOF
         echo [Warning]: already has YCM installed, omitting now ...
     else
         git clone $repoLink/$repoName $ycmDir
-        # check if wget returns successfully
+        # check if clone returns successfully
         if [[ $? != 0 ]]; then
             echo [Error]: git clone returns error, quiting now ...
             exit
@@ -169,8 +168,7 @@ _EOF
 
 install() {
     installVim
-    compileYCM
-    return $retVal
+    #compileYCM
 }
 
 case $1 in
