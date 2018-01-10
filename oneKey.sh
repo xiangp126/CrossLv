@@ -362,10 +362,10 @@ _EOF
 install() {
     checkOsCpus
     installBone
+    installTmuxPlugins
     installVimPlugins 
     installVim8
     compileYcm
-    installTmuxPlugins
     installSummary
 }
 

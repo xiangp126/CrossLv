@@ -128,8 +128,8 @@ export LD_LIBRARY_PATH=~/.usr/lib:/usr/local/lib
 
 # SET HTTP/HTTPS PROXY.
 # ssh -vv -ND 8080 [proxy_ip] [port]
-export https_proxy=socks5://127.0.0.1:8080
-export http_proxy=socks5://127.0.0.1:8080
+#export https_proxy=socks5://127.0.0.1:8080
+#export http_proxy=socks5://127.0.0.1:8080
 
 # bash-completion for git
 gitCompletionBashPath=~/.git-completion.bash
