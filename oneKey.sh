@@ -206,19 +206,23 @@ _EOF
     git checkout $checkoutVersion
 	# clean before ./configure
 	make distclean
-	# python2Config=`python2-config --configdir`
-	# python3Config='/usr/lib/python3.4/config-3.4m-x86_64-linux-gnu/'
+
+    #find python2 & python3 config dir
+	python2Config=`python2-config --configdir 2> /dev/null`
+	python3Config=`python3-config --configdir 2> /dev/null`
+
 	./configure --prefix=$vimInstDir \
 			--with-features=huge \
             --enable-multibyte \
             --enable-rubyinterp=yes \
             --enable-pythoninterp=yes \
+            --with-python3-config-dir=$python2Config \
             --enable-python3interp=yes \
+            --with-python3-config-dir=$python3Config \
             --enable-perlinterp=yes \
             --enable-luainterp=yes \
     		--enable-gui=gtk2 \
 			--enable-cscope
-    # ./configure --prefix=$vimInstDir --enable-pythoninterp=yes --enable-python3interp=yes
     make -j $checkOsCpus
     # check if make returns successfully
     if [[ $? != 0 ]]; then
@@ -282,7 +286,7 @@ INSTALLING .ycm_extra_conf.py TO HOME ...
 ------------------------------------------------------
 _EOF
     cd $startDir
-    sampleDir=./sample
+    sampleDir=./template
     sampleFile=ycm_extra_conf.py
     echo cp ${sampleDir}/$sampleFile ~/.$sampleFile
     cp ${sampleDir}/$sampleFile ~/.$sampleFile
@@ -301,6 +305,18 @@ STEP : INSTALLING TMUX PLUGINS ...
 _EOF
     tmuxInstallScript=~/.tmux/plugins/tpm/bin/install_plugins
     sh -x $tmuxInstallScript
+
+    #tmux rescover plugin
+    newResurrectDir=~/.tmux/resurrect
+    oldResurrectDir=~/.tmux.old/resurrect
+    if [[ -d "$oldResurrectDir" ]]; then
+        cat << "_EOF"
+------------------------------------------------------
+COPY BACK TMUX-RESURRECT OLD FILES ...
+------------------------------------------------------
+_EOF
+        mv $oldResurrectDir $newResurrectDir
+    fi
 }
 
 installSummary() {

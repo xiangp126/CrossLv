@@ -2,6 +2,10 @@
 *.swo
 backup/
 vim/
+git/
+gcc/
+gcc-*
+Python-*
 backup.*/
 dry_install/
 dry_restore/
