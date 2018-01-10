@@ -5,13 +5,14 @@
 
 # basic parameters set.
 base_dir=~
+# YouCompleteMe not compatible with snipMate
 bk_files=(
     ".vimrc"
     ".bashrc"
     ".tmux.conf"
     ".vim/colors/corsair.vim"
-    ".vim/bundle/snipMate/snippets/c.snippets"
-    ".vim/bundle/snipMate/snippets/cpp.snippets"
+    #".vim/bundle/snipMate/snippets/c.snippets"
+    #".vim/bundle/snipMate/snippets/cpp.snippets"
 )
 # global parameters.
 backup_dir=./backup
@@ -124,7 +125,7 @@ restore() {
 
     cat << _EOF
 ------------------------------------------------------
-Start to copying common key files ...
+BEGIN TO RUN RESTORE ROUTINE ...
 ------------------------------------------------------
 _EOF
     # already copied file path stored in this array.
@@ -170,7 +171,7 @@ _EOF
 
     cat << _EOF
 ------------------------------------------------------
-Start to copying bash completion files ...
+START TO COPYING BASH COMPLETION FILES ...
 ------------------------------------------------------
 _EOF
     for file in `find $complete_dir -type f`
@@ -183,7 +184,7 @@ _EOF
 
     cat << _EOF
 ------------------------------------------------------
-Finding files copied successfully ...
+FINDING FILES COPIED SUCCESSFULLY ...
 ------------------------------------------------------
 _EOF
     # loop again to print echo messages.

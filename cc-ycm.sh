@@ -1,6 +1,5 @@
 #!/bin/bash
 set -x
-
 # this shell start dir, normally original path
 startDir=`pwd`
 # main work directory, usually ~/myGit
@@ -12,6 +11,7 @@ rootInstDir=/usr/local
 # default is home mode
 commInstdir=$homeInstDir
 execPrefix=""
+retVal=""
 # VIM install
 
 logo() {
@@ -39,12 +39,12 @@ usage() {
     root -- install to $rootInstDir/
 
 _EOF
+    set +x
 	logo
 }
 
 installVim() {
     cat << "_EOF"
-    
 ------------------------------------------------------
 STEP : INSTALLING VIM ...
 ------------------------------------------------------
@@ -73,8 +73,21 @@ _EOF
     cd $clonedName
     # checkout to v2.15.0
     git checkout $checkoutVersion
-    # run make routine
-    ./configure --prefix=$vimInstDir --enable-pythoninterp=yes --enable-python3interp=yes
+	# clean before ./configure
+	make distclean
+	# python2Config=`python2-config --configdir`
+	# python3Config='/usr/lib/python3.4/config-3.4m-x86_64-linux-gnu/'
+	./configure --prefix=$vimInstDir \
+			--with-features=huge \
+            --enable-multibyte \
+            --enable-rubyinterp=yes \
+            --enable-pythoninterp=yes \
+            --enable-python3interp=yes \
+            --enable-perlinterp=yes \
+            --enable-luainterp=yes \
+    		--enable-gui=gtk2 \
+			--enable-cscope
+    # ./configure --prefix=$vimInstDir --enable-pythoninterp=yes --enable-python3interp=yes
     make -j
     # check if make returns successfully
     if [[ $? != 0 ]]; then
@@ -90,9 +103,9 @@ Installing Git Completion Bash To Home ...
 ------------------------------------------------------
 _EOF
     cd $startDir
+    retVal=$vimInstDir
 
     cat << _EOF
-    
 ------------------------------------------------------
 INSTALLING VIM DONE ...
 `$vimInstDir/bin/vim --version`
@@ -103,20 +116,31 @@ _EOF
 
 # compile YCM if plugin already cloned.
 compileYCM() {
-    ycmDir=~/.vim/bundle/YouCompleteMe
-    if [[ ! -d $ycmDir ]]; then
-        echo [Warning]: has no YCM installed, quitting now ...
-        return
-    fi
     cat << "_EOF"
     
 ------------------------------------------------------
 STEP : COMPILING YCM ...
 ------------------------------------------------------
 _EOF
+    # comm attribute for getting source tmux
+    repoLink=https://github.com/Valloric
+	repoName=YouCompleteMe
+    ycmDir=~/.vim/bundle/YouCompleteMe
+
+    if [[ -d $ycmDir ]]; then
+        echo [Warning]: already has YCM installed, omitting now ...
+    else
+        git clone $repoLink/$repoName $ycmDir
+        # check if wget returns successfully
+        if [[ $? != 0 ]]; then
+            echo [Error]: git clone returns error, quiting now ...
+            exit
+        fi
+    fi
 
     cd $ycmDir
-    ./install.sh --clang-completer
+	git submodule update --init --recursive
+    ./install.py --clang-completer
     # check if install returns successfully
     if [[ $? != 0 ]]; then
         echo [Error]: install fails, quitting now ...
@@ -146,6 +170,7 @@ _EOF
 install() {
     installVim
     compileYCM
+    return $retVal
 }
 
 case $1 in
@@ -158,7 +183,7 @@ case $1 in
     'root')
         commInstdir=$rootInstDir
         execPrefix=sudo
-        install
+		install
     ;;
 
     *)

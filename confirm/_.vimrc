@@ -20,11 +20,13 @@ set fencs=utf8,gbk,gb2312,gb18030
 " set textwidth=80 formatoptions+=Mm
 " always use 'corsair.vim' scheme in private ~/.vim/colors/corsair.vim
 :colorscheme corsair
+let mapleader='\'  " leader key, default is '\''
 
 """"""""""""""""""""""""""""""
 " VIM BUNDLE 
 """"""""""""""""""""""""""""""
 set nocompatible              " be iMproved, required
+set backspace=indent,eol,start
 filetype off                  " required
 " set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
@@ -57,11 +59,26 @@ Plugin 'VundleVim/Vundle.vim'
 " Plugin 'ascenator/L9', {'name': 'newL9'}
 
 " Add plugins you need below.
-Plugin 'L9'
-Plugin 'The-NERD-tree'
+" Plugin 'L9'
+" Plugin 'OmniCppComplete'
+" Plugin 'snipMate'
+" Plugin 'vim-airline/vim-airline'
+" Plugin 'vim-airline/vim-airline-themes'
+" Plugin 'tell-k/vim-autopep8'
+" Plugin 'Lokaltog/vim-powerline'
+
+"------ NEW PLUGINS -----
 Plugin 'Tagbar'
-Plugin 'OmniCppComplete'
-Plugin 'snipMate'
+Plugin 'scrooloose/nerdtree'
+Plugin 'scrooloose/nerdcommenter'
+Plugin 'Yggdroot/indentLine'
+Plugin 'jiangmiao/auto-pairs'
+"------ THREE ALGOTHER -----
+Plugin 'SirVer/ultisnips'
+Plugin 'ervandew/supertab'
+Plugin 'honza/vim-snippets'
+"------ END OF THREE  -----
+Plugin 'Valloric/YouCompleteMe'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -91,7 +108,7 @@ set shell=/bin/bash
 """"""""""""""""""""""""""""""
 " SET TAGS FILE 
 """"""""""""""""""""""""""""""" 
-" set autochdir " did not auto change pwd value
+set autochdir " Auto change 'pwd' value
 " set tags=/usr/include/system-include.tags " 1st tag use '=' not '+='
 " " if you will jump across different source dircetory
 " set tags+=./tags
@@ -193,3 +210,61 @@ let OmniCpp_DefaultNamespaces = ["std", "_GLIBCXX_STD"]
 let OmniCpp_SelectFirstItem = 2
 let OmniCpp_DisplayMode = 1
 au CursorMovedI,InsertLeave * if pumvisible() == 0|silent! pclose|endif
+
+""""""""""""""""""""""""""""""
+" CONFIG INDENTLINE
+""""""""""""""""""""""""""""""
+let g:indentLine_char = '|'
+let g:indentLine_enabled = 0
+nnoremap <silent> <F2> :IndentLinesToggle<CR>
+
+""""""""""""""""""""""""""""""
+" CONFIG AUTOPEP8
+""""""""""""""""""""""""""""""
+let g:autopep8_disable_show_diff = 1
+
+""""""""""""""""""""""""""""""
+" CONFIG NERDCOMMENTER
+""""""""""""""""""""""""""""""
+"quick comment/uncomment
+map <F4> <leader>ci <CR>
+
+""""""""""""""""""""""""""""""
+" CONFIG SUPERTAB
+""""""""""""""""""""""""""""""
+let g:SuperTabDefaultCompletionType = '<C-n>'
+
+""""""""""""""""""""""""""""""
+" CONFIG ULTISNIPS
+""""""""""""""""""""""""""""""
+"Trigger configuration. Do not use <tab> 
+"if you use https://github.com/Valloric/YouCompleteMe.
+" 
+let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsJumpForwardTrigger = "<tab>"
+let g:UltiSnipsJumpBackwardTrigger = "<c-b>"
+" If you want :UltiSnipsEdit to split your window.
+let g:UltiSnipsEditSplit="vertical"
+
+""""""""""""""""""""""""""""""
+" CONFIG YouCompleteMe
+""""""""""""""""""""""""""""""
+" let g:ycm_keep_logfiles = 1
+" let g:ycm_log_level = 'debug'
+set completeopt=longest,menu
+let g:ycm_global_ycm_extra_conf = '~/.ycm_extra_conf.py'
+let g:ycm_confirm_extra_conf = 0 
+let g:ycm_enable_diagnostic_signs = 0
+let g:ycm_enable_diagnostic_highlighting = 0
+let g:ycm_error_symbol = '>>'
+let g:ycm_warning_symbol = '>*'
+let g:ycm_collect_identifiers_from_tags_files = 1 
+let g:ycm_min_num_of_chars_for_completion = 2 
+let g:ycm_complete_in_comments = 1
+let g:ycm_complete_in_strings = 1
+let g:ycm_collect_identifiers_from_comments_and_strings = 0
+let g:ycm_autoclose_preview_window_after_completion = 1
+let g:ycm_cache_omnifunc = 0
+" make YCM compatible with UltiSnips (using supertab)
+let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
+let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
