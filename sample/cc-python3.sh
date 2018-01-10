@@ -2,27 +2,28 @@
 set -x
 # this shell start dir, normally original path
 startDir=`pwd`
-# main work directory, usually ~/myGit
+# main work directory
 mainWd=$startDir
 
-# VIM install
+# Python3 install
 # common install dir for home | root mode
 homeInstDir=~/.usr
 rootInstDir=/usr/local
 # default is home mode
 commInstdir=$homeInstDir
 #sudo or empty
-execPrefix=""
+execPrefix=""      
 #how many cpus os has, used for make -j 
 osCpus=1
 
 logo() {
     cat << "_EOF"
-__     _____ __  __
-\ \   / /_ _|  \/  |
- \ \ / / | || |\/| |
-  \ V /  | || |  | |
-   \_/  |___|_|  |_|
+             _   _
+ _ __  _   _| |_| |__   ___  _ __
+| '_ \| | | | __| '_ \ / _ \| '_ \
+| |_) | |_| | |_| | | | (_) | | | |
+| .__/ \__, |\__|_| |_|\___/|_| |_|
+|_|    |___/
 
 _EOF
 }
@@ -31,7 +32,7 @@ usage() {
     exeName=${0##*/}
     cat << _EOF
 [NAME]
-    $exeName -- setup newly Vim 8.0
+    $exeName -- setup newly python3 
 
 [SYNOPSIS]
     $exeName [home | root | help]
@@ -58,72 +59,59 @@ checkOsCpus() {
     echo "OS has CPU(S): $osCpus"
 }
 
-installVim() {
+installPython3() {
     cat << "_EOF"
 ------------------------------------------------------
-STEP : INSTALLING VIM ...
+STEP : INSTALLING PYTHON3 ...
 ------------------------------------------------------
 _EOF
-    vimInstDir=$commInstdir
+    python3InstDir=$commInstdir
     $execPrefix mkdir -p $commInstdir
-    # comm attribute to get source 'vim'
-    vimClonePath=https://github.com/vim/vim
-    clonedName=vim
-    checkoutVersion=v8.0.1428
+    # comm attribute to get source 'python3'
+    wgetLink=https://www.python.org/ftp/python/3.6.4
+	tarName=Python-3.6.4.tgz
+    untarName=Python-3.6.4
 
     # rename download package if needed
     cd $startDir
     # check if already has this tar ball.
-    if [[ -d $clonedName ]]; then
-        echo [Warning]: target $clonedName/ already exists, Omitting now ...
+    if [[ -f $tarName ]]; then
+        echo [Warning]: Tar Ball $tarName already exists, Omitting wget ...
     else
-        git clone ${vimClonePath} $clonedName
-        # check if git clone returns successfully
+        wget --no-cookies \
+            --no-check-certificate \
+            --header "Cookie: oraclelicense=accept-securebackup-cookie" \
+            "${wgetLink}/${tarName}" \
+            -O $tarName
+        # check if wget returns successfully
         if [[ $? != 0 ]]; then
-            echo [Error]: git clone returns error, quitting now ...
+            echo [Error]: wget returns error, quiting now ...
             exit
         fi
     fi
-
-    cd $clonedName
-    # if need checkout
-    git checkout $checkoutVersion
-	# clean before ./configure
-	make distclean
-	# python2Config=`python2-config --configdir`
-	# python3Config='/usr/lib/python3.4/config-3.4m-x86_64-linux-gnu/'
-	./configure --prefix=$vimInstDir \
-			--with-features=huge \
-            --enable-multibyte \
-            --enable-rubyinterp=yes \
-            --enable-pythoninterp=yes \
-            --enable-python3interp=yes \
-            --enable-perlinterp=yes \
-            --enable-luainterp=yes \
-    		--enable-gui=gtk2 \
-			--enable-cscope
-    # ./configure --prefix=$vimInstDir --enable-pythoninterp=yes --enable-python3interp=yes
+    tar -zxv -f $tarName
+    cd $untarName
+    ./configure --prefix=$python3InstDir
     make -j $osCpus
-    # check if make returns successfully
-    if [[ $? != 0 ]]; then
-        echo [Error]: make returns error, quitting now ...
-        exit
-    fi
+	# check if make returns successfully
+	if [[ $? != 0 ]]; then
+		echo [Error]: make returns error, quiting now ...
+		exit
+	fi
     $execPrefix make install
-    cd $startDir
-
+    
     cat << _EOF
 ------------------------------------------------------
-INSTALLING VIM DONE ...
-`$vimInstDir/bin/vim --version`
-vim path = $vimInstDir/bin/
+INSTALLING python3 DONE ...
+`$python3InstDir/bin/python3 --version`
+python3 path = $python3InstDir/bin/
 ------------------------------------------------------
 _EOF
 }
 
 install() {
-    checkOsCpus
-    installVim
+	checkOsCpus
+    installPython3
 }
 
 case $1 in

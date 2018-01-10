@@ -11,10 +11,8 @@ homeInstDir=~/.usr
 rootInstDir=/usr/local
 # default is home mode
 commInstdir=$homeInstDir
-#sudo or empty
 execPrefix=""
-#how many cpus os has, used for make -j 
-osCpus=1
+# VIM install
 
 logo() {
     cat << "_EOF"
@@ -31,7 +29,7 @@ usage() {
     exeName=${0##*/}
     cat << _EOF
 [NAME]
-    $exeName -- setup newly Vim 8.0
+    $exeName -- setup newly Vim and compile YCM (optional)
 
 [SYNOPSIS]
     $exeName [home | root | help]
@@ -43,19 +41,6 @@ usage() {
 _EOF
     set +x
 	logo
-}
-
-checkOsCpus() {
-    if [[ "`which lscpu 2> /dev/null`" == "" ]]; then
-        echo [Warning]: OS has no lscpu installed, omitting this ...
-        return
-    fi
-    #set new os cpus
-    osCpus=`lscpu | grep -i "^CPU(s):" | tr -s " " | cut -d " " -f 2`
-    if [[ "$osCpus" == "" ]]; then
-        osCpus=1
-    fi
-    echo "OS has CPU(S): $osCpus"
 }
 
 installVim() {
@@ -71,7 +56,7 @@ _EOF
     clonedName=vim
     checkoutVersion=v8.0.1428
 
-    # rename download package if needed
+    # rename download package
     cd $startDir
     # check if already has this tar ball.
     if [[ -d $clonedName ]]; then
@@ -103,14 +88,22 @@ _EOF
     		--enable-gui=gtk2 \
 			--enable-cscope
     # ./configure --prefix=$vimInstDir --enable-pythoninterp=yes --enable-python3interp=yes
-    make -j $osCpus
+    make -j
     # check if make returns successfully
     if [[ $? != 0 ]]; then
         echo [Error]: make returns error, quitting now ...
         exit
     fi
+
     $execPrefix make install
+
+    cat << "_EOF"
+------------------------------------------------------
+Installing Git Completion Bash To Home ...
+------------------------------------------------------
+_EOF
     cd $startDir
+    retVal=$vimInstDir
 
     cat << _EOF
 ------------------------------------------------------
@@ -121,9 +114,61 @@ vim path = $vimInstDir/bin/
 _EOF
 }
 
+# compile YouCompleteMe
+compileYCM() {
+    cat << "_EOF"
+------------------------------------------------------
+STEP : COMPILING YCM ...
+------------------------------------------------------
+_EOF
+    # comm attribute for getting source tmux
+    repoLink=https://github.com/Valloric
+	repoName=YouCompleteMe
+    ycmDir=~/.vim/bundle/YouCompleteMe
+
+    if [[ -d $ycmDir ]]; then
+        echo [Warning]: already has YCM installed, omitting now ...
+    else
+        git clone $repoLink/$repoName $ycmDir
+        # check if clone returns successfully
+        if [[ $? != 0 ]]; then
+            echo [Error]: git clone returns error, quiting now ...
+            exit
+        fi
+    fi
+
+    cd $ycmDir
+	git submodule update --init --recursive
+    ./install.py --clang-completer
+    # check if install returns successfully
+    if [[ $? != 0 ]]; then
+        echo [Error]: install fails, quitting now ...
+        exit
+    fi
+
+    cat << "_EOF"
+------------------------------------------------------
+Installing .ycm_extra_conf.py To Home ...
+------------------------------------------------------
+_EOF
+    cd $startDir
+    sampleDir=./sample
+    sampleFile=ycm_extra_conf.py
+
+    echo cp ${sampleDir}/$sampleFile ~/.$sampleFile
+    cp ${sampleDir}/$sampleFile ~/.$sampleFile
+
+    cat << _EOF
+    
+------------------------------------------------------
+INSTALLING YCM DONE ...
+------------------------------------------------------
+_EOF
+}
+
 install() {
-    checkOsCpus
     installVim
+    #compileYCM
 }
 
 case $1 in

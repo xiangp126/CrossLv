@@ -5,7 +5,7 @@ startDir=`pwd`
 # main work directory, usually ~/myGit
 mainWd=$startDir
 
-# VIM install
+# GCC install
 # common install dir for home | root mode
 homeInstDir=~/.usr
 rootInstDir=/usr/local
@@ -18,11 +18,11 @@ osCpus=1
 
 logo() {
     cat << "_EOF"
-__     _____ __  __
-\ \   / /_ _|  \/  |
- \ \ / / | || |\/| |
-  \ V /  | || |  | |
-   \_/  |___|_|  |_|
+  ____  ____ ____
+ / ___|/ ___/ ___|
+| |  _| |  | |
+| |_| | |__| |___
+ \____|\____\____|
 
 _EOF
 }
@@ -31,7 +31,7 @@ usage() {
     exeName=${0##*/}
     cat << _EOF
 [NAME]
-    $exeName -- setup newly Vim 8.0
+    $exeName -- setup newly Gcc 5.0
 
 [SYNOPSIS]
     $exeName [home | root | help]
@@ -58,7 +58,7 @@ checkOsCpus() {
     echo "OS has CPU(S): $osCpus"
 }
 
-installVim() {
+installGcc() {
     cat << "_EOF"
 ------------------------------------------------------
 STEP : INSTALLING VIM ...
@@ -71,7 +71,7 @@ _EOF
     clonedName=vim
     checkoutVersion=v8.0.1428
 
-    # rename download package if needed
+    # rename download package
     cd $startDir
     # check if already has this tar ball.
     if [[ -d $clonedName ]]; then
@@ -123,7 +123,7 @@ _EOF
 
 install() {
     checkOsCpus
-    installVim
+    installGcc
 }
 
 case $1 in
