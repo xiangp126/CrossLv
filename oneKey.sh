@@ -292,10 +292,19 @@ _EOF
     fi
     cd $ycmDir
 	git submodule update --init --recursive
-    ./install.py --clang-completer
+
+    #check if python3 was installed
+    pythonExe=python
+    whereIsPython3=`which python3 2> /dev/null`
+    if [[ "$whereIsPython3" != "" ]]; then
+        pythonExe=$whereIsPython3
+    fi
+    $pythonExe install.py --clang-completer
+
     # check if install returns successfully
     if [[ $? != 0 ]]; then
         echo [Error]: install fails, quitting now ...
+        echo you can try ./sample/linkgcc.sh to link your newly gcc/g++
         exit
     fi
     cat << "_EOF"

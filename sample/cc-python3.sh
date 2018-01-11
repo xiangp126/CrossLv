@@ -91,7 +91,8 @@ _EOF
     fi
     tar -zxv -f $tarName
     cd $untarName
-    ./configure --prefix=$python3InstDir
+    ./configure --prefix=$python3InstDir \
+                --enable-shared
     make -j $osCpus
 	# check if make returns successfully
 	if [[ $? != 0 ]]; then

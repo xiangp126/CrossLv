@@ -5,8 +5,18 @@ sysGccDir=/usr/bin/
 
 startDir=`pwd`
 mainWd=$startDir
+#file gcc/c++
 #backup suffix
 bksuffix=sys
+
+if [[ ! -f "$myGccDir/gcc" ]]; then
+    echo no gcc under $myGccDir, exit now ...
+    exit
+fi
+if [[ ! -f "$myGccDir/c++" ]]; then
+    echo no c++ under $myGccDir, exit now ...
+    exit
+fi
 
 usage() {
 	exeName=${0##*/}
@@ -18,7 +28,7 @@ usage() {
     $exeName [link | unlink | help]
 
 [DESCRIPTION]
-    link gcc/g++ from $myGccDir to $sysGccDir
+    link gcc/c++ from $myGccDir to $sysGccDir
     || need root privilege
 
 _EOF
@@ -29,15 +39,15 @@ case $1 in
         cd $sysGccDir
         #gcc-sys
         sudo mv gcc gcc-$bksuffix
-        sudo mv g++ g++-$bksuffix
+        sudo mv c++ c++-$bksuffix
         sudo ln -s $myGccDir/gcc gcc
-        sudo ln -s $myGccDir/g++ g++
+        sudo ln -s $myGccDir/c++ c++
     ;;
 
     'unlink' )
         cd $sysGccDir
         sudo mv gcc-$bksuffix gcc
-        sudo mv g++-$bksuffix g++
+        sudo mv c++-$bksuffix c++
     ;;
 
     *)

@@ -97,6 +97,7 @@ _EOF
     #for ubuntu has privilege, use apt-get install libmpc-dev fix error.
 	if [[ $? != 0 ]]; then
 		echo [error]: fix depends returns error, quiting now ...
+        echo Ubuntu use apt-get install libmpc-dev may fix error ...
 		exit
 	fi
 
