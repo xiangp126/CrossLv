@@ -1,6 +1,23 @@
+we can manual specify gcc/c++ using env variables
+---------------------
 export CC=/usr/local/bin/gcc
 export CXX=/usr/local/bin/c++
 make -j
 
+---------------------
 or
 make CC=/usr/local/bin/gcc CXX=/usr/local/bin/c++ -j
+
+-----------------------------------------------------
+Some influential environment variables:
+  CC          C compiler command
+  CFLAGS      C compiler flags
+  LDFLAGS     linker flags, e.g. -L<lib dir> if you have libraries in a
+              nonstandard directory <lib dir>
+  LIBS        libraries to pass to the linker, e.g. -l<library>
+  CPPFLAGS    (Objective) C/C++ preprocessor flags, e.g. -I<include dir> if
+              you have headers in a nonstandard directory <include dir>
+  CPP         C preprocessor
+  CXX         C++ compiler command
+  CXXFLAGS    C++ compiler flags
+

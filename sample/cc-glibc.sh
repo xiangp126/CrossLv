@@ -33,7 +33,7 @@ usage() {
     cat << _EOF
 [NAME]
     $exeName -- setup newly glibc 2.15
-                || 2.26 too old as GNU ld
+                || only compile, must not install
 
 [SYNOPSIS]
     $exeName [home | root | help]
@@ -60,7 +60,7 @@ checkOsCpus() {
     echo "OS has CPU(S): $osCpus"
 }
 
-installGlibc() {
+compileGlibc() {
     cat << "_EOF"
 ------------------------------------------------------
 STEP : INSTALLING GLIBC ...
@@ -110,28 +110,20 @@ _EOF
 		exit
 	fi
 
-    if [[ "$execPrefix" != "sudo" ]]; then
-        echo Not make install with oridinary privilege ...
-        `ls -l ./$buildir/libc.so.6`
-        exit
-    fi
-
-    $execPrefix make install
     #back to start directory
     cd $startDir
     
     cat << _EOF
 ------------------------------------------------------
 INSTALLING GLIBC DONE ...
-export LD_LIBRARY_PATH=$glibcInstDir/lib:$glibcInstDir/lib64:$LD_LIBRARY_PATH
-export PATH=$glibcInstDir/bin:$PATH
+ls -l ./$buildir/libc.so.6
 ------------------------------------------------------
 _EOF
 }
 
 install() {
 	checkOsCpus
-    installGlibc
+    compileGlibc
 }
 
 case $1 in

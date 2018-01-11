@@ -23,6 +23,12 @@ set fencs=utf8,gbk,gb2312,gb18030
 let mapleader='\'  " leader key, default is '\''
 
 """"""""""""""""""""""""""""""
+" BASIC KEYBIND 
+""""""""""""""""""""""""""""""
+"map <F10>:set paste<CR>
+set pastetoggle=<F11>
+
+""""""""""""""""""""""""""""""
 " VIM BUNDLE 
 """"""""""""""""""""""""""""""
 set nocompatible              " be iMproved, required
