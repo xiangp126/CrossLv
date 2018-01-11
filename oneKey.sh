@@ -138,7 +138,6 @@ STEP : INSTALLING TMUX-PLUGIN MANAGER
 _EOF
     gitClonePath=https://github.com/tmux-plugins/tpm 
     clonedName=${baseDir}/${tackleDir[1]}/plugins/tpm
-    git clone $gitClonePath $clonedName 
     # check if target directory already exists
     if [[ -d $clonedName ]]; then
         echo [Warning]: target $clonedName already exists, Omitting clone ...
@@ -179,6 +178,8 @@ _EOF
     vim +"source ~/.vimrc" +PluginInstall +qall
 	# run restore routine
     sh autoHandle.sh restore
+    #load new .bashrc after 'restore' routine
+    source ~/.bashrc 2> /dev/null
 }
 
 installVim8() {
@@ -186,6 +187,8 @@ installVim8() {
     checkCmd=`vim --version | head -n 1 | grep -i "Vi IMproved 8" 2> /dev/null`
     if [[ "$checkCmd" != "" ]]; then
         echo "[Warning]: Vim 8 was already installed, omitting this step ..."
+        whereIsVim=`which vim`
+        vimInstDir=`echo ${whereIsVim%/bin*}`
         return
     fi
     cat << "_EOF"
@@ -364,7 +367,7 @@ Brief help
     send-prefix + I        # install
     send-prefix + U        # update
     send-prefix + Alt-u    # uninstall plugins not on the plugin list
-    [ctrl +x] +r             # :source ~/.tmux.conf
+    [ctrl +x] +r           # :source ~/.tmux.conf
 
 _EOF
     cat << _EOF
