@@ -182,9 +182,15 @@ _EOF
 }
 
 installVim8() {
+    #check if vim 8 was installed
+    checkCmd=`vim --version | head -n 1 | grep -i "Vi IMproved 8" 2> /dev/null`
+    if [[ "$checkCmd" != "" ]]; then
+        echo "[Warning]: Vim 8 was already installed, omitting this step ..."
+        return
+    fi
     cat << "_EOF"
 ------------------------------------------------------
-STEP : INSTALLING NEWLY VIM ...
+STEP : INSTALLING NEWLY VIM VERSION 8 ...
 ------------------------------------------------------
 _EOF
     vimInstDir=$commInstdir
