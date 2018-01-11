@@ -94,7 +94,7 @@ _EOF
 	if [[ ! -d $untarName ]]; then
 		tar -zxv -f $tarName
 	fi
-	echo [Error]: already untared, omitting tar -zxv -f $tarName ...
+	echo [Error]: Tar Ball already untared, omitting untar routine ...
 
     cd $untarName
 	# make a separate build directory
@@ -109,13 +109,22 @@ _EOF
 		echo [Error]: make returns error, quiting now ...
 		exit
 	fi
+
+    if [[ "$execPrefix" != "sudo" ]]; then
+        echo Not make install with oridinary privilege ...
+        `ls -l ./$buildir/libc.so.6`
+        exit
+    fi
+
     $execPrefix make install
+    #back to start directory
+    cd $startDir
     
     cat << _EOF
 ------------------------------------------------------
-INSTALLING glibc DONE ...
-`$glibcInstDir/bin/glibc --version`
-glibc path = $glibcInstDir/bin/
+INSTALLING GLIBC DONE ...
+export LD_LIBRARY_PATH=$glibcInstDir/lib:$glibcInstDir/lib64:$LD_LIBRARY_PATH
+export PATH=$glibcInstDir/bin:$PATH
 ------------------------------------------------------
 _EOF
 }
