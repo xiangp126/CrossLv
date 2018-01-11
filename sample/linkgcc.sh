@@ -35,6 +35,11 @@ case $1 in
         #gcc => gcc-sys
         for file in "${tackleFile[@]}" ; do
             lnSrcFileName=$myGccDir/$file
+            if [[ -f "$file-$bksuffix" ]]; then
+                echo "[Error]: already linked file exist, quiting now ..."
+                echo you should run unlink rather than link.
+                exit
+            fi
             if [[ ! -f "$lnSrcFileName" ]]; then
                 echo "[Warning]: has no $lnSrcFileName under $myGccDir, omitting it ..."
                 continue

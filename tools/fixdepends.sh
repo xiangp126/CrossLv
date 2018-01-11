@@ -3,6 +3,18 @@
 
 #dependency for Ubuntu
 ubuntuDepends=(
+    #build tools
+    "build-essential"
+    "cmake"
+    "python-dev"
+    "libmpc-dev"  #for compile gcc
+    #for compile git
+    "libcurl4-openssl-dev"
+    "automake"
+    "asciidoc"
+    "xmlto"
+    "libperl-dev"
+    #common tools
     "figlet"            
     "shellcheck"
     "htop"
@@ -12,32 +24,31 @@ ubuntuDepends=(
     "tmux"          # terminal multiplexer
     "checkinstall"
     "mosh"          # mobile ssh tool
-    #for compile gcc
-    "libmpc-dev"
-    #for compile git
-    "libcurl4-openssl-dev"
-    "automake"
-    "asciidoc"
-    "xmlto"
-    "libperl-dev"
 )
 
 #dependency for CentOS
 centosDepends=(
-    "figlet"            
-    "shellcheck"
-    "mosh"          # mobile ssh tool
-    "htop"
-    "iftop"
-    "netcat"        # also known as nc
-    "bridge-utils"
-    "tmux"          # terminal multiplexer
+    #compile tools
+    "cmake"
+    "python-devel"
+    "gmp-devel"
+    "gcc"
+    "gcc-c++"
+    #"shellcheck"
     #for git use
     "libcurl-devel"
     "automake"
     "asciidoc"
     "xmlto"
     "perl-devel"
+    # common tools
+    "figlet"            
+    "mosh"          # mobile ssh tool
+    "htop"
+    "iftop"
+    "netcat"        # also known as nc
+    "bridge-utils"
+    "tmux"          # terminal multiplexer
 )
 
 logo() {
