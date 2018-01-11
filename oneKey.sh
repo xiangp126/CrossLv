@@ -97,20 +97,21 @@ STEP : RUN BACKUP FIRST ...
 _EOF
     sh autoHandle.sh backup
 
-    # absolute file path.
-    for tdir in "${tackleDir[@]}"
-    do
-        #~/.tmux
-        abPath=${baseDir}/${tdir}
-        bkAbPath=${abPath}.${bkPostfix}
-        # remove .old files before mv overwrite.
-        if [[ -d "$bkAbPath" ]]; then
-            rm -rf $bkAbPath
-        fi
-        if [[ -d "$abPath" ]]; then
-            cp -r ${abPath} $bkAbPath 
-        fi
-    done
+    #no need to backup after v3.9.1
+    #backup .vim/.tmux to .vim.old/.tmux.old
+#    for tdir in "${tackleDir[@]}"
+#    do
+#        #~/.tmux
+#        abPath=${baseDir}/${tdir}
+#        bkAbPath=${abPath}.${bkPostfix}
+#        # remove .old files before mv overwrite.
+#        if [[ -d "$bkAbPath" ]]; then
+#            rm -rf $bkAbPath
+#        fi
+#        if [[ -d "$abPath" ]]; then
+#            cp -r ${abPath} $bkAbPath 
+#        fi
+#    done
 
     cat << "_EOF"
 ------------------------------------------------------
@@ -299,7 +300,7 @@ _EOF
     if [[ "$whereIsPython3" != "" ]]; then
         pythonExe=$whereIsPython3
     fi
-    $pythonExe install.py --clang-completer
+    $pythonExe ./install.py --clang-completer
 
     # check if install returns successfully
     if [[ $? != 0 ]]; then
@@ -333,6 +334,7 @@ _EOF
     tmuxInstallScript=~/.tmux/plugins/tpm/bin/install_plugins
     sh -x $tmuxInstallScript
 
+    #no need to recover this after v3.9.1
     #tmux rescover plugin
 #     newResurrectDir=~/.tmux/resurrect
 #     oldResurrectDir=~/.tmux.old/resurrect

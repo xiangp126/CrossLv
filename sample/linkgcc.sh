@@ -5,18 +5,13 @@ sysGccDir=/usr/bin/
 
 startDir=`pwd`
 mainWd=$startDir
-#file gcc/c++
+tackleFile=(
+    "gcc"
+    "g++"
+    "c++"
+)
 #backup suffix
 bksuffix=sys
-
-if [[ ! -f "$myGccDir/gcc" ]]; then
-    echo no gcc under $myGccDir, exit now ...
-    exit
-fi
-if [[ ! -f "$myGccDir/c++" ]]; then
-    echo no c++ under $myGccDir, exit now ...
-    exit
-fi
 
 usage() {
 	exeName=${0##*/}
@@ -37,17 +32,29 @@ _EOF
 case $1 in
     'link' )
         cd $sysGccDir
-        #gcc-sys
-        sudo mv gcc gcc-$bksuffix
-        sudo mv c++ c++-$bksuffix
-        sudo ln -s $myGccDir/gcc gcc
-        sudo ln -s $myGccDir/c++ c++
+        #gcc => gcc-sys
+        for file in "${tackleFile[@]}" ; do
+            lnSrcFileName=$myGccDir/$file
+            if [[ ! -f "$lnSrcFileName" ]]; then
+                echo "[Warning]: has no $lnSrcFileName under $myGccDir, omitting it ..."
+                continue
+            fi
+            sudo mv $file $file-$bksuffix
+            sudo ln -s $lnSrcFileName $file
+        done
     ;;
 
     'unlink' )
         cd $sysGccDir
-        sudo mv gcc-$bksuffix gcc
-        sudo mv c++-$bksuffix c++
+        #gcc-sys => gcc
+        for file in "${tackleFile[@]}" ; do
+            bkFileName=$file-$bksuffix
+            if [[ ! -f "$bkFileName" ]]; then
+                echo "[Warning]: has no $bkFileName under $sysGccDir, omitting it ..."
+                continue
+            fi
+            sudo mv $file-$bksuffix $file
+        done
     ;;
 
     *)
