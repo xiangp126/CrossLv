@@ -36,8 +36,8 @@ case $1 in
 
     'unlink' )
         cd $sysGccDir
-        sudo mv gcc-$bksuffixgcc gcc
-        sudo mv g++-$bksuffixg++ g++
+        sudo mv gcc-$bksuffix gcc
+        sudo mv g++-$bksuffix g++
     ;;
 
     *)
