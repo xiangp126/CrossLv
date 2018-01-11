@@ -5,9 +5,9 @@ startDir=`pwd`
 # main work directory
 mainWd=$startDir
 
-# Gcc install
+# Glibc install
 # common install dir for home | root mode
-homeInstDir=/ws/penxiang-sjc/.usr
+homeInstDir=~/.usr
 rootInstDir=/usr/local
 # default is home mode
 commInstdir=$homeInstDir
@@ -18,12 +18,12 @@ osCpus=1
 
 logo() {
     cat << "_EOF"
-             _   _
- _ __  _   _| |_| |__   ___  _ __
-| '_ \| | | | __| '_ \ / _ \| '_ \
-| |_) | |_| | |_| | | | (_) | | | |
-| .__/ \__, |\__|_| |_|\___/|_| |_|
-|_|    |___/
+      _ _ _
+  __ _| (_) |__   ___
+ / _` | | | '_ \ / __|
+| (_| | | | |_) | (__
+ \__, |_|_|_.__/ \___|
+ |___/
 
 _EOF
 }
@@ -32,7 +32,8 @@ usage() {
     exeName=${0##*/}
     cat << _EOF
 [NAME]
-    $exeName -- setup newly python3 
+    $exeName -- setup newly glibc 2.15
+                || 2.26 too old as GNU ld
 
 [SYNOPSIS]
     $exeName [home | root | help]
@@ -59,18 +60,18 @@ checkOsCpus() {
     echo "OS has CPU(S): $osCpus"
 }
 
-installGcc() {
+installGlibc() {
     cat << "_EOF"
 ------------------------------------------------------
-STEP : INSTALLING GCC5 ...
+STEP : INSTALLING GLIBC ...
 ------------------------------------------------------
 _EOF
-    gccInstDir=$commInstdir
+    glibcInstDir=$commInstdir
     $execPrefix mkdir -p $commInstdir
-    # comm attribute to get source 'gcc'
-    wgetLink=http://ftp.tsukuba.wide.ad.jp/software/gcc/releases/gcc-5.5.0
-    tarName=gcc-5.5.0.tar.gz
-    untarName=gcc-5.5.0
+    # comm attribute to get source 'glibc'
+    wgetLink=http://mirrors.peers.community/mirrors/gnu/libc
+    tarName=glibc-2.15.tar.gz
+    untarName=glibc-2.15
 
     # rename download package if needed
     cd $startDir
@@ -90,42 +91,38 @@ _EOF
         fi
     fi
 
-    if [[ ! -d $untarName ]]; then
-        tar -zxv -f $tarName
-    fi
+	if [[ ! -d $untarName ]]; then
+		tar -zxv -f $tarName
+	fi
+	echo [Error]: already untared, omitting tar -zxv -f $tarName ...
 
     cd $untarName
-    #download extra packages fixing depends
-    ./contrib/download_prerequisites
-    #for ubuntu has privilege, use apt-get install libmpc-dev fix error.
-	if [[ $? != 0 ]]; then
-		echo [error]: fix depends returns error, quiting now ...
-        echo Ubuntu use apt-get install libmpc-dev may fix error ...
-		exit
-	fi
-
-    ./configure --prefix=$gccInstDir \
-                --disable-multilib
+	# make a separate build directory
+	buildir=build_tmp
+	mkdir -p $buildir
+	cd $buildir
+    ../configure --prefix=$glibcInstDir \
+                 --disable-sanity-checks
     make -j $osCpus
 	# check if make returns successfully
 	if [[ $? != 0 ]]; then
-		echo [error]: make returns error, quiting now ...
+		echo [Error]: make returns error, quiting now ...
 		exit
 	fi
     $execPrefix make install
     
     cat << _EOF
 ------------------------------------------------------
-INSTALLING GCC DONE ...
-`$gccInstDir/bin/gcc --version`
-GCC/C++/G++ path = $gccInstDir/bin/
+INSTALLING glibc DONE ...
+`$glibcInstDir/bin/glibc --version`
+glibc path = $glibcInstDir/bin/
 ------------------------------------------------------
 _EOF
 }
 
 install() {
 	checkOsCpus
-    installGcc
+    installGlibc
 }
 
 case $1 in

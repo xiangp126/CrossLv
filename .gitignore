@@ -6,6 +6,7 @@ git/
 gcc/
 gcc-*
 Python-*
+glibc-*
 backup.*/
 dry_install/
 dry_restore/

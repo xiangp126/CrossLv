@@ -420,6 +420,7 @@ case $1 in
     'home')
         commInstdir=$homeInstDir
         execPrefix=""
+        install
     ;;
 
     'root')

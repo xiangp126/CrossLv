@@ -183,6 +183,64 @@ _EOF
     source ~/.bashrc 2> /dev/null
 }
 
+installPython3() {
+    #find python2 & python3 config dir
+	#python2Config=`python2-config --configdir 2> /dev/null`
+	python3Config=`python3-config --configdir 2> /dev/null`
+    if [[ "$python3Config" != "" ]]; then
+        echo [Error]: python3/python3-config already installed, omitting this step ...
+        return
+    fi
+    cat << "_EOF"
+------------------------------------------------------
+STEP : INSTALLING PYTHON3 ...
+------------------------------------------------------
+_EOF
+    python3InstDir=$commInstdir
+    $execPrefix mkdir -p $commInstdir
+    # comm attribute to get source 'python3'
+    wgetLink=https://www.python.org/ftp/python/3.6.4
+	tarName=Python-3.6.4.tgz
+    untarName=Python-3.6.4
+
+    # rename download package if needed
+    cd $startDir
+    # check if already has this tar ball.
+    if [[ -f $tarName ]]; then
+        echo [Warning]: Tar Ball $tarName already exists, Omitting wget ...
+    else
+        wget --no-cookies \
+            --no-check-certificate \
+            --header "Cookie: oraclelicense=accept-securebackup-cookie" \
+            "${wgetLink}/${tarName}" \
+            -O $tarName
+        # check if wget returns successfully
+        if [[ $? != 0 ]]; then
+            echo [Error]: wget returns error, quiting now ...
+            exit
+        fi
+    fi
+    tar -zxv -f $tarName
+    cd $untarName
+    ./configure --prefix=$python3InstDir \
+                --enable-shared
+    make -j $osCpus
+	# check if make returns successfully
+	if [[ $? != 0 ]]; then
+		echo [Error]: make returns error, quiting now ...
+		exit
+	fi
+    $execPrefix make install
+    
+    cat << _EOF
+------------------------------------------------------
+INSTALLING python3 DONE ...
+`$python3InstDir/bin/python3 --version`
+python3 path = $python3InstDir/bin/
+------------------------------------------------------
+_EOF
+}
+
 installVim8() {
     #check if vim 8 was installed
     checkCmd=`vim --version | head -n 1 | grep -i "Vi IMproved 8" 2> /dev/null`
@@ -393,6 +451,7 @@ install() {
     installBone
     installTmuxPlugins
     installVimPlugins 
+    installPython3
     installVim8
     compileYcm
     installSummary

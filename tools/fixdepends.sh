@@ -19,7 +19,8 @@ ubuntuDepends=(
     "shellcheck"
     "htop"
     "iftop"
-    "netcat"        # also known as nc
+    "tcpdump"
+    #"netcat"        # also known as nc
     "bridge-utils"
     "tmux"          # terminal multiplexer
     "checkinstall"
@@ -67,6 +68,7 @@ usage() {
     cat << _EOF
 [NAME]
     $exeName -- fix common dependes for this OS
+                || no sudo before command
 
 [SYNOPSIS] 
     sh $exeName [install | uninstall | help]
@@ -107,6 +109,7 @@ _EOF
         ;;
         'CentOS' | 'Red')
             echo "OS is CentOS or Red Hat..."
+            yum groupinstall "Development Tools" -y
             for pkg in ${centosDepends[@]}
             do
                 sudo yum $para $pkg -y
