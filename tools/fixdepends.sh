@@ -20,7 +20,7 @@ ubuntuDepends=(
     "htop"
     "iftop"
     "tcpdump"
-    #"netcat"        # also known as nc
+    "netcat"        # also known as nc
     "bridge-utils"
     "tmux"          # terminal multiplexer
     "checkinstall"
@@ -47,7 +47,7 @@ centosDepends=(
     "mosh"          # mobile ssh tool
     "htop"
     "iftop"
-    "netcat"        # also known as nc
+    #"netcat"        # also known as nc
     "bridge-utils"
     "tmux"          # terminal multiplexer
 )

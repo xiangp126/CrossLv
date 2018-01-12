@@ -7,8 +7,8 @@ mainWd=$startDir
 
 # Glibc install
 # common install dir for home | root mode
-homeInstDir=~/.usr
-rootInstDir=/usr/local
+homeInstDir=~/.usr/myglibc
+rootInstDir=/usr/local/myglibc
 # default is home mode
 commInstdir=$homeInstDir
 #sudo or empty
@@ -33,7 +33,7 @@ usage() {
     cat << _EOF
 [NAME]
     $exeName -- setup newly glibc 2.15
-                || only compile, must not install
+                || must install in a separare dir
 
 [SYNOPSIS]
     $exeName [home | root | help]
@@ -70,8 +70,10 @@ _EOF
     $execPrefix mkdir -p $commInstdir
     # comm attribute to get source 'glibc'
     wgetLink=http://mirrors.peers.community/mirrors/gnu/libc
-    tarName=glibc-2.15.tar.gz
-    untarName=glibc-2.15
+    #tarName=glibc-2.26.tar.gz
+    #untarName=glibc-2.26
+    tarName=glibc-2.16.0.tar.gz
+    untarName=glibc-2.16.0
 
     # rename download package if needed
     cd $startDir
@@ -109,16 +111,18 @@ _EOF
 		echo [Error]: make returns error, quiting now ...
 		exit
 	fi
+    $execPrefix make install
 
     #back to start directory
     cd $startDir
     
-    cat << _EOF
-------------------------------------------------------
-INSTALLING GLIBC DONE ...
-ls -l ./$buildir/libc.so.6
-------------------------------------------------------
-_EOF
+    set +x
+    echo ------------------------------------------------------
+    echo COMPILING GLIBC DONE ...
+    echo GLIBC INSTALL DIR: $glibcInstDir
+    echo "export PATH=$glibcInstDir/bin"':$PATH'
+    echo "export LD_LIBRARY_PATH=$glibcInstDir/lib"':$LD_LIBRARY_PATH'
+    echo ------------------------------------------------------
 }
 
 install() {

@@ -121,10 +121,12 @@ export SHELL=/bin/bash
 export EDITOR=vim
 # SET PATH VARIABLES.
 PATH=~/.usr/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin
-export PATH
 # export PKG_CONFIG_PATH=~/.usr/lib/pkgconfig:$PKG_CONFIG_PATH
-export PKG_CONFIG_PATH=~/.usr/lib/pkgconfig:/usr/local/lib/pkgconfig
-export LD_LIBRARY_PATH=~/.usr/lib:/usr/local/lib
+PKG_CONFIG_PATH=~/.usr/lib/pkgconfig:/usr/local/lib/pkgconfig
+LD_LIBRARY_PATH=~/.usr/lib:~/.usr/lib64:/usr/local/lib:/usr/local/lib64
+export PATH
+export PKG_CONFIG_PATH
+export LD_LIBRARY_PATH
 
 # SET HTTP/HTTPS PROXY.
 # ssh -vv -ND 8080 [proxy_ip] [port]

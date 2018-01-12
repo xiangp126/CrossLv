@@ -1,0 +1,12 @@
+--------- reference link
+https://github.com/Valloric/ycmd/issues/838
+
+---------- check ycmd ilnk issue
+cd ~/.vim/bundle/YouCompleteMe/third_party/ycmd
+ldd ycm_core.so
+
+---------- check ycmd ilnk issue 2
+LD_LIBRARY_PATH=/path/to/gcc-4.8.2/lib python -c "import ycm_core; print(ycm_core.HasClangSupport())"
+
+-------------
+#you should compile python3 with your self-compiled gcc/c++ first

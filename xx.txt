@@ -1,0 +1,11 @@
+if gcc not support c++11, you have to build your gcc/c++ version
+
+and then use set following variables before 'make'
+
+export CC=/usr/local/bin/gcc
+export CXX=/usr/local/bin/c++
+
+use your newly built gcc/c++ to build:
+-- python3
+
+before compile YCM

@@ -90,19 +90,20 @@ _EOF
     git checkout $checkoutVersion
 	# clean before ./configure
 	make distclean
-	# python2Config=`python2-config --configdir`
-	# python3Config='/usr/lib/python3.4/config-3.4m-x86_64-linux-gnu/'
-	./configure --prefix=$vimInstDir \
-			--with-features=huge \
-            --enable-multibyte \
-            --enable-rubyinterp=yes \
-            --enable-pythoninterp=yes \
-            --enable-python3interp=yes \
-            --enable-perlinterp=yes \
-            --enable-luainterp=yes \
-    		--enable-gui=gtk2 \
-			--enable-cscope
-    # ./configure --prefix=$vimInstDir --enable-pythoninterp=yes --enable-python3interp=yes
+    python2Config=`python2-config --configdir 2> /dev/null`
+    python3Config=`python3-config --configdir 2> /dev/null`
+    ./configure --prefix=$vimInstDir \
+                --with-features=huge \
+                --enable-multibyte \
+                --enable-rubyinterp=yes \
+                --enable-pythoninterp=yes \
+                --with-python2-config-dir=$python2Config \
+                --enable-python3interp=yes \
+                --with-python3-config-dir=$python3Config \
+                --enable-perlinterp=yes \
+                --enable-luainterp=yes \
+                --enable-gui=gtk2 \
+                --enable-cscope
     make -j $osCpus
     # check if make returns successfully
     if [[ $? != 0 ]]; then

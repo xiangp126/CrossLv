@@ -281,25 +281,25 @@ _EOF
 	make distclean
 
     #find python2 & python3 config dir
-	python2Config=`python2-config --configdir 2> /dev/null`
-	python3Config=`python3-config --configdir 2> /dev/null`
+    python2Config=`python2-config --configdir 2> /dev/null`
+    python3Config=`python3-config --configdir 2> /dev/null`
     if [[ "$python2Config" == "" && "$python3Config" == "" ]]; then
         echo [Error]: Not found python2 or python3, please install either of them ...
         exit
     fi
 
-	./configure --prefix=$vimInstDir \
-			--with-features=huge \
-            --enable-multibyte \
-            --enable-rubyinterp=yes \
-            --enable-pythoninterp=yes \
-            --with-python3-config-dir=$python2Config \
-            --enable-python3interp=yes \
-            --with-python3-config-dir=$python3Config \
-            --enable-perlinterp=yes \
-            --enable-luainterp=yes \
-    		--enable-gui=gtk2 \
-			--enable-cscope
+    ./configure --prefix=$vimInstDir \
+                --with-features=huge \
+                --enable-multibyte \
+                --enable-rubyinterp=yes \
+                --enable-pythoninterp=yes \
+                --with-python2-config-dir=$python2Config \
+                --enable-python3interp=yes \
+                --with-python3-config-dir=$python3Config \
+                --enable-perlinterp=yes \
+                --enable-luainterp=yes \
+                --enable-gui=gtk2 \
+                --enable-cscope
     make -j $checkOsCpus
     # check if make returns successfully
     if [[ $? != 0 ]]; then
@@ -363,7 +363,12 @@ _EOF
     # check if install returns successfully
     if [[ $? != 0 ]]; then
         echo [Error]: install fails, quitting now ...
-        echo you can try ./sample/linkgcc.sh to link your newly gcc/g++
+        cat << "_EOF"
+        if 'Your C++ compiler does NOT fully support C++11.'
+        Build you new gcc/c++
+        and then source template/gcc_env.sh [MODE]
+        and then build again
+_EOF
         exit
     fi
     cat << "_EOF"

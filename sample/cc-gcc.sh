@@ -120,6 +120,11 @@ INSTALLING GCC DONE ...
 `$gccInstDir/bin/gcc --version`
 GCC/C++/G++ path = $gccInstDir/bin/
 ------------------------------------------------------
+before you run 'make' using this newly built gcc/c++
+-------------
+export CC=$gccInstDir/bin/gcc
+export CXX=$gccInstDir/bn/c++
+------------------------------------------------------
 _EOF
 }
 
