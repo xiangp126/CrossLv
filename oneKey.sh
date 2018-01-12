@@ -69,6 +69,34 @@ set +x
     logo
 }    
 
+#gcc must support C++11 to compile YCM
+checkGccVersion() {
+    gccLocation=/usr/bin/gcc
+    if [[ "$CC" != "" ]]; then
+        gccLocation=$CC
+    fi
+    version=`$gccLocation -dumpversion`
+    gccVersion=${version%.*}
+    basicVersion=4.8
+    echo $gccVersion
+    #if gcc < 4.8, exit
+    if [[ `echo "$gccVersion >= $basicVersion" | bc` -ne 1 ]]; then
+        cat << _EOF
+[FatalError]: Gcc version < 4.8.0, not support c++11
+-----------------------------------------------------
+compile gcc(version > 4.8) to /usr/local
+--
+export CC=/usr/local/bin/gcc
+export CXX=/usr/local/bin/c++
+export LDFLAGS="-L/usr/local/lib -L/usr/local/lib64" 
+-- or
+use 'source sample/gen-gccenv.sh root' to export env 
+-----------------------------------------------------
+_EOF
+        exit
+    fi
+}
+
 checkOsCpus() {
     if [[ "`which lscpu 2> /dev/null`" == "" ]]; then
         echo [Warning]: OS has no lscpu installed, omitting this ...
@@ -452,6 +480,7 @@ _EOF
 }
 
 install() {
+    checkGccVersion
     checkOsCpus
     installBone
     installTmuxPlugins

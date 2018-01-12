@@ -1,0 +1,3 @@
+export CC=/home/corsair/.usr/bin/gcc
+export CXX=/home/corsair/.usr/bin/c++
+export LDFLAGS="-L/home/corsair/.usr/lib -L/home/corsair/.usr/lib64"

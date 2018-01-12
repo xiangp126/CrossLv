@@ -1,15 +1,14 @@
-we can manual specify gcc/c++ using env variables
----------------------
+WE CAN MANUAL SPECIFY GCC/C++ USING ENV VARIABLES
+----------
 export CC=/usr/local/bin/gcc
 export CXX=/usr/local/bin/c++
 make -j
 
----------------------
-or
+---------- or
 make CC=/usr/local/bin/gcc CXX=/usr/local/bin/c++ -j
 
+SOME INFLUENTIAL ENVIRONMENT VARIABLES FOR GCC
 -----------------------------------------------------
-Some influential environment variables:
   CC          C compiler command
   CFLAGS      C compiler flags
   LDFLAGS     linker flags, e.g. -L<lib dir> if you have libraries in a
@@ -21,3 +20,12 @@ Some influential environment variables:
   CXX         C++ compiler command
   CXXFLAGS    C++ compiler flags
 
+VALUE ENV VARIABLE
+-----------------------------------------------------
+LD_PRELOAD=/lib64/libc-2.12.so whoami
+LD_PRELOAD=/lib64/libc-2.12.so ls -l
+LD_PRELOAD=/lib64/libc-2.12.so ln -sf /lib64/libc-2.12.so /lib64/libc.so.6
+
+---------- .bashrc
+LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib64
+PKG_CONFIG_PATH=/usr/local/lib/pkgconfig

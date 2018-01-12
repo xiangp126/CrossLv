@@ -11,6 +11,7 @@ usage() {
     cat << _EOF
 [NAME]
     $exeName -- source self-built gcc/c++ env
+                || and write to config
 
 [SYNOPSIS]
     source $exeName [home | root | help]
@@ -22,9 +23,17 @@ _EOF
 }
 
 tackleMode() {
+    #export env variables
     export CC=${commInstdir}/bin/gcc
     export CXX=${commInstdir}/bin/c++
     export LDFLAGS="-L${commInstdir}/lib -L${commInstdir}/lib64"
+    #write to config for further use
+    writeFile=gccenv.txt
+    cat > ./$writeFile << _EOF
+export CC=${commInstdir}/bin/gcc
+export CXX=${commInstdir}/bin/c++
+export LDFLAGS="-L${commInstdir}/lib -L${commInstdir}/lib64"
+_EOF
 }
 
 case $1 in

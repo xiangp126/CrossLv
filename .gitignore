@@ -11,3 +11,5 @@ backup.*/
 dry_install/
 dry_restore/
 __pycache__/
+gccenv.txt
+!gccenv.txt.sample
