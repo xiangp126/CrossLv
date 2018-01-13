@@ -1,0 +1,10 @@
+------------------------ CentOS
+sudo vim /etc/ssh/sshd_config
+#search in vim for 'Password'
+
+-- demon begin
+Password Authentiaction no
+-- demon end
+
+sudo /etc/init.d/sshd restart
+and wait ...

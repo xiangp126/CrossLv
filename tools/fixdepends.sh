@@ -6,6 +6,7 @@ ubuntuDepends=(
     #build tools
     "build-essential"
     "cmake"
+    "ctags"
     "python-dev"
     "libmpc-dev"  #for compile gcc
     #for compile git
@@ -14,6 +15,9 @@ ubuntuDepends=(
     "asciidoc"
     "xmlto"
     "libperl-dev"
+    #for compile vim8
+    "perl-*"
+    "lib32ncursesw5-dev"
     #common tools
     "figlet"            
     "shellcheck"
@@ -31,6 +35,8 @@ ubuntuDepends=(
 centosDepends=(
     #compile tools
     "cmake"
+    "ncurses*"
+    "ctags"
     "python-devel"
     "gmp-devel"
     "gcc"

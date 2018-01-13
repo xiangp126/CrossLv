@@ -1,15 +1,15 @@
-## Ubuntu 
+---------------------------------- Ubuntu 
 # cd /etc/sudoers.d
 # sudo vim You-Name
 
-# begin of example
+-- begin of example
 You-Name ALL=(root) NOPASSWD:ALL
 Defaults:You-Name secure_path=/sbin:/usr/sbin:/usr/bin:/bin:/usr/local/sbin:/usr/local/bin
-# end of example
+-- end of example
 
-## CentOS
+---------------------------------- CentOS
 # sudo vim /etc/sudoers
-# begin of sample
+-- begin of sample
 
 ## The COMMANDS section may have other options added to it.
 ##
@@ -18,4 +18,4 @@ root     ALL=(ALL)       ALL
 You-Name ALL=(ALL)     NOPASSWD: ALL
 
 ## Allows members of the 'sys' group to run networking, software,
-# end of sample
+-- end of sample

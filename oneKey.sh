@@ -58,8 +58,8 @@ usage() {
     $exeName [home | root | help]
 
 [DESCRIPTION]
-    home -- build VIM to $homeInstDir/
-    root -- build VIM to $rootInstDir/
+    home -- build VIM/Python3 to $homeInstDir/
+    root -- build VIM/Python3 to $rootInstDir/
 
 [TROUBLESHOOTING]
     sudo ln -s /bin/bash /bin/sh, make sure sh linked to bash.
@@ -321,7 +321,7 @@ _EOF
                 --enable-multibyte \
                 --enable-rubyinterp=yes \
                 --enable-pythoninterp=yes \
-                --with-python2-config-dir=$python2Config \
+                --with-python-config-dir=$python2Config \
                 --enable-python3interp=yes \
                 --with-python3-config-dir=$python3Config \
                 --enable-perlinterp=yes \
@@ -333,6 +333,7 @@ _EOF
     if [[ $? != 0 ]]; then
         echo [Error]: make returns error, try below commands ...
         echo "sudo yum -y install perl-devel perl-ExtUtils-Embed"
+        echo or "sudo apt-get install perl-* lib32ncursesw5-dev"
         exit
     fi
     $execPrefix make install
@@ -368,7 +369,7 @@ _EOF
 	repoName=YouCompleteMe
     ycmDir=~/.vim/bundle/YouCompleteMe
     if [[ -d $ycmDir ]]; then
-        echo [Warning]: already has YCM installed, omitting now ...
+        echo [Warning]: already has YCM repo cloned, omitting now ...
     else
         git clone $repoLink/$repoName $ycmDir
         # check if clone returns successfully
@@ -392,10 +393,12 @@ _EOF
     if [[ $? != 0 ]]; then
         echo [Error]: install fails, quitting now ...
         cat << "_EOF"
-        if 'Your C++ compiler does NOT fully support C++11.'
+        -- native gcc/c++ not support c++11
         Build you new gcc/c++
-        and then source template/gcc_env.sh [MODE]
-        and then build again
+        source template/gcc_env.sh [MODE]
+        -- or md5 mismatch
+        rm ~/.vim/bundle/YouCompleteMe
+        then try again
 _EOF
         exit
     fi

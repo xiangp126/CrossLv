@@ -6,7 +6,8 @@ set ignorecase
 set number
 set ruler
 set tabstop=4
-set expandtab " set TAB expands to spaces
+"set TAB expands to spaces
+set expandtab 
 set laststatus=1
 set softtabstop=4
 set shiftwidth=4
@@ -16,17 +17,19 @@ set cinoptions={0,1s,t0,n-2,p2s,(03s,=.5s,>1s,=1s,:1s
 set fileencodings=utf-8,gb2312,gb18030,gbk,ucs-bom,cp936,latin1
 set enc=utf8
 set fencs=utf8,gbk,gb2312,gb18030
-" set text auto next line when exceed 80 characters.
-" set textwidth=80 formatoptions+=Mm
 " always use 'corsair.vim' scheme in private ~/.vim/colors/corsair.vim
 :colorscheme corsair
 let mapleader='\'  " leader key, default is '\''
+" set text auto next line when exceed 80 characters.
+" set textwidth=80 formatoptions+=Mm
 
 """"""""""""""""""""""""""""""
 " BASIC KEYBIND 
 """"""""""""""""""""""""""""""
-"map <F10>:set paste<CR>
-set pastetoggle=<F11>
+" Toggle paste mode, F11 usually for maximum
+set pastetoggle=<F12>  
+" Toggle line numbers 
+noremap <F10> :set invnumber <CR>
 
 """"""""""""""""""""""""""""""
 " VIM BUNDLE 
