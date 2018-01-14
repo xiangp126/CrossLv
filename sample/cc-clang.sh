@@ -23,8 +23,12 @@ osCpus=1
 
 logo() {
     cat << "_EOF"
-
-clang
+      _
+  ___| | __ _ _ __   __ _
+ / __| |/ _` | '_ \ / _` |
+| (__| | (_| | | | | (_| |
+ \___|_|\__,_|_| |_|\__, |
+                    |___/
 _EOF
 }
 
@@ -32,10 +36,10 @@ usage() {
     exeName=${0##*/}
     cat << _EOF
 [NAME]
-    $exeName -- build newly clang  
+    $exeName -- compile and install newly clang version
 
 [SYNOPSIS]
-    $exeName [home | root | help]
+    sh $exeName [home | root | help]
 
 [DESCRIPTION]
     home -- install to $homeInstDir/

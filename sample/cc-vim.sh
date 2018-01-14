@@ -34,7 +34,7 @@ usage() {
     $exeName -- setup newly Vim 8.0
 
 [SYNOPSIS]
-    $exeName [home | root | help]
+    sh $exeName [home | root | help]
 
 [DESCRIPTION]
     home -- install to $homeInstDir/

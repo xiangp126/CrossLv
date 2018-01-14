@@ -52,7 +52,7 @@ usage() {
     $exeName -- install newly Git through one script
 
 [SYNOPSIS]
-    $exeName [home | root | help]
+    sh $exeName [home | root | help]
 
 [DESCRIPTION]
     home -- install to $homeInstDir/

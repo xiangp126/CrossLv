@@ -7,7 +7,7 @@ mainWd=$startDir
 
 # Gcc install
 # common install dir for home | root mode
-homeInstDir=/ws/penxiang-sjc/.usr
+homeInstDir=~/.usr
 rootInstDir=/usr/local
 # default is home mode
 commInstdir=$homeInstDir
@@ -18,12 +18,11 @@ osCpus=1
 
 logo() {
     cat << "_EOF"
-             _   _
- _ __  _   _| |_| |__   ___  _ __
-| '_ \| | | | __| '_ \ / _ \| '_ \
-| |_) | |_| | |_| | | | (_) | | | |
-| .__/ \__, |\__|_| |_|\___/|_| |_|
-|_|    |___/
+  ____  ____ ____
+ / ___|/ ___/ ___|
+| |  _| |  | |
+| |_| | |__| |___
+ \____|\____\____|
 
 _EOF
 }
@@ -32,10 +31,10 @@ usage() {
     exeName=${0##*/}
     cat << _EOF
 [NAME]
-    $exeName -- setup newly python3 
+    $exeName -- compile and install newly gcc/c++ version
 
 [SYNOPSIS]
-    $exeName [home | root | help]
+    [HOME=/other/home/to/install] sh $exeName [home | root | help]
 
 [DESCRIPTION]
     home -- install to $homeInstDir/
@@ -105,7 +104,8 @@ _EOF
 	fi
 
     ./configure --prefix=$gccInstDir \
-                --disable-multilib
+                --disable-multilib \
+                --enable-checking=release
     make -j $osCpus
 	# check if make returns successfully
 	if [[ $? != 0 ]]; then

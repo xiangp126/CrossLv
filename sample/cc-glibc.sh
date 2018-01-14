@@ -38,7 +38,7 @@ usage() {
                 || must install in a separare dir
 
 [SYNOPSIS]
-    $exeName [home | root | help]
+    sh $exeName [home | root | help]
 
 [DESCRIPTION]
     home -- install to $homeInstDir/

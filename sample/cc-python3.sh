@@ -35,7 +35,7 @@ usage() {
     $exeName -- setup newly python3 
 
 [SYNOPSIS]
-    $exeName [home | root | help]
+    sh $exeName [home | root | help]
 
 [DESCRIPTION]
     home -- install to $homeInstDir/
