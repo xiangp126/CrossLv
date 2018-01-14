@@ -5,28 +5,26 @@ startDir=`pwd`
 # main work directory
 mainWd=$startDir
 
-# Glibc install
+# Clang install
 # common install dir for home | root mode
-#glibc installation name
-glibcVersion=2.16.0
-homeInstDir=~/.usr/glibc-$glibcVersion
-rootInstDir=/opt/glibc-$glibcVersion
+homeInstDir=~/.usr
+rootInstDir=/usr/local
 # default is home mode
 commInstdir=$homeInstDir
 #sudo or empty
 execPrefix=""      
+#clang install info
+clangVersion=5.0.1
+clangHomeInstDir=~/.usr/clang-$clangVersion
+clangRootInstDir=/opt/clang-$clangVersion
+clangInstDir=$clangHomeInstDir
 #how many cpus os has, used for make -j 
 osCpus=1
 
 logo() {
     cat << "_EOF"
-      _ _ _
-  __ _| (_) |__   ___
- / _` | | | '_ \ / __|
-| (_| | | | |_) | (__
- \__, |_|_|_.__/ \___|
- |___/
 
+clang
 _EOF
 }
 
@@ -34,8 +32,7 @@ usage() {
     exeName=${0##*/}
     cat << _EOF
 [NAME]
-    $exeName -- setup newly glibc 2.16
-                || must install in a separare dir
+    $exeName -- build newly clang  
 
 [SYNOPSIS]
     $exeName [home | root | help]
@@ -62,19 +59,34 @@ checkOsCpus() {
     echo "OS has CPU(S): $osCpus"
 }
 
-compileGlibc() {
+#cmake > 3.0
+checkGccVersion() {
+    gccLocation=/usr/bin/gcc
+    if [[ "$CC" != "" ]]; then
+        gccLocation=$CC
+    fi
+    version=`$gccLocation -dumpversion`
+    gccVersion=${version%.*}
+    basicVersion=3.0
+    echo $gccVersion
+    #if gcc < 4.8, exit
+    if [[ `echo "$gccVersion >= $basicVersion" | bc` -ne 1 ]]; then
+        echo 
+    fi
+}
+
+installCmake() {
     cat << "_EOF"
 ------------------------------------------------------
-STEP : INSTALLING GLIBC ...
+STEP : INSTALLING CMAKE 3.10 ...
 ------------------------------------------------------
 _EOF
-    # comm attribute to get source 'glibc'
-    #glibcVersion=2.16.0
-    glibcInstDir=$commInstdir
+    cmakeInstDir=$commInstdir
     $execPrefix mkdir -p $commInstdir
-    wgetLink=http://mirrors.peers.community/mirrors/gnu/libc
-    tarName=glibc-$glibcVersion.tar.gz
-    untarName=glibc-$glibcVersion
+    # comm attribute to get source 'python3'
+    wgetLink=https://cmake.org/files/v3.10
+    tarName=cmake-3.10.1.tar.gz
+    untarName=cmake-3.10.1
 
     # rename download package if needed
     cd $startDir
@@ -93,19 +105,10 @@ _EOF
             exit
         fi
     fi
-
-	if [[ ! -d $untarName ]]; then
-		tar -zxv -f $tarName
-	fi
-	echo [Error]: Tar Ball already untared, omitting untar routine ...
-
+    tar -zxv -f $tarName
     cd $untarName
-	# make a separate build directory
-	buildir=build_tmp
-	mkdir -p $buildir
-	cd $buildir
-    ../configure --prefix=$glibcInstDir \
-                 --disable-sanity-checks
+    ./bootstrap --prefix=$cmakeInstDir
+
     make -j $osCpus
 	# check if make returns successfully
 	if [[ $? != 0 ]]; then
@@ -113,22 +116,19 @@ _EOF
 		exit
 	fi
     $execPrefix make install
-
-    #back to start directory
-    cd $startDir
     
-    set +x
-    echo ------------------------------------------------------
-    echo COMPILING GLIBC DONE ...
-    echo GLIBC INSTALL DIR: $glibcInstDir
-    echo "export PATH=$glibcInstDir/bin"':$PATH'
-    echo "export LD_LIBRARY_PATH=$glibcInstDir/lib"':$LD_LIBRARY_PATH'
-    echo ------------------------------------------------------
+    cat << _EOF
+------------------------------------------------------
+INSTALLING cmake 3 DONE ...
+`$cmakeInstDir/bin/cmake --version`
+cmake path = $cmakeInstDir/bin/
+------------------------------------------------------
+_EOF
 }
 
 install() {
 	checkOsCpus
-    compileGlibc
+    installCmake
 }
 
 case $1 in

@@ -5,6 +5,11 @@ vim/
 git/
 gcc/
 gcc-*
+llvm-*
+cmake-*
+compiler-rt-*
+clang-tools-extra-*
+cfe-*
 Python-*
 glibc-*
 backup.*/
