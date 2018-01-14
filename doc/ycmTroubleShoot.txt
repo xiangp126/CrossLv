@@ -1,3 +1,17 @@
+--------- glibc.so issue
+./ycm_core.so: /lib64/libc.so.6: version `GLIBC_2.15' not found (required by /home/corsair/.vim/bundle/YouCompleteMe/third_party/ycmd/./libclang.so.5)
+./ycm_core.so: /lib64/libc.so.6: version `GLIBC_2.14' not found (required by /home/corsair/.vim/bundle/YouCompleteMe/third_party/ycmd/./libclang.so.5)
+-- bried
+./install.py downloaded one pre-compiled clang(compiled on Ubuntu 14.04) that is newer than CennOS
+you should self-compile clang with your glibc version on your OS
+
+and at last 
+cd /home/corsair/.vim/bundle/YouCompleteMe/third_party/ycmd
+ln -s /home/corsair/myGit/mylx-vundle/sample/llvm-5.0.1.src/build_dir/lib/libclang.so.5 libclang.so.5
+
+
+
+
 --------- reference link
 https://github.com/Valloric/ycmd/issues/838
 

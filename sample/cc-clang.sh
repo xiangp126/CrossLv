@@ -323,14 +323,19 @@ _EOF
 		echo [Error]: make returns error, quiting now ...
 		exit
 	fi
-    exit
-    $execPrefix make install
+    #$execPrefix make install
+    #need not install, just cp to lib dir is ok
+    $execPrefix cp buildDir/lib/libclang.so.5 $commInstdir/lib/libclang.so
+    cd $startDir
     
     cat << _EOF
 ------------------------------------------------------
 INSTALLING LLVM DONE ...
-#`$llvmInstDir/bin/llvm --version`
-llvm path = $llvmInstDir/bin/
+libclang.so under $commInstdir/lib/libclang.so
+------ tackle below
+cd ~/.vim/bundle/YouCompleteMe/third_party/ycmd
+mv libclang.so.5 libclang.so.5-bak
+ln -s $commInstdir/lib/libclang.so libclang.so.5
 ------------------------------------------------------
 _EOF
 }
