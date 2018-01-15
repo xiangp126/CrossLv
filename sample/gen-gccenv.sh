@@ -20,20 +20,23 @@ usage() {
     home -- gcc/c++ was installed in $homeInstDir/
     root -- gcc/c++ was installed in $rootInstDir/
 _EOF
+    set +x
 }
 
 tackleMode() {
+    set +x
     #export env variables
     export CC=${commInstdir}/bin/gcc
     export CXX=${commInstdir}/bin/c++
-    export LDFLAGS="-L${commInstdir}/lib -L${commInstdir}/lib64"
+    #export LDFLAGS="-L${commInstdir}/lib -L${commInstdir}/lib64"
     #write to config for further use
     writeFile=gccenv.txt
     cat > ./$writeFile << _EOF
 export CC=${commInstdir}/bin/gcc
 export CXX=${commInstdir}/bin/c++
-export LDFLAGS="-L${commInstdir}/lib -L${commInstdir}/lib64"
+#export LDFLAGS="-L${commInstdir}/lib -L${commInstdir}/lib64"
 _EOF
+    cat $writeFile
 }
 
 case $1 in

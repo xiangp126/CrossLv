@@ -63,11 +63,10 @@ checkOsCpus() {
     echo "OS has CPU(S): $osCpus"
 }
 
-#cmake > 3.0
-checkGccVersion() {
-    gccLocation=/usr/bin/gcc
-    if [[ "$CC" != "" ]]; then
-        gccLocation=$CC
+checkCmakeVersion() {
+    cmakeLoc=`which cmake 2> /dev/null`
+    if [[ "$cmakeLoc" != "" ]]; then
+        echo
     fi
     version=`$gccLocation -dumpversion`
     gccVersion=${version%.*}
@@ -79,6 +78,7 @@ checkGccVersion() {
     fi
 }
 
+#need cmake > 3.4
 installCmake() {
     cat << "_EOF"
 ------------------------------------------------------
@@ -111,7 +111,7 @@ _EOF
     fi
     tar -zxv -f $tarName
     cd $untarName
-    ./bootstrap --prefix=$cmakeInstDir
+    ./configure --prefix=$cmakeInstDir
 
     make -j $osCpus
 	# check if make returns successfully
@@ -283,8 +283,8 @@ STEP : CHECK AND SET PROPER GCC/G++ VERSION ...
 _EOF
     #set proper gcc/g++ version
     #default gcc/g++ location
-    gccLoc=/usr/bin/gcc
-    gppLoc=/usr/bin/g++
+    gccLoc=`which gcc 2> /dev/null`
+    gppLoc=`which g++ 2> /dev/null`
     #selt-built gcc/g++ location
     homeGccInstDir=~/.usr/bin
     rootGccInstDir=/usr/local/bin
@@ -306,15 +306,15 @@ _EOF
     mkdir -p $buildDir
     cd $buildDir
     #cmakePath=$commInstdir/bin/cmake
-    cmakePath=$homeInstDir/bin/cmake
-    python3Path=/usr/local
+    cmakePath=`which cmake`
+    python3Path=`which python3`
     $cmakePath -G"Unix Makefiles" \
         -DCMAKE_C_COMPILER=$gccLoc \
         -DCMAKE_CXX_COMPILER=$gppLoc \
         -DCMAKE_INSTALL_PREFIX=$clangInstDir \
         -DCMAKE_BUILD_TYPE=Release \
         -DLLVM_TARGETS_TO_BUILD="X86" \
-        -DPYTHON_EXECUTABLE=/usr/local/bin/python3 \
+        -DPYTHON_EXECUTABLE=$python3Path \
         -DLLVM_INCLUDE_TESTS=OFF \
         $startDir/$llvmUntarName
     make -j $osCpus
@@ -325,14 +325,14 @@ _EOF
 	fi
     #$execPrefix make install
     #need not install, just cp to lib dir is ok
-    $execPrefix cp buildDir/lib/libclang.so.5 $commInstdir/lib/libclang.so
+    $execPrefix cp ./lib/libclang.so.5 $commInstdir/lib/libclang.so
     cd $startDir
     
     cat << _EOF
 ------------------------------------------------------
 INSTALLING LLVM DONE ...
 libclang.so under $commInstdir/lib/libclang.so
------- tackle below
+------ recommend you do below
 cd ~/.vim/bundle/YouCompleteMe/third_party/ycmd
 mv libclang.so.5 libclang.so.5-bak
 ln -s $commInstdir/lib/libclang.so libclang.so.5

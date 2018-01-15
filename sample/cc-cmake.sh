@@ -63,7 +63,6 @@ checkOsCpus() {
     echo "OS has CPU(S): $osCpus"
 }
 
-#cmake > 3.0
 checkGccVersion() {
     gccLocation=/usr/bin/gcc
     if [[ "$CC" != "" ]]; then
@@ -111,7 +110,7 @@ _EOF
     fi
     tar -zxv -f $tarName
     cd $untarName
-    ./bootstrap --prefix=$cmakeInstDir
+    ./configure --prefix=$cmakeInstDir
 
     make -j $osCpus
 	# check if make returns successfully

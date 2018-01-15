@@ -1,6 +1,13 @@
 *.swp
 *.swo
+core
+core-*
+core.*
 backup/
+asciidoc/
+curl-*
+expat-*
+xmlto-*
 vim/
 git/
 gcc/

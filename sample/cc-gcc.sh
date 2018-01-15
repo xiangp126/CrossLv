@@ -103,9 +103,13 @@ _EOF
 		exit
 	fi
 
-    ./configure --prefix=$gccInstDir \
-                --disable-multilib \
-                --enable-checking=release
+    gccBuildDir=build_dir
+    mkdir -p $gccBuildDir
+    cd $gccBuildDir
+    ../configure --prefix=$gccInstDir \
+                 --disable-multilib \
+                 #--enable-languages=c,c++ \
+                 --enable-checking=release
     make -j $osCpus
 	# check if make returns successfully
 	if [[ $? != 0 ]]; then
