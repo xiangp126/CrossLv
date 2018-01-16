@@ -47,9 +47,29 @@ logo() {
 _EOF
 }
 
-vimThroughCmd() {
-cat << _EOF
-    --- EXECUTE VIM COMMANDS THROUGH COMMAND LINE ---
+printNotePage() {
+	cat << "_EOF"
+------------------------------------------------------
+VIM PLUGIN MANAGER INSTRUTION
+------------------------------------------------------
+Brief help
+    :PluginList       - lists configured plugins
+    :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
+    :PluginSearch foo - searches for foo; append `!` to refresh local cache
+    :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
+
+------------------------------------------------------
+TMUX PLUGIN MANAGER INSTRUCTION
+------------------------------------------------------
+Brief help
+    send-prefix + I        # install
+    send-prefix + U        # update
+    send-prefix + Alt-u    # uninstall plugins not on the plugin list
+    [ctrl +x] +r           # :source $HOME/.tmux.conf
+
+------------------------------------------------------
+EXECUTE VIM COMMANDS THROUGH COMMAND LINE 
+------------------------------------------------------
     [sample 1] vim +PluginInstall +qall
     equals $ vim and then :PluginInstall and then :qall
     [sample 2] vim +"help tags"
@@ -755,44 +775,28 @@ _EOF
     sampleFile=ycm_extra_conf.py
     echo cp ${sampleDir}/$sampleFile $HOME/.$sampleFile
     cp ${sampleDir}/$sampleFile $HOME/.$sampleFile
+
+    if [[ $? != 0 ]]; then
+        echo "[Error]: cp $sampleFile error, quitting now ..."
+    fi
+    cat << "_EOF"
+------------------------------------------------------
+INSTALLING YOUCOMPLETEME SUCCESSFULLY DONE
+------------------------------------------------------
+_EOF
 }
 
 installSummary() {
-	cat << "_EOF"
-------------------------------------------------------
-VIM PLUGIN MANAGER INSTRUTION
-------------------------------------------------------
-__     __  ___   __  __
-\ \   / / |_ _| |  \/  |
- \ \ / /   | |  | |\/| |
-  \ V /    | |  | |  | |
-   \_/    |___| |_|  |_|
-
-Brief help
-    :PluginList       - lists configured plugins
-    :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
-    :PluginSearch foo - searches for foo; append `!` to refresh local cache
-    :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
-
-------------------------------------------------------
-TMUX PLUGIN MANAGER INSTRUCTION
-------------------------------------------------------
- _____   __  __   _   _  __  __
-|_   _| |  \/  | | | | | \ \/ /
-  | |   | |\/| | | | | |  \  /
-  | |   | |  | | | |_| |  /  \
-  |_|   |_|  |_|  \___/  /_/\_\
-
-Brief help
-    send-prefix + I        # install
-    send-prefix + U        # update
-    send-prefix + Alt-u    # uninstall plugins not on the plugin list
-    [ctrl +x] +r           # :source $HOME/.tmux.conf
-
-_EOF
     cat << _EOF
 ------------------------------------------------------
-VIM path = $vimInstDir/bin/
+INSTALLATION SUMMARY
+------------------------------------------------------
+-- OS CPU CORES = $osCpus
+gcc path = $CC
+vim path = $vimInstDir/bin/
+python3 path = $python3Path
+cmake path = $cmakeInstDir/bin
+libclang.so path = $libClangPath
 ------------------------------------------------------
 _EOF
 }

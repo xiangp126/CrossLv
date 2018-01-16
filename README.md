@@ -1,7 +1,9 @@
 # Installation Guide
-use plugins manager for VIM and TMUX
+Install plugins manager for VIM/TMUX
 
-verified on MacOS | Ubuntu | CentOS
+Compiling YouCompleteMe fixing dependency
+
+Verified on Ubuntu/CentOS 7 | CentOS 6
 
 ```bash
 $ sh oneKey.sh
@@ -9,18 +11,18 @@ $ sh oneKey.sh
     oneKey.sh -- onekey to setup my working environment | - tmux
     | - vim | - vundle -- youcompleteme -- supertab -- vim-snippets
              -- ultisnips -- nerdtree -- auto-pairs
+    | - gcc | - python3 | - etc
 
 [SYNOPSIS]
     oneKey.sh [home | root | help]
-
-[DESCRIPTION]
-    home -- build VIM to /home/corsair/.usr/
-    root -- build VIM to /usr/local/
 
 [TROUBLESHOOTING]
     sudo ln -s /bin/bash /bin/sh, make sure sh linked to bash.
     $ ll /bin/sh lrwxrwxrwx 1 root root 9 Dec  7 01:00 /bin/sh -> /bin/bash*
 
+[DESCRIPTION]
+    home -- build required packages to ~/.usr/
+    root -- build required packages to /usr/local/
                    _     _
  _ __ ___  _   _  | |   (_)_ __  _   ___  __
 | '_ ` _ \| | | | | |   | | '_ \| | | \ \/ /
@@ -167,5 +169,7 @@ find ./confirm -type f
 
 # Reference
 [Vundle Introduction Guide](http://www.jianshu.com/p/8d416ac4ad11)
+
 [how dows cat eof work in bash](https://stackoverflow.com/questions/2500436/how-does-cat-eof-work-in-bash)
 
+[VIM-YouCompleteMe clang+llvm](https://www.jianshu.com/p/c24f919097b3)
