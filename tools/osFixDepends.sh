@@ -3,6 +3,10 @@
 
 #dependency for Ubuntu
 ubuntuDepends=(
+    #clang use
+    "libclang-5.0-dev"
+    "clang-5.0"
+    #completion
     "bash-completion"
     "python-optcomplete"
     #build tools

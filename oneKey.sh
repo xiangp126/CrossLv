@@ -113,6 +113,10 @@ checkGccVersion() {
     CC=""
     for pathLoc in ${pathLoopLoc[@]}
     do
+        if [[ ! -d $pathLoc ]]; then
+            continue
+        fi
+        #check if version matches
         gccLoc="$pathLoc/gcc"
         if [[ ! -x "$gccLoc" ]]; then
             continue
@@ -581,11 +585,26 @@ _EOF
 
 installClang() {
     libClangName="libclang.so"
-    libClangPath=`find $commInstdir/ -name libclang.so | head -n 1 2> /dev/null`
-    if [[ "$libClangPath" != "" ]]; then
-        echo "[Warning]: $libClangName was already installed, omitting this step ..."
-        return
-    fi
+    #loop to find system installed libclang.so
+    pathLoopLoc=(
+        "$HOME/.usr/lib"
+        "$HOME/.usr/lib64"
+        "/usr/local/lib"
+        "/usr/local/lib64"
+        "/usr/lib"
+        "/usr/lib64"
+    )
+    libClangPath=""
+    for pathLoc in ${pathLoopLoc[@]}
+    do
+        if [[ -d $pathLoc ]]; then
+            libClangPath=`find $pathLoc -name libclang.so | head -n 1 2> /dev/null`
+            if [[ "$libClangPath" != "" ]]; then
+                echo "[Warning]: $libClangName was already installed, omitting this step ..."
+                return
+            fi
+        fi
+    done
 
     cat << "_EOF"
 ------------------------------------------------------
@@ -932,7 +951,8 @@ WRITING PYTHON3 INTERPRETER PATH TO $HOME/.VIMRC
 ------------------------------------------------------
 _EOF
     matchStr="ycm_server_python_interpreter"
-    sed -i --regexp-extended "/$matchStr/c let g:$matchStr = '$python3Path'" $HOME/.vimrc
+    sed -i --regexp-extended \
+        "/$matchStr/c let g:$matchStr = '$python3Path'" $HOME/.vimrc
 
     cat << "_EOF"
 ------------------------------------------------------
