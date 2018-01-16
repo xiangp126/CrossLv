@@ -264,7 +264,7 @@ installPython3() {
     python3Path=`which python3 2> /dev/null`
 	python3Config=`python3-config --configdir 2> /dev/null`
     if [[ "$python3Config" != "" ]]; then
-        echo [Error]: python3/python3-config already installed, omitting this step ...
+        echo [Warning]: python3/python3-config already installed, omitting this step ...
         return
     fi
 
@@ -696,11 +696,11 @@ _EOF
     cat << _EOF
 ------------------------------------------------------
 INSTALLING LLVM DONE ...
-libclang.so under $commInstdir/lib/libclang.so
------- tackle below
+libclang.so path = $libClangPath
+------ suggest (need not do)
 cd $HOME/.vim/bundle/YouCompleteMe/third_party/ycmd
 mv libclang.so.5 libclang.so.5-bak
-ln -s $commInstdir/lib/libclang.so libclang.so.5
+ln -s $libClangPath libclang.so.5
 ------------------------------------------------------
 _EOF
 }

@@ -63,74 +63,43 @@ checkOsCpus() {
     echo "OS has CPU(S): $osCpus"
 }
 
-checkCmakeVersion() {
-    cmakeLoc=`which cmake 2> /dev/null`
-    if [[ "$cmakeLoc" != "" ]]; then
-        echo
+checkDepends() {
+    #check python3 version
+    python3Path=`which python3 2> /dev/null`
+	python3Config=`python3-config --configdir 2> /dev/null`
+    if [[ "$python3Config" == "" ]]; then
+        echo [Error]: please install python3/python3-config first ...
+        exit
     fi
-    version=`$gccLocation -dumpversion`
-    gccVersion=${version%.*}
-    basicVersion=3.0
-    echo $gccVersion
-    #if gcc < 4.8, exit
-    if [[ `echo "$gccVersion >= $basicVersion" | bc` -ne 1 ]]; then
-        echo 
-    fi
-}
 
-#need cmake > 3.4
-installCmake() {
-    cat << "_EOF"
-------------------------------------------------------
-STEP : INSTALLING CMAKE 3.10 ...
-------------------------------------------------------
-_EOF
-    cmakeInstDir=$commInstdir
-    $execPrefix mkdir -p $commInstdir
-    # comm attribute to get source 'python3'
-    wgetLink=https://cmake.org/files/v3.10
-    tarName=cmake-3.10.1.tar.gz
-    untarName=cmake-3.10.1
-
-    # rename download package if needed
-    cd $startDir
-    # check if already has this tar ball.
-    if [[ -f $tarName ]]; then
-        echo [Warning]: Tar Ball $tarName already exists, Omitting wget ...
-    else
-        wget --no-cookies \
-            --no-check-certificate \
-            --header "Cookie: oraclelicense=accept-securebackup-cookie" \
-            "${wgetLink}/${tarName}" \
-            -O $tarName
-        # check if wget returns successfully
-        if [[ $? != 0 ]]; then
-            echo [Error]: wget returns error, quiting now ...
+    #check cmake version, if >= 3.1
+    cmakePath=`which cmake 2> /dev/null`
+    if [[ "$cmakePath" != "" ]]; then
+        #cmake version 2.8.12.2
+        cmakeVersion=`cmake --version`
+        #2.8.12.2
+        cmakeVer=`echo ${cmakeVersion} | tr -s "" | cut -d " " -f 3`
+        #2.8
+        cmakeV=$(echo $cmakeVer | cut -d "." -f 1,2)
+        basicCmakeV=3.1
+        #if installed cmake already meets the requirement
+        if [[ `echo "$cmakeV >= $basicCmakeV" | bc` -ne 1 ]]; then
+            echo "[Error]: cmake version not match, pls install newly cmake first ..."
             exit
         fi
+    else
+        echo "[Error]: cmake version not match, pls install newly cmake first ..."
+        exit
     fi
-    tar -zxv -f $tarName
-    cd $untarName
-    ./configure --prefix=$cmakeInstDir
-
-    make -j $osCpus
-	# check if make returns successfully
-	if [[ $? != 0 ]]; then
-		echo [Error]: make returns error, quiting now ...
-		exit
-	fi
-    $execPrefix make install
-    
-    cat << _EOF
-------------------------------------------------------
-INSTALLING cmake 3 DONE ...
-`$cmakeInstDir/bin/cmake --version`
-cmake path = $cmakeInstDir/bin/
-------------------------------------------------------
-_EOF
 }
 
 installClang() {
+    libClangName="libclang.so"
+    libClangPath=`find $commInstdir/ -name libclang.so | head -n 1 2> /dev/null`
+    if [[ "$libClangPath" != "" ]]; then
+        echo "[Warning]: $libClangName was already installed, omitting this step ..."
+        return
+    fi
     cat << "_EOF"
 ------------------------------------------------------
 STEP : PREPARE TO INSTALL CLANG 5 ...
@@ -138,9 +107,8 @@ STEP : PREPARE TO INSTALL CLANG 5 ...
 _EOF
     #clang version, change it if you need other version
     #clangVersion=5.0.1
-    #clangInstDir=/opt-clang-$clangVersion
+    clangInstDir=$commInstdir/clang-$clangVersion
     $execPrefix mkdir -p $clangInstDir
-
     cat << "_EOF"
 ------------------------------------------------------
 STEP : DOWNLOADING LLVM 5 ...
@@ -151,7 +119,6 @@ _EOF
     wgetLink=http://releases.llvm.org/$clangVersion
     llvmTarName=llvm-$clangVersion.src.tar.xz
     llvmUntarName=llvm-$clangVersion.src
-
     # rename download package if needed
     cd $startDir
     # check if already has this tar ball.
@@ -169,8 +136,12 @@ _EOF
             exit
         fi
     fi
-    tar -xv -f $llvmTarName
-
+    #check if dir already exist
+    if [[ -d $llvmUntarName ]]; then
+        echo [Warning]: $llvmUntarName already exist, Omitting untar ...
+    else
+        tar -xv -f $llvmTarName
+    fi
     cat << "_EOF"
 ------------------------------------------------------
 STEP : DOWNLOADING CFE 5 ...
@@ -181,7 +152,6 @@ _EOF
     cfeTarName=cfe-$clangVersion.src.tar.xz
     #cfeUntarName=cfe-$clangVersion.src
     cfeUntarName=$llvmUntarName/tools/clang
-
     # rename download package if needed
     cd $startDir
     # check if already has this tar ball.
@@ -199,10 +169,13 @@ _EOF
             exit
         fi
     fi
-    #mkdir if not exist
-    mkdir -p $cfeUntarName
-    tar -xv -f $cfeTarName --strip-components=1 -C $cfeUntarName
-
+    #check if dir already exist
+    if [[ -d $cfeUntarName ]]; then
+        echo [Warning]: $cfeUntarName already exist, Omitting untar ...
+    else
+        mkdir -p $cfeUntarName
+        tar -xv -f $cfeTarName --strip-components=1 -C $cfeUntarName
+    fi
     cat << "_EOF"
 ------------------------------------------------------
 STEP : DOWNLOADING COMPILER-RT 5 ...
@@ -213,7 +186,6 @@ _EOF
     crtTarName=compiler-rt-$clangVersion.src.tar.xz
     #crtUntarName=compiler-rt-$clangVersion.src
     crtUntarName=$llvmUntarName/projects/compiler-rt
-
     # rename download package if needed
     cd $startDir
     # check if already has this tar ball.
@@ -231,10 +203,13 @@ _EOF
             exit
         fi
     fi
-    #mkdir if not exist
-    mkdir -p $crtUntarName
-    tar -xv -f $crtTarName --strip-components=1 -C $crtUntarName
-
+    #check if dir already exist
+    if [[ -d $crtUntarName ]]; then
+        echo [Warning]: $crtUntarName already exist, Omitting untar ...
+    else
+        mkdir -p $crtUntarName
+        tar -xv -f $crtTarName --strip-components=1 -C $crtUntarName
+    fi
     cat << "_EOF"
 ------------------------------------------------------
 STEP : DOWNLOADING CLANG-TOOLS-EXTRA 5 ...
@@ -248,13 +223,11 @@ _EOF
 #   See documentation for policy CMP0002 for more details.
 # Call Stack (most recent call first):
 #   tools/clang/tools/extra/lib/xray/CMakeLists.txt:66 (add_compiler_rt_object_libraries)
-
     # comm attribute to get source 'clang-tools-extra'
     #cteWgetLink=http://releases.llvm.org/$clangVersion
     cteTarName=clang-tools-extra-$clangVersion.src.tar.xz
     #cteUntarName=clang-tools-extra-$clangVersion.src
     cteUntarName=$llvmUntarName/tools/clang/tools/extra
-
     # rename download package if needed
     cd $startDir
     # check if already has this tar ball.
@@ -272,30 +245,13 @@ _EOF
             exit
         fi
     fi
-    #mkdir if not exist
-    #mkdir -p $cteUntarName
-    #tar -xv -f $crtTarName --strip-components=1 -C $cteUntarName
-
-    cat << "_EOF"
-------------------------------------------------------
-STEP : CHECK AND SET PROPER GCC/G++ VERSION ...
-------------------------------------------------------
-_EOF
-    #set proper gcc/g++ version
-    #default gcc/g++ location
-    gccLoc=`which gcc 2> /dev/null`
-    gppLoc=`which g++ 2> /dev/null`
-    #selt-built gcc/g++ location
-    homeGccInstDir=~/.usr/bin
-    rootGccInstDir=/usr/local/bin
-    if [[ -f "$homeGccInstDir/gcc" ]]; then
-        gccLoc=$homeGccInstDir/gcc
-        gppLoc=$homeGccInstDir/g++
-    elif [[ -f "$rootGccInstDir/gcc" ]]; then
-        gccLoc=$rootGccInstDir/gcc
-        gppLoc=$rootGccInstDir/g++
-    fi
-
+    #check if dir already exist
+#    if [[ -d $cteUntarName ]]; then
+#        echo [Warning]: $cteUntarName already exist, Omitting untar ...
+#    else
+#        mkdir -p $cteUntarName
+#        tar -xv -f $crtTarName --strip-components=1 -C $cteUntarName
+#    fi
     cat << "_EOF"
 ------------------------------------------------------
 STEP : START TO COMPILE CLANG 5 ...
@@ -305,15 +261,18 @@ _EOF
     buildDir=build_dir
     mkdir -p $buildDir
     cd $buildDir
+    #cmakePath was set in installCmake
     #cmakePath=$commInstdir/bin/cmake
-    cmakePath=`which cmake`
-    python3Path=`which python3`
+    #python3Path was set in installPython3
+    python3Path=`which python3 2> /dev/null`
+    #python3Path=$python3InstDir/bin/python3
     $cmakePath -G"Unix Makefiles" \
-        -DCMAKE_C_COMPILER=$gccLoc \
-        -DCMAKE_CXX_COMPILER=$gppLoc \
+        -DCMAKE_C_COMPILER=$CC \
+        -DCMAKE_CXX_COMPILER=$CXX \
         -DCMAKE_INSTALL_PREFIX=$clangInstDir \
         -DCMAKE_BUILD_TYPE=Release \
         -DLLVM_TARGETS_TO_BUILD="X86" \
+        -DPYTHON_LIBRARY=$python3InstDir/lib/libpython3.6m.so \
         -DPYTHON_EXECUTABLE=$python3Path \
         -DLLVM_INCLUDE_TESTS=OFF \
         $startDir/$llvmUntarName
@@ -323,26 +282,37 @@ _EOF
 		echo [Error]: make returns error, quiting now ...
 		exit
 	fi
-    #$execPrefix make install
-    #need not install, just cp to lib dir is ok
-    $execPrefix cp ./lib/libclang.so.5 $commInstdir/lib/libclang.so
-    cd $startDir
+    libClangPath=$clangInstDir/lib/libclang.so
+    #clangNeedInstall=TRUE
+    clangNeedInstall=FALSE
+    if [[ "$clangNeedInstall" == "TRUE" ]]; then
+        #normally need not install, it may take up 3G+ space
+        $execPrefix make install
+        # check if 'make install' successfully
+        if [[ $? != 0 ]]; then
+            echo [Error]: make install returns error, quiting now ...
+            exit
+        fi
+    else
+        $execPrefix cp ./lib/libclang.so.5 $libClangPath
+        ls -l $libClangPath
+    fi
     
     cat << _EOF
 ------------------------------------------------------
 INSTALLING LLVM DONE ...
-libclang.so under $commInstdir/lib/libclang.so
------- recommend you do below
-cd ~/.vim/bundle/YouCompleteMe/third_party/ycmd
+libclang.so path = $libClangPath
+------ suggest (need not do)
+cd $HOME/.vim/bundle/YouCompleteMe/third_party/ycmd
 mv libclang.so.5 libclang.so.5-bak
-ln -s $commInstdir/lib/libclang.so libclang.so.5
+ln -s $libClangPath libclang.so.5
 ------------------------------------------------------
 _EOF
 }
 
 install() {
 	checkOsCpus
-    #installCmake
+    checkDepends
     installClang
 }
 
