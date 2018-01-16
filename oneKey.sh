@@ -344,15 +344,17 @@ _EOF
 installPython3() {
     #install python3, ignore if installed python2
     python3Path=`which python3 2> /dev/null`
-    #python3 Python - Python library
-    whereIsLibPython3=`pkg-config --list-all | grep -i python3 2> /dev/null`
-    if [[ "$python3Path" != "" && "$whereIsLibPython3" != "" ]]; then
-		#-L/usr/local/lib
-		python3LibL=`pkg-config --libs-only-L python3`
-        #-lpython3.6m
-		python3Libl=`pkg-config --libs-only-l python3`
-        libPython3Path="$(echo ${python3LibL#*L})/lib$(echo ${python3Libl#*-l}).so"
-        ls -l $libPython3Path
+    if [[ "$python3Path" != "" ]]; then
+        #Python 3.5.2
+        python3Version=`python3 --version`
+        #3.5.2
+        python3Ver=$(echo $python3Version | tr -s "" | cut -d " " -f 2)
+        #3.5
+        python3V=$(echo $python3Ver | cut -d "." -f 1,2)
+        #libpython3.5m.so
+        libPython3Name=libpython${python3V}.so
+        #may need run 'sudo updatedb'
+        libPython3Path=$(locate $libPython3Name | head -n 1 2> /dev/null)
 
         #check if any error occurs
         if [[ $? != 0 ]]; then
@@ -362,6 +364,26 @@ installPython3() {
             return
         fi
     fi
+
+#    #python3 Python - Python library
+#    #sudo updatedb
+#    whereIsLibPython3=`pkg-config --list-all | grep -i python3 2> /dev/null`
+#    if [[ "$python3Path" != "" && "$whereIsLibPython3" != "" ]]; then
+#		#-L/usr/local/lib
+#		python3LibL=`pkg-config --libs-only-L python3`
+#        #-lpython3.6m
+#		python3Libl=`pkg-config --libs-only-l python3`
+#        libPython3Path="$(echo ${python3LibL#*L})/lib$(echo ${python3Libl#*-l}).so"
+#        ls -l $libPython3Path
+#
+#        #check if any error occurs
+#        if [[ $? != 0 ]]; then
+#            echo "[Warning]: parsing python3 path/lib error, re-install python3 ..."
+#        else 
+#            echo [Warning]: python3/lib already installed, omitting this step ...
+#            return
+#        fi
+#    fi
 
     cat << "_EOF"
 ------------------------------------------------------
