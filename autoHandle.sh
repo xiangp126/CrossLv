@@ -8,7 +8,7 @@ base_dir=~
 # YouCompleteMe not compatible with snipMate
 bk_files=(
     ".vimrc"
-    #".bashrc"
+    ".bashrc"
     ".tmux.conf"
     ".vim/colors/corsair.vim"
     #".vim/bundle/snipMate/snippets/c.snippets"

@@ -259,12 +259,23 @@ _EOF
 }
 
 installPython3() {
-    #find python2 & python3 config dir
-	#python2Config=`python2-config --configdir 2> /dev/null`
+    #install python3, ignore if installed python2
     python3Path=`which python3 2> /dev/null`
-	python3Config=`python3-config --configdir 2> /dev/null`
-    if [[ "$python3Config" != "" ]]; then
-        echo [Warning]: python3/python3-config already installed, omitting this step ...
+    #python3 Python - Python library
+    whereIsLibPython3=`pkg-config --list-all | grep -i python3 2> /dev/null`
+    if [[ "$python3Path" != "" && "$whereIsLibPython3" != "" ]]; then
+		#-L/usr/local/lib
+		python3LibL=`pkg-config --libs-only-L python3`
+        #-lpython3.6m
+		python3Libl=`pkg-config --libs-only-l python3`
+        libPython3Path="$(echo ${python3LibL#*L})/lib$(echo ${python3Libl#*-l}).so"
+        ls -l $libPython3Path
+
+        if [[ $? != 0 ]]; then
+            echo "[Warning]: parsing python3 path/lib error, re-install python3 ..."
+            exit
+        fi
+        echo [Warning]: python3/lib already installed, omitting this step ...
         return
     fi
 
@@ -312,14 +323,26 @@ _EOF
 		echo [Error]: make returns error, quiting now ...
 		exit
 	fi
+
     $execPrefix make install
+	# check if make returns successfully
+	if [[ $? != 0 ]]; then
+		echo [Error]: make install returns error, quiting now ...
+		exit
+	fi
     python3Path=$python3InstDir/bin/python3
+    libPython3Path=$python3InstDir/lib/libpython3.6m.so
+    if [[ ! -f $libPython3Path ]]; then
+        echo [Error]: can not find lib-python3, quitting now ...
+        exit
+    fi
     
     cat << _EOF
 ------------------------------------------------------
 INSTALLING python3 DONE ...
 `$python3InstDir/bin/python3 --version`
-python3 path = $python3InstDir/bin/
+python3 path = $python3InstDir/bin/python3
+libpython3 path = $libPython3Path
 ------------------------------------------------------
 _EOF
 }
@@ -666,7 +689,7 @@ _EOF
         -DCMAKE_INSTALL_PREFIX=$clangInstDir \
         -DCMAKE_BUILD_TYPE=Release \
         -DLLVM_TARGETS_TO_BUILD="X86" \
-        -DPYTHON_LIBRARY=$python3InstDir/lib/libpython3.6m.so \
+        -DPYTHON_LIBRARY=$libPython3Path \
         -DPYTHON_EXECUTABLE=$python3Path \
         -DLLVM_INCLUDE_TESTS=OFF \
         $startDir/$llvmUntarName
@@ -681,18 +704,19 @@ _EOF
     #clangNeedInstall=TRUE
     clangNeedInstall=FALSE
     if [[ "$clangNeedInstall" == "TRUE" ]]; then
-        #normally need not install, it may take up 3G+ space
+        #install may take up 3G+ space
         $execPrefix make install
-        # check if 'make install' successfully
-        if [[ $? != 0 ]]; then
-            echo [Error]: make install returns error, quiting now ...
-            exit
-        fi
     else
+        $execPrefix mkdir -p $clangInstDir/lib
         $execPrefix cp ./lib/libclang.so.5 $libClangPath
         ls -l $libClangPath
     fi
     
+	# check if make install/cp returns successfully
+	if [[ $? != 0 ]]; then
+		echo [Error]: make install or cp $libClangPath returns error, quiting now ...
+		exit
+	fi
     cat << _EOF
 ------------------------------------------------------
 INSTALLING LLVM DONE ...
@@ -748,7 +772,7 @@ _EOF
                -DEXTERNAL_LIBCLANG_PATH=$libClangPath \
                -DCMAKE_BUILD_TYPE=Release \
                -DPYTHON_EXECUTABLE=$python3Path \
-               -DPYTHON_LIBRARY=$python3InstDir/lib/libpython3.6m.so \
+               -DPYTHON_LIBRARY=$libPython3Path \
                -DUSE_PYTHON2=OFF \
                $ycmDir/third_party/ycmd/cpp
     # check if install returns successfully
@@ -764,6 +788,11 @@ BUILDING YCM_CORE NOW ...
 _EOF
     #$cmakePath --build . --target ycm_core 
     make -j $osCpus
+    # check if make returns successfully
+    if [[ $? != 0 ]]; then
+        echo "[Error]: make ycm_core error, quiting now ..."
+        exit
+    fi
 
     cat << "_EOF"
 ------------------------------------------------------
@@ -793,9 +822,11 @@ INSTALLATION SUMMARY
 ------------------------------------------------------
 -- OS CPU CORES = $osCpus
 gcc path = $CC
-vim path = $vimInstDir/bin/
+cxx path = $CXX
 python3 path = $python3Path
-cmake path = $cmakeInstDir/bin
+vim path = $vimInstDir/bin/vim
+cmake path = $cmakeInstDir/bin/cmake
+libpython3 path = $libPython3Path
 libclang.so path = $libClangPath
 ------------------------------------------------------
 _EOF
@@ -826,7 +857,7 @@ case $1 in
     'root')
         set -x
         #run fix dependency routine as has root privilege
-        sh -x tools/osFixDepends.sh
+        #sh -x tools/osFixDepends.sh install
 		commInstdir=$rootInstDir
         execPrefix=sudo
         install

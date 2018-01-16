@@ -16,7 +16,7 @@ ubuntuDepends=(
     "xmlto"
     "libperl-dev"
     #for compile vim8
-    "perl-*"
+    "perl"
     "lib32ncursesw5-dev"
     #common tools
     "figlet"            
