@@ -1,17 +1,16 @@
 #!/bin/bash
 # COPYRIGHT BY PENG, 2018. XIANGP126@SJTU.EDU.CN.
-set -x
-# this shell start dir, normally original path
+#shell start location
 startDir=`pwd`
-# main work directory, usually $HOME/myGit
+# main work directory
 mainWd=$startDir
 #.vim/.tmux installation dir
 baseDir=$HOME    
-bkPostfix=old
 tackleDir=(
     ".vim"
     ".tmux"
 )
+bkPostfix=old
 # common install dir for home | root mode
 homeInstDir=$HOME/.usr
 rootInstDir=/usr/local
@@ -24,10 +23,12 @@ execPrefix=""
 gccInstDir=$commInstdir
 #python3 install
 python3InstDir=$commInstdir
+python3Path=`which python3 2> /dev/null`
 #vim install
 vimInstDir=$commInstdir
 #cmake install
 cmakeInstDir=$commInstdir
+cmakePath=`which cmake 2> /dev/null`
 #clang install
 clangVersion=5.0.1
 clangInstDir=$commInstdir/clang-$clangVersion
@@ -69,16 +70,14 @@ usage() {
 [SYNOPSIS]
     $exeName [home | root | help]
 
-[DESCRIPTION]
-    home -- build required packages to $homeInstDir/
-    root -- build required packages to $rootInstDir/
-
 [TROUBLESHOOTING]
     sudo ln -s /bin/bash /bin/sh, make sure sh linked to bash.
     $ ll /bin/sh lrwxrwxrwx 1 root root 9 Dec  7 01:00 /bin/sh -> /bin/bash*
 
+[DESCRIPTION]
+    home -- build required packages to $homeInstDir/
+    root -- build required packages to $rootInstDir/
 _EOF
-set +x
     logo
 }    
 
@@ -106,6 +105,8 @@ checkGccVersion() {
         if [[ `echo "$gccV >= $basicGccVersion" | bc` -eq 1 ]]; then
             CC=$pathLoc/gcc
             CXX=$pathLoc/c++
+            #if found one matchs, quit this 'for' loop
+            break
         fi
     done
     #check env CC
@@ -125,8 +126,6 @@ use 'source sample/gen-gccenv.sh root' to export env
 _EOF
         exit
     fi
-
-    exit
 }
 
 checkOsCpus() {
@@ -149,6 +148,7 @@ installBone() {
         mkdir -p $baseDir
     fi
 
+    cd $startDir
     # run backup first of all.
     cat << _EOF
 ------------------------------------------------------
@@ -156,22 +156,6 @@ STEP : RUN BACKUP FIRST ...
 ------------------------------------------------------
 _EOF
     sh autoHandle.sh backup
-
-    #no need to backup after v3.9.1
-    #backup .vim/.tmux to .vim.old/.tmux.old
-#    for tdir in "${tackleDir[@]}"
-#    do
-#        #$HOME/.tmux
-#        abPath=${baseDir}/${tdir}
-#        bkAbPath=${abPath}.${bkPostfix}
-#        # remove .old files before mv overwrite.
-#        if [[ -d "$bkAbPath" ]]; then
-#            rm -rf $bkAbPath
-#        fi
-#        if [[ -d "$abPath" ]]; then
-#            cp -r ${abPath} $bkAbPath 
-#        fi
-#    done
 
     cat << "_EOF"
 ------------------------------------------------------
@@ -222,6 +206,16 @@ _EOF
     cp -f ./confirm/_corsair.vim ${baseDir}/${tackleDir[0]}/colors/corsair.vim
 }
 
+installTmuxPlugins() {
+    cat << "_EOF"
+------------------------------------------------------
+STEP : INSTALLING TMUX PLUGINS ...
+------------------------------------------------------
+_EOF
+    tmuxInstallScript=$HOME/.tmux/plugins/tpm/bin/install_plugins
+    sh -x $tmuxInstallScript
+}
+
 # install VIM plugins using old version.
 installVimPlugins() {
     cat << "_EOF"
@@ -229,6 +223,7 @@ installVimPlugins() {
 STEP : INSTALLING VIM PLUGINS ...
 ------------------------------------------------------
 _EOF
+    cd $startDir
  	#81 Plugin 'Valloric/YouCompleteMe'
 	tackleFile=$HOME/.vimrc
 	# comment YouCompleteMe in $HOME/.vimrc
@@ -243,14 +238,16 @@ _EOF
     source $HOME/.bashrc 2> /dev/null
 }
 
-installpython() {
+installPython3() {
     #find python2 & python3 config dir
 	#python2Config=`python2-config --configdir 2> /dev/null`
+    python3Path=`which python3 2> /dev/null`
 	python3Config=`python3-config --configdir 2> /dev/null`
     if [[ "$python3Config" != "" ]]; then
         echo [Error]: python3/python3-config already installed, omitting this step ...
         return
     fi
+
     cat << "_EOF"
 ------------------------------------------------------
 STEP : INSTALLING PYTHON3 ...
@@ -280,7 +277,12 @@ _EOF
             exit
         fi
     fi
-    tar -zxv -f $tarName
+    #check if already untared
+    if [[ -d $untarName ]]; then
+        echo [Warning]: found $untarName, omitting this step ...
+    else
+        tar -zxv -f $tarName
+    fi
     cd $untarName
     ./configure --prefix=$python3InstDir \
                 --enable-shared
@@ -291,6 +293,7 @@ _EOF
 		exit
 	fi
     $execPrefix make install
+    python3Path=$python3InstDir/bin/python3
     
     cat << _EOF
 ------------------------------------------------------
@@ -348,12 +351,12 @@ _EOF
         exit
     fi
 
+    #--with-python-config-dir=$python2Config
     ./configure --prefix=$vimInstDir \
                 --with-features=huge \
                 --enable-multibyte \
                 --enable-rubyinterp=yes \
                 --enable-pythoninterp=yes \
-                #--with-python-config-dir=$python2Config \
                 --enable-python3interp=yes \
                 --with-python3-config-dir=$python3Config \
                 --enable-perlinterp=yes \
@@ -386,7 +389,7 @@ _EOF
 
 #install newly cmake if needed
 installCmake() {
-    #check cmake version, if >= 3.4
+    #check cmake version, if >= 3.1
     cmakePath=`which cmake 2> /dev/null`
     if [[ "$cmakePath" != "" ]]; then
         #cmake version 2.8.12.2
@@ -395,7 +398,7 @@ installCmake() {
         cmakeVer=`echo ${cmakeVersion} | tr -s "" | cut -d " " -f 3`
         #2.8
         cmakeV=$(echo $cmakeVer | cut -d "." -f 1,2)
-        basicCmakeV=3.4
+        basicCmakeV=3.1
         #if installed cmake already meets the requirement
         if [[ `echo "$cmakeV >= $basicCmakeV" | bc` -eq 1 ]]; then
             echo "[Warning]: system cmake $cmakeVersion  already >= $basicCmakeV ..."
@@ -442,6 +445,7 @@ _EOF
 		exit
 	fi
     $execPrefix make install
+    cmakePath=$cmakeInstDir/bin/cmake
     
     cat << _EOF
 ------------------------------------------------------
@@ -453,6 +457,13 @@ _EOF
 }
 
 installClang() {
+    libClangName="libclang.so"
+    libClangPath=`find $commInstdir/ -name libclang.so | head -n 1 2> /dev/null`
+    if [[ "$libClangPath" != "" ]]; then
+        echo "[Warning]: $libClangName was already installed, omitting this step ..."
+        return
+    fi
+
     cat << "_EOF"
 ------------------------------------------------------
 STEP : PREPARE TO INSTALL CLANG 5 ...
@@ -460,7 +471,7 @@ STEP : PREPARE TO INSTALL CLANG 5 ...
 _EOF
     #clang version, change it if you need other version
     #clangVersion=5.0.1
-    clangInstDir=$commin
+    clangInstDir=$commInstdir/clang-$clangVersion
     $execPrefix mkdir -p $clangInstDir
 
     cat << "_EOF"
@@ -491,7 +502,12 @@ _EOF
             exit
         fi
     fi
-    tar -xv -f $llvmTarName
+    #check if dir already exist
+    if [[ -d $llvmUntarName ]]; then
+        echo [Warning]: $llvmUntarName already exist, Omitting untar ...
+    else
+        tar -xv -f $llvmTarName
+    fi
 
     cat << "_EOF"
 ------------------------------------------------------
@@ -521,9 +537,13 @@ _EOF
             exit
         fi
     fi
-    #mkdir if not exist
-    mkdir -p $cfeUntarName
-    tar -xv -f $cfeTarName --strip-components=1 -C $cfeUntarName
+    #check if dir already exist
+    if [[ -d $cfeUntarName ]]; then
+        echo [Warning]: $cfeUntarName already exist, Omitting untar ...
+    else
+        mkdir -p $cfeUntarName
+        tar -xv -f $cfeTarName --strip-components=1 -C $cfeUntarName
+    fi
 
     cat << "_EOF"
 ------------------------------------------------------
@@ -553,9 +573,13 @@ _EOF
             exit
         fi
     fi
-    #mkdir if not exist
-    mkdir -p $crtUntarName
-    tar -xv -f $crtTarName --strip-components=1 -C $crtUntarName
+    #check if dir already exist
+    if [[ -d $crtUntarName ]]; then
+        echo [Warning]: $crtUntarName already exist, Omitting untar ...
+    else
+        mkdir -p $crtUntarName
+        tar -xv -f $crtTarName --strip-components=1 -C $crtUntarName
+    fi
 
     cat << "_EOF"
 ------------------------------------------------------
@@ -594,29 +618,13 @@ _EOF
             exit
         fi
     fi
-    #mkdir if not exist
-    #mkdir -p $cteUntarName
-    #tar -xv -f $crtTarName --strip-components=1 -C $cteUntarName
-
-    cat << "_EOF"
-------------------------------------------------------
-STEP : CHECK AND SET PROPER GCC/G++ VERSION ...
-------------------------------------------------------
-_EOF
-    #set proper gcc/g++ version
-    #default gcc/g++ location
-    gccLoc=/usr/bin/gcc
-    gppLoc=/usr/bin/g++
-    #selt-built gcc/g++ location
-    homeGccInstDir=$HOME/.usr/bin
-    rootGccInstDir=/usr/local/bin
-    if [[ -f "$homeGccInstDir/gcc" ]]; then
-        gccLoc=$homeGccInstDir/gcc
-        gppLoc=$homeGccInstDir/g++
-    elif [[ -f "$rootGccInstDir/gcc" ]]; then
-        gccLoc=$rootGccInstDir/gcc
-        gppLoc=$rootGccInstDir/g++
-    fi
+    #check if dir already exist
+#    if [[ -d $cteUntarName ]]; then
+#        echo [Warning]: $cteUntarName already exist, Omitting untar ...
+#    else
+#        mkdir -p $cteUntarName
+#        tar -xv -f $crtTarName --strip-components=1 -C $cteUntarName
+#    fi
 
     cat << "_EOF"
 ------------------------------------------------------
@@ -627,15 +635,18 @@ _EOF
     buildDir=build_dir
     mkdir -p $buildDir
     cd $buildDir
+    #cmakePath was set in installCmake
     #cmakePath=$commInstdir/bin/cmake
-    cmakePath=`which cmake`
-    python3Path=`which python3`
+    #python3Path was set in installPython3
+    python3Path=`which python3 2> /dev/null`
+    #python3Path=$python3InstDir/bin/python3
     $cmakePath -G"Unix Makefiles" \
-        -DCMAKE_C_COMPILER=$gccLoc \
-        -DCMAKE_CXX_COMPILER=$gppLoc \
+        -DCMAKE_C_COMPILER=$CC \
+        -DCMAKE_CXX_COMPILER=$CXX \
         -DCMAKE_INSTALL_PREFIX=$clangInstDir \
         -DCMAKE_BUILD_TYPE=Release \
         -DLLVM_TARGETS_TO_BUILD="X86" \
+        -DPYTHON_LIBRARY=$python3InstDir/lib/libpython3.6m.so \
         -DPYTHON_EXECUTABLE=$python3Path \
         -DLLVM_INCLUDE_TESTS=OFF \
         $startDir/$llvmUntarName
@@ -645,10 +656,22 @@ _EOF
 		echo [Error]: make returns error, quiting now ...
 		exit
 	fi
-    #$execPrefix make install
-    #need not install, just cp to lib dir is ok
-    $execPrefix cp ./lib/libclang.so.5 $commInstdir/lib/libclang.so
-    cd $startDir
+
+    libClangPath=$clangInstDir/lib/libclang.so
+    #clangNeedInstall=TRUE
+    clangNeedInstall=FALSE
+    if [[ "$clangNeedInstall" == "TRUE" ]]; then
+        #normally need not install, it may take up 3G+ space
+        $execPrefix make install
+        # check if 'make install' successfully
+        if [[ $? != 0 ]]; then
+            echo [Error]: make install returns error, quiting now ...
+            exit
+        fi
+    else
+        $execPrefix cp ./lib/libclang.so.5 $libClangPath
+        ls -l $libClangPath
+    fi
     
     cat << _EOF
 ------------------------------------------------------
@@ -664,11 +687,7 @@ _EOF
 
 # compile YouCompleteMe
 compileYcm() {
-    cmakePath=`which cmake 2> /dev/null`
-    if [[ "$cmakePath" == "" ]]; then
-        echo [Error]: Missing cmake, please install it first ...
-        exit
-    fi
+    #cmakePath=`which cmake 2> /dev/null`
     cat << "_EOF"
 ------------------------------------------------------
 STEP : COMPILING YOUCOMPLETEME ...
@@ -688,47 +707,47 @@ _EOF
             exit
         fi
     fi
+
     cd $ycmDir
 	git submodule update --init --recursive
 
-    #check if python3 was installed
-    pythonExe=python
-    whereIsPython3=`which python3 2> /dev/null`
-    if [[ "$whereIsPython3" != "" ]]; then
-        pythonExe=$whereIsPython3
-    fi
-    #$pythonExe ./install.py --clang-completer
+    #not use official install script now
+    #$python3Path ./install.py --clang-completer
+
     ycmBuildDir=ycm_build
     mkdir -p $ycmBuildDir
     cd $ycmBuildDir
-    cmake -G "Unix Makefiles" -DEXTERNAL_LIBCLANG_PATH=$clangLibPath $ycmDir/third_party/ycmd/cpp
-
+    #remove old CMakeCache.txt
+    rm -rf CMakeCache.txt
+    #-DUSE_PYTHON2=OFF, do not use python2 library
+    #-- Found PythonLibs: ~/.usr/lib/libpython3.6m.so 
+    #(found suitable version "3.6.4", minimum required is "3.3")
+    $cmakePath -G "Unix Makefiles" \
+               -DCMAKE_C_COMPILER=$CC \
+               -DCMAKE_CXX_COMPILER=$CXX \
+               -DEXTERNAL_LIBCLANG_PATH=$libClangPath \
+               -DCMAKE_BUILD_TYPE=Release \
+               -DPYTHON_EXECUTABLE=$python3Path \
+               -DPYTHON_LIBRARY=$python3InstDir/lib/libpython3.6m.so \
+               -DUSE_PYTHON2=OFF \
+               $ycmDir/third_party/ycmd/cpp
     # check if install returns successfully
     if [[ $? != 0 ]]; then
-        echo [Error]: install fails, quitting now ...
-        cat << "_EOF"
-        -- native gcc/c++ not support c++11
-        Build you new gcc/c++
-        source template/gcc_env.sh [MODE]
-        -- or md5 mismatch
-        rm $HOME/.vim/bundle/YouCompleteMe
-        then try again
-_EOF
+        echo "cmake -G "Unix Makefiles" error, quiting now ..."
         exit
     fi
 
     cat << "_EOF"
 ------------------------------------------------------
-LINKING libclang.so FROM SYSTEM-BUILT libclang.so ...
+BUILDING YCM_CORE NOW ...
 ------------------------------------------------------
 _EOF
-    cd $HOME/.vim/bundle/YouCompleteMe/third_party/ycmd
-    mv libclang.so.5 libclang.so.5-bak
-    ln -s $commInstdir/lib/libclang.so libclang.so.5
+    #$cmakePath --build . --target ycm_core 
+    make -j $osCpus
 
     cat << "_EOF"
 ------------------------------------------------------
-INSTALLING .ycm_extra_conf.py TO HOME ...
+INSTALLING .YCM_EXTRA_CONF.PY TO HOME ...
 ------------------------------------------------------
 _EOF
     cd $startDir
@@ -736,34 +755,6 @@ _EOF
     sampleFile=ycm_extra_conf.py
     echo cp ${sampleDir}/$sampleFile $HOME/.$sampleFile
     cp ${sampleDir}/$sampleFile $HOME/.$sampleFile
-}
-
-installTmuxPlugins() {
-    cmakePath=`which cmake 2> /dev/null`
-    if [[ "$cmakePath" == "" ]]; then
-        echo [Error]: Missing cmake, please install cmake first ...
-        exit
-    fi
-    cat << "_EOF"
-------------------------------------------------------
-STEP : INSTALLING TMUX PLUGINS ...
-------------------------------------------------------
-_EOF
-    tmuxInstallScript=$HOME/.tmux/plugins/tpm/bin/install_plugins
-    sh -x $tmuxInstallScript
-
-    #no need to recover this after v3.9.1
-    #tmux rescover plugin
-#     newResurrectDir=$HOME/.tmux/resurrect
-#     oldResurrectDir=$HOME/.tmux.old/resurrect
-#     if [[ -d "$oldResurrectDir" ]]; then
-#         cat << "_EOF"
-# ------------------------------------------------------
-# COPY BACK TMUX-RESURRECT OLD FILES ...
-# ------------------------------------------------------
-# _EOF
-#         mv $oldResurrectDir $newResurrectDir
-#     fi
 }
 
 installSummary() {
@@ -808,26 +799,28 @@ _EOF
 
 install() {
     checkGccVersion
-    #checkOsCpus
-    #installBone
-    #installTmuxPlugins
-    #installVimPlugins 
-    #installpython
-    #installvim
+    checkOsCpus
+    installBone
+    installTmuxPlugins
+    installVimPlugins 
+    installPython3
+    installvim
     installCmake
-    #installClang
-    #compileYcm
-    #installSummary
+    installClang
+    compileYcm
+    installSummary
 }
 
 case $1 in 
     'home')
+        set -x
 		commInstdir=$homeInstDir
         execPrefix=""
         install 
     ;;
 
     'root')
+        set -x
         #run fix dependency routine as has root privilege
         sh -x tools/osFixDepends.sh
 		commInstdir=$rootInstDir

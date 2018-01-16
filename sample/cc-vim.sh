@@ -97,7 +97,6 @@ _EOF
                 --enable-multibyte \
                 --enable-rubyinterp=yes \
                 --enable-pythoninterp=yes \
-                --with-python-config-dir=$python2Config \
                 --enable-python3interp=yes \
                 --with-python3-config-dir=$python3Config \
                 --enable-perlinterp=yes \

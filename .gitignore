@@ -25,3 +25,4 @@ dry_restore/
 __pycache__/
 gccenv.txt
 !gccenv.txt.template
+.nfs*

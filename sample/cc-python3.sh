@@ -89,7 +89,9 @@ _EOF
             exit
         fi
     fi
-    tar -zxv -f $tarName
+    if [[ ! -d $untarName ]]; then
+        tar -zxv -f $tarName
+    fi
     cd $untarName
     ./configure --prefix=$python3InstDir \
                 --enable-shared
