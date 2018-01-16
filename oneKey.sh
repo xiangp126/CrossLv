@@ -271,12 +271,13 @@ installPython3() {
         libPython3Path="$(echo ${python3LibL#*L})/lib$(echo ${python3Libl#*-l}).so"
         ls -l $libPython3Path
 
+        #check if any error occurs
         if [[ $? != 0 ]]; then
             echo "[Warning]: parsing python3 path/lib error, re-install python3 ..."
-            exit
+        else 
+            echo [Warning]: python3/lib already installed, omitting this step ...
+            return
         fi
-        echo [Warning]: python3/lib already installed, omitting this step ...
-        return
     fi
 
     cat << "_EOF"
@@ -808,6 +809,27 @@ _EOF
     if [[ $? != 0 ]]; then
         echo "[Error]: cp $sampleFile error, quitting now ..."
     fi
+
+    ycmCorePath="$HOME/.vim/bundle/YouCompleteMe/third_party/ycmd/ycm_core.so"
+    lddPath=`which ldd 2> /dev/null`
+    if [[ $lddPath != "" ]]; then
+        isSomeNotFound=`$lddPath $ycmCorePath | grep -i 'not found'`
+        if [[ "$isSomeNotFound" != "" ]]; then
+            echo "[Error]: some dynamic library for ycm_core.so not found, quitting now ..."
+            echo ------------------------------------------------------
+            $lddPath $ycmCorePath
+            exit
+        fi
+    fi
+
+    cat << _EOF
+------------------------------------------------------
+WRITING PYTHON3 INTERPRETER PATH TO $HOME/.VIMRC
+------------------------------------------------------
+_EOF
+    matchStr="ycm_server_python_interpreter"
+    sed -i --regexp-extended "/$matchStr/c let g:$matchStr = '$python3Path'" $HOME/.vimrc
+
     cat << "_EOF"
 ------------------------------------------------------
 INSTALLING YOUCOMPLETEME SUCCESSFULLY DONE

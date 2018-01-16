@@ -6,8 +6,10 @@ ubuntuDepends=(
     #build tools
     "build-essential"
     "cmake"
+    "cmake3"
     "ctags"
     "python-dev"
+    "python3-dev"
     "libmpc-dev"  #for compile gcc
     #for compile git
     "libcurl4-openssl-dev"
