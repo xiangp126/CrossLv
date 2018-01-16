@@ -100,11 +100,13 @@ backup() {
         cp ${base_dir}/${file} ${backup_subdir}/_${file_name}
     done
 
-    echo "------------------------------------------------------"
-    echo Finding files backuped successfully ...
-    echo "------------------------------------------------------"
-    find $backup_dir -type f
-    echo "------------------------------------------------------"
+    cat << _EOF
+------------------------------------------------------
+FINDING FILES BACKUPED SUCCESSFULLY ...
+------------------------------------------------------
+$(find $backup_dir -type f)
+------------------------------------------------------
+_EOF
 }
 
 restore() {
@@ -176,7 +178,19 @@ START TO COPYING BASH COMPLETION FILES ...
 _EOF
     myCompleteDir=$HOME/.completion.d
     mkdir -p $myCompleteDir
-    cp -r $completion_dir/* $myCompleteDir
+    for file in `find $completion_dir -type f`
+    do
+        echo cp -f $file $myCompleteDir/
+        cp -f $file $myCompleteDir/
+    done
+
+    cat << _EOF
+------------------------------------------------------
+FINDING FILES SUCCESSFULLY COPIED ...
+------------------------------------------------------
+_EOF
+    find $myCompleteDir -type f
+echo ------------------------------------------------------
 }
 
 regret() {

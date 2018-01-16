@@ -22,7 +22,7 @@ shopt -s checkwinsize
 #shopt -s globstar
 
 #bash command prompt
-export PS1="\u@\H:\W\$ "
+export PS1="[\u@\h:\W\]$ ""]"
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
