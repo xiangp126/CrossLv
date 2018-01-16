@@ -810,16 +810,41 @@ _EOF
         echo "[Error]: cp $sampleFile error, quitting now ..."
     fi
 
-    ycmCorePath="$HOME/.vim/bundle/YouCompleteMe/third_party/ycmd/ycm_core.so"
+    cat << _EOF
+------------------------------------------------------
+CHECK IF ANY DYNAMIC LIBRARY LINK ISSUE 
+------------------------------------------------------
+_EOF
+    ycmCoreDir="$HOME/.vim/bundle/YouCompleteMe/third_party/ycmd"
+    ycmCorePath="$ycmCoreDir/ycm_core.so"
     lddPath=`which ldd 2> /dev/null`
     if [[ $lddPath != "" ]]; then
-        isSomeNotFound=`$lddPath $ycmCorePath | grep -i 'not found'`
-        if [[ "$isSomeNotFound" != "" ]]; then
-            echo "[Error]: some dynamic library for ycm_core.so not found, quitting now ..."
-            echo ------------------------------------------------------
-            $lddPath $ycmCorePath
-            exit
-        fi
+        #loop to check and fix issue
+        loopCnt=2
+        for (( i = 0; i < $loopCnt; i++ )); do
+            isSomeNotFound=`$lddPath $ycmCorePath | grep -i 'not found'`
+            if [[ "$isSomeNotFound" != "" ]]; then
+                cat << _EOF
+------------------------------------------------------ link bad
+_EOF
+                $lddPath $ycmCorePath
+
+                #try to fix issue libclang.so.5 not found
+                cat << _EOF
+------------------------------------------------------ try fix
+_EOF
+                cd $ycmCoreDir
+                linkedName=libclang.so.5
+                ln -sf $libClangPath $linkedName
+                ls -l $linkedName
+            else
+                cat << _EOF
+------------------------------------------------------ link well
+_EOF
+                $lddPath $ycmCorePath
+                break
+            fi
+        done
     fi
 
     cat << _EOF
