@@ -13,11 +13,9 @@ rootInstDir=/usr/local
 commInstdir=$homeInstDir
 #sudo or empty
 execPrefix=""      
-#clang install info
+#clang install
 clangVersion=5.0.1
-clangHomeInstDir=~/.usr/clang-$clangVersion
-clangRootInstDir=/opt/clang-$clangVersion
-clangInstDir=$clangHomeInstDir
+clangInstDir=$commInstdir/clang-$clangVersion
 #how many cpus os has, used for make -j 
 osCpus=1
 
@@ -319,14 +317,12 @@ install() {
 case $1 in
     'home')
         commInstdir=$homeInstDir
-        clangInstDir=$clangHomeInstDir
         execPrefix=""
         install
     ;;
 
     'root')
         commInstdir=$rootInstDir
-        clangInstDir=$clangRootInstDir
         execPrefix=sudo
 		install
     ;;
