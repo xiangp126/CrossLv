@@ -129,23 +129,101 @@ checkGccVersion() {
             break
         fi
     done
-    #check env CC
-    which gcc
+    #compile new version gcc if not found suitable
     if [[ "$CC" == "" ]]; then
         cat << _EOF
-[FatalError]: Gcc version < 4.8.0, not support c++11
+[FatalWarning]: Gcc version < 4.8.0, not support c++11
 -----------------------------------------------------
-compile gcc(version > 4.8) to /usr/local
+FOR EXAMPLE: compile gcc(version > 4.8) to /usr/local
 --
 export CC=/usr/local/bin/gcc
 export CXX=/usr/local/bin/c++
-export LDFLAGS="-L/usr/local/lib -L/usr/local/lib64" 
+#export LDFLAGS="-L/usr/local/lib -L/usr/local/lib64" 
 -- or
 use 'source sample/gen-gccenv.sh root' to export env 
 -----------------------------------------------------
 _EOF
-        exit
+        installGcc
     fi
+}
+
+installGcc() {
+    cat << "_EOF"
+------------------------------------------------------
+STEP : INSTALLING GCC 5 ...
+------------------------------------------------------
+_EOF
+    gccInstDir=$commInstdir
+    $execPrefix mkdir -p $commInstdir
+    # comm attribute to get source 'gcc'
+    wgetLink=http://ftp.tsukuba.wide.ad.jp/software/gcc/releases/gcc-5.5.0
+    tarName=gcc-5.5.0.tar.gz
+    untarName=gcc-5.5.0
+    # rename download package if needed
+    cd $startDir
+    # check if already has this tar ball.
+    if [[ -f $tarName ]]; then
+        echo [Warning]: Tar Ball $tarName already exists, Omitting wget ...
+    else
+        wget --no-cookies \
+            --no-check-certificate \
+            --header "Cookie: oraclelicense=accept-securebackup-cookie" \
+            "${wgetLink}/${tarName}" \
+            -O $tarName
+        # check if wget returns successfully
+        if [[ $? != 0 ]]; then
+            echo [Error]: wget returns error, quiting now ...
+            exit
+        fi
+    fi
+    if [[ ! -d $untarName ]]; then
+        tar -zxv -f $tarName
+    fi
+    cd $untarName
+    #download extra packages fixing depends
+    ./contrib/download_prerequisites
+    #for ubuntu has privilege, use apt-get install libmpc-dev fix error.
+	if [[ $? != 0 ]]; then
+		echo [error]: fix depends returns error, quiting now ...
+        echo Ubuntu use apt-get install libmpc-dev may fix error ...
+		exit
+	fi
+    gccBuildDir=build_dir
+    mkdir -p $gccBuildDir
+    cd $gccBuildDir
+    #--enable-languages=c,c++
+    ../configure --prefix=$gccInstDir \
+                 --disable-multilib \
+                 --enable-checking=release
+    make -j $osCpus
+	# check if make returns successfully
+	if [[ $? != 0 ]]; then
+		echo [error]: make returns error, quiting now ...
+		exit
+	fi
+
+    $execPrefix make install
+	# check if make install returns successfully
+	if [[ $? != 0 ]]; then
+		echo [error]: make install returns error, quiting now ...
+		exit
+	fi
+    
+    cat << _EOF
+------------------------------------------------------
+SETTING CC/CXX COMPILE VARIABLES
+------------------------------------------------------
+_EOF
+    CC=$gccInstDir/bin/gcc
+    CXX=$gccInstDir/bin/c++
+
+    cat << _EOF
+------------------------------------------------------
+INSTALLING GCC DONE ...
+`$gccInstDir/bin/gcc --version`
+GCC/C++/G++ path = $gccInstDir/bin/
+------------------------------------------------------
+_EOF
 }
 
 checkOsCpus() {
