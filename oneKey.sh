@@ -191,6 +191,7 @@ _EOF
     gccBuildDir=build_dir
     mkdir -p $gccBuildDir
     cd $gccBuildDir
+    make distclean 2> /dev/null
     #--enable-languages=c,c++
     ../configure --prefix=$gccInstDir \
                  --disable-multilib \

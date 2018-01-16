@@ -3,6 +3,8 @@
 
 #dependency for Ubuntu
 ubuntuDepends=(
+    "bash-completion"
+    "python-optcomplete"
     #build tools
     "build-essential"
     "cmake"
@@ -31,10 +33,13 @@ ubuntuDepends=(
     "tmux"          # terminal multiplexer
     "checkinstall"
     "mosh"          # mobile ssh tool
+    "realpath"
 )
 
 #dependency for CentOS
 centosDepends=(
+    "bash-completion"
+    "python-optcomplete"
     #compile tools
     "cmake"
     "ncurses*"

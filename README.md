@@ -1,10 +1,18 @@
-# Installation Guide
-Install plugins manager for VIM/TMUX
+## Mylx-Vundle
+Goal to handle my working environment through one key stroke under Unix like platform 
 
-Compiling YouCompleteMe fixing dependency
+Also provides some very helpful tools
 
-Verified on Ubuntu/CentOS 7 | CentOS 6
+Two modes for deploy selection: home -> without root privilege
+                                root -> with root privilege
 
+Compiling GCC and Clang may take up 5G+ disk space
+
+This tool itself end up with compiling YouCompleteMe done
+
+Verified on Ubuntu/CentOS 7 and old version - CentOS 6
+
+## Installation Guide
 ```bash
 $ sh oneKey.sh
 [NAME]
@@ -32,10 +40,12 @@ $ sh oneKey.sh
 
 ```
 
-# Features
+## Features
 V3.9
-* use oneKey.sh replace of some small scripts
+* compile newly gcc/c++ version if not support c++ 11
+* add number of cpu core check, make -j [cores] 
 * add YouCompleteMe
+* use oneKey.sh replace of some small scripts
 
 V3.1 
 * use tmux plugin manager for Tmux plugins.
@@ -54,50 +64,7 @@ V2.1
 V1.0
 * user-friendly manipulate for backup | restore | confirm | clean .
 
-# Manual Guide
-## Backup First
-```bash
-> mv ~/.vim ~/.vim.old
-> sh autoUpdate.sh backup
-```
-
-## Install Vndle
-```bash
-# will make new '~/.vim/' if it not exist.
-> git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-```
-
-## Replace Configurations
-```bash
-# replace key files like .vimrc with them under confirm/
-> mv confirm/_.vimrc ~/.vim/.vimrc
-```
-
-## Setup Plugins
-```bash
-------------------------------------------------------
-Please open a vim and excute command
-    :source haha/.vim/.vimrc
-    :PluginInstall
-
-Brief help
-    :PluginList       - lists configured plugins
-    :PluginInstall    - installs plugins; append  to update or just :PluginUpdate
-    :PluginSearch foo - searches for foo; append  to refresh local cache
-    :PluginClean      - confirms removal of unused plugins; append  to auto-approve removal
-
--------------------------------------------------
-" My Plugins                               |  1
-Plugin 'VundleVim/Vundle.vim'              |~
-Plugin 'L9'                                |~
-Plugin 'The-NERD-tree'                     |~
-Plugin 'Tagbar'                            |~
-Plugin 'OmniCppComplete'                   |~
-Plugin 'snipMate' 
-
-```
-
-## Usage
+## Example for autoHandle.sh
 ```bash
 > sh autoHandle.sh
 [NAME]
@@ -170,6 +137,6 @@ find ./confirm -type f
 # Reference
 [Vundle Introduction Guide](http://www.jianshu.com/p/8d416ac4ad11)
 
-[how dows cat eof work in bash](https://stackoverflow.com/questions/2500436/how-does-cat-eof-work-in-bash)
+[how does cat eof work in bash](https://stackoverflow.com/questions/2500436/how-does-cat-eof-work-in-bash)
 
 [VIM-YouCompleteMe clang+llvm](https://www.jianshu.com/p/c24f919097b3)
