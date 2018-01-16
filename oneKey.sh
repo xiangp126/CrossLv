@@ -433,7 +433,7 @@ _EOF
 
 #install newly cmake if needed
 installCmake() {
-    #check cmake version, if >= 3.1
+    #check cmake version, if >= 3.0
     cmakePath=`which cmake 2> /dev/null`
     if [[ "$cmakePath" != "" ]]; then
         #cmake version 2.8.12.2
@@ -442,7 +442,7 @@ installCmake() {
         cmakeVer=`echo ${cmakeVersion} | tr -s "" | cut -d " " -f 3`
         #2.8
         cmakeV=$(echo $cmakeVer | cut -d "." -f 1,2)
-        basicCmakeV=3.1
+        basicCmakeV=3.0
         #if installed cmake already meets the requirement
         if [[ `echo "$cmakeV >= $basicCmakeV" | bc` -eq 1 ]]; then
             echo "[Warning]: system cmake $cmakeVersion  already >= $basicCmakeV ..."
