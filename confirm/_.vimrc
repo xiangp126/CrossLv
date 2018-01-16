@@ -5,17 +5,18 @@ syntax on
 set ignorecase
 set number
 set ruler
+set tabstop=4
+"set TAB expands to spaces
+set expandtab 
 set laststatus=1
-set autoindent
-set cindent
 set softtabstop=4
 set shiftwidth=4
-set tabstop=4
-set expandtab  "TAB expands to spaces
+set autoindent
+set cindent
 set cinoptions={0,1s,t0,n-2,p2s,(03s,=.5s,>1s,=1s,:1s
 set fileencodings=utf-8,gb2312,gb18030,gbk,ucs-bom,cp936,latin1
-set encoding=utf8
-set fileencodings=utf8,gbk,gb2312,gb18030
+set enc=utf8
+set fencs=utf8,gbk,gb2312,gb18030
 " always use 'corsair.vim' scheme in private ~/.vim/colors/corsair.vim
 :colorscheme corsair
 let mapleader='\'  " leader key, default is '\''
@@ -277,4 +278,4 @@ let g:ycm_cache_omnifunc = 0
 let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
 let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
 "do not delete next line | specify python3 interpreter
-"let g:ycm_server_python_interpreter = '/usr/bin/python3'
+let g:ycm_server_python_interpreter = '/usr/local/bin/python3'
