@@ -342,7 +342,8 @@ _EOF
 }
 
 installPython3() {
-    #install python3, ignore if installed python2
+    #install python3, no matter if installed python2
+    #method one -> locate  | sudo updatedb
     python3Path=`which python3 2> /dev/null`
     if [[ "$python3Path" != "" ]]; then
         #Python 3.5.2
@@ -358,32 +359,33 @@ installPython3() {
 
         #check if any error occurs
         if [[ $? != 0 ]]; then
-            echo "[Warning]: parsing python3 path/lib error, re-install python3 ..."
+            echo "[Warning]: locate checking python3 path/lib failed, start find checking ..."
         else 
             echo [Warning]: python3/lib already installed, omitting this step ...
             return
         fi
-    fi
 
-#    #python3 Python - Python library
-#    #sudo updatedb
-#    whereIsLibPython3=`pkg-config --list-all | grep -i python3 2> /dev/null`
-#    if [[ "$python3Path" != "" && "$whereIsLibPython3" != "" ]]; then
-#		#-L/usr/local/lib
-#		python3LibL=`pkg-config --libs-only-L python3`
-#        #-lpython3.6m
-#		python3Libl=`pkg-config --libs-only-l python3`
-#        libPython3Path="$(echo ${python3LibL#*L})/lib$(echo ${python3Libl#*-l}).so"
-#        ls -l $libPython3Path
-#
-#        #check if any error occurs
-#        if [[ $? != 0 ]]; then
-#            echo "[Warning]: parsing python3 path/lib error, re-install python3 ..."
-#        else 
-#            echo [Warning]: python3/lib already installed, omitting this step ...
-#            return
-#        fi
-#    fi
+        #method two -> find
+        #python3 Python - Python library
+        #sudo updatedb
+        whereIsLibPython3=`pkg-config --list-all | grep -i python3 2> /dev/null`
+        if [[ "$python3Path" != "" && "$whereIsLibPython3" != "" ]]; then
+            #-L/usr/local/lib
+            python3LibL=`pkg-config --libs-only-L python3`
+            #-lpython3.6m
+            python3Libl=`pkg-config --libs-only-l python3`
+            libPython3Path="$(echo ${python3LibL#*L})/lib$(echo ${python3Libl#*-l}).so"
+            ls -l $libPython3Path
+
+            #check if any error occurs
+            if [[ $? != 0 ]]; then
+                echo "[Warning]: find checking python3 path/lib failed, re-install python3 ..."
+            else 
+                echo [Warning]: python3/lib already installed, omitting this step ...
+                return
+            fi
+        fi
+    fi
 
     cat << "_EOF"
 ------------------------------------------------------
