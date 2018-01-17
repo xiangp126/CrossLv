@@ -6,6 +6,8 @@ ubuntuDepends=(
     #clang use
     "libclang-5.0-dev"
     "clang-5.0"
+    "libclang-3.9-dev"
+    "clang-3.9"
     #completion
     "bash-completion"
     "python-optcomplete"
@@ -140,6 +142,7 @@ _EOF
             exit
         ;;
     esac
+    sudo updatedb
 }
 
 parseInput() {

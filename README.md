@@ -1,14 +1,14 @@
 ## Mylx-Vundle
 Goal to handle my working environment through one key stroke under Unix like platform 
 
-Also provides some very helpful tools
-
-Two modes for deploy selection: home -> without root privilege
-                                root -> with root privilege
-
-Compiling GCC and Clang may take up 5G+ disk space
+Auto fix dependency and skipping already installed packages
 
 This tool itself end up with compiling YouCompleteMe done
+
+Two modes deploy selection: home -> without root privilege
+                            root -> with root privilege
+
+If needed, compiling GCC and Clang may take up 5G+ disk space
 
 Verified on Ubuntu/CentOS 7 and old version - CentOS 6
 

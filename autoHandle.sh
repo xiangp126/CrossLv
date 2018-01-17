@@ -178,7 +178,7 @@ START TO COPYING BASH COMPLETION FILES ...
 _EOF
     myCompleteDir=$HOME/.completion.d
     mkdir -p $myCompleteDir
-    for file in `find $completion_dir -type f`
+    for file in `find completion_dir -regex .*.bash -type f`
     do
         echo cp -f $file $myCompleteDir/
         cp -f $file $myCompleteDir/

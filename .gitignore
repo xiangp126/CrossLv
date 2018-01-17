@@ -26,3 +26,5 @@ __pycache__/
 gccenv.txt
 !gccenv.txt.template
 .nfs*
+bash-completion-*
+bash-completion_*

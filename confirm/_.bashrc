@@ -70,10 +70,22 @@ export LD_LIBRARY_PATH
 #export https_proxy=socks5://127.0.0.1:8080
 #export http_proxy=socks5://127.0.0.1:8080
 
-#loop to source bash completion for tmux/git
-myCompleteDir=$HOME/.completion.d
-if [[ -d "$myCompleteDir" ]]; then
-    for file in `find $myCompleteDir -type f`
+# enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+    . /etc/bash_completion
+else 
+	#source full bash completion manually
+	myBashCompTool=.bash_completion.sh
+	if [[ -f $myBashCompTool ]]; then
+		source $myBashCompTool
+	fi
+fi
+#loop to source extra completion for tmux/git etc
+extraCompDir=$HOME/.completion.d
+if [[ -d "$extraCompDir" ]]; then
+    for file in `find $extraCompDir -regex .*.bash -type f`
     do
         source $file
     done

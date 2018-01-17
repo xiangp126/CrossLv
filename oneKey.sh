@@ -101,6 +101,63 @@ _EOF
     logo
 }    
 
+installBashCompletion() {
+    cat << "_EOF"
+------------------------------------------------------
+STEP : INSTALLING BASH COMPLETION ...
+------------------------------------------------------
+_EOF
+    bashCompInstDir=$commInstdir
+    $execPrefix mkdir -p $commInstdir
+    # comm attribute to get source 'gcc'
+    wgetLink=http://archive.ubuntu.com/ubuntu/pool/main/b/bash-completion
+    tarName=bash-completion_2.1.orig.tar.bz2
+    untarName=bash-completion-2.1
+
+    # rename download package if needed
+    cd $startDir
+    # check if already has this tar ball.
+    if [[ -f $tarName ]]; then
+        echo [Warning]: Tar Ball $tarName already exists, Omitting wget ...
+    else
+        wget --no-cookies \
+            --no-check-certificate \
+            --header "Cookie: oraclelicense=accept-securebackup-cookie" \
+            "${wgetLink}/${tarName}" \
+            -O $tarName
+        # check if wget returns successfully
+        if [[ $? != 0 ]]; then
+            echo [Error]: wget returns error, quitting now ...
+            exit
+        fi
+    fi
+    if [[ ! -d $untarName ]]; then
+        tar -jxv -f $tarName
+    fi
+    cd $untarName
+    ./configure --prefix=$bashCompInstDir
+    make -j $osCpus
+	# check if make returns successfully
+	if [[ $? != 0 ]]; then
+		echo [error]: make returns error, quitting now ...
+		exit
+	fi
+
+    $execPrefix make install
+	if [[ $? != 0 ]]; then
+		echo [error]: make install returns error, quitting now ...
+		exit
+	fi
+
+    checkName=bash_completion
+    ls -l $checkName
+	if [[ $? != 0 ]]; then
+		echo [error]: $checkName did not exist, quitting now ...
+		exit
+	fi
+    cp bash_completion.sh $HOME/.bash_completion.sh
+}
+
 #gcc must support C++11 to compile YCM
 checkGccVersion() {
     #loop to find if there exists gcc version meets requirement
@@ -176,7 +233,7 @@ _EOF
             -O $tarName
         # check if wget returns successfully
         if [[ $? != 0 ]]; then
-            echo [Error]: wget returns error, quiting now ...
+            echo [Error]: wget returns error, quitting now ...
             exit
         fi
     fi
@@ -188,7 +245,7 @@ _EOF
     ./contrib/download_prerequisites
     #for ubuntu has privilege, use apt-get install libmpc-dev fix error.
 	if [[ $? != 0 ]]; then
-		echo [error]: fix depends returns error, quiting now ...
+		echo [error]: fix depends returns error, quitting now ...
         echo Ubuntu use apt-get install libmpc-dev may fix error ...
 		exit
 	fi
@@ -203,14 +260,14 @@ _EOF
     make -j $osCpus
 	# check if make returns successfully
 	if [[ $? != 0 ]]; then
-		echo [error]: make returns error, quiting now ...
+		echo [error]: make returns error, quitting now ...
 		exit
 	fi
 
     $execPrefix make install
 	# check if make install returns successfully
 	if [[ $? != 0 ]]; then
-		echo [error]: make install returns error, quiting now ...
+		echo [error]: make install returns error, quitting now ...
 		exit
 	fi
     
@@ -274,7 +331,7 @@ _EOF
         git clone $gitClonePath $clonedName 
         # check if git returns successfully
         if [[ $? != 0 ]]; then
-            echo "[Error]: git returns error, quiting now ..."
+            echo "[Error]: git returns error, quitting now ..."
             exit
         fi
     fi
@@ -293,7 +350,7 @@ _EOF
         git clone $gitClonePath $clonedName 
         # check if git returns successfully
         if [[ $? != 0 ]]; then
-            echo "[Error]: git returns error, quiting now ..."
+            echo "[Error]: git returns error, quitting now ..."
             exit
         fi
     fi
@@ -307,6 +364,11 @@ _EOF
     # replace corsair.vim ahead of whole restore
     mkdir -p ${baseDir}/${tackleDir[0]}/colors
     cp -f ./confirm/_corsair.vim ${baseDir}/${tackleDir[0]}/colors/corsair.vim
+
+    #call function to install bash completion now
+    installBashCompletion
+
+    exit
 }
 
 installTmuxPlugins() {
@@ -415,7 +477,7 @@ _EOF
             -O $tarName
         # check if wget returns successfully
         if [[ $? != 0 ]]; then
-            echo [Error]: wget returns error, quiting now ...
+            echo [Error]: wget returns error, quitting now ...
             exit
         fi
     fi
@@ -431,14 +493,14 @@ _EOF
     make -j $osCpus
 	# check if make returns successfully
 	if [[ $? != 0 ]]; then
-		echo [Error]: make returns error, quiting now ...
+		echo [Error]: make returns error, quitting now ...
 		exit
 	fi
 
     $execPrefix make install
 	# check if make returns successfully
 	if [[ $? != 0 ]]; then
-		echo [Error]: make install returns error, quiting now ...
+		echo [Error]: make install returns error, quitting now ...
 		exit
 	fi
     python3Path=$python3InstDir/bin/python3
@@ -584,7 +646,7 @@ _EOF
             -O $tarName
         # check if wget returns successfully
         if [[ $? != 0 ]]; then
-            echo [Error]: wget returns error, quiting now ...
+            echo [Error]: wget returns error, quitting now ...
             exit
         fi
     fi
@@ -595,7 +657,7 @@ _EOF
     make -j $osCpus
 	# check if make returns successfully
 	if [[ $? != 0 ]]; then
-		echo [Error]: make returns error, quiting now ...
+		echo [Error]: make returns error, quitting now ...
 		exit
 	fi
     $execPrefix make install
@@ -667,7 +729,7 @@ _EOF
             -O $llvmTarName
         # check if wget returns successfully
         if [[ $? != 0 ]]; then
-            echo [Error]: wget returns error, quiting now ...
+            echo [Error]: wget returns error, quitting now ...
             exit
         fi
     fi
@@ -702,7 +764,7 @@ _EOF
             -O $cfeTarName
         # check if wget returns successfully
         if [[ $? != 0 ]]; then
-            echo [Error]: wget returns error, quiting now ...
+            echo [Error]: wget returns error, quitting now ...
             exit
         fi
     fi
@@ -738,7 +800,7 @@ _EOF
             -O $crtTarName
         # check if wget returns successfully
         if [[ $? != 0 ]]; then
-            echo [Error]: wget returns error, quiting now ...
+            echo [Error]: wget returns error, quitting now ...
             exit
         fi
     fi
@@ -783,7 +845,7 @@ _EOF
             -O $cteTarName
         # check if wget returns successfully
         if [[ $? != 0 ]]; then
-            echo [Error]: wget returns error, quiting now ...
+            echo [Error]: wget returns error, quitting now ...
             exit
         fi
     fi
@@ -822,7 +884,7 @@ _EOF
     make -j $osCpus
 	# check if make returns successfully
 	if [[ $? != 0 ]]; then
-		echo [Error]: make returns error, quiting now ...
+		echo [Error]: make returns error, quitting now ...
 		exit
 	fi
 
@@ -840,7 +902,7 @@ _EOF
     
 	# check if make install/cp returns successfully
 	if [[ $? != 0 ]]; then
-		echo [Error]: make install or cp $libClangPath returns error, quiting now ...
+		echo [Error]: make install or cp $libClangPath returns error, quitting now ...
 		exit
 	fi
     cat << _EOF
@@ -873,7 +935,7 @@ _EOF
         git clone $repoLink/$repoName $ycmDir
         # check if clone returns successfully
         if [[ $? != 0 ]]; then
-            echo [Error]: git clone returns error, quiting now ...
+            echo [Error]: git clone returns error, quitting now ...
             exit
         fi
     fi
@@ -903,7 +965,7 @@ _EOF
                $ycmDir/third_party/ycmd/cpp
     # check if install returns successfully
     if [[ $? != 0 ]]; then
-        echo "cmake -G "Unix Makefiles" error, quiting now ..."
+        echo "cmake -G "Unix Makefiles" error, quitting now ..."
         exit
     fi
 
@@ -916,7 +978,7 @@ _EOF
     make -j $osCpus
     # check if make returns successfully
     if [[ $? != 0 ]]; then
-        echo "[Error]: make ycm_core error, quiting now ..."
+        echo "[Error]: make ycm_core error, quitting now ..."
         exit
     fi
 
