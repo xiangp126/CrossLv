@@ -5,23 +5,24 @@ syntax on
 set ignorecase
 set number
 set ruler
+set autoindent
+set cindent
 set tabstop=4
-"set TAB expands to spaces
-set expandtab 
 set laststatus=1
 set softtabstop=4
 set shiftwidth=4
-set autoindent
-set cindent
+set expandtab      "set TAB expands to spaces
 set cinoptions={0,1s,t0,n-2,p2s,(03s,=.5s,>1s,=1s,:1s
 set fileencodings=utf-8,gb2312,gb18030,gbk,ucs-bom,cp936,latin1
 set enc=utf8
 set fencs=utf8,gbk,gb2312,gb18030
 " always use 'corsair.vim' scheme in private ~/.vim/colors/corsair.vim
 :colorscheme corsair
-let mapleader='\'  " leader key, default is '\''
 " set text auto next line when exceed 80 characters.
 " set textwidth=80 formatoptions+=Mm
+let mapleader='\'  " leader key, default is '\''
+":help ins-completion-menu
+set pumheight=15   " maximum height of popup menu
 
 """"""""""""""""""""""""""""""
 " BASIC KEYBIND 
@@ -34,9 +35,9 @@ noremap <F10> :set invnumber <CR>
 """"""""""""""""""""""""""""""
 " VIM BUNDLE 
 """"""""""""""""""""""""""""""
-set nocompatible              " be iMproved, required
+set nocompatible   " be iMproved, required
 set backspace=indent,eol,start
-filetype off                  " required
+filetype off       " required
 " set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
@@ -258,6 +259,19 @@ let g:UltiSnipsEditSplit="vertical"
 """"""""""""""""""""""""""""""
 " CONFIG YouCompleteMe
 """"""""""""""""""""""""""""""
+let g:ycm_semantic_triggers =  {
+  \   'c' : ['->', '.', 're![_a-zA-z0-9]'],
+  \   'objc' : ['->', '.', 're!\[[_a-zA-Z]+\w*\s', 're!^\s*[^\W\d]\w*\s',
+  \             're!\[.*\]\s'],
+  \   'ocaml' : ['.', '#'],
+  \   'cpp,objcpp' : ['->', '.', '::', 're![_a-zA-z0-9]'],
+  \   'perl' : ['->'],
+  \   'php' : ['->', '::'],
+  \   'cs,java,javascript,typescript,d,python,perl6,scala,vb,elixir,go' : ['.'],
+  \   'ruby' : ['.', '::'],
+  \   'lua' : ['.', ':'],
+  \   'erlang' : [':'],
+  \ }
 " let g:ycm_keep_logfiles = 1
 " let g:ycm_log_level = 'debug'
 set completeopt=longest,menu
@@ -279,3 +293,4 @@ let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
 let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
 "do not delete next line | specify python3 interpreter
 let g:ycm_server_python_interpreter = '/usr/local/bin/python3'
+"let g:ycm_key_invoke_completion = '<F9>'
