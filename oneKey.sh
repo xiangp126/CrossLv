@@ -367,8 +367,6 @@ _EOF
 
     #call function to install bash completion now
     installBashCompletion
-
-    exit
 }
 
 installTmuxPlugins() {

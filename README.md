@@ -42,6 +42,7 @@ $ sh oneKey.sh
 
 ## Features
 V3.9
+* safe to run installation routine many times
 * compile newly gcc/c++ version if not support c++ 11
 * add number of cpu core check, make -j [cores] 
 * add YouCompleteMe

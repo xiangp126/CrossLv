@@ -26,7 +26,7 @@ export PS1="\u@\h:\W\$ "
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+#alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
 # BELOW IS MYSELF CONFIGURATION.
 # SET LS COLOR
@@ -77,7 +77,7 @@ if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
 else 
 	#source full bash completion manually
-	myBashCompTool=.bash_completion.sh
+	myBashCompTool=$HOME/.bash_completion.sh
 	if [[ -f $myBashCompTool ]]; then
 		source $myBashCompTool
 	fi
@@ -85,7 +85,7 @@ fi
 #loop to source extra completion for tmux/git etc
 extraCompDir=$HOME/.completion.d
 if [[ -d "$extraCompDir" ]]; then
-    for file in `find $extraCompDir -regex .*.bash -type f`
+    for file in `find $extraCompDir -regex ".*.bash" -type f`
     do
         source $file
     done
