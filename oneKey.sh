@@ -346,23 +346,26 @@ installPython3() {
     #method one -> locate  | sudo updatedb
     python3Path=`which python3 2> /dev/null`
     if [[ "$python3Path" != "" ]]; then
-        #Python 3.5.2
-        python3Version=`python3 --version`
-        #3.5.2
-        python3Ver=$(echo $python3Version | tr -s "" | cut -d " " -f 2)
-        #3.5
-        python3V=$(echo $python3Ver | cut -d "." -f 1,2)
-        #libpython3.5m.so
-        libPython3Name=libpython${python3V}.so
-        #may need run 'sudo updatedb'
-        libPython3Path=$(locate $libPython3Name | head -n 1 2> /dev/null)
+        whereIsLocate=`which locate 2> /dev/null`
+        if [[ "$whereIsLocate" != "" ]]; then
+            #Python 3.5.2
+            python3Version=`python3 --version`
+            #3.5.2
+            python3Ver=$(echo $python3Version | tr -s "" | cut -d " " -f 2)
+            #3.5
+            python3V=$(echo $python3Ver | cut -d "." -f 1,2)
+            #libpython3.5m.so
+            libPython3Name=libpython${python3V}.so
+            #may need run 'sudo updatedb'
+            libPython3Path=$(locate $libPython3Name | head -n 1 2> /dev/null)
 
-        #check if any error occurs
-        if [[ $? != 0 ]]; then
-            echo "[Warning]: locate checking python3 path/lib failed, start find checking ..."
-        else 
-            echo [Warning]: python3/lib already installed, omitting this step ...
-            return
+            #check if any error occurs
+            if [[ "$libPython3Path" == "" || "$?" != 0  ]]; then
+                echo "[Warning]: locate checking python3 path/lib failed, start find checking ..."
+            else 
+                echo [Warning]: python3/lib already installed, omitting this step ...
+                return
+            fi
         fi
 
         #method two -> find
@@ -1027,7 +1030,7 @@ case $1 in
     'root')
         set -x
         #run fix dependency routine as has root privilege
-        #sh -x tools/osFixDepends.sh install
+        #sh -x ./tools/fixOsDepends.sh install
 		commInstdir=$rootInstDir
         execPrefix=sudo
         install

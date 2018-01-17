@@ -42,6 +42,7 @@ ubuntuDepends=(
 
 #dependency for CentOS
 centosDepends=(
+    "mlocate"
     "bash-completion"
     "python-optcomplete"
     #compile tools
