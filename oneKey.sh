@@ -31,7 +31,9 @@ cmakeInstDir=$commInstdir
 cmakePath=`which cmake 2> /dev/null`
 #clang install
 clangVersion=5.0.1
-clangInstDir=$commInstdir/clang-$clangVersion
+#install clang into a separate dir
+clangSubDir=clang-$clangVersion
+clangInstDir=$commInstdir/$clangSubDir
 #how many cpus os has, used for make -j 
 osCpus=1
 
@@ -102,6 +104,13 @@ _EOF
 }    
 
 installBashCompletion() {
+    #bash-completion bash-completion - programmable completion for the bash shell
+    whereIsLibBashComp=`pkg-config --list-all | grep -i bash-completion \
+        2> /dev/null`
+    if [[ $whereIsLibBashComp != "" ]]; then
+        echo "[Warning]: already has full bash completion installed, omitting this step ..."
+        return
+    fi
     cat << "_EOF"
 ------------------------------------------------------
 STEP : INSTALLING BASH COMPLETION ...
@@ -149,13 +158,24 @@ _EOF
 		exit
 	fi
 
-    checkName=bash_completion
+    checkName=bash_completion.sh
     ls -l $checkName
 	if [[ $? != 0 ]]; then
 		echo [error]: $checkName did not exist, quitting now ...
 		exit
 	fi
     cp bash_completion.sh $HOME/.bash_completion.sh
+
+    #copy bash-completion.pc to standard PKG_CONFIG_PATH search path
+    itOriPkgPath=$bashCompInstDir/share/pkgconfig/bash-completion.pc
+    itDstPkgPath=$bashCompInstDir/lib/pkgconfig/
+    $execPrefix cp $itOriPkgPath $itDstPkgPath
+
+    ls -l $itDstPkgPath/bash-completion.pc
+	if [[ $? != 0 ]]; then
+		echo [error]: copy bash-compile.pc failed, quitting now ...
+		exit
+	fi
 }
 
 #gcc must support C++11 to compile YCM
@@ -674,6 +694,9 @@ installClang() {
     libClangName="libclang.so"
     #loop to find system installed libclang.so
     pathLoopLoc=(
+        #~/.usr/clang-5.0.1
+        "$commInstdir/$clangSubDir"
+        "$rootInstDir/$clangSubDir"
         "$HOME/.usr/lib"
         "$HOME/.usr/lib64"
         "/usr/local/lib"
@@ -684,12 +707,13 @@ installClang() {
     libClangPath=""
     for pathLoc in ${pathLoopLoc[@]}
     do
-        if [[ -d $pathLoc ]]; then
-            libClangPath=`find $pathLoc -name libclang.so | head -n 1 2> /dev/null`
-            if [[ "$libClangPath" != "" ]]; then
-                echo "[Warning]: $libClangName was already installed, omitting this step ..."
-                return
-            fi
+        if [[ ! -d $pathLoc ]]; then
+            continue
+        fi
+        libClangPath=`find $pathLoc -name libclang.so | head -n 1 2> /dev/null`
+        if [[ "$libClangPath" != "" ]]; then
+            echo "[Warning]: $libClangName was already installed, omitting this step ..."
+            return
         fi
     done
 
