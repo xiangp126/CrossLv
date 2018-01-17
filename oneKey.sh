@@ -72,11 +72,12 @@ Brief help
 ------------------------------------------------------
 EXECUTE VIM COMMANDS THROUGH COMMAND LINE 
 ------------------------------------------------------
-    [sample 1] vim +PluginInstall +qall
-    equals $ vim and then :PluginInstall and then :qall
-    [sample 2] vim +"help tags"
-    equals $ vim and then :help tags
-    --------------- END OF THIS NOTE ----------------
+Brief help
+    vim +PluginInstall +qall
+    #equals $ vim and then :PluginInstall and then :qall
+    vim +"help tags"
+    #equals $ vim and then :help tags
+----------------- END OF THIS NOTE -------------------
 _EOF
 }
 
