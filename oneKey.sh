@@ -50,7 +50,7 @@ _EOF
 }
 
 printNotePage() {
-	cat << "_EOF"
+    cat << "_EOF"
 ------------------------------------------------------
 VIM PLUGIN MANAGER INSTRUTION
 ------------------------------------------------------
@@ -81,8 +81,8 @@ _EOF
 }
 
 usage() {
-	exeName=${0##*/}
-	cat << _EOF
+    exeName=${0##*/}
+    cat << _EOF
 [NAME]
     $exeName -- onekey to setup my working environment | - tmux
     | - vim | - vundle -- youcompleteme -- supertab -- vim-snippets
@@ -100,7 +100,7 @@ usage() {
     home -- build required packages to $homeInstDir/
     root -- build required packages to $rootInstDir/
 _EOF
-    logo
+logo
 }    
 
 installBashCompletion() {
@@ -122,7 +122,7 @@ _EOF
     wgetLink=http://archive.ubuntu.com/ubuntu/pool/main/b/bash-completion
     tarName=bash-completion_2.1.orig.tar.bz2
     untarName=bash-completion-2.1
-
+    
     # rename download package if needed
     cd $startDir
     # check if already has this tar ball.
@@ -130,10 +130,10 @@ _EOF
         echo [Warning]: Tar Ball $tarName already exists, Omitting wget ...
     else
         wget --no-cookies \
-            --no-check-certificate \
-            --header "Cookie: oraclelicense=accept-securebackup-cookie" \
-            "${wgetLink}/${tarName}" \
-            -O $tarName
+             --no-check-certificate \
+             --header "Cookie: oraclelicense=accept-securebackup-cookie" \
+             "${wgetLink}/${tarName}" \
+             -O $tarName
         # check if wget returns successfully
         if [[ $? != 0 ]]; then
             echo [Error]: wget returns error, quitting now ...
@@ -146,36 +146,36 @@ _EOF
     cd $untarName
     ./configure --prefix=$bashCompInstDir
     make -j $osCpus
-	# check if make returns successfully
-	if [[ $? != 0 ]]; then
-		echo [error]: make returns error, quitting now ...
-		exit
-	fi
-
+    # check if make returns successfully
+    if [[ $? != 0 ]]; then
+        echo [error]: make returns error, quitting now ...
+        exit
+    fi
+    
     $execPrefix make install
-	if [[ $? != 0 ]]; then
-		echo [error]: make install returns error, quitting now ...
-		exit
-	fi
-
+    if [[ $? != 0 ]]; then
+        echo [error]: make install returns error, quitting now ...
+        exit
+    fi
+    
     checkName=bash_completion.sh
     ls -l $checkName
-	if [[ $? != 0 ]]; then
-		echo [error]: $checkName did not exist, quitting now ...
-		exit
-	fi
+    if [[ $? != 0 ]]; then
+        echo [error]: $checkName did not exist, quitting now ...
+        exit
+    fi
     cp bash_completion.sh $HOME/.bash_completion.sh
-
+    
     #copy bash-completion.pc to standard PKG_CONFIG_PATH search path
     itOriPkgPath=$bashCompInstDir/share/pkgconfig/bash-completion.pc
     itDstPkgPath=$bashCompInstDir/lib/pkgconfig/
     $execPrefix cp $itOriPkgPath $itDstPkgPath
-
+    
     ls -l $itDstPkgPath/bash-completion.pc
-	if [[ $? != 0 ]]; then
-		echo [error]: copy bash-compile.pc failed, quitting now ...
-		exit
-	fi
+    if [[ $? != 0 ]]; then
+        echo [error]: copy bash-compile.pc failed, quitting now ...
+        exit
+    fi
 }
 
 #gcc must support C++11 to compile YCM
@@ -224,6 +224,7 @@ export CXX=/usr/local/bin/c++
 use 'source sample/gen-gccenv.sh root' to export env 
 -----------------------------------------------------
 _EOF
+        #start to compile newly gcc/c++
         installGcc
     fi
 }
@@ -247,10 +248,10 @@ _EOF
         echo [Warning]: Tar Ball $tarName already exists, Omitting wget ...
     else
         wget --no-cookies \
-            --no-check-certificate \
-            --header "Cookie: oraclelicense=accept-securebackup-cookie" \
-            "${wgetLink}/${tarName}" \
-            -O $tarName
+             --no-check-certificate \
+             --header "Cookie: oraclelicense=accept-securebackup-cookie" \
+             "${wgetLink}/${tarName}" \
+             -O $tarName
         # check if wget returns successfully
         if [[ $? != 0 ]]; then
             echo [Error]: wget returns error, quitting now ...
@@ -264,11 +265,11 @@ _EOF
     #download extra packages fixing depends
     ./contrib/download_prerequisites
     #for ubuntu has privilege, use apt-get install libmpc-dev fix error.
-	if [[ $? != 0 ]]; then
-		echo [error]: fix depends returns error, quitting now ...
+    if [[ $? != 0 ]]; then
+        echo [error]: fix depends returns error, quitting now ...
         echo Ubuntu use apt-get install libmpc-dev may fix error ...
-		exit
-	fi
+        exit
+    fi
     gccBuildDir=build_dir
     mkdir -p $gccBuildDir
     cd $gccBuildDir
@@ -278,27 +279,27 @@ _EOF
                  --disable-multilib \
                  --enable-checking=release
     make -j $osCpus
-	# check if make returns successfully
-	if [[ $? != 0 ]]; then
-		echo [error]: make returns error, quitting now ...
-		exit
-	fi
-
-    $execPrefix make install
-	# check if make install returns successfully
-	if [[ $? != 0 ]]; then
-		echo [error]: make install returns error, quitting now ...
-		exit
-	fi
+    # check if make returns successfully
+    if [[ $? != 0 ]]; then
+        echo [error]: make returns error, quitting now ...
+        exit
+    fi
     
-    cat << _EOF
+    $execPrefix make install
+    # check if make install returns successfully
+    if [[ $? != 0 ]]; then
+        echo [error]: make install returns error, quitting now ...
+        exit
+    fi
+
+cat << _EOF
 ------------------------------------------------------
 SETTING CC/CXX COMPILE VARIABLES
 ------------------------------------------------------
 _EOF
     CC=$gccInstDir/bin/gcc
     CXX=$gccInstDir/bin/c++
-
+    
     cat << _EOF
 ------------------------------------------------------
 INSTALLING GCC DONE ...
@@ -337,7 +338,7 @@ STEP : RUN BACKUP FIRST ...
 _EOF
     sh autoHandle.sh backup
 
-    cat << "_EOF"
+cat << "_EOF"
 ------------------------------------------------------
 STEP : INSTALLING VIM-PLUGIN MANAGER ...
 ------------------------------------------------------
@@ -355,7 +356,6 @@ _EOF
             exit
         fi
     fi
-
     cat << "_EOF"
 ------------------------------------------------------
 STEP : INSTALLING TMUX-PLUGIN MANAGER
@@ -374,7 +374,7 @@ _EOF
             exit
         fi
     fi
-
+    
     cat << _EOF
 ------------------------------------------------------
 REPLACING SOME KEY FILES FIRST ...
@@ -384,7 +384,7 @@ _EOF
     # replace corsair.vim ahead of whole restore
     mkdir -p ${baseDir}/${tackleDir[0]}/colors
     cp -f ./confirm/_corsair.vim ${baseDir}/${tackleDir[0]}/colors/corsair.vim
-
+    
     #call function to install bash completion now
     installBashCompletion
 }
@@ -407,15 +407,15 @@ STEP : INSTALLING VIM PLUGINS ...
 ------------------------------------------------------
 _EOF
     cd $startDir
- 	#81 Plugin 'Valloric/YouCompleteMe'
-	tackleFile=$HOME/.vimrc
-	# comment YouCompleteMe in $HOME/.vimrc
-	#it takes too long time, manually compile in cc-ycm.sh
-	sed -i --regexp-extended "s/(^Plugin 'Valloric)/\" \1/" $tackleFile
-
+    #81 Plugin 'Valloric/YouCompleteMe'
+    tackleFile=$HOME/.vimrc
+    # comment YouCompleteMe in $HOME/.vimrc
+    #it takes too long time, manually compile in cc-ycm.sh
+    sed -i --regexp-extended "s/(^Plugin 'Valloric)/\" \1/" $tackleFile
+    
     # source $HOME/.vimrc if needed
     vim +"source $HOME/.vimrc" +PluginInstall +qall
-	# run restore routine
+    # run restore routine
     sh autoHandle.sh restore
     #load new .bashrc after 'restore' routine
     source $HOME/.bashrc 2> /dev/null
@@ -479,9 +479,9 @@ _EOF
     $execPrefix mkdir -p $commInstdir
     # comm attribute to get source 'python3'
     wgetLink=https://www.python.org/ftp/python/3.6.4
-	tarName=Python-3.6.4.tgz
+    tarName=Python-3.6.4.tgz
     untarName=Python-3.6.4
-
+    
     # rename download package if needed
     cd $startDir
     # check if already has this tar ball.
@@ -489,10 +489,10 @@ _EOF
         echo [Warning]: Tar Ball $tarName already exists, Omitting wget ...
     else
         wget --no-cookies \
-            --no-check-certificate \
-            --header "Cookie: oraclelicense=accept-securebackup-cookie" \
-            "${wgetLink}/${tarName}" \
-            -O $tarName
+             --no-check-certificate \
+             --header "Cookie: oraclelicense=accept-securebackup-cookie" \
+             "${wgetLink}/${tarName}" \
+             -O $tarName
         # check if wget returns successfully
         if [[ $? != 0 ]]; then
             echo [Error]: wget returns error, quitting now ...
@@ -509,18 +509,18 @@ _EOF
     ./configure --prefix=$python3InstDir \
                 --enable-shared
     make -j $osCpus
-	# check if make returns successfully
-	if [[ $? != 0 ]]; then
-		echo [Error]: make returns error, quitting now ...
-		exit
-	fi
-
+    # check if make returns successfully
+    if [[ $? != 0 ]]; then
+        echo [Error]: make returns error, quitting now ...
+        exit
+    fi
+    
     $execPrefix make install
-	# check if make returns successfully
-	if [[ $? != 0 ]]; then
-		echo [Error]: make install returns error, quitting now ...
-		exit
-	fi
+    # check if make returns successfully
+    if [[ $? != 0 ]]; then
+        echo [Error]: make install returns error, quitting now ...
+        exit
+    fi
     python3Path=$python3InstDir/bin/python3
     libPython3Path=$python3InstDir/lib/libpython3.6m.so
     if [[ ! -f $libPython3Path ]]; then
@@ -572,11 +572,11 @@ _EOF
         fi
     fi
     cd $clonedName
-	# if need checkout
+    # if need checkout
     git checkout $checkoutVersion
-	# clean before ./configure
-	make distclean
-
+    # clean before ./configure
+    make distclean
+    
     #find python2 & python3 config dir
     python2Config=`python2-config --configdir 2> /dev/null`
     python3Config=`python3-config --configdir 2> /dev/null`
@@ -584,7 +584,7 @@ _EOF
         echo [Error]: Not found python2 or python3, please install either of them ...
         exit
     fi
-
+    
     #--with-python-config-dir=$python2Config
     ./configure --prefix=$vimInstDir \
                 --with-features=huge \
@@ -606,9 +606,9 @@ _EOF
         exit
     fi
     $execPrefix make install
-	# go back to start directory.
+    # go back to start directory.
     cd $startDir
-
+    
     cat << _EOF
 ------------------------------------------------------
 INSTALLING VIM DONE ...
@@ -616,9 +616,8 @@ INSTALLING VIM DONE ...
 vim path = $vimInstDir/bin/
 ------------------------------------------------------
 _EOF
-
-	# uncomment YouCompleteMe in $HOME/.vimrc, no need after run 'restore'
-	#sed -i --regexp-extended "s/\" (Plugin 'Valloric)/\1/" confirm/_.vimrc
+    # uncomment YouCompleteMe in $HOME/.vimrc, no need after run 'restore'
+    #sed -i --regexp-extended "s/\" (Plugin 'Valloric)/\1/" confirm/_.vimrc
 }
 
 #install newly cmake if needed
@@ -650,7 +649,7 @@ _EOF
     wgetLink=https://cmake.org/files/v3.10
     tarName=cmake-3.10.1.tar.gz
     untarName=cmake-3.10.1
-
+    
     # rename download package if needed
     cd $startDir
     # check if already has this tar ball.
@@ -658,10 +657,10 @@ _EOF
         echo [Warning]: Tar Ball $tarName already exists, Omitting wget ...
     else
         wget --no-cookies \
-            --no-check-certificate \
-            --header "Cookie: oraclelicense=accept-securebackup-cookie" \
-            "${wgetLink}/${tarName}" \
-            -O $tarName
+             --no-check-certificate \
+             --header "Cookie: oraclelicense=accept-securebackup-cookie" \
+             "${wgetLink}/${tarName}" \
+             -O $tarName
         # check if wget returns successfully
         if [[ $? != 0 ]]; then
             echo [Error]: wget returns error, quitting now ...
@@ -671,16 +670,15 @@ _EOF
     tar -zxv -f $tarName
     cd $untarName
     ./configure --prefix=$cmakeInstDir
-
+    
     make -j $osCpus
-	# check if make returns successfully
-	if [[ $? != 0 ]]; then
-		echo [Error]: make returns error, quitting now ...
-		exit
-	fi
+    # check if make returns successfully
+    if [[ $? != 0 ]]; then
+        echo [Error]: make returns error, quitting now ...
+        exit
+    fi
     $execPrefix make install
     cmakePath=$cmakeInstDir/bin/cmake
-    
     cat << _EOF
 ------------------------------------------------------
 INSTALLING cmake 3 DONE ...
@@ -726,7 +724,6 @@ _EOF
     #clangVersion=5.0.1
     clangInstDir=$commInstdir/clang-$clangVersion
     $execPrefix mkdir -p $clangInstDir
-
     cat << "_EOF"
 ------------------------------------------------------
 STEP : DOWNLOADING LLVM 5 ...
@@ -737,7 +734,7 @@ _EOF
     wgetLink=http://releases.llvm.org/$clangVersion
     llvmTarName=llvm-$clangVersion.src.tar.xz
     llvmUntarName=llvm-$clangVersion.src
-
+    
     # rename download package if needed
     cd $startDir
     # check if already has this tar ball.
@@ -745,10 +742,10 @@ _EOF
         echo [Warning]: Tar Ball $llvmTarName already exists, Omitting wget ...
     else
         wget --no-cookies \
-            --no-check-certificate \
-            --header "Cookie: oraclelicense=accept-securebackup-cookie" \
-            "${wgetLink}/${llvmTarName}" \
-            -O $llvmTarName
+             --no-check-certificate \
+             --header "Cookie: oraclelicense=accept-securebackup-cookie" \
+             "${wgetLink}/${llvmTarName}" \
+             -O $llvmTarName
         # check if wget returns successfully
         if [[ $? != 0 ]]; then
             echo [Error]: wget returns error, quitting now ...
@@ -761,7 +758,6 @@ _EOF
     else
         tar -xv -f $llvmTarName
     fi
-
     cat << "_EOF"
 ------------------------------------------------------
 STEP : DOWNLOADING CFE 5 ...
@@ -772,7 +768,7 @@ _EOF
     cfeTarName=cfe-$clangVersion.src.tar.xz
     #cfeUntarName=cfe-$clangVersion.src
     cfeUntarName=$llvmUntarName/tools/clang
-
+    
     # rename download package if needed
     cd $startDir
     # check if already has this tar ball.
@@ -780,10 +776,10 @@ _EOF
         echo [Warning]: Tar Ball $cfeTarName already exists, Omitting wget ...
     else
         wget --no-cookies \
-            --no-check-certificate \
-            --header "Cookie: oraclelicense=accept-securebackup-cookie" \
-            "${wgetLink}/${cfeTarName}" \
-            -O $cfeTarName
+             --no-check-certificate \
+             --header "Cookie: oraclelicense=accept-securebackup-cookie" \
+             "${wgetLink}/${cfeTarName}" \
+             -O $cfeTarName
         # check if wget returns successfully
         if [[ $? != 0 ]]; then
             echo [Error]: wget returns error, quitting now ...
@@ -797,7 +793,6 @@ _EOF
         mkdir -p $cfeUntarName
         tar -xv -f $cfeTarName --strip-components=1 -C $cfeUntarName
     fi
-
     cat << "_EOF"
 ------------------------------------------------------
 STEP : DOWNLOADING COMPILER-RT 5 ...
@@ -808,7 +803,7 @@ _EOF
     crtTarName=compiler-rt-$clangVersion.src.tar.xz
     #crtUntarName=compiler-rt-$clangVersion.src
     crtUntarName=$llvmUntarName/projects/compiler-rt
-
+    
     # rename download package if needed
     cd $startDir
     # check if already has this tar ball.
@@ -816,10 +811,10 @@ _EOF
         echo [Warning]: Tar Ball $crtTarName already exists, Omitting wget ...
     else
         wget --no-cookies \
-            --no-check-certificate \
-            --header "Cookie: oraclelicense=accept-securebackup-cookie" \
-            "${wgetLink}/${crtTarName}" \
-            -O $crtTarName
+             --no-check-certificate \
+             --header "Cookie: oraclelicense=accept-securebackup-cookie" \
+             "${wgetLink}/${crtTarName}" \
+             -O $crtTarName
         # check if wget returns successfully
         if [[ $? != 0 ]]; then
             echo [Error]: wget returns error, quitting now ...
@@ -833,7 +828,6 @@ _EOF
         mkdir -p $crtUntarName
         tar -xv -f $crtTarName --strip-components=1 -C $crtUntarName
     fi
-
     cat << "_EOF"
 ------------------------------------------------------
 STEP : DOWNLOADING CLANG-TOOLS-EXTRA 5 ...
@@ -853,7 +847,7 @@ _EOF
     cteTarName=clang-tools-extra-$clangVersion.src.tar.xz
     #cteUntarName=clang-tools-extra-$clangVersion.src
     cteUntarName=$llvmUntarName/tools/clang/tools/extra
-
+    
     # rename download package if needed
     cd $startDir
     # check if already has this tar ball.
@@ -861,10 +855,10 @@ _EOF
         echo [Warning]: Tar Ball $cteTarName already exists, Omitting wget ...
     else
         wget --no-cookies \
-            --no-check-certificate \
-            --header "Cookie: oraclelicense=accept-securebackup-cookie" \
-            "${wgetLink}/${cteTarName}" \
-            -O $cteTarName
+             --no-check-certificate \
+             --header "Cookie: oraclelicense=accept-securebackup-cookie" \
+             "${wgetLink}/${cteTarName}" \
+             -O $cteTarName
         # check if wget returns successfully
         if [[ $? != 0 ]]; then
             echo [Error]: wget returns error, quitting now ...
@@ -872,13 +866,12 @@ _EOF
         fi
     fi
     #check if dir already exist
-#    if [[ -d $cteUntarName ]]; then
-#        echo [Warning]: $cteUntarName already exist, Omitting untar ...
-#    else
-#        mkdir -p $cteUntarName
-#        tar -xv -f $crtTarName --strip-components=1 -C $cteUntarName
-#    fi
-
+    #    if [[ -d $cteUntarName ]]; then
+    #        echo [Warning]: $cteUntarName already exist, Omitting untar ...
+    #    else
+    #        mkdir -p $cteUntarName
+    #        tar -xv -f $crtTarName --strip-components=1 -C $cteUntarName
+    #    fi
     cat << "_EOF"
 ------------------------------------------------------
 STEP : START TO COMPILE CLANG 5 ...
@@ -894,22 +887,22 @@ _EOF
     python3Path=`which python3 2> /dev/null`
     #python3Path=$python3InstDir/bin/python3
     $cmakePath -G"Unix Makefiles" \
-        -DCMAKE_C_COMPILER=$CC \
-        -DCMAKE_CXX_COMPILER=$CXX \
-        -DCMAKE_INSTALL_PREFIX=$clangInstDir \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DLLVM_TARGETS_TO_BUILD="X86" \
-        -DPYTHON_LIBRARY=$libPython3Path \
-        -DPYTHON_EXECUTABLE=$python3Path \
-        -DLLVM_INCLUDE_TESTS=OFF \
-        $startDir/$llvmUntarName
+               -DCMAKE_C_COMPILER=$CC \
+               -DCMAKE_CXX_COMPILER=$CXX \
+               -DCMAKE_INSTALL_PREFIX=$clangInstDir \
+               -DCMAKE_BUILD_TYPE=Release \
+               -DLLVM_TARGETS_TO_BUILD="X86" \
+               -DPYTHON_LIBRARY=$libPython3Path \
+               -DPYTHON_EXECUTABLE=$python3Path \
+               -DLLVM_INCLUDE_TESTS=OFF \
+               $startDir/$llvmUntarName
     make -j $osCpus
-	# check if make returns successfully
-	if [[ $? != 0 ]]; then
-		echo [Error]: make returns error, quitting now ...
-		exit
-	fi
-
+    # check if make returns successfully
+    if [[ $? != 0 ]]; then
+        echo [Error]: make returns error, quitting now ...
+        exit
+    fi
+    
     libClangPath=$clangInstDir/lib/libclang.so
     #clangNeedInstall=TRUE
     clangNeedInstall=FALSE
@@ -922,11 +915,11 @@ _EOF
         ls -l $libClangPath
     fi
     
-	# check if make install/cp returns successfully
-	if [[ $? != 0 ]]; then
-		echo [Error]: make install or cp $libClangPath returns error, quitting now ...
-		exit
-	fi
+    # check if make install/cp returns successfully
+    if [[ $? != 0 ]]; then
+        echo [Error]: make install or cp $libClangPath returns error, quitting now ...
+        exit
+    fi
     cat << _EOF
 ------------------------------------------------------
 INSTALLING LLVM DONE ...
@@ -949,7 +942,7 @@ STEP : COMPILING YOUCOMPLETEME ...
 _EOF
     # comm attribute for getting source ycm
     repoLink=https://github.com/Valloric
-	repoName=YouCompleteMe
+    repoName=YouCompleteMe
     ycmDir=$HOME/.vim/bundle/YouCompleteMe
     if [[ -d $ycmDir ]]; then
         echo [Warning]: already has YCM repo cloned, omitting now ...
@@ -961,13 +954,13 @@ _EOF
             exit
         fi
     fi
-
+    
     cd $ycmDir
-	git submodule update --init --recursive
-
+    git submodule update --init --recursive
+    
     #not use official install script now
     #$python3Path ./install.py --clang-completer
-
+    
     ycmBuildDir=ycm_build
     mkdir -p $ycmBuildDir
     cd $ycmBuildDir
@@ -990,7 +983,6 @@ _EOF
         echo "cmake -G "Unix Makefiles" error, quitting now ..."
         exit
     fi
-
     cat << "_EOF"
 ------------------------------------------------------
 BUILDING YCM_CORE NOW ...
@@ -1003,7 +995,7 @@ _EOF
         echo "[Error]: make ycm_core error, quitting now ..."
         exit
     fi
-
+    
     cat << "_EOF"
 ------------------------------------------------------
 INSTALLING .YCM_EXTRA_CONF.PY TO HOME ...
@@ -1014,11 +1006,11 @@ _EOF
     sampleFile=ycm_extra_conf.py
     echo cp ${sampleDir}/$sampleFile $HOME/.$sampleFile
     cp ${sampleDir}/$sampleFile $HOME/.$sampleFile
-
+    
     if [[ $? != 0 ]]; then
         echo "[Error]: cp $sampleFile error, quitting now ..."
     fi
-
+    
     cat << _EOF
 ------------------------------------------------------
 CHECK IF ANY DYNAMIC LIBRARY LINK ISSUE 
@@ -1037,7 +1029,6 @@ _EOF
 ------------------------------------------------------ link bad
 _EOF
                 $lddPath $ycmCorePath
-
                 #try to fix issue libclang.so.5 not found
                 cat << _EOF
 ------------------------------------------------------ try fix
@@ -1055,7 +1046,6 @@ _EOF
             fi
         done
     fi
-
     cat << _EOF
 ------------------------------------------------------
 WRITING PYTHON3 INTERPRETER PATH TO $HOME/.VIMRC
@@ -1064,7 +1054,6 @@ _EOF
     matchStr="ycm_server_python_interpreter"
     sed -i --regexp-extended \
         "/$matchStr/c let g:$matchStr = '$python3Path'" $HOME/.vimrc
-
     cat << "_EOF"
 ------------------------------------------------------
 INSTALLING YOUCOMPLETEME SUCCESSFULLY DONE
@@ -1106,22 +1095,22 @@ install() {
 case $1 in 
     'home')
         set -x
-		commInstdir=$homeInstDir
+        commInstdir=$homeInstDir
         execPrefix=""
         install 
-    ;;
+        ;;
 
     'root')
         set -x
         #run fix dependency routine as has root privilege
         #sh -x ./tools/fixOsDepends.sh install
-		commInstdir=$rootInstDir
+        commInstdir=$rootInstDir
         execPrefix=sudo
         install
-    ;;
+        ;;
 
     *)
         usage
         exit
-    ;;
+        ;;
 esac
