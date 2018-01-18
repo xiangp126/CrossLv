@@ -1,10 +1,10 @@
 #!/bin/bash
 # COPYRIGHT BY PENG, 2018. XIANGP126@SJTU.EDU.CN.
-#shell start location
+# shell start location
 startDir=`pwd`
 # main work directory
 mainWd=$startDir
-#.vim/.tmux installation dir
+# .vim/.tmux installation dir
 baseDir=$HOME    
 tackleDir=(
     ".vim"
@@ -16,26 +16,29 @@ homeInstDir=$HOME/.usr
 rootInstDir=/usr/local
 # default is home mode
 commInstdir=$homeInstDir
-#execute prefix: "" or sudo
+# execute prefix: "" or sudo
 execPrefix=""
-#required packages install info
-#gcc install
+# required packages install info
+# gcc install
 gccInstDir=$commInstdir
-#python3 install
+# python3 install
 python3InstDir=$commInstdir
 python3Path=`which python3 2> /dev/null`
-#vim install
+# vim install
 vimInstDir=$commInstdir
-#cmake install
+# cmake install
 cmakeInstDir=$commInstdir
 cmakePath=`which cmake 2> /dev/null`
-#clang install
+# clang install
 clangVersion=5.0.1
-#install clang into a separate dir
+# install clang into a separate dir
 clangSubDir=clang-$clangVersion
 clangInstDir=$commInstdir/$clangSubDir
-#how many cpus os has, used for make -j 
+# how many cpus os has, used for make -j 
 osCpus=1
+# store all downloaded packages here
+downloadPath=$mainWd./downloads
+mkdir -p $downloadPath
 
 logo() {
     cat << "_EOF"
@@ -74,9 +77,9 @@ EXECUTE VIM COMMANDS THROUGH COMMAND LINE
 ------------------------------------------------------
 Brief help
     vim +PluginInstall +qall
-    #equals $ vim and then :PluginInstall and then :qall
+    # equals $ vim and then :PluginInstall and then :qall
     vim +"help tags"
-    #equals $ vim and then :help tags
+    # equals $ vim and then :help tags
 ----------------- END OF THIS NOTE -------------------
 _EOF
 }
@@ -86,9 +89,9 @@ usage() {
     cat << _EOF
 [NAME]
     $exeName -- onekey to setup my working environment | - tmux
-    | - vim | - vundle -- youcompleteme -- supertab -- vim-snippets
-             -- ultisnips -- nerdtree -- auto-pairs
-    | - gcc | - python3 | - etc
+             | - vim | - vundle -- youcompleteme -- supertab -- vim-snippets
+                      -- ultisnips -- nerdtree -- auto-pairs
+             | - gcc | - python3 | - etc
 
 [SYNOPSIS]
     $exeName [home | root | help]
@@ -105,7 +108,7 @@ logo
 }    
 
 installBashCompletion() {
-    #bash-completion bash-completion - programmable completion for the bash shell
+    # bash-completion bash-completion - programmable completion for the bash shell
     whereIsLibBashComp=`pkg-config --list-all | grep -i bash-completion \
         2> /dev/null`
     if [[ $whereIsLibBashComp != "" ]]; then
@@ -125,7 +128,7 @@ _EOF
     untarName=bash-completion-2.1
     
     # rename download package if needed
-    cd $startDir
+    cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $tarName ]]; then
         echo [Warning]: Tar Ball $tarName already exists, Omitting wget ...
@@ -167,7 +170,7 @@ _EOF
     fi
     cp bash_completion.sh $HOME/.bash_completion.sh
     
-    #copy bash-completion.pc to standard PKG_CONFIG_PATH search path
+    # copy bash-completion.pc to standard PKG_CONFIG_PATH search path
     itOriPkgPath=$bashCompInstDir/share/pkgconfig/bash-completion.pc
     itDstPkgPath=$bashCompInstDir/lib/pkgconfig/
     $execPrefix cp $itOriPkgPath $itDstPkgPath
@@ -179,9 +182,9 @@ _EOF
     fi
 }
 
-#gcc must support C++11 to compile YCM
+# gcc must support C++11 to compile YCM
 checkGccVersion() {
-    #loop to find if there exists gcc version meets requirement
+    # loop to find if there exists gcc version meets requirement
     pathLoopLoc=(
         "$HOME/.usr/bin"
         "/usr/local/bin"
@@ -194,24 +197,24 @@ checkGccVersion() {
         if [[ ! -d $pathLoc ]]; then
             continue
         fi
-        #check if version matches
+        # check if version matches
         gccLoc="$pathLoc/gcc"
         if [[ ! -x "$gccLoc" ]]; then
             continue
         fi
-        #4.4.7
+        # 4.4.7
         gccVersion=`$gccLoc -dumpversion`
-        #4.4
+        # 4.4
         gccV=$(echo $gccVersion | cut -d "." -f 1,2)
-        #if found, set env CC/CXX
+        # if found, set env CC/CXX
         if [[ `echo "$gccV >= $basicGccVersion" | bc` -eq 1 ]]; then
             CC=$pathLoc/gcc
             CXX=$pathLoc/c++
-            #if found one matchs, quit this 'for' loop
+            # if found one matchs, quit this 'for' loop
             break
         fi
     done
-    #compile new version gcc if not found suitable
+    # compile new version gcc if not found suitable
     if [[ "$CC" == "" ]]; then
         cat << _EOF
 [FatalWarning]: Gcc version < 4.8.0, not support c++11
@@ -220,12 +223,12 @@ FOR EXAMPLE: compile gcc(version > 4.8) to /usr/local
 --
 export CC=/usr/local/bin/gcc
 export CXX=/usr/local/bin/c++
-#export LDFLAGS="-L/usr/local/lib -L/usr/local/lib64" 
+# export LDFLAGS="-L/usr/local/lib -L/usr/local/lib64" 
 -- or
 use 'source sample/gen-gccenv.sh root' to export env 
 -----------------------------------------------------
 _EOF
-        #start to compile newly gcc/c++
+        # start to compile newly gcc/c++
         installGcc
     fi
 }
@@ -242,8 +245,9 @@ _EOF
     wgetLink=http://ftp.tsukuba.wide.ad.jp/software/gcc/releases/gcc-5.5.0
     tarName=gcc-5.5.0.tar.gz
     untarName=gcc-5.5.0
+
     # rename download package if needed
-    cd $startDir
+    cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $tarName ]]; then
         echo [Warning]: Tar Ball $tarName already exists, Omitting wget ...
@@ -263,9 +267,9 @@ _EOF
         tar -zxv -f $tarName
     fi
     cd $untarName
-    #download extra packages fixing depends
+    # download extra packages fixing depends
     ./contrib/download_prerequisites
-    #for ubuntu has privilege, use apt-get install libmpc-dev fix error.
+    # for ubuntu has privilege, use apt-get install libmpc-dev fix error.
     if [[ $? != 0 ]]; then
         echo [error]: fix depends returns error, quitting now ...
         echo Ubuntu use apt-get install libmpc-dev may fix error ...
@@ -275,7 +279,7 @@ _EOF
     mkdir -p $gccBuildDir
     cd $gccBuildDir
     make distclean 2> /dev/null
-    #--enable-languages=c,c++
+    # --enable-languages=c,c++
     ../configure --prefix=$gccInstDir \
                  --disable-multilib \
                  --enable-checking=release
@@ -315,7 +319,7 @@ checkOsCpus() {
         echo [Warning]: OS has no lscpu installed, omitting this ...
         return
     fi
-    #set new os cpus
+    # set new os cpus
     osCpus=`lscpu | grep -i "^CPU(s):" | tr -s " " | cut -d " " -f 2`
     if [[ "$osCpus" == "" ]]; then
         osCpus=1
@@ -323,14 +327,14 @@ checkOsCpus() {
     echo "OS has CPU(S): $osCpus"
 }
 
-#install vim and tmux
+# install vim and tmux
 installBone() {
     if [ ! -d $baseDir ]; then
         echo mkdir -p $baseDir
         mkdir -p $baseDir
     fi
 
-    cd $startDir
+    cd $mainWd
     # run backup first of all.
     cat << _EOF
 ------------------------------------------------------
@@ -386,7 +390,7 @@ _EOF
     mkdir -p ${baseDir}/${tackleDir[0]}/colors
     cp -f ./confirm/_corsair.vim ${baseDir}/${tackleDir[0]}/colors/corsair.vim
     
-    #call function to install bash completion now
+    # call function to install bash completion now
     installBashCompletion
 }
 
@@ -407,40 +411,40 @@ installVimPlugins() {
 STEP : INSTALLING VIM PLUGINS ...
 ------------------------------------------------------
 _EOF
-    cd $startDir
-    #81 Plugin 'Valloric/YouCompleteMe'
+    cd $mainWd
+    # 81 Plugin 'Valloric/YouCompleteMe'
     tackleFile=$HOME/.vimrc
     # comment YouCompleteMe in $HOME/.vimrc
-    #it takes too long time, manually compile in cc-ycm.sh
+    # it takes too long time, manually compile in cc-ycm.sh
     sed -i --regexp-extended "s/(^Plugin 'Valloric)/\" \1/" $tackleFile
     
     # source $HOME/.vimrc if needed
     vim +"source $HOME/.vimrc" +PluginInstall +qall
     # run restore routine
     sh autoHandle.sh restore
-    #load new .bashrc after 'restore' routine
+    # load new .bashrc after 'restore' routine
     source $HOME/.bashrc 2> /dev/null
 }
 
 installPython3() {
-    #install python3, no matter if installed python2
-    #method one -> locate  | sudo updatedb
+    # install python3, no matter if installed python2
+    # method one -> locate  | sudo updatedb
     python3Path=`which python3 2> /dev/null`
     if [[ "$python3Path" != "" ]]; then
         whereIsLocate=`which locate 2> /dev/null`
         if [[ "$whereIsLocate" != "" ]]; then
-            #Python 3.5.2
+            # Python 3.5.2
             python3Version=`python3 --version`
-            #3.5.2
+            # 3.5.2
             python3Ver=$(echo $python3Version | tr -s "" | cut -d " " -f 2)
-            #3.5
+            # 3.5
             python3V=$(echo $python3Ver | cut -d "." -f 1,2)
-            #libpython3.5m.so
+            # libpython3.5m.so
             libPython3Name=libpython${python3V}.so
-            #may need run 'sudo updatedb'
+            # may need run 'sudo updatedb'
             libPython3Path=$(locate $libPython3Name | head -n 1 2> /dev/null)
 
-            #check if any error occurs
+            # check if any error occurs
             if [[ "$libPython3Path" == "" || "$?" != 0  ]]; then
                 echo "[Warning]: locate checking python3 path/lib failed, start find checking ..."
             else 
@@ -449,19 +453,19 @@ installPython3() {
             fi
         fi
 
-        #method two -> find
-        #python3 Python - Python library
-        #sudo updatedb
+        # method two -> find
+        # python3 Python - Python library
+        # sudo updatedb
         whereIsLibPython3=`pkg-config --list-all | grep -i python3 2> /dev/null`
         if [[ "$python3Path" != "" && "$whereIsLibPython3" != "" ]]; then
-            #-L/usr/local/lib
+            # -L/usr/local/lib
             python3LibL=`pkg-config --libs-only-L python3`
-            #-lpython3.6m
+            # -lpython3.6m
             python3Libl=`pkg-config --libs-only-l python3`
             libPython3Path="$(echo ${python3LibL#*L})/lib$(echo ${python3Libl#*-l}).so"
             ls -l $libPython3Path
 
-            #check if any error occurs
+            # check if any error occurs
             if [[ $? != 0 ]]; then
                 echo "[Warning]: find checking python3 path/lib failed, re-install python3 ..."
             else 
@@ -484,7 +488,7 @@ _EOF
     untarName=Python-3.6.4
     
     # rename download package if needed
-    cd $startDir
+    cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $tarName ]]; then
         echo [Warning]: Tar Ball $tarName already exists, Omitting wget ...
@@ -500,7 +504,7 @@ _EOF
             exit
         fi
     fi
-    #check if already untared
+    # check if already untared
     if [[ -d $untarName ]]; then
         echo [Warning]: found $untarName, omitting this step ...
     else
@@ -540,7 +544,7 @@ _EOF
 }
 
 installvim() {
-    #check if vim 8 was installed
+    # check if vim 8 was installed
     checkCmd=`vim --version | head -n 1 | grep -i "Vi IMproved 8" 2> /dev/null`
     if [[ "$checkCmd" != "" ]]; then
         echo "[Warning]: Vim 8 was already installed, omitting this step ..."
@@ -559,8 +563,9 @@ _EOF
     vimClonePath=https://github.com/vim/vim
     clonedName=vim
     checkoutVersion=v8.0.1428
+
     # rename download package
-    cd $startDir
+    cd $downloadPath
     # check if already has this tar ball.
     if [[ -d $clonedName ]]; then
         echo [Warning]: target $clonedName/ already exists, Omitting now ...
@@ -578,7 +583,7 @@ _EOF
     # clean before ./configure
     make distclean
     
-    #find python2 & python3 config dir
+    # find python2 & python3 config dir
     python2Config=`python2-config --configdir 2> /dev/null`
     python3Config=`python3-config --configdir 2> /dev/null`
     if [[ "$python2Config" == "" && "$python3Config" == "" ]]; then
@@ -586,7 +591,7 @@ _EOF
         exit
     fi
     
-    #--with-python-config-dir=$python2Config
+    # --with-python-config-dir=$python2Config
     ./configure --prefix=$vimInstDir \
                 --with-features=huge \
                 --enable-multibyte \
@@ -607,8 +612,6 @@ _EOF
         exit
     fi
     $execPrefix make install
-    # go back to start directory.
-    cd $startDir
     
     cat << _EOF
 ------------------------------------------------------
@@ -618,22 +621,22 @@ vim path = $vimInstDir/bin/
 ------------------------------------------------------
 _EOF
     # uncomment YouCompleteMe in $HOME/.vimrc, no need after run 'restore'
-    #sed -i --regexp-extended "s/\" (Plugin 'Valloric)/\1/" confirm/_.vimrc
+    # sed -i --regexp-extended "s/\" (Plugin 'Valloric)/\1/" confirm/_.vimrc
 }
 
-#install newly cmake if needed
+# install newly cmake if needed
 installCmake() {
-    #check cmake version, if >= 3.0
+    # check cmake version, if >= 3.0
     cmakePath=`which cmake 2> /dev/null`
     if [[ "$cmakePath" != "" ]]; then
-        #cmake version 2.8.12.2
+        # cmake version 2.8.12.2
         cmakeVersion=`cmake --version`
-        #2.8.12.2
+        # 2.8.12.2
         cmakeVer=`echo ${cmakeVersion} | tr -s "" | cut -d " " -f 3`
-        #2.8
+        # 2.8
         cmakeV=$(echo $cmakeVer | cut -d "." -f 1,2)
         basicCmakeV=3.0
-        #if installed cmake already meets the requirement
+        # if installed cmake already meets the requirement
         if [[ `echo "$cmakeV >= $basicCmakeV" | bc` -eq 1 ]]; then
             echo "[Warning]: system cmake $cmakeVersion  already >= $basicCmakeV ..."
             return
@@ -652,7 +655,7 @@ _EOF
     untarName=cmake-3.10.1
     
     # rename download package if needed
-    cd $startDir
+    cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $tarName ]]; then
         echo [Warning]: Tar Ball $tarName already exists, Omitting wget ...
@@ -691,9 +694,9 @@ _EOF
 
 installClang() {
     libClangName="libclang.so"
-    #loop to find system installed libclang.so
+    # loop to find system installed libclang.so
     pathLoopLoc=(
-        #~/.usr/clang-5.0.1
+        # ~/.usr/clang-5.0.1
         "$commInstdir/$clangSubDir"
         "$rootInstDir/$clangSubDir"
         "$HOME/.usr/lib"
@@ -721,8 +724,8 @@ installClang() {
 STEP : PREPARE TO INSTALL CLANG 5 ...
 ------------------------------------------------------
 _EOF
-    #clang version, change it if you need other version
-    #clangVersion=5.0.1
+    # clang version, change it if you need other version
+    # clangVersion=5.0.1
     clangInstDir=$commInstdir/clang-$clangVersion
     $execPrefix mkdir -p $clangInstDir
     cat << "_EOF"
@@ -731,13 +734,13 @@ STEP : DOWNLOADING LLVM 5 ...
 ------------------------------------------------------
 _EOF
     # comm attribute to get source 'llvm'
-    #this link is the same for all four packages
+    # this link is the same for all four packages
     wgetLink=http://releases.llvm.org/$clangVersion
     llvmTarName=llvm-$clangVersion.src.tar.xz
     llvmUntarName=llvm-$clangVersion.src
     
     # rename download package if needed
-    cd $startDir
+    cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $llvmTarName ]]; then
         echo [Warning]: Tar Ball $llvmTarName already exists, Omitting wget ...
@@ -753,7 +756,7 @@ _EOF
             exit
         fi
     fi
-    #check if dir already exist
+    # check if dir already exist
     if [[ -d $llvmUntarName ]]; then
         echo [Warning]: $llvmUntarName already exist, Omitting untar ...
     else
@@ -765,13 +768,13 @@ STEP : DOWNLOADING CFE 5 ...
 ------------------------------------------------------
 _EOF
     # comm attribute to get source 'cfe'
-    #cfeWgetLink=http://releases.llvm.org/$clangVersion
+    # cfeWgetLink=http://releases.llvm.org/$clangVersion
     cfeTarName=cfe-$clangVersion.src.tar.xz
-    #cfeUntarName=cfe-$clangVersion.src
+    # cfeUntarName=cfe-$clangVersion.src
     cfeUntarName=$llvmUntarName/tools/clang
     
     # rename download package if needed
-    cd $startDir
+    cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $cfeTarName ]]; then
         echo [Warning]: Tar Ball $cfeTarName already exists, Omitting wget ...
@@ -787,7 +790,7 @@ _EOF
             exit
         fi
     fi
-    #check if dir already exist
+    # check if dir already exist
     if [[ -d $cfeUntarName ]]; then
         echo [Warning]: $cfeUntarName already exist, Omitting untar ...
     else
@@ -800,13 +803,13 @@ STEP : DOWNLOADING COMPILER-RT 5 ...
 ------------------------------------------------------
 _EOF
     # comm attribute to get source 'compiler-rt'
-    #crtWgetLink=http://releases.llvm.org/$clangVersion
+    # crtWgetLink=http://releases.llvm.org/$clangVersion
     crtTarName=compiler-rt-$clangVersion.src.tar.xz
-    #crtUntarName=compiler-rt-$clangVersion.src
+    # crtUntarName=compiler-rt-$clangVersion.src
     crtUntarName=$llvmUntarName/projects/compiler-rt
     
     # rename download package if needed
-    cd $startDir
+    cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $crtTarName ]]; then
         echo [Warning]: Tar Ball $crtTarName already exists, Omitting wget ...
@@ -822,7 +825,7 @@ _EOF
             exit
         fi
     fi
-    #check if dir already exist
+    # check if dir already exist
     if [[ -d $crtUntarName ]]; then
         echo [Warning]: $crtUntarName already exist, Omitting untar ...
     else
@@ -835,22 +838,22 @@ STEP : DOWNLOADING CLANG-TOOLS-EXTRA 5 ...
 ------------------------------------------------------
 _EOF
 # CMake Error at tools/clang/tools/extra/cmake/Modules/AddCompilerRT.cmake:58 (add_library):
-#   add_library cannot create target "RTXray.x86_64" because another target
-#   with the same name already exists.  The existing target is created in
-#   source directory
-#   "/home/corsair/myGit/mylx-vundle/sample/llvm-5.0.1.src/projects/compiler-rt/lib/xray".
-#   See documentation for policy CMP0002 for more details.
+# add_library cannot create target "RTXray.x86_64" because another target
+# with the same name already exists.  The existing target is created in
+# source directory
+# "~/myGit/mylx-vundle/sample/llvm-5.0.1.src/projects/compiler-rt/lib/xray".
+# See documentation for policy CMP0002 for more details.
 # Call Stack (most recent call first):
-#   tools/clang/tools/extra/lib/xray/CMakeLists.txt:66 (add_compiler_rt_object_libraries)
+# tools/clang/tools/extra/lib/xray/CMakeLists.txt:66 (add_compiler_rt_object_libraries)
 
     # comm attribute to get source 'clang-tools-extra'
-    #cteWgetLink=http://releases.llvm.org/$clangVersion
+    # cteWgetLink=http://releases.llvm.org/$clangVersion
     cteTarName=clang-tools-extra-$clangVersion.src.tar.xz
-    #cteUntarName=clang-tools-extra-$clangVersion.src
+    # cteUntarName=clang-tools-extra-$clangVersion.src
     cteUntarName=$llvmUntarName/tools/clang/tools/extra
     
     # rename download package if needed
-    cd $startDir
+    cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $cteTarName ]]; then
         echo [Warning]: Tar Ball $cteTarName already exists, Omitting wget ...
@@ -866,13 +869,13 @@ _EOF
             exit
         fi
     fi
-    #check if dir already exist
-    #    if [[ -d $cteUntarName ]]; then
-    #        echo [Warning]: $cteUntarName already exist, Omitting untar ...
-    #    else
-    #        mkdir -p $cteUntarName
-    #        tar -xv -f $crtTarName --strip-components=1 -C $cteUntarName
-    #    fi
+    # check if dir already exist
+       # if [[ -d $cteUntarName ]]; then
+           # echo [Warning]: $cteUntarName already exist, Omitting untar ...
+       # else
+           # mkdir -p $cteUntarName
+           # tar -xv -f $crtTarName --strip-components=1 -C $cteUntarName
+       # fi
     cat << "_EOF"
 ------------------------------------------------------
 STEP : START TO COMPILE CLANG 5 ...
@@ -882,11 +885,11 @@ _EOF
     buildDir=build_dir
     mkdir -p $buildDir
     cd $buildDir
-    #cmakePath was set in installCmake
-    #cmakePath=$commInstdir/bin/cmake
-    #python3Path was set in installPython3
+    # cmakePath was set in installCmake
+    # cmakePath=$commInstdir/bin/cmake
+    # python3Path was set in installPython3
     python3Path=`which python3 2> /dev/null`
-    #python3Path=$python3InstDir/bin/python3
+    # python3Path=$python3InstDir/bin/python3
     $cmakePath -G"Unix Makefiles" \
                -DCMAKE_C_COMPILER=$CC \
                -DCMAKE_CXX_COMPILER=$CXX \
@@ -905,10 +908,10 @@ _EOF
     fi
     
     libClangPath=$clangInstDir/lib/libclang.so
-    #clangNeedInstall=TRUE
+    # clangNeedInstall=TRUE
     clangNeedInstall=FALSE
     if [[ "$clangNeedInstall" == "TRUE" ]]; then
-        #install may take up 3G+ space
+        # install may take up 3G+ space
         $execPrefix make install
     else
         $execPrefix mkdir -p $clangInstDir/lib
@@ -935,7 +938,7 @@ _EOF
 
 # compile YouCompleteMe
 compileYcm() {
-    #cmakePath=`which cmake 2> /dev/null`
+    # cmakePath=`which cmake 2> /dev/null`
     cat << "_EOF"
 ------------------------------------------------------
 STEP : COMPILING YOUCOMPLETEME ...
@@ -959,17 +962,17 @@ _EOF
     cd $ycmDir
     git submodule update --init --recursive
     
-    #not use official install script now
-    #$python3Path ./install.py --clang-completer
+    # not use official install script now
+    # $python3Path ./install.py --clang-completer
     
     ycmBuildDir=ycm_build
     mkdir -p $ycmBuildDir
     cd $ycmBuildDir
-    #remove old CMakeCache.txt
+    # remove old CMakeCache.txt
     rm -rf CMakeCache.txt
-    #-DUSE_PYTHON2=OFF, do not use python2 library
-    #-- Found PythonLibs: ~/.usr/lib/libpython3.6m.so 
-    #(found suitable version "3.6.4", minimum required is "3.3")
+    # -DUSE_PYTHON2=OFF, do not use python2 library
+    # -- Found PythonLibs: ~/.usr/lib/libpython3.6m.so 
+    # (found suitable version "3.6.4", minimum required is "3.3")
     $cmakePath -G "Unix Makefiles" \
                -DCMAKE_C_COMPILER=$CC \
                -DCMAKE_CXX_COMPILER=$CXX \
@@ -989,7 +992,7 @@ _EOF
 BUILDING YCM_CORE NOW ...
 ------------------------------------------------------
 _EOF
-    #$cmakePath --build . --target ycm_core 
+    # $cmakePath --build . --target ycm_core 
     make -j $osCpus
     # check if make returns successfully
     if [[ $? != 0 ]]; then
@@ -1002,7 +1005,7 @@ _EOF
 INSTALLING .YCM_EXTRA_CONF.PY TO HOME ...
 ------------------------------------------------------
 _EOF
-    cd $startDir
+    cd $mainWd
     sampleDir=./template
     sampleFile=ycm_extra_conf.py
     echo cp ${sampleDir}/$sampleFile $HOME/.$sampleFile
@@ -1021,7 +1024,7 @@ _EOF
     ycmCorePath="$ycmCoreDir/ycm_core.so"
     lddPath=`which ldd 2> /dev/null`
     if [[ $lddPath != "" ]]; then
-        #loop to check and fix issue
+        # loop to check and fix issue
         loopCnt=2
         for (( i = 0; i < $loopCnt; i++ )); do
             isSomeNotFound=`$lddPath $ycmCorePath | grep -i 'not found'`
@@ -1030,7 +1033,7 @@ _EOF
 ------------------------------------------------------ link bad
 _EOF
                 $lddPath $ycmCorePath
-                #try to fix issue libclang.so.5 not found
+                # try to fix issue libclang.so.5 not found
                 cat << _EOF
 ------------------------------------------------------ try fix
 _EOF
@@ -1099,19 +1102,19 @@ case $1 in
         commInstdir=$homeInstDir
         execPrefix=""
         install 
-        ;;
+    ;;
 
     'root')
         set -x
-        #run fix dependency routine as has root privilege
-        #sh -x ./tools/fixOsDepends.sh install
+        # run fix dependency routine as has root privilege
+        # sh -x ./tools/fixOsDepends.sh install
         commInstdir=$rootInstDir
         execPrefix=sudo
         install
-        ;;
+   ;;
 
     *)
         usage
         exit
-        ;;
+   ;;
 esac
