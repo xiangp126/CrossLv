@@ -15,7 +15,6 @@ execPrefix=""
 osCpus=1
 # store all downloaded packages here
 downloadPath=$mainWd/downloads
-mkdir -p $downloadPath
 
 logo() {
     cat << "_EOF"
@@ -128,7 +127,8 @@ _EOF
 }
 
 install() {
-	checkOsCpus
+    mkdir -p $downloadPath
+    checkOsCpus
     installCmake
 }
 

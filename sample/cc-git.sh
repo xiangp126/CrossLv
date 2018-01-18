@@ -16,7 +16,6 @@ execPrefix=""
 osCpus=1
 # store all downloaded packages here
 downloadPath=$mainWd/downloads
-mkdir -p $downloadPath
 
 # depends pkgs for Ubuntu
 ubuntuMissPkgs=(
@@ -405,6 +404,8 @@ _EOF
 }
 
 install() {
+    mkdir -p $downloadPath
+    checkOsCpus
     installLibCurl
     installExpat
     installAsciidoc

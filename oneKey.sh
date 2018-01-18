@@ -38,7 +38,6 @@ clangInstDir=$commInstdir/$clangSubDir
 osCpus=1
 # store all downloaded packages here
 downloadPath=$mainWd/downloads
-mkdir -p $downloadPath
 
 logo() {
     cat << "_EOF"
@@ -899,7 +898,7 @@ _EOF
                -DPYTHON_LIBRARY=$libPython3Path \
                -DPYTHON_EXECUTABLE=$python3Path \
                -DLLVM_INCLUDE_TESTS=OFF \
-               $startDir/$llvmUntarName
+               $downloadPath/$llvmUntarName
     make -j $osCpus
     # check if make returns successfully
     if [[ $? != 0 ]]; then
@@ -1083,6 +1082,7 @@ _EOF
 }
 
 install() {
+    mkdir -p $downloadPath
     checkGccVersion
     checkOsCpus
     installBone

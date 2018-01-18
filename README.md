@@ -17,9 +17,9 @@ Verified on Ubuntu/CentOS 7 and old version - CentOS 6
 $ sh oneKey.sh
 [NAME]
     oneKey.sh -- onekey to setup my working environment | - tmux
-    | - vim | - vundle -- youcompleteme -- supertab -- vim-snippets
-             -- ultisnips -- nerdtree -- auto-pairs
-    | - gcc | - python3 | - etc
+             | - vim | - vundle -- youcompleteme -- supertab -- vim-snippets
+                      -- ultisnips -- nerdtree -- auto-pairs
+             | - gcc | - python3 | - etc
 
 [SYNOPSIS]
     oneKey.sh [home | root | help]
@@ -42,6 +42,7 @@ $ sh oneKey.sh
 
 ## Features
 V3.9
+* use downloads/ to store all packages wget/clone
 * safe to run installation routine many times
 * compile newly gcc/c++ version if not support c++ 11
 * add number of cpu core check, make -j [cores] 

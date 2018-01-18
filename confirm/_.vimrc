@@ -238,6 +238,8 @@ let g:autopep8_disable_show_diff = 1
 """"""""""""""""""""""""""""""
 "quick comment/uncomment
 map <F4> <leader>ci <CR>
+"add a space after comment flag
+let g:NERDSpaceDelims=1
 
 """"""""""""""""""""""""""""""
 " CONFIG SUPERTAB
@@ -292,5 +294,5 @@ let g:ycm_cache_omnifunc = 0
 let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
 let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
 "do not delete next line | specify python3 interpreter
-let g:ycm_server_python_interpreter = '/usr/local/bin/python3'
+let g:ycm_server_python_interpreter = '/usr/bin/python3'
 "let g:ycm_key_invoke_completion = '<F9>'

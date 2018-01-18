@@ -19,7 +19,8 @@ clangInstDir=$commInstdir/clang-$clangVersion
 osCpus=1
 # store all downloaded packages here
 downloadPath=$mainWd/downloads
-mkdir -p $downloadPath
+CC=`which gcc`
+CXX=`which c++`
 
 logo() {
     cat << "_EOF"
@@ -267,15 +268,15 @@ _EOF
     python3Path=`which python3 2> /dev/null`
     #python3Path=$python3InstDir/bin/python3
     $cmakePath -G"Unix Makefiles" \
-        -DCMAKE_C_COMPILER=$CC \
-        -DCMAKE_CXX_COMPILER=$CXX \
-        -DCMAKE_INSTALL_PREFIX=$clangInstDir \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DLLVM_TARGETS_TO_BUILD="X86" \
-        -DPYTHON_LIBRARY=$python3InstDir/lib/libpython3.6m.so \
-        -DPYTHON_EXECUTABLE=$python3Path \
-        -DLLVM_INCLUDE_TESTS=OFF \
-        $startDir/$llvmUntarName
+               -DCMAKE_C_COMPILER=$CC \
+               -DCMAKE_CXX_COMPILER=$CXX \
+               -DCMAKE_INSTALL_PREFIX=$clangInstDir \
+               -DCMAKE_BUILD_TYPE=Release \
+               -DLLVM_TARGETS_TO_BUILD="X86" \
+               -DPYTHON_LIBRARY=$python3InstDir/lib/libpython3.6m.so \
+               -DPYTHON_EXECUTABLE=$python3Path \
+               -DLLVM_INCLUDE_TESTS=OFF \
+               $downloadPath/$llvmUntarName
     make -j $osCpus
 	# check if make returns successfully
 	if [[ $? != 0 ]]; then
@@ -311,7 +312,8 @@ _EOF
 }
 
 install() {
-	checkOsCpus
+    mkdir -p $downloadPath
+    checkOsCpus
     checkDepends
     installClang
 }
