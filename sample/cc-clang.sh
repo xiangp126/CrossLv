@@ -295,6 +295,7 @@ _EOF
             exit
         fi
     else
+        $execPrefix mkdir -p $libClangPath/lib
         $execPrefix cp ./lib/libclang.so.5 $libClangPath
         ls -l $libClangPath
     fi
