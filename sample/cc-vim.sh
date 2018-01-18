@@ -1,10 +1,9 @@
 #!/bin/bash
 set -x
-# this shell start dir, normally original path
+# where is shell executed
 startDir=`pwd`
-# main work directory, usually ~/myGit
-mainWd=$startDir
-
+# main work directory, not influenced by start dir
+mainWd=$(cd $(dirname $0)/../; pwd)
 # VIM install
 # common install dir for home | root mode
 homeInstDir=~/.usr
@@ -15,6 +14,9 @@ commInstdir=$homeInstDir
 execPrefix=""
 #how many cpus os has, used for make -j 
 osCpus=1
+# store all downloaded packages here
+downloadPath=$mainWd/downloads
+mkdir -p $downloadPath
 
 logo() {
     cat << "_EOF"
@@ -72,7 +74,7 @@ _EOF
     checkoutVersion=v8.0.1428
 
     # rename download package if needed
-    cd $startDir
+    cd $downloadPath
     # check if already has this tar ball.
     if [[ -d $clonedName ]]; then
         echo [Warning]: target $clonedName/ already exists, Omitting now ...
@@ -110,8 +112,6 @@ _EOF
         exit
     fi
     $execPrefix make install
-    cd $startDir
-
     cat << _EOF
 ------------------------------------------------------
 INSTALLING VIM DONE ...

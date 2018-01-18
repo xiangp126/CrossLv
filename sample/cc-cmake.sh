@@ -1,11 +1,9 @@
 #!/bin/bash
 set -x
-# this shell start dir, normally original path
+# where is shell executed
 startDir=`pwd`
-# main work directory
-mainWd=$startDir
-
-# Clang install
+# main work directory, not influenced by start dir
+mainWd=$(cd $(dirname $0)/../; pwd)
 # common install dir for home | root mode
 homeInstDir=~/.usr
 rootInstDir=/usr/local
@@ -13,13 +11,11 @@ rootInstDir=/usr/local
 commInstdir=$homeInstDir
 #sudo or empty
 execPrefix=""      
-#clang install info
-clangVersion=5.0.1
-clangHomeInstDir=~/.usr/clang-$clangVersion
-clangRootInstDir=/opt/clang-$clangVersion
-clangInstDir=$clangHomeInstDir
 #how many cpus os has, used for make -j 
 osCpus=1
+# store all downloaded packages here
+downloadPath=$mainWd/downloads
+mkdir -p $downloadPath
 
 logo() {
     cat << "_EOF"
@@ -92,7 +88,7 @@ _EOF
     untarName=cmake-3.10.1
 
     # rename download package if needed
-    cd $startDir
+    cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $tarName ]]; then
         echo [Warning]: Tar Ball $tarName already exists, Omitting wget ...
@@ -108,7 +104,9 @@ _EOF
             exit
         fi
     fi
-    tar -zxv -f $tarName
+    if [[ ! -d $untarName ]]; then
+        tar -zxv -f $tarName
+    fi
     cd $untarName
     ./configure --prefix=$cmakeInstDir
 

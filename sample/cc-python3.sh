@@ -1,10 +1,9 @@
 #!/bin/bash
 set -x
-# this shell start dir, normally original path
+# where is shell executed
 startDir=`pwd`
-# main work directory
-mainWd=$startDir
-
+# main work directory, not influenced by start dir
+mainWd=$(cd $(dirname $0)/../; pwd)
 # Python3 install
 # common install dir for home | root mode
 homeInstDir=~/.usr
@@ -15,6 +14,9 @@ commInstdir=$homeInstDir
 execPrefix=""      
 #how many cpus os has, used for make -j 
 osCpus=1
+# store all downloaded packages here
+downloadPath=$mainWd/downloads
+mkdir -p $downloadPath
 
 logo() {
     cat << "_EOF"
@@ -73,15 +75,15 @@ _EOF
     untarName=Python-3.6.4
 
     # rename download package if needed
-    cd $startDir
+    cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $tarName ]]; then
         echo [Warning]: Tar Ball $tarName already exists, Omitting wget ...
     else
         wget --no-cookies \
-            --no-check-certificate \
-            --header "Cookie: oraclelicense=accept-securebackup-cookie" \
-            "${wgetLink}/${tarName}" \
+             --no-check-certificate \
+             --header "Cookie: oraclelicense=accept-securebackup-cookie" \
+             "${wgetLink}/${tarName}" \
             -O $tarName
         # check if wget returns successfully
         if [[ $? != 0 ]]; then

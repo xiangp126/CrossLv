@@ -1,5 +1,9 @@
 #!/bin/bash
 set -x
+# where is shell executed
+startDir=`pwd`
+# main work directory, not influenced by start dir
+mainWd=$(cd $(dirname $0)/../; pwd)
 # common install dir for home | root mode
 homeInstDir=~/.usr
 rootInstDir=/usr/local
@@ -30,8 +34,8 @@ tackleMode() {
     export CXX=${commInstdir}/bin/c++
     #export LDFLAGS="-L${commInstdir}/lib -L${commInstdir}/lib64"
     #write to config for further use
-    writeFile=gccenv.txt
-    cat > ./$writeFile << _EOF
+    writeFile=$mainWd/gccenv.txt
+    cat > $writeFile << _EOF
 export CC=${commInstdir}/bin/gcc
 export CXX=${commInstdir}/bin/c++
 #export LDFLAGS="-L${commInstdir}/lib -L${commInstdir}/lib64"
