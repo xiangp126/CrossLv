@@ -1,9 +1,9 @@
 #!/bin/bash
 # COPYRIGHT BY PENG, 2018. XIANGP126@SJTU.EDU.CN.
-# shell start location
+# where is shell executed
 startDir=`pwd`
-# main work directory
-mainWd=$startDir
+# main work directory, not influenced by start dir
+mainWd=$(cd $(dirname $0); pwd)
 # .vim/.tmux installation dir
 baseDir=$HOME    
 tackleDir=(
@@ -37,7 +37,7 @@ clangInstDir=$commInstdir/$clangSubDir
 # how many cpus os has, used for make -j 
 osCpus=1
 # store all downloaded packages here
-downloadPath=$mainWd./downloads
+downloadPath=$mainWd/downloads
 mkdir -p $downloadPath
 
 logo() {
