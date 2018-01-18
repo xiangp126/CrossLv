@@ -1,10 +1,9 @@
 #!/bin/bash
 set -x
-# this shell start dir, normally original path
+# where is shell executed
 startDir=`pwd`
-# main work directory
-mainWd=$startDir
-
+# main work directory, not influenced by start dir
+mainWd=$(cd $(dirname $0)/../; pwd)
 # Clang install
 # common install dir for home | root mode
 homeInstDir=~/.usr
@@ -18,6 +17,9 @@ clangVersion=5.0.1
 clangInstDir=$commInstdir/clang-$clangVersion
 #how many cpus os has, used for make -j 
 osCpus=1
+# store all downloaded packages here
+downloadPath=$mainWd/downloads
+mkdir -p $downloadPath
 
 logo() {
     cat << "_EOF"
@@ -118,7 +120,7 @@ _EOF
     llvmTarName=llvm-$clangVersion.src.tar.xz
     llvmUntarName=llvm-$clangVersion.src
     # rename download package if needed
-    cd $startDir
+    cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $llvmTarName ]]; then
         echo [Warning]: Tar Ball $llvmTarName already exists, Omitting wget ...
@@ -151,7 +153,7 @@ _EOF
     #cfeUntarName=cfe-$clangVersion.src
     cfeUntarName=$llvmUntarName/tools/clang
     # rename download package if needed
-    cd $startDir
+    cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $cfeTarName ]]; then
         echo [Warning]: Tar Ball $cfeTarName already exists, Omitting wget ...
@@ -185,7 +187,7 @@ _EOF
     #crtUntarName=compiler-rt-$clangVersion.src
     crtUntarName=$llvmUntarName/projects/compiler-rt
     # rename download package if needed
-    cd $startDir
+    cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $crtTarName ]]; then
         echo [Warning]: Tar Ball $crtTarName already exists, Omitting wget ...
@@ -227,7 +229,7 @@ _EOF
     #cteUntarName=clang-tools-extra-$clangVersion.src
     cteUntarName=$llvmUntarName/tools/clang/tools/extra
     # rename download package if needed
-    cd $startDir
+    cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $cteTarName ]]; then
         echo [Warning]: Tar Ball $cteTarName already exists, Omitting wget ...

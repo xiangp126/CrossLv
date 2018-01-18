@@ -1,10 +1,9 @@
 #!/bin/bash
 set -x
-# this shell start dir, normally original path
+# where is shell executed
 startDir=`pwd`
-# main work directory
-mainWd=$startDir
-
+# main work directory, not influenced by start dir
+mainWd=$(cd $(dirname $0)/../; pwd)
 # GIT install
 # common install dir for home | root mode
 homeInstDir=~/.usr
@@ -15,6 +14,9 @@ commInstdir=$homeInstDir
 execPrefix=""
 #how many cpus os has, used for make -j
 osCpus=1
+# store all downloaded packages here
+downloadPath=$mainWd/downloads
+mkdir -p $downloadPath
 
 # depends pkgs for Ubuntu
 ubuntuMissPkgs=(
@@ -98,16 +100,16 @@ _EOF
     untarName=curl-7.57.0
 
     # rename download package
-    cd $startDir
+    cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $tarName ]]; then
         echo [Warning]: Tar Ball $tarName already exists, Omitting wget ...
     else
         wget --no-cookies \
-            --no-check-certificate \
-            --header "Cookie: oraclelicense=accept-securebackup-cookie" \
-            "${wgetLink}/${tarName}" \
-            -O $tarName
+             --no-check-certificate \
+             --header "Cookie: oraclelicense=accept-securebackup-cookie" \
+             "${wgetLink}/${tarName}" \
+             -O $tarName
         # check if wget returns successfully
         if [[ $? != 0 ]]; then
             echo [Error]: wget returns error, quiting now ...
@@ -115,17 +117,17 @@ _EOF
         fi
     fi
 
-    tar -zxv -f $tarName
+    if [[ ! -d $untarName ]]; then
+        tar -zxv -f $tarName
+    fi
     cd $untarName
     ./configure --prefix=$libcurlInstDir
     make -j $osCpus
-
     # check if make returns successfully
     if [[ $? != 0 ]]; then
         echo [Error]: make returns error, quiting now ...
         exit
     fi
-
     $execPrefix make install
 }
 
@@ -151,16 +153,16 @@ _EOF
     untarName=expat-2.2.5
 
     # rename download package
-    cd $startDir
+    cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $tarName ]]; then
         echo [Warning]: Tar Ball $tarName already exists, Omitting wget ...
     else
         wget --no-cookies \
-            --no-check-certificate \
-            --header "Cookie: oraclelicense=accept-securebackup-cookie" \
-            "${wgetLink}/${tarName}" \
-            -O $tarName
+             --no-check-certificate \
+             --header "Cookie: oraclelicense=accept-securebackup-cookie" \
+             "${wgetLink}/${tarName}" \
+             -O $tarName
         # check if wget returns successfully
         if [[ $? != 0 ]]; then
             echo [Error]: wget returns error, quiting now ...
@@ -168,17 +170,17 @@ _EOF
         fi
     fi
 
-    tar -jxv -f $tarName
+    if [[ ! -d $untarName ]]; then
+        tar -jxv -f $tarName
+    fi
     cd $untarName
     ./configure --prefix=$expatInstDir
     make -j $osCpus
-
     # check if make returns successfully
     if [[ $? != 0 ]]; then
         echo [Error]: make returns error, quiting now ...
         exit
     fi
-
     $execPrefix make install
 }
 
@@ -200,7 +202,7 @@ _EOF
     checkoutVersion=8.6.10
 
     # rename download package
-    cd $startDir
+    cd $downloadPath
     # check if already has this tar ball.
     if [[ -d $clonedName ]]; then
         echo [Warning]: target $clonedName/ already exists, Omitting now ...
@@ -225,11 +227,8 @@ _EOF
         echo [Error]: make returns error, quiting now ...
         exit
     fi
-    make install
-    cd $startDir
-
+    $execPrefix make install
     cat << _EOF
-    
 ------------------------------------------------------
 INSTALLING ASCIIDOC DONE ...
 `$asciidocInstDir/bin/asciidoc --version`
@@ -255,16 +254,16 @@ _EOF
     untarName=xmlto-0.0.21
 
     # rename download package
-    cd $startDir
+    cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $tarName ]]; then
         echo [Warning]: Tar Ball $tarName already exists, Omitting wget ...
     else
         wget --no-cookies \
-            --no-check-certificate \
-            --header "Cookie: oraclelicense=accept-securebackup-cookie" \
-            "${wgetLink}/${tarName}" \
-            -O $tarName
+             --no-check-certificate \
+             --header "Cookie: oraclelicense=accept-securebackup-cookie" \
+             "${wgetLink}/${tarName}" \
+             -O $tarName
         # check if wget returns successfully
         if [[ $? != 0 ]]; then
             echo [Error]: wget returns error, quiting now ...
@@ -272,7 +271,9 @@ _EOF
         fi
     fi
 
-    tar -jxv -f $tarName
+    if [[ ! -d $untarName ]]; then
+        tar -jxv -f $tarName
+    fi
     cd $untarName
     ./configure --prefix=$xmltoInstDir
     make check
@@ -281,10 +282,8 @@ _EOF
         echo [Error]: make returns error, quiting now ...
         exit
     fi
-
     make -j $osCpus
     $execPrefix make install
-
     cat << _EOF
 ------------------------------------------------------
 INSTALLING XMLTO DONE ...
@@ -349,7 +348,7 @@ _EOF
     checkoutVersion=v2.15.0
 
     # rename download package
-    cd $startDir
+    cd $downloadPath
     # check if already has this tar ball.
     if [[ -d $clonedName ]]; then
         echo [Warning]: target $clonedName/ already exists, Omitting now ...
@@ -373,7 +372,6 @@ _EOF
         ./configure --prefix=$gitInstDir --with-curl=$curlPath \
             --with-expat=$expatPath
     fi
-
     make all doc -j
     # check if make returns successfully
     if [[ $? != 0 ]]; then
@@ -397,8 +395,6 @@ _EOF
     gitCompletionBashPath=~/.git-completion.bash
     cp -f contrib/completion/git-completion.bash $gitCompletionBashPath
     source $gitCompletionBashPath
-    cd $startDir
-
     cat << _EOF
 ------------------------------------------------------
 INSTALLING GIT DONE ...
