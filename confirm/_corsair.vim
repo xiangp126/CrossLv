@@ -28,6 +28,7 @@ hi pMenu ctermbg=DarkGrey ctermfg=Grey
 hi PmenuSel ctermfg=Brown
 " match parentheses, cursor color can be set in 'iTrem' -> preference ->
 " Profiles -> default -> colors -> cursor colors
+" hi MatchParen ctermbg=Black ctermfg=DarkMagenta term=standout
 hi MatchParen ctermbg=Black ctermfg=DarkMagenta term=standout
 " Visual mode selection section color
 hi Visual ctermfg=DarkYellow term=Bold

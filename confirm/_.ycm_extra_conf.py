@@ -45,7 +45,7 @@ flags = [
 '-isystem',
 '/usr/local/include',
 '-isystem',
-'/usr/include/c++/4.4.7'
+#  '/usr/include/c++/4.4.7'
 ]
 
 

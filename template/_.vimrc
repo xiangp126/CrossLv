@@ -16,15 +16,13 @@ set cinoptions={0,1s,t0,n-2,p2s,(03s,=.5s,>1s,=1s,:1s
 set fileencodings=utf-8,gb2312,gb18030,gbk,ucs-bom,cp936,latin1
 set enc=utf8
 set fencs=utf8,gbk,gb2312,gb18030
+" always use 'corsair.vim' scheme in private ~/.vim/colors/corsair.vim
+:colorscheme corsair
 " set text auto next line when exceed 80 characters.
 " set textwidth=80 formatoptions+=Mm
 let mapleader='\'  " leader key, default is '\''
 ":help ins-completion-menu
-set pumheight=15      " maximum height of popup menu
-set autochdir         " auto change 'pwd' value
-set shell=/bin/bash   " set vim default shell
-" 'corsair.vim' under ~/.vim/colors/
-:colorscheme corsair
+set pumheight=15   " maximum height of popup menu
 
 """"""""""""""""""""""""""""""
 " BASIC KEYBIND 
@@ -110,6 +108,82 @@ filetype plugin indent on    " required
 " Put your non-Plugin stuff after this line
 
 """"""""""""""""""""""""""""""
+" SET VIM SHELL
+""""""""""""""""""""""""""""""
+" Set default shell for vim, resolving below problem
+" Error detected while processing function <SNR>33_Tlist_Window_Toggle..
+" line   87:
+" E484: Can't open file /tmp/vZAVQWu/0
+" Taglist: Failed to generate tags for
+set shell=/bin/bash
+
+""""""""""""""""""""""""""""""
+" SET TAGS FILE 
+""""""""""""""""""""""""""""""" 
+set autochdir " Auto change 'pwd' value
+" set tags=/usr/include/system-include.tags " 1st tag use '=' not '+='
+" " if you will jump across different source dircetory
+" set tags+=./tags
+
+""""""""""""""""""""""""""""""
+" CONFIG CSCOPE
+""""""""""""""""""""""""""""""
+if has("cscope")
+    set cscopetag   " let only support Ctrl+] & Ctrl+t to jump between
+    " check cscope for definition of a symbol before checking ctags:
+    " set to 1 if you want the reverse search order.
+    set csto=1
+
+    " add any cscope database in current directory
+    if filereadable("cscope.out")
+        cs add cscope.out
+    " else add the database pointed to by environment variable
+    elseif $CSCOPE_DB !=""
+        cs add $CSCOPE_DB
+    endif
+
+    " show msg when any other cscope db added
+    set cscopeverbose
+
+    nmap <C-\>s :cs find s <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-\>g :cs find g <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-\>c :cs find c <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-\>t :cs find t <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-\>e :cs find e <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-\>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
+    nmap <C-\>i :cs find i <C-R>=expand("<cfile>")<CR><CR>
+    nmap <C-\>d :cs find d <C-R>=expand("<cword>")<CR><CR>
+    endif
+
+""""""""""""""""""""""""""""""
+" CONFIG MINIBUFEXPLPP 
+""""""""""""""""""""""""""""""
+let g:miniBufExplMapWindowNavVim = 1   
+let g:miniBufExplMapWindowNavArrows = 1   
+let g:miniBufExplMapCTabSwitchBufs = 1   
+let g:miniBufExplModSelTarget = 1  
+let g:miniBufExplAutoStart = 1
+" comment to disable it
+let g:miniBufExplorerMoreThanOne = 1  
+" MiniBufExpl Colors
+" hi MBENormal          ctermbg=88
+" hi MBEChanged         ctermbg=89
+" hi MBEVisibleNormal   ctermbg=88
+" hi MBEVisibleChanged  ctermbg=89
+highlight MBEVisibleActiveNormal  ctermfg=5
+highlight MBEVisibleActiveChanged cterm=underline ctermfg=5
+
+""""""""""""""""""""""""""""""
+" CONFIG NERDTREE 
+""""""""""""""""""""""""""""""
+" When pressed F3, toggle nerd tree
+nnoremap <silent> <F3> :NERDTreeToggle<CR>
+let g:NERDTree_title = "[NERDTree]"
+let g:NERDTreeShowBookmarks = 0
+let g:NERDTreeWinSize = 20 " default 30
+let g:NERDTreeWinPos = 'left' " only left or right
+
+""""""""""""""""""""""""""""""
 " CONFIG TAGBAR
 """"""""""""""""""""""""""""""
 " When pressed F5, toggle tagbar window
@@ -126,6 +200,30 @@ function! TagbarMyOpen()
 endfunction
 
 """"""""""""""""""""""""""""""
+" CONFIG AUTO-COMPLPOP
+""""""""""""""""""""""""""""""
+" disables auto-popup at startup, if needed use :AcpEnable manually
+let g:acp_enableAtStartup = 0 
+
+""""""""""""""""""""""""""""""
+" CONFIG OMNICPPCOMPLETE
+""""""""""""""""""""""""""""""
+" ctags --c-kinds=+px --c++-kinds=+px --fields=+iafksS --extra=+qf -R /usr/include/*
+" map <C-F12> :!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .<CR>
+set completeopt=menu,longest,menuone
+let OmniCpp_NamespaceSearch = 2
+let OmniCpp_GlobalScopeSearch = 1
+let OmniCpp_ShowAccess = 1
+let OmniCpp_ShowPrototypeInAbbr = 1 
+let OmniCpp_MayCompleteDot = 1   
+let OmniCpp_MayCompleteArrow = 1 
+let OmniCpp_MayCompleteScope = 1 
+let OmniCpp_DefaultNamespaces = ["std", "_GLIBCXX_STD"]
+let OmniCpp_SelectFirstItem = 2
+let OmniCpp_DisplayMode = 1
+au CursorMovedI,InsertLeave * if pumvisible() == 0|silent! pclose|endif
+
+""""""""""""""""""""""""""""""
 " CONFIG INDENTLINE
 """"""""""""""""""""""""""""""
 let g:indentLine_char = '|'
@@ -136,16 +234,6 @@ nnoremap <silent> <F2> :IndentLinesToggle<CR>
 " CONFIG AUTOPEP8
 """"""""""""""""""""""""""""""
 let g:autopep8_disable_show_diff = 1
-
-""""""""""""""""""""""""""""""
-" CONFIG NERDTREE 
-""""""""""""""""""""""""""""""
-" When pressed F3, toggle nerd tree
-nnoremap <silent> <F3> :NERDTreeToggle<CR>
-let g:NERDTree_title = "[NERDTree]"
-let g:NERDTreeShowBookmarks = 0
-let g:NERDTreeWinSize = 20 " default 30
-let g:NERDTreeWinPos = 'left' " only left or right
 
 """"""""""""""""""""""""""""""
 " CONFIG NERDCOMMENTER
@@ -222,7 +310,7 @@ let g:ycm_cache_omnifunc = 0
 let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
 let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
 "do not delete next line | specify python3 interpreter
-let g:ycm_server_python_interpreter = '/usr/bin/python3'
+let g:ycm_server_python_interpreter = '/users/penxiang/.usr/bin/python3'
 " let g:ycm_add_preview_to_completeopt = 1
 let g:ycm_autoclose_preview_window_after_insertion = 1 
 " let g:ycm_autoclose_preview_window_after_completion = 0

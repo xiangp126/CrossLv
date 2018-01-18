@@ -999,21 +999,6 @@ _EOF
         exit
     fi
     
-    cat << "_EOF"
-------------------------------------------------------
-INSTALLING .YCM_EXTRA_CONF.PY TO HOME ...
-------------------------------------------------------
-_EOF
-    cd $mainWd
-    sampleDir=./template
-    sampleFile=ycm_extra_conf.py
-    echo cp ${sampleDir}/$sampleFile $HOME/.$sampleFile
-    cp ${sampleDir}/$sampleFile $HOME/.$sampleFile
-    
-    if [[ $? != 0 ]]; then
-        echo "[Error]: cp $sampleFile error, quitting now ..."
-    fi
-    
     cat << _EOF
 ------------------------------------------------------
 CHECK IF ANY DYNAMIC LIBRARY LINK ISSUE 
