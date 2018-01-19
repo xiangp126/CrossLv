@@ -5,11 +5,9 @@ Auto fix dependency and skipping already installed packages
 
 This tool itself end up with compiling YouCompleteMe done
 
-``` bash
 Two modes deploy selection: home -> without root privilege
 
                             root -> with root privilege
-```
 
 If needed, compiling GCC and Clang may take up 5G+ disk space
 
@@ -98,7 +96,9 @@ V1.0
     regret  -> regret previous 'restore'/'dry' action.
     confirm -> confirm to copy files in ./widget/ to ./confirm/
     clean   -> clean ./widget.*/, but reserve main backup dir
+```
 
+``` bash
 > sh autoUpdate.sh restore
 missing restore directory, please check it first ...
 
@@ -115,7 +115,9 @@ Finding Files Copied Successfully ...
 ./trial/./.vim/bundle/snipMate/snippets/c.snippets
 ./trial/./.vim/bundle/snipMate/snippets/cpp.snippets
 ------------------------------------------------------
+```
 
+``` bash
 > sh autoUpdate.sh backup
 mkdir -p widget/.vim/colors
 mkdir -p widget/.vim/bundle/snipMate/snippets
@@ -123,7 +125,9 @@ Backup /home/virl/./.vimrc to widget/./_.vimrc ...
 Backup /home/virl/./.bashrc to widget/./_.bashrc ...
 Backup /home/virl/./.tmux.conf to widget/./_.tmux.conf ...
 ......
+```
 
+``` bash
 > sh autoUpdate.sh confirm
 start to copying files from widget to ./confirm ...
 ------------------------------------------------------
