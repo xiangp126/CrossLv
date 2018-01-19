@@ -5,16 +5,16 @@ Auto fix dependency and skipping already installed packages
 
 This tool itself end up with compiling YouCompleteMe done
 
-Two modes deploy selection: home -> without root privilege
-
-                            root -> with root privilege
-
 If needed, compiling GCC and Clang may take up 5G+ disk space
 
 Verified on Ubuntu/CentOS 7 and old version - CentOS 6
 
 ## Installation Guide
 ```bash
+Two modes deploy selection: home -> without root privilege
+
+                            root -> with root privilege
+
 $ sh oneKey.sh
 [NAME]
     oneKey.sh -- onekey to setup my working environment | - tmux
