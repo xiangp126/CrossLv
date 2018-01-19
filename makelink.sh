@@ -1,8 +1,12 @@
 #!/bin/bash
-
-handleDir=tools
-mainWd=`pwd`
-installDir=~/.usr/bin
+# where is shell executed
+startDir=`pwd`
+# main work directory, not influenced by start dir
+mainWd=$(cd $(dirname $0); pwd)
+# dir to handle from and linking to
+handleDir=$mainWd/tools
+installDir=$HOME/.usr/bin
+# link parameter
 para=-sf
 
 logo() {
@@ -17,41 +21,44 @@ _EOF
 }
 
 usage() {
+    exeName=${0##*/}
     cat << _EOF
 [NAME]
-    $0 -- make linke to $installDir/ from $handleDir/
-
+    $exeName -- make linke from $handleDir/
+                           to   $installDir/ 
 [USAGE]
-    sh $0 [install | uninstall | help]
+    sh $exeName [install | uninstall | help]
 
 [DEPENDS]
-    make sure $installDir was in PATH
+    After, you should make $installDir in PATH
 
 _EOF
 }
 
 makeLink() {
-    echo mkdir -p $installDir
     mkdir -p $installDir
-    
     cd $handleDir
-    echo Entering into $handleDir/ ...
+    cat << _EOF
+------------------------------------------------------
+ENTERING INTO $handleDir/ 
+------------------------------------------------------
+_EOF
 
     handleFiles=`find . -regex ".*.[sh|py]" -type f`
-
     for file in ${handleFiles[@]}
     # ./sshproxy.sh
     do
         realName=${file##*/}      # sshproxy.sh
         linkName=${realName%.*}   # sshproxy
-
         echo Founding tool $realName to make link ...
-        echo ln $para ${mainWd}/${handleDir}/${realName} ${installDir}/${linkName}
-        ln $para ${mainWd}/${handleDir}/${realName} ${installDir}/${linkName}
+        # show message
+        cat << _EOF
+ln $para $handleDir/$realName 
+            to ${installDir}/${linkName}
+
+_EOF
+        ln $para $handleDir/$realName ${installDir}/${linkName}
     done
-    
-    cd $mainWd &>/dev/null
-    echo Going back to original directory ${mainWd}/ ...
 }
 
 rmLink() {
@@ -61,10 +68,12 @@ rmLink() {
     fi
 
     cd $handleDir
-    echo Entering into $handleDir/ ...
-
+    cat << _EOF
+------------------------------------------------------
+ENTERING INTO $handleDir/ 
+------------------------------------------------------
+_EOF
     handleFiles=`find . -regex ".*.sh" -type f`
-
     for file in ${handleFiles[@]}
     # ./sshproxy.sh
     do
@@ -73,15 +82,14 @@ rmLink() {
 
         echo "Found tool $realName to remove link ..."
         if [[ ! -f ${installDir}/${linkName} ]]; then
-            echo [Warning]: No link name $linkName found, omitting it ...
+            echo [Warning]: No linked name $linkName found, omitting it ...
+            echo
             continue
         fi
-        echo -e "rm ${installDir}/${linkName}"
+        echo "rm ${installDir}/${linkName}"
         rm ${installDir}/${linkName}
+        echo
     done
-    
-    cd $mainWd &>/dev/null
-    echo Going back to original directory ${mainWd}/ ...
 }
 
 case $1 in 
@@ -99,4 +107,3 @@ case $1 in
     ;;
 
 esac
-

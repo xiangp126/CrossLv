@@ -53,6 +53,7 @@ dstServer=(
     "sjc-marsbu-013"
     "sjc-marsbu-014"
     "sjc-marsbu-019"
+    "sjc-marsbu-020"
 )
 # ssh port of jumpHost
 jHostPort=22

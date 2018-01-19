@@ -5,9 +5,11 @@ Auto fix dependency and skipping already installed packages
 
 This tool itself end up with compiling YouCompleteMe done
 
+``` bash
 Two modes deploy selection: home -> without root privilege
 
                             root -> with root privilege
+```
 
 If needed, compiling GCC and Clang may take up 5G+ disk space
 
