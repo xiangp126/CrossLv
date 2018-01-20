@@ -1,4 +1,4 @@
-"""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""
 " BASIC CONFIG
 """"""""""""""""""""""""""""""
 syntax on
@@ -11,17 +11,20 @@ set tabstop=4
 set laststatus=1
 set softtabstop=4
 set shiftwidth=4
-set expandtab      "set TAB expands to spaces
+set expandtab         "set TAB expands to spaces
 set cinoptions={0,1s,t0,n-2,p2s,(03s,=.5s,>1s,=1s,:1s
+set encoding=utf-8
+set fileencoding=utf-8
 set fileencodings=utf-8,gb2312,gb18030,gbk,ucs-bom,cp936,latin1
-set enc=utf8
-set fencs=utf8,gbk,gb2312,gb18030
-" set text auto next line when exceed 80 characters.
+set termencoding=utf-8
+set backspace=indent,eol,start
+" set text auto line feed when exceeds 80 characters.
 " set textwidth=80 formatoptions+=Mm
-let mapleader='\'  " leader key, default is '\''
+let mapleader='\'     " leader key, default is '\''
 ":help ins-completion-menu
-set pumheight=15      " maximum height of popup menu
+set nocompatible      " be iMproved, required
 set autochdir         " auto change 'pwd' value
+set pumheight=12      " maximum height of popup menu
 set shell=/bin/bash   " set vim default shell
 " 'corsair.vim' under ~/.vim/colors/
 :colorscheme corsair
@@ -33,68 +36,42 @@ set shell=/bin/bash   " set vim default shell
 set pastetoggle=<F12>  
 " Toggle line numbers 
 noremap <F10> :set invnumber <CR>
+" move among buffers with CTRL, case ignorance
+map <C-L> :buffers <CR>
+map <C-J> :bnext <CR>
+map <C-K> :bprev <CR>
 
 """"""""""""""""""""""""""""""
 " VIM BUNDLE 
 """"""""""""""""""""""""""""""
-set nocompatible   " be iMproved, required
-set backspace=indent,eol,start
-filetype off       " required
-" set the runtime path to include Vundle and initialize
+filetype off          " Vundle required
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
-" alternatively, pass a path where Vundle should install plugins
-"call vundle#begin('~/some/path/here')
-
-" let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
 
-" The following are examples of different formats supported.
-" Keep Plugin commands between vundle#begin/end.
-" #1 case: plugin on GitHub repo
-" Plugin 'tpope/vim-fugitive'
-" plugin from http://vim-scripts.org/vim/scripts.html
+"------ OPTIONAL PLUGINS -----
 " Plugin 'L9'
-
-" #2 case: Git plugin not hosted on GitHub
-" Plugin 'git://git.wincent.com/command-t.git'
-
-" #3 case: git repos on your local machine 
-" i.e. when working on your own plugin.
-" Plugin 'file:///home/gmarik/path/to/plugin'
-
-" The sparkup vim script is in a subdirectory of this repo called vim.
-" Pass the path to set the runtimepath properly.
-" Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
-" Install L9 and avoid a Naming conflict if you've already installed a
-" different version somewhere else.
-" Plugin 'ascenator/L9', {'name': 'newL9'}
-
-" Add plugins you need below.
-" Plugin 'L9'
-" Plugin 'OmniCppComplete'
-" Plugin 'snipMate'
+" Plugin 'davidhalter/jedi'
+" Plugin 'tell-k/vim-autopep8'
+" Plugin 'Raimondi/delimitMate'
 " Plugin 'vim-airline/vim-airline'
 " Plugin 'vim-airline/vim-airline-themes'
-" Plugin 'tell-k/vim-autopep8'
-" Plugin 'Lokaltog/vim-powerline'
-
+Plugin 'Yggdroot/LeaderF'
 "------ NEW PLUGINS -----
-Plugin 'Tagbar'
 Plugin 'scrooloose/nerdtree'
 Plugin 'scrooloose/nerdcommenter'
-Plugin 'Yggdroot/indentLine'
 Plugin 'jiangmiao/auto-pairs'
-" Plugin 'davidhalter/jedi'
+Plugin 'majutsushi/tagbar'
+Plugin 'Yggdroot/indentLine'
 "------ THREE ALGOTHER -----
-Plugin 'SirVer/ultisnips'
 Plugin 'ervandew/supertab'
+Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
 "------ END OF THREE  -----
 Plugin 'Valloric/YouCompleteMe'
-Plugin 'Raimondi/delimitMate'
+" complete parameter after type '('
+Plugin 'tenfyzhong/CompleteParameter.vim'
 
-" All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
 " To ignore plugin indent changes, instead use:
@@ -112,12 +89,11 @@ filetype plugin indent on    " required
 """"""""""""""""""""""""""""""
 " CONFIG TAGBAR
 """"""""""""""""""""""""""""""
-" When pressed F5, toggle tagbar window
+" let g:tagbar_ctags_bin = "/usr/bin/ctags"
 nnoremap <silent> <F5> :call TagbarMyOpen()<CR><CR>
 let g:Tagbar_title = "[Tagbar]"
-" let g:tagbar_ctags_bin = "/usr/bin/ctags"
 let g:tagbar_left = 0
-let g:tagbar_width = 20
+let g:tagbar_width = 25
 " originally Yellow value 11
 highlight Search ctermbg=88
 highlight TagbarSignature ctermfg=68
@@ -131,11 +107,6 @@ endfunction
 let g:indentLine_char = '|'
 let g:indentLine_enabled = 0
 nnoremap <silent> <F2> :IndentLinesToggle<CR>
-
-""""""""""""""""""""""""""""""
-" CONFIG AUTOPEP8
-""""""""""""""""""""""""""""""
-let g:autopep8_disable_show_diff = 1
 
 """"""""""""""""""""""""""""""
 " CONFIG NERDTREE 
@@ -153,21 +124,7 @@ let g:NERDTreeWinPos = 'left' " only left or right
 "quick comment/uncomment
 map <F4> <leader>ci <CR>
 "add a space after comment flag
-let g:NERDSpaceDelims=1
-
-""""""""""""""""""""""""""""""
-" CONFIG DELIMITMATE
-""""""""""""""""""""""""""""""
-autocmd VimEnter * imap <silent> <expr> <TAB> 
-  \ delimitMate#ShouldJump() ?  delimitMate#JumpAny() : "\<C-r>=UltiSnips#ExpandSnippetOrJump()\<CR>"
-autocmd VimEnter * inoremap <S-TAB> <S-TAB>
-autocmd VimEnter * imap <expr> <CR>
-  \ pumvisible() ?
-  \   (exists('v:completed_item') && !empty(v:completed_item) &&
-  \     v:completed_item.word != '' && v:completed_item.kind == 'f') ?
-  \       "\<C-R>=\<SID>onCompleteDone()\<CR>" :
-  \       "\<C-y>" :
-  \   "\<Plug>delimitMateCR\<Plug>DiscretionaryEnd"
+let g:NERDSpaceDelims = 1
 
 """"""""""""""""""""""""""""""
 " CONFIG SUPERTAB
@@ -175,11 +132,16 @@ autocmd VimEnter * imap <expr> <CR>
 let g:SuperTabDefaultCompletionType = '<C-n>'
 
 """"""""""""""""""""""""""""""
+" CONFIG AUTO-PAIRS
+""""""""""""""""""""""""""""""
+let g:AutoPairs = {'[':']', '{':'}',"'":"'",'"':'"', '`':'`'}
+inoremap <buffer><silent> ) <C-R>=AutoPairsInsert(')')<CR>
+
+""""""""""""""""""""""""""""""
 " CONFIG ULTISNIPS
 """"""""""""""""""""""""""""""
 "Trigger configuration. Do not use <tab> 
 "if you use https://github.com/Valloric/YouCompleteMe.
-" 
 let g:UltiSnipsExpandTrigger="<tab>"
 let g:UltiSnipsJumpForwardTrigger = "<tab>"
 let g:UltiSnipsJumpBackwardTrigger = "<c-b>"
@@ -187,7 +149,18 @@ let g:UltiSnipsJumpBackwardTrigger = "<c-b>"
 let g:UltiSnipsEditSplit="vertical"
 
 """"""""""""""""""""""""""""""
-" CONFIG YouCompleteMe
+" CONFIG COMPLETEPARAMETER.VIM
+""""""""""""""""""""""""""""""
+inoremap <silent><expr> ( complete_parameter#pre_complete("()")
+smap <c-j> <Plug>(complete_parameter#goto_next_parameter)
+imap <c-j> <Plug>(complete_parameter#goto_next_parameter)
+smap <c-k> <Plug>(complete_parameter#goto_previous_parameter)
+imap <c-k> <Plug>(complete_parameter#goto_previous_parameter))
+" use ultisnips mapping to goto next or previous parameter if set
+let g:complete_parameter_use_ultisnips_mapping = 0
+
+""""""""""""""""""""""""""""""
+" CONFIG YOUCOMPLETEME
 """"""""""""""""""""""""""""""
 let g:ycm_semantic_triggers =  {
   \   'c' : ['->', '.', 're![_a-zA-z0-9]'],
@@ -222,7 +195,11 @@ let g:ycm_cache_omnifunc = 0
 let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
 let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
 "do not delete next line | specify python3 interpreter
-let g:ycm_server_python_interpreter = '/usr/bin/python3'
-" let g:ycm_add_preview_to_completeopt = 1
-let g:ycm_autoclose_preview_window_after_insertion = 1 
-" let g:ycm_autoclose_preview_window_after_completion = 0
+let g:ycm_server_python_interpreter = '/users/penxiang/.usr/bin/python3'
+let g:ycm_add_preview_to_completeopt = 0
+let g:ycm_autoclose_preview_window_after_insertion = 0 
+let g:ycm_autoclose_preview_window_after_completion = 0
+let g:ycm_goto_buffer_command = 'new-tab'
+nnoremap <leader>gl :YcmCompleter GoToDeclaration<CR>
+nnoremap <leader>gf :YcmCompleter GoToDefinition<CR>
+nnoremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<CR>
