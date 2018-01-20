@@ -5,8 +5,6 @@ Auto fix dependency and skipping already installed packages
 
 This tool itself end up with compiling YouCompleteMe done
 
-If needed, compiling GCC and Clang may take up 5G+ disk space
-
 Verified on Ubuntu/CentOS 7 and old version - CentOS 6
 
 ## Installation Guide
@@ -41,31 +39,35 @@ $ sh oneKey.sh
 
 ```
 
-## Features
-V3.9
-* use downloads/ to store all packages wget/clone
-* safe to run installation routine many times
-* compile newly gcc/c++ version if not support c++ 11
-* add number of cpu core check, make -j [cores] 
-* add YouCompleteMe
-* use oneKey.sh replace of some small scripts
-
-V3.1 
-* use tmux plugin manager for Tmux plugins.
-* add tmux-resurrect and update install.sh
-* update .tmux.conf and files associated
-* reformat function call for some 'case' switch.
-* add regret mode for autoHandle script.
-
-V2.1
-* for 'backup' mode, add mechanism to check if file to be backuped exists.
-* add alias for 'grep'
-* change name autoUpdate.sh => autoHandle.sh
-* add dry mode and re-format code logic.
-* use cat << instead of many echo for this script.
-
-V1.0
-* user-friendly manipulate for backup | restore | confirm | clean .
+## Project Outline
+* confirm/  => files to track on the system, for backup and restore
+* oneKey.sh => main 'one key stroke' shell
+* mklink.sh => additional shell to make link for that in tools/
+* autoHandle.sh   => assistant for handling files tracked in confirm/
+* tools/          => written for better or understanding some logics 
+ - ./mygit.py
+ - ./indexcat.py
+ - ./addtools.sh
+ - ./mkfonts.sh
+ - ./tmuxhelp.sh
+ - ./sshjumphost.sh
+ - ./fixosdepends.sh
+ - ./sshproxy-git.sh
+ - ./httproxy-git.sh
+* compile-tools/  => some useful automatically compiling tools, as name indicated
+ -  ./cc-vim.sh
+ -  ./cc-git.sh
+ -  ./cc-gcc.sh
+ -  ./cc-clang.sh # compiling GCC and Clang may take up 5G+ disk space
+ -  ./cc-cmake.sh
+ -  ./cc-python3.sh
+ -  ./gen-gccenv.sh
+* doc/   => frequently used document
+* fonts/ => beautifully and recommended open source fonts
+* template/ => some templates generated or used by this project
+* testing/  => derived from compile-tools or tools, but deprecated by far
+* security/ => derived from doc, but has affairs with sccurity
+* completion/ => bash completion for some extra use
 
 ## Example for autoHandle.sh
 ```bash
@@ -143,7 +145,33 @@ find ./confirm -type f
 
 ```
 
-# Reference
+## Features
+V3.9
+* use downloads/ to store all packages wget/clone
+* safe to run installation routine many times
+* compile newly gcc/c++ version if not support c++ 11
+* add number of cpu core check, make -j [cores] 
+* add YouCompleteMe
+* use oneKey.sh replace of some small scripts
+
+V3.1 
+* use tmux plugin manager for Tmux plugins.
+* add tmux-resurrect and update install.sh
+* update .tmux.conf and files associated
+* reformat function call for some 'case' switch.
+* add regret mode for autoHandle script.
+
+V2.1
+* for 'backup' mode, add mechanism to check if file to be backuped exists.
+* add alias for 'grep'
+* change name autoUpdate.sh => autoHandle.sh
+* add dry mode and re-format code logic.
+* use cat << instead of many echo for this script.
+
+V1.0
+* user-friendly manipulate for backup | restore | confirm | clean .
+
+## Reference
 [Vundle Introduction Guide](http://www.jianshu.com/p/8d416ac4ad11)
 
 [how does cat eof work in bash](https://stackoverflow.com/questions/2500436/how-does-cat-eof-work-in-bash)
