@@ -11,11 +11,11 @@ rootInstDir=/usr/local
 # default is home mode
 commInstdir=$homeInstDir
 #sudo or empty
-execPrefix=""      
+execPrefix=""
 #clang install
 clangVersion=5.0.1
 clangInstDir=$commInstdir/clang-$clangVersion
-#how many cpus os has, used for make -j 
+#how many cpus os has, used for make -j
 osCpus=1
 # store all downloaded packages here
 downloadPath=$mainWd/downloads
@@ -48,7 +48,7 @@ usage() {
 
 _EOF
     set +x
-	logo
+    logo
 }
 
 checkOsCpus() {
@@ -299,7 +299,7 @@ _EOF
         $execPrefix cp ./lib/libclang.so.5 $libClangPath
         ls -l $libClangPath
     fi
-    
+
     cat << _EOF
 ------------------------------------------------------
 INSTALLING LLVM DONE ...

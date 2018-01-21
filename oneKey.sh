@@ -5,7 +5,7 @@ startDir=`pwd`
 # main work directory, not influenced by start dir
 mainWd=$(cd $(dirname $0); pwd)
 # .vim/.tmux installation dir
-baseDir=$HOME    
+baseDir=$HOME
 tackleDir=(
     ".vim"
     ".tmux"
@@ -34,7 +34,7 @@ clangVersion=5.0.1
 # install clang into a separate dir
 clangSubDir=clang-$clangVersion
 clangInstDir=$commInstdir/$clangSubDir
-# how many cpus os has, used for make -j 
+# how many cpus os has, used for make -j
 osCpus=1
 # store all downloaded packages here
 downloadPath=$mainWd/downloads
@@ -72,7 +72,7 @@ Brief help
     [ctrl +x] +r           # :source $HOME/.tmux.conf
 
 ------------------------------------------------------
-EXECUTE VIM COMMANDS THROUGH COMMAND LINE 
+EXECUTE VIM COMMANDS THROUGH COMMAND LINE
 ------------------------------------------------------
 Brief help
     vim +PluginInstall +qall
@@ -104,7 +104,7 @@ usage() {
     root -- build required packages to $rootInstDir/
 _EOF
 logo
-}    
+}
 
 installBashCompletion() {
     # bash-completion bash-completion - programmable completion for the bash shell
@@ -125,7 +125,7 @@ _EOF
     wgetLink=http://archive.ubuntu.com/ubuntu/pool/main/b/bash-completion
     tarName=bash-completion_2.1.orig.tar.bz2
     untarName=bash-completion-2.1
-    
+
     # rename download package if needed
     cd $downloadPath
     # check if already has this tar ball.
@@ -154,13 +154,13 @@ _EOF
         echo [error]: make returns error, quitting now ...
         exit
     fi
-    
+
     $execPrefix make install
     if [[ $? != 0 ]]; then
         echo [error]: make install returns error, quitting now ...
         exit
     fi
-    
+
     checkName=bash_completion.sh
     ls -l $checkName
     if [[ $? != 0 ]]; then
@@ -168,12 +168,12 @@ _EOF
         exit
     fi
     cp bash_completion.sh $HOME/.bash_completion.sh
-    
+
     # copy bash-completion.pc to standard PKG_CONFIG_PATH search path
     itOriPkgPath=$bashCompInstDir/share/pkgconfig/bash-completion.pc
     itDstPkgPath=$bashCompInstDir/lib/pkgconfig/
     $execPrefix cp $itOriPkgPath $itDstPkgPath
-    
+
     ls -l $itDstPkgPath/bash-completion.pc
     if [[ $? != 0 ]]; then
         echo [error]: copy bash-compile.pc failed, quitting now ...
@@ -222,9 +222,9 @@ FOR EXAMPLE: compile gcc(version > 4.8) to /usr/local
 --
 export CC=/usr/local/bin/gcc
 export CXX=/usr/local/bin/c++
-# export LDFLAGS="-L/usr/local/lib -L/usr/local/lib64" 
+# export LDFLAGS="-L/usr/local/lib -L/usr/local/lib64"
 -- or
-use 'source sample/gen-gccenv.sh root' to export env 
+use 'source sample/gen-gccenv.sh root' to export env
 -----------------------------------------------------
 _EOF
         # start to compile newly gcc/c++
@@ -288,7 +288,7 @@ _EOF
         echo [error]: make returns error, quitting now ...
         exit
     fi
-    
+
     $execPrefix make install
     # check if make install returns successfully
     if [[ $? != 0 ]]; then
@@ -303,7 +303,7 @@ SETTING CC/CXX COMPILE VARIABLES
 _EOF
     CC=$gccInstDir/bin/gcc
     CXX=$gccInstDir/bin/c++
-    
+
     cat << _EOF
 ------------------------------------------------------
 INSTALLING GCC DONE ...
@@ -353,7 +353,7 @@ _EOF
     if [[ -d $clonedName ]]; then
         echo [Warning]: target $clonedName already exists, Omitting clone ...
     else
-        git clone $gitClonePath $clonedName 
+        git clone $gitClonePath $clonedName
         # check if git returns successfully
         if [[ $? != 0 ]]; then
             echo "[Error]: git returns error, quitting now ..."
@@ -365,20 +365,20 @@ _EOF
 STEP : INSTALLING TMUX-PLUGIN MANAGER
 ------------------------------------------------------
 _EOF
-    gitClonePath=https://github.com/tmux-plugins/tpm 
+    gitClonePath=https://github.com/tmux-plugins/tpm
     clonedName=${baseDir}/${tackleDir[1]}/plugins/tpm
     # check if target directory already exists
     if [[ -d $clonedName ]]; then
         echo [Warning]: target $clonedName already exists, Omitting clone ...
     else
-        git clone $gitClonePath $clonedName 
+        git clone $gitClonePath $clonedName
         # check if git returns successfully
         if [[ $? != 0 ]]; then
             echo "[Error]: git returns error, quitting now ..."
             exit
         fi
     fi
-    
+
     cat << _EOF
 ------------------------------------------------------
 REPLACING SOME KEY FILES FIRST ...
@@ -388,7 +388,7 @@ _EOF
     # replace corsair.vim ahead of whole restore
     mkdir -p ${baseDir}/${tackleDir[0]}/colors
     cp -f ./confirm/_corsair.vim ${baseDir}/${tackleDir[0]}/colors/corsair.vim
-    
+
     # call function to install bash completion now
     installBashCompletion
 }
@@ -416,7 +416,7 @@ _EOF
     # comment YouCompleteMe in $HOME/.vimrc
     # it takes too long time, manually compile in cc-ycm.sh
     sed -i --regexp-extended "s/(^Plugin 'Valloric)/\" \1/" $tackleFile
-    
+
     # source $HOME/.vimrc if needed
     vim +"source $HOME/.vimrc" +PluginInstall +qall
     # run restore routine
@@ -446,7 +446,7 @@ installPython3() {
             # check if any error occurs
             if [[ "$libPython3Path" == "" || "$?" != 0  ]]; then
                 echo "[Warning]: locate checking python3 path/lib failed, start find checking ..."
-            else 
+            else
                 echo [Warning]: python3/lib already installed, omitting this step ...
                 return
             fi
@@ -467,7 +467,7 @@ installPython3() {
             # check if any error occurs
             if [[ $? != 0 ]]; then
                 echo "[Warning]: find checking python3 path/lib failed, re-install python3 ..."
-            else 
+            else
                 echo [Warning]: python3/lib already installed, omitting this step ...
                 return
             fi
@@ -485,7 +485,7 @@ _EOF
     wgetLink=https://www.python.org/ftp/python/3.6.4
     tarName=Python-3.6.4.tgz
     untarName=Python-3.6.4
-    
+
     # rename download package if needed
     cd $downloadPath
     # check if already has this tar ball.
@@ -518,7 +518,7 @@ _EOF
         echo [Error]: make returns error, quitting now ...
         exit
     fi
-    
+
     $execPrefix make install
     # check if make returns successfully
     if [[ $? != 0 ]]; then
@@ -531,7 +531,7 @@ _EOF
         echo [Error]: can not find lib-python3, quitting now ...
         exit
     fi
-    
+
     cat << _EOF
 ------------------------------------------------------
 INSTALLING python3 DONE ...
@@ -581,7 +581,7 @@ _EOF
     git checkout $checkoutVersion
     # clean before ./configure
     make distclean
-    
+
     # find python2 & python3 config dir
     python2Config=`python2-config --configdir 2> /dev/null`
     python3Config=`python3-config --configdir 2> /dev/null`
@@ -589,7 +589,7 @@ _EOF
         echo [Error]: Not found python2 or python3, please install either of them ...
         exit
     fi
-    
+
     # --with-python-config-dir=$python2Config
     ./configure --prefix=$vimInstDir \
                 --with-features=huge \
@@ -611,7 +611,7 @@ _EOF
         exit
     fi
     $execPrefix make install
-    
+
     cat << _EOF
 ------------------------------------------------------
 INSTALLING VIM DONE ...
@@ -652,7 +652,7 @@ _EOF
     wgetLink=https://cmake.org/files/v3.10
     tarName=cmake-3.10.1.tar.gz
     untarName=cmake-3.10.1
-    
+
     # rename download package if needed
     cd $downloadPath
     # check if already has this tar ball.
@@ -673,7 +673,7 @@ _EOF
     tar -zxv -f $tarName
     cd $untarName
     ./configure --prefix=$cmakeInstDir
-    
+
     make -j $osCpus
     # check if make returns successfully
     if [[ $? != 0 ]]; then
@@ -737,7 +737,7 @@ _EOF
     wgetLink=http://releases.llvm.org/$clangVersion
     llvmTarName=llvm-$clangVersion.src.tar.xz
     llvmUntarName=llvm-$clangVersion.src
-    
+
     # rename download package if needed
     cd $downloadPath
     # check if already has this tar ball.
@@ -771,7 +771,7 @@ _EOF
     cfeTarName=cfe-$clangVersion.src.tar.xz
     # cfeUntarName=cfe-$clangVersion.src
     cfeUntarName=$llvmUntarName/tools/clang
-    
+
     # rename download package if needed
     cd $downloadPath
     # check if already has this tar ball.
@@ -806,7 +806,7 @@ _EOF
     crtTarName=compiler-rt-$clangVersion.src.tar.xz
     # crtUntarName=compiler-rt-$clangVersion.src
     crtUntarName=$llvmUntarName/projects/compiler-rt
-    
+
     # rename download package if needed
     cd $downloadPath
     # check if already has this tar ball.
@@ -850,7 +850,7 @@ _EOF
     cteTarName=clang-tools-extra-$clangVersion.src.tar.xz
     # cteUntarName=clang-tools-extra-$clangVersion.src
     cteUntarName=$llvmUntarName/tools/clang/tools/extra
-    
+
     # rename download package if needed
     cd $downloadPath
     # check if already has this tar ball.
@@ -905,7 +905,7 @@ _EOF
         echo [Error]: make returns error, quitting now ...
         exit
     fi
-    
+
     libClangPath=$clangInstDir/lib/libclang.so
     # clangNeedInstall=TRUE
     clangNeedInstall=FALSE
@@ -917,7 +917,7 @@ _EOF
         $execPrefix cp ./lib/libclang.so.5 $libClangPath
         ls -l $libClangPath
     fi
-    
+
     # check if make install/cp returns successfully
     if [[ $? != 0 ]]; then
         echo [Error]: make install or cp $libClangPath returns error, quitting now ...
@@ -957,20 +957,20 @@ _EOF
             exit
         fi
     fi
-    
+
     cd $ycmDir
     git submodule update --init --recursive
-    
+
     # not use official install script now
     # $python3Path ./install.py --clang-completer
-    
+
     ycmBuildDir=ycm_build
     mkdir -p $ycmBuildDir
     cd $ycmBuildDir
     # remove old CMakeCache.txt
     rm -rf CMakeCache.txt
     # -DUSE_PYTHON2=OFF, do not use python2 library
-    # -- Found PythonLibs: ~/.usr/lib/libpython3.6m.so 
+    # -- Found PythonLibs: ~/.usr/lib/libpython3.6m.so
     # (found suitable version "3.6.4", minimum required is "3.3")
     $cmakePath -G "Unix Makefiles" \
                -DCMAKE_C_COMPILER=$CC \
@@ -991,17 +991,17 @@ _EOF
 BUILDING YCM_CORE NOW ...
 ------------------------------------------------------
 _EOF
-    # $cmakePath --build . --target ycm_core 
+    # $cmakePath --build . --target ycm_core
     make -j $osCpus
     # check if make returns successfully
     if [[ $? != 0 ]]; then
         echo "[Error]: make ycm_core error, quitting now ..."
         exit
     fi
-    
+
     cat << _EOF
 ------------------------------------------------------
-CHECK IF ANY DYNAMIC LIBRARY LINK ISSUE 
+CHECK IF ANY DYNAMIC LIBRARY LINK ISSUE
 ------------------------------------------------------
 _EOF
     ycmCoreDir="$HOME/.vim/bundle/YouCompleteMe/third_party/ycmd"
@@ -1051,7 +1051,7 @@ _EOF
     sysTackleDir=/usr/include
     cppTackleDir=$sysTackleDir/c++
     if [[ -d $cppTackleDir ]]; then
-		cat << _EOF
+        cat << _EOF
 ----------------------------------------------------------
 WRITING C++ INCLUDE DIRECTORY TO $HOME/.YCM_EXTRA_CONF.PY
 ----------------------------------------------------------
@@ -1094,7 +1094,7 @@ install() {
     checkOsCpus
     installBone
     installTmuxPlugins
-    installVimPlugins 
+    installVimPlugins
     installPython3
     installvim
     installCmake
@@ -1104,12 +1104,12 @@ install() {
     installSummary
 }
 
-case $1 in 
+case $1 in
     'home')
         set -x
         commInstdir=$homeInstDir
         execPrefix=""
-        install 
+        install
     ;;
 
     'root')
