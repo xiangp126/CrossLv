@@ -3,8 +3,8 @@ set -x
 # where is shell executed
 startDir=`pwd`
 # main work directory, not influenced by start dir
-# mainWd=$(cd $(dirname $0)/../; pwd)
-mainWd=$startDir
+mainWd=$(cd $(dirname $0)/../; pwd)
+#mainWd=$startDir
 # dir to handle font from
 fontsDir=fonts
 sysFontsDir=/usr/share/fonts/truetype
@@ -43,7 +43,7 @@ makeFonts() {
             continue
             echo -----------------------------------------------
         fi
-        echo "Found font $fontName ..."
+        echo "Found font $fontName ready to install ..."
         $execPrefix cp $fontName $fullNewTftDir
     done
     echo -----------------------------------------------

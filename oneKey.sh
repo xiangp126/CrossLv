@@ -1034,6 +1034,10 @@ _EOF
             fi
         done
     fi
+}
+
+# auto correct path of key packages according to the system
+finalAdjustParams() {
     cat << _EOF
 ------------------------------------------------------
 WRITING PYTHON3 INTERPRETER PATH TO $HOME/.VIMRC
@@ -1042,7 +1046,25 @@ _EOF
     matchStr="ycm_server_python_interpreter"
     sed -i --regexp-extended \
         "/$matchStr/c let g:$matchStr = '$python3Path'" $HOME/.vimrc
-    cat << "_EOF"
+
+    # find c++ header include directory
+    sysTackleDir=/usr/include
+    cppTackleDir=$sysTackleDir/c++
+    if [[ -d $cppTackleDir ]]; then
+		cat << _EOF
+----------------------------------------------------------
+WRITING C++ INCLUDE DIRECTORY TO $HOME/.YCM_EXTRA_CONF.PY
+----------------------------------------------------------
+_EOF
+        cppHeaderPath=`find  $cppTackleDir -maxdepth 1 -mindepth 1 -type d \
+            | head -n 1 2> /dev/null`
+        if [[ $cppHeaderPath != "" ]]; then
+            matchStr="usr\/include\/c\+\+"
+            sed -i --regexp-extended \
+                "/$matchStr/c '$cppHeaderPath'," $HOME/.ycm_extra_conf.py
+        fi
+    fi
+cat << "_EOF"
 ------------------------------------------------------
 INSTALLING YOUCOMPLETEME SUCCESSFULLY DONE
 ------------------------------------------------------
@@ -1078,6 +1100,7 @@ install() {
     installCmake
     installClang
     compileYcm
+    finalAdjustParams
     installSummary
 }
 

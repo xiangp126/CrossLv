@@ -1,18 +1,18 @@
 ## Mylx-Vundle
-Goal to handle my working environment through one key stroke under Unix like platform 
+- Goal to handle working environment crossing different Linux platform through one key stroke 
+    - fix dependency and skipping already installed packages
+    - correct key parameter of config file adjusting to current system
 
-Auto fix dependency and skipping already installed packages
+- Two modes deploy selection
+    - home -> without root privilege, normally installed into $HOME/.usr
+    - root -> with root privilege, normally installed into /usr/local
 
-This tool itself end up with compiling YouCompleteMe done
+- This tool itself end up with compiling YouCompleteMe done
 
-Verified on Ubuntu/CentOS 7 and old version - CentOS 6
+- Verified on Ubuntu/CentOS 7 and old version - CentOS 6
 
 ## Installation Guide
 ```bash
-Two modes deploy selection: home -> without root privilege
-
-                            root -> with root privilege
-
 $ sh oneKey.sh
 [NAME]
     oneKey.sh -- onekey to setup my working environment | - tmux
@@ -147,6 +147,9 @@ find ./confirm -type f
 
 ## Features
 V3.9
+
+* .ycm_extra_conf.py adjust c++ include dir/version
+* .vimrc adjust python3 interpreter path
 * use downloads/ to store all packages wget/clone
 * safe to run installation routine many times
 * compile newly gcc/c++ version if not support c++ 11
