@@ -195,7 +195,7 @@ let g:ycm_cache_omnifunc = 0
 let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
 let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
 "do not delete next line | specify python3 interpreter
-let g:ycm_server_python_interpreter = '/usr/bin/python3'
+let g:ycm_server_python_interpreter = '/usr/local/bin/python3'
 let g:ycm_add_preview_to_completeopt = 0
 let g:ycm_autoclose_preview_window_after_insertion = 0 
 let g:ycm_autoclose_preview_window_after_completion = 0
