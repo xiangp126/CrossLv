@@ -40,11 +40,11 @@ $ sh oneKey.sh
 ```
 
 ## Project Outline
-* confirm/  => files to track on the system, for backup and restore
-* oneKey.sh => main 'one key stroke' shell
-* mklink.sh => additional shell to make link for that in tools/
-* autoHandle.sh   => assistant for handling files tracked in confirm/
-* tools/          => written for better or understanding some logics 
+- confirm/  => key files to track on the system, for backup and restore
+- oneKey.sh => main 'one key stroke' shell, will auto call
+    - makeLink.sh   => additional shell to make link for that in tools/
+    - autoHandle.sh => assistant for handling files tracked in confirm/
+- tools/    => written for better or understanding some logics 
     - ./mygit.py
     - ./indexcat.py
     - ./addtools.sh
@@ -54,7 +54,7 @@ $ sh oneKey.sh
     - ./fixosdepends.sh
     - ./sshproxy-git.sh
     - ./httproxy-git.sh
-* compile-tools/  => some useful automatically compiling tools, as name indicated
+- compile-tools/  => some useful automatically compiling tools, as name indicated
     -  ./cc-vim.sh
     -  ./cc-git.sh
     -  ./cc-gcc.sh
@@ -62,12 +62,12 @@ $ sh oneKey.sh
     -  ./cc-cmake.sh
     -  ./cc-python3.sh
     -  ./gen-gccenv.sh
-* doc/   => frequently used document
-* fonts/ => beautifully and recommended open source fonts
-* template/ => some templates generated or used by this project
-* testing/  => derived from compile-tools or tools, but deprecated by far
-* security/ => derived from doc, but has affairs with sccurity
-* completion/ => bash completion for some extra use
+- doc/   => frequently used document
+- fonts/ => beautifully and recommended open source fonts
+- template/ => some templates generated or used by this project
+- testing/  => derived from compile-tools or tools, but deprecated by far
+- security/ => derived from doc, but has affairs with sccurity
+- completion/ => bash completion for some extra use
 
 ## Example for autoHandle.sh
 ```bash
