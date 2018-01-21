@@ -385,9 +385,9 @@ REPLACING SOME KEY FILES FIRST ...
 ------------------------------------------------------
 _EOF
     cp -f ./confirm/_.vimrc ${baseDir}/.vimrc
-    # replace corsair.vim ahead of whole restore
+    # replace darkcoding.vim ahead of whole restore
     mkdir -p ${baseDir}/${tackleDir[0]}/colors
-    cp -f ./confirm/_corsair.vim ${baseDir}/${tackleDir[0]}/colors/corsair.vim
+    cp -f ./confirm/_darkcoding.vim ${baseDir}/${tackleDir[0]}/colors/darkcoding.vim
 
     # call function to install bash completion now
     installBashCompletion
