@@ -1092,7 +1092,7 @@ case $1 in
     'root')
         set -x
         # run fix dependency routine as has root privilege
-        # sh -x ./tools/fixOsDepends.sh install
+        # sh -x ./tools/fixosdepends.sh
         commInstdir=$rootInstDir
         execPrefix=sudo
         install

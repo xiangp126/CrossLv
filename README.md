@@ -45,23 +45,23 @@ $ sh oneKey.sh
 * mklink.sh => additional shell to make link for that in tools/
 * autoHandle.sh   => assistant for handling files tracked in confirm/
 * tools/          => written for better or understanding some logics 
- - ./mygit.py
- - ./indexcat.py
- - ./addtools.sh
- - ./mkfonts.sh
- - ./tmuxhelp.sh
- - ./sshjumphost.sh
- - ./fixosdepends.sh
- - ./sshproxy-git.sh
- - ./httproxy-git.sh
+    - ./mygit.py
+    - ./indexcat.py
+    - ./addtools.sh
+    - ./mkfonts.sh
+    - ./tmuxhelp.sh
+    - ./sshjumphost.sh
+    - ./fixosdepends.sh
+    - ./sshproxy-git.sh
+    - ./httproxy-git.sh
 * compile-tools/  => some useful automatically compiling tools, as name indicated
- -  ./cc-vim.sh
- -  ./cc-git.sh
- -  ./cc-gcc.sh
- -  ./cc-clang.sh # compiling GCC and Clang may take up 5G+ disk space
- -  ./cc-cmake.sh
- -  ./cc-python3.sh
- -  ./gen-gccenv.sh
+    -  ./cc-vim.sh
+    -  ./cc-git.sh
+    -  ./cc-gcc.sh
+    -  ./cc-clang.sh # compiling GCC and Clang may take up 5G+ disk space
+    -  ./cc-cmake.sh
+    -  ./cc-python3.sh
+    -  ./gen-gccenv.sh
 * doc/   => frequently used document
 * fonts/ => beautifully and recommended open source fonts
 * template/ => some templates generated or used by this project
