@@ -17,7 +17,7 @@ if exists("syntax_on")
   syntax reset
 endif
 
-let colors_name = "corsair"
+let colors_name = "mydefault"
 " add self optimization here
 " hi Search term=reverse ctermbg=Yellow ctermfg=Black guibg=Yellow guifg=Black
 hi Comment ctermfg=Grey guifg=green

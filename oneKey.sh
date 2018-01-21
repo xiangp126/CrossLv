@@ -1046,6 +1046,11 @@ _EOF
     matchStr="ycm_server_python_interpreter"
     sed -i --regexp-extended \
         "/$matchStr/c let g:$matchStr = '$python3Path'" $HOME/.vimrc
+    # check return status
+    retVal=$?
+    if [[ $retVal != 0 ]]; then
+        echo "[Warning]: replace python3 interpreter path returns $retVal ..."
+    fi
 
     # find c++ header include directory
     sysTackleDir=/usr/include
@@ -1064,6 +1069,33 @@ _EOF
                 "/$matchStr/c '$cppHeaderPath'," $HOME/.ycm_extra_conf.py
         fi
     fi
+    # check return status
+    retVal=$?
+    if [[ $retVal != 0 ]]; then
+        echo "[Warning]: replace c++ header directory returns $retVal ..."
+    fi
+
+    cat << _EOF
+------------------------------------------------------
+INSTALLING VIM-COLORS TO $HOME/.VIM/COLORS
+------------------------------------------------------
+_EOF
+    cd $mainWd
+    tackleDir=./vim-colors
+    privateColorDir=$HOME/.vim/colors
+    if [[ ! -d $privateColorDir ]]; then
+        mkdir -p $privateColorDir
+    fi
+    for colorName in `find $tackleDir -regex '.*.vim' -type f`
+    do
+        cp $colorName $privateColorDir
+    done
+    # check return status
+    retVal=$?
+    if [[ $retVal != 0 ]]; then
+        echo "[Warning]: copy color returns $retVal ..."
+    fi
+
 cat << "_EOF"
 ------------------------------------------------------
 INSTALLING YOUCOMPLETEME SUCCESSFULLY DONE
