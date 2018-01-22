@@ -93,7 +93,7 @@ usage() {
              | - gcc | - python3 | - etc
 
 [SYNOPSIS]
-    $exeName [home | root | help]
+    sh $exeName [home | root | help]
 
 [TROUBLESHOOTING]
     sudo ln -s /bin/bash /bin/sh, make sure sh linked to bash.

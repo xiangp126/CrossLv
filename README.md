@@ -21,7 +21,7 @@ $ sh oneKey.sh
              | - gcc | - python3 | - etc
 
 [SYNOPSIS]
-    oneKey.sh [home | root | help]
+    sh oneKey.sh [home | root | help]
 
 [TROUBLESHOOTING]
     sudo ln -s /bin/bash /bin/sh, make sure sh linked to bash.
@@ -37,6 +37,9 @@ $ sh oneKey.sh
 |_| |_| |_|\__, | |_____|_|_| |_|\__,_/_/\_\
            |___/
 
+```
+```bash
+$ sh oneKey.sh [home | root]
 ```
 
 ## Project Outline
