@@ -1,4 +1,5 @@
-" Derived from 'default' scheme, copyright by Peng 2018
+" DERIVED FROM 'DEFAULT' SCHEME, COPYRIGHT BY PENG 2018 
+" COLOR REFERENCE http://blog.csdn.net/cp3alai/article/details/45509459
 hi clear Normal
 set bg&
 
@@ -11,17 +12,19 @@ if exists("syntax_on")
 endif
 
 let colors_name = "darkcoding"
+" ---------------------- comment ---------------------
 hi Comment ctermfg=Grey guifg=green
 hi Directory ctermfg=Blue
-
-hi PMenu ctermfg=DarkGrey ctermbg=0
-hi PmenuSel ctermfg=Brown ctermbg=0
+" ---------------------- pop up menu ---------------------
+hi PMenu ctermfg=DarkGrey ctermbg=16
+hi PmenuSel ctermfg=DarkYellow ctermbg=0 term=Bold
+" ---------------------- status line ---------------------
 hi StatusLine ctermfg=DarkGrey ctermbg=0
-
-" match parentheses, cursor color can be set in 'iTrem' -> preference ->
-" Profiles -> default -> colors -> cursor colors
+" ---------------------- match parentheses ---------------------
+" match parentheses, cursor color can be set in 'iTerm' -> 
+" preference " -> Profiles -> default -> colors -> cursor colors
 hi MatchParen ctermbg=Black ctermfg=DarkMagenta term=standout
-" Visual mode selection section color
-hi Visual ctermfg=DarkYellow ctermbg=0 term=Bold
+" ---------------------- visual mode selection ---------------------
+hi Visual ctermfg=Grey ctermbg=237 term=Bold
 
 " vim: sw=4

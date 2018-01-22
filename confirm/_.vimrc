@@ -18,15 +18,16 @@ set fileencoding=utf-8
 set fileencodings=utf-8,gb2312,gb18030,gbk,ucs-bom,cp936,latin1
 set termencoding=utf-8
 set backspace=indent,eol,start
-" set text auto line feed when exceeds 80 characters.
-" set textwidth=80 formatoptions+=Mm
 let mapleader='\'     " leader key, default is '\''
-":help ins-completion-menu
 set nocompatible      " be iMproved, required
-set autochdir         " auto change 'pwd' value
+" set autochdir         " not change dir with help of leaderF
+"------ :help ins-completion-menu -----
 set pumheight=12      " maximum height of popup menu
 set shell=/bin/bash   " set vim default shell
-" self-scheme under ~/.vim/colors/
+set mouse=n           " set mouse for normal mode
+set t_Co=256
+set background=dark
+"------ private under ~/.vim/colors -----
 :colorscheme darkcoding
 
 """"""""""""""""""""""""""""""
@@ -102,8 +103,8 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#buffer_nr_show = 1
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
-" let g:airline#extensions#tabline#formatter = 'unique_tail'
-let g:airline#extensions#tabline#formatter = 'jsformatter'
+let g:airline#extensions#tabline#formatter = 'unique_tail'
+" let g:airline#extensions#tabline#formatter = 'jsformatter'
 
 """"""""""""""""""""""""""""""
 " CONFIG VIMAIRLINE-THEME
