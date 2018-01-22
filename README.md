@@ -1,15 +1,19 @@
-## Mylx-Vundle
-- Goal to handle working environment crossing different Linux platform through one key stroke 
+## lx-Vundle
+- Goal to handle working environment crossing different Linux/MAC platform through 'oneKey' stroke
     - fix dependency and skipping already installed packages
     - correct key parameter of config file adjusting to current system
 
-- Two modes deploy selection
+- Three modes deploy selection
     - home -> without root privilege, normally installed into $HOME/.usr
     - root -> with root privilege, normally installed into /usr/local
+    - mac  -> 'mac' has some difference with basic Linux, and install to $HOME/.usr
 
 - This tool itself end up with compiling YouCompleteMe done
 
-- Verified on Ubuntu/CentOS 7 and old version - CentOS 6
+- On Ubuntu and MacOS whole installation takes little time
+
+- On CentOS 6, too old version gcc and missing clang make compiling them takes huge time
+    - however it is still a whole stage automatical solution that is very helpful.
 
 ## Installation Guide
 ```bash
@@ -21,15 +25,16 @@ $ sh oneKey.sh
              | - gcc | - python3 | - etc
 
 [SYNOPSIS]
-    sh oneKey.sh [home | root | help]
-
-[TROUBLESHOOTING]
-    sudo ln -s /bin/bash /bin/sh, make sure sh linked to bash.
-    $ ll /bin/sh lrwxrwxrwx 1 root root 9 Dec  7 01:00 /bin/sh -> /bin/bash*
+    sh oneKey.sh [home | root | mac | help]
 
 [DESCRIPTION]
-    home -- build required packages to ~/.usr/
+    home -- build required packages to /Users/xiang/.usr/
     root -- build required packages to /usr/local/
+    mac  -- build required packages to /Users/xiang/.usr/ on MacOS
+
+[TROUBLESHOOTING]
+    sudo ln -s /bin/bash /bin/sh, ensure /bin/sh was linked to /bin/bash.
+    $ ll /bin/sh lrwxrwxrwx 1 root root 9 Dec  7 01:00 /bin/sh -> /bin/bash*
                    _     _
  _ __ ___  _   _  | |   (_)_ __  _   ___  __
 | '_ ` _ \| | | | | |   | | '_ \| | | \ \/ /
@@ -39,7 +44,7 @@ $ sh oneKey.sh
 
 ```
 ```bash
-$ sh oneKey.sh [home | root]
+$ sh oneKey.sh [home | root | mac]
 ```
 
 ## Project Outline
@@ -47,7 +52,7 @@ $ sh oneKey.sh [home | root]
 - oneKey.sh => main 'one key stroke' shell, will auto call
     - makeLink.sh   => additional shell to make link for that in tools/
     - autoHandle.sh => assistant for handling files tracked in confirm/
-- tools/    => written for better or understanding some logics 
+- tools/    => written for better or understanding some logics
     - ./mygit.py
     - ./indexcat.py
     - ./addtools.sh
@@ -70,6 +75,7 @@ $ sh oneKey.sh [home | root]
 - template/ => some templates generated or used by this project
 - testing/  => derived from compile-tools or tools, but deprecated by far
 - security/ => derived from doc, but has affairs with sccurity
+- vim-colors/ => color schemes for vim use
 - completion/ => bash completion for some extra use
 
 ## Example for autoHandle.sh
@@ -151,16 +157,17 @@ find ./confirm -type f
 ## Features
 V3.9
 
+* add support for MAC system
 * .ycm_extra_conf.py adjust c++ include dir/version
 * .vimrc adjust python3 interpreter path
 * use downloads/ to store all packages wget/clone
 * safe to run installation routine many times
 * compile newly gcc/c++ version if not support c++ 11
-* add number of cpu core check, make -j [cores] 
+* add number of cpu core check, make -j [cores]
 * add YouCompleteMe
 * use oneKey.sh replace of some small scripts
 
-V3.1 
+V3.1
 * use tmux plugin manager for Tmux plugins.
 * add tmux-resurrect and update install.sh
 * update .tmux.conf and files associated
