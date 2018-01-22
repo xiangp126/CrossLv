@@ -1,11 +1,5 @@
-" My Vim Default color file: corsair.vim, work together with self-.vimrc
-" placed under ~/.vim/colors, that not influence other's.
-
-" This is the default color scheme.  It doesn't define the Normal
-" highlighting, it uses whatever the colors used to be.
-
-" Set 'background' back to the default.  The value can't always be estimated
-" and is then guessed.
+" DERIVED FROM 'DEFAULT' SCHEME, COPYRIGHT BY PENG 2018 
+" COLOR REFERENCE http://blog.csdn.net/cp3alai/article/details/45509459
 hi clear Normal
 set bg&
 
@@ -18,19 +12,19 @@ if exists("syntax_on")
 endif
 
 let colors_name = "mydefault"
-" add self optimization here
-" hi Search term=reverse ctermbg=Yellow ctermfg=Black guibg=Yellow guifg=Black
+" ---------------------- comment ---------------------
 hi Comment ctermfg=Grey guifg=green
 hi Directory ctermfg=Blue
-" PopUp Menu
-" hi pMenu ctermbg=22 ctermfg=Grey
-hi pMenu ctermbg=DarkGrey ctermfg=Grey
-hi PmenuSel ctermfg=Brown
-" match parentheses, cursor color can be set in 'iTrem' -> preference ->
-" Profiles -> default -> colors -> cursor colors
-" hi MatchParen ctermbg=Black ctermfg=DarkMagenta term=standout
+" ---------------------- pop up menu ---------------------
+hi PMenu ctermfg=DarkGrey ctermbg=16
+hi PmenuSel ctermfg=DarkYellow ctermbg=0 term=Bold
+" ---------------------- status line ---------------------
+hi StatusLine ctermfg=DarkGrey ctermbg=0
+" ---------------------- match parentheses ---------------------
+" match parentheses, cursor color can be set in 'iTerm' -> 
+" preference " -> Profiles -> default -> colors -> cursor colors
 hi MatchParen ctermbg=Black ctermfg=DarkMagenta term=standout
-" Visual mode selection section color
-hi Visual ctermfg=DarkYellow term=Bold
+" ---------------------- visual mode selection ---------------------
+hi Visual ctermfg=Grey ctermbg=237 term=Bold
 
 " vim: sw=4

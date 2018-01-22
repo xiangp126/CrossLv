@@ -93,17 +93,18 @@ usage() {
              | - gcc | - python3 | - etc
 
 [SYNOPSIS]
-    sh $exeName [home | root | help]
-
-[TROUBLESHOOTING]
-    sudo ln -s /bin/bash /bin/sh, make sure sh linked to bash.
-    $ ll /bin/sh lrwxrwxrwx 1 root root 9 Dec  7 01:00 /bin/sh -> /bin/bash*
+    sh $exeName [home | root | mac | help]
 
 [DESCRIPTION]
     home -- build required packages to $homeInstDir/
     root -- build required packages to $rootInstDir/
+    mac  -- build required packages to $homeInstDir/ on MacOS
+
+[TROUBLESHOOTING]
+    sudo ln -s /bin/bash /bin/sh, ensure /bin/sh was linked to /bin/bash.
+    $ ll /bin/sh lrwxrwxrwx 1 root root 9 Dec  7 01:00 /bin/sh -> /bin/bash*
 _EOF
-logo
+    logo
 }
 
 installBashCompletion() {
@@ -389,8 +390,11 @@ _EOF
     mkdir -p ${baseDir}/${tackleDir[0]}/colors
     cp -f ./confirm/_darkcoding.vim ${baseDir}/${tackleDir[0]}/colors/darkcoding.vim
 
-    # call function to install bash completion now
+    # call sub-functions to install each module
     installBashCompletion
+    installVimColors
+    installTmuxPlugins
+    installVimPlugins
 }
 
 installTmuxPlugins() {
@@ -1036,45 +1040,7 @@ _EOF
     fi
 }
 
-# auto correct path of key packages according to the system
-finalAdjustParams() {
-    cat << _EOF
-------------------------------------------------------
-WRITING PYTHON3 INTERPRETER PATH TO $HOME/.VIMRC
-------------------------------------------------------
-_EOF
-    matchStr="ycm_server_python_interpreter"
-    sed -i --regexp-extended \
-        "/$matchStr/c let g:$matchStr = '$python3Path'" $HOME/.vimrc
-    # check return status
-    retVal=$?
-    if [[ $retVal != 0 ]]; then
-        echo "[Warning]: replace python3 interpreter path returns $retVal ..."
-    fi
-
-    # find c++ header include directory
-    sysTackleDir=/usr/include
-    cppTackleDir=$sysTackleDir/c++
-    if [[ -d $cppTackleDir ]]; then
-        cat << _EOF
-----------------------------------------------------------
-WRITING C++ INCLUDE DIRECTORY TO $HOME/.YCM_EXTRA_CONF.PY
-----------------------------------------------------------
-_EOF
-        cppHeaderPath=`find  $cppTackleDir -maxdepth 1 -mindepth 1 -type d \
-            | head -n 1 2> /dev/null`
-        if [[ $cppHeaderPath != "" ]]; then
-            matchStr="usr\/include\/c\+\+"
-            sed -i --regexp-extended \
-                "/$matchStr/c '$cppHeaderPath'," $HOME/.ycm_extra_conf.py
-        fi
-    fi
-    # check return status
-    retVal=$?
-    if [[ $retVal != 0 ]]; then
-        echo "[Warning]: replace c++ header directory returns $retVal ..."
-    fi
-
+installVimColors() {
     cat << _EOF
 ------------------------------------------------------
 INSTALLING VIM-COLORS TO $HOME/.VIM/COLORS
@@ -1094,6 +1060,87 @@ _EOF
     retVal=$?
     if [[ $retVal != 0 ]]; then
         echo "[Warning]: copy color returns $retVal ..."
+    fi
+}
+
+# auto correct path of key packages according to the system
+finalAdjustParams() {
+    cat << _EOF
+------------------------------------------------------
+CORRECTING PYTHON3 INTERPRETER PATH IN $HOME/.VIMRC
+------------------------------------------------------
+_EOF
+    if [[ $python3Path == "" ]]; then
+        python3Path=`which python3`
+    fi
+    matchStr="ycm_server_python_interpreter"
+    sed -i --regexp-extended \
+        "/$matchStr/c let g:$matchStr = '$python3Path'" $HOME/.vimrc
+    # check return status
+    retVal=$?
+    if [[ $retVal != 0 ]]; then
+        echo "[Warning]: replace python3 interpreter path returns $retVal ..."
+    fi
+
+    cat << _EOF
+------------------------------------------------------
+CORRECTING COLOR SCHEME IN $HOME/.VIMRC
+------------------------------------------------------
+_EOF
+    matchStr=':colorscheme'
+    replacedTo="mydefault"
+    # Linux use :colorscheme mydefault, Mac use darkcoding
+    if [[ $1 == "mac" ]]; then
+        replacedTo=darkcoding
+    fi
+    sed -i --regexp-extended \
+        "/$matchStr/c $matchStr $replacedTo" $HOME/.vimrc
+    # check return status
+    retVal=$?
+    if [[ $retVal != 0 ]]; then
+        echo "[Warning]: replace color scheme returns $retVal ..."
+    fi
+
+    # find c++ header include directory
+    sysTackleDir=/usr/include
+    cppTackleDir=$sysTackleDir/c++
+    if [[ -d $cppTackleDir ]]; then
+        cat << _EOF
+----------------------------------------------------------
+CORRECTING C++ INCLUDE DIRECTORY IN $HOME/.YCM_EXTRA_CONF.PY
+----------------------------------------------------------
+_EOF
+        cppHeaderPath=`find  $cppTackleDir -maxdepth 1 -mindepth 1 -type d \
+            | head -n 1 2> /dev/null`
+        if [[ $cppHeaderPath != "" ]]; then
+            matchStr="usr\/include\/c\+\+"
+            sed -i --regexp-extended \
+                "/$matchStr/c '$cppHeaderPath'," $HOME/.ycm_extra_conf.py
+        fi
+    fi
+    # check return status
+    retVal=$?
+    if [[ $retVal != 0 ]]; then
+        echo "[Warning]: replace c++ header directory returns $retVal ..."
+    fi
+
+    # only mac needed, for mac not support --color=auto
+    if [[ ! $1 == "mac" ]]; then
+        return
+    fi
+    cat << _EOF
+------------------------------------------------------
+DELETING --COLOR=AUTO IN $HOME/.BASHRC
+------------------------------------------------------
+_EOF
+    # delete whole line matched
+    matchStr="--color=auto"
+    sed -i --regexp-extended \
+        "/$matchStr/d" $HOME/.bashrc
+    # check return status
+    retVal=$?
+    if [[ $retVal != 0 ]]; then
+        echo "[Warning]: deleting --color=auto returns $retVal ..."
     fi
 
 cat << "_EOF"
@@ -1125,7 +1172,10 @@ install() {
     checkGccVersion
     checkOsCpus
     installBone
-    installTmuxPlugins
+        # | - installBashCompletion
+        #   - installVimColors
+        #   - installTmuxPlugins
+        #   - installVimPlugins
     installVimPlugins
     installPython3
     installvim
@@ -1136,9 +1186,83 @@ install() {
     installSummary
 }
 
+checkIsLinux() {
+    if [[ "$(uname -s)" != "Linux" ]]; then
+        cat << "_EOF"
+------------------------------------------------------
+WE ONLY SUPPORT LINUX AND MACOS
+please run 'sh onekey.sh mac' if it is MacOS
+------------------------------------------------------
+_EOF
+        exit
+    fi
+}
+
+#####################################################
+# two func for installation under mac
+#####################################################
+# compile YouCompleteMe for Mac
+compileYcmForMac() {
+    cat << "_EOF"
+------------------------------------------------------
+STEP : COMPILING YOUCOMPLETEME ...
+------------------------------------------------------
+_EOF
+    # comm attribute for getting source ycm
+    repoLink=https://github.com/Valloric
+    repoName=YouCompleteMe
+    ycmDir=$HOME/.vim/bundle/YouCompleteMe
+    if [[ -d $ycmDir ]]; then
+        echo [Warning]: already has YCM repo cloned, omitting now ...
+    else
+        git clone $repoLink/$repoName $ycmDir
+        # check if clone returns successfully
+        if [[ $? != 0 ]]; then
+            echo [Error]: git clone returns error, quitting now ...
+            exit
+        fi
+    fi
+
+    cd $ycmDir
+    git submodule update --init --recursive
+    python3 ./install.py --clang-completer --system-libclang
+
+    if [[ $? != 0 ]]; then
+        echo "install YCM returns error, quitting now ..."
+        exit 1
+    fi
+}
+
+installForMac() {
+    mkdir -p $downloadPath
+    whereIsBrew=`which brew`
+    if [[ "$whereIsBrew" == "" ]]; then
+        echo "[Error]: Not fould brew, please install homebrew first ..."
+        exit 1
+    fi
+    # fix dependency
+    brew upgrade ctags python python3 cmake vim -y
+    # use gnu-sed as compatible with that under Linux
+    brew upgrade gnu-sed --with-default-names -y
+
+    checkOsCpus
+    installBone
+        # | - installBashCompletion
+        #   - installVimColors
+        #   - installTmuxPlugins
+        #   - installVimPlugins
+    compileYcmForMac
+    finalAdjustParams mac
+    # installSummary
+}
+#####################################################
+# end of two func for installation under mac
+#####################################################
+
 case $1 in
     'home')
         set -x
+        checkIsLinux
         commInstdir=$homeInstDir
         execPrefix=""
         install
@@ -1148,10 +1272,18 @@ case $1 in
         set -x
         # run fix dependency routine as has root privilege
         # sh -x ./tools/fixosdepends.sh
+        checkIsLinux
         commInstdir=$rootInstDir
         execPrefix=sudo
         install
    ;;
+
+    'mac')
+        set -x
+        commInstdir=$homeInstDir
+        execPrefix=""
+        installForMac
+    ;;
 
     *)
         usage
