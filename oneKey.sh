@@ -1178,7 +1178,6 @@ install() {
         #   - installVimColors
         #   - installTmuxPlugins
         #   - installVimPlugins
-    installVimPlugins
     installPython3
     installvim
     installCmake
@@ -1196,8 +1195,9 @@ WE ONLY SUPPORT LINUX AND MACOS
 please run 'sh onekey.sh mac' if it is MacOS
 ------------------------------------------------------
 _EOF
-        exit
+        exit 1
     fi
+    return 0
 }
 
 #####################################################
@@ -1282,6 +1282,16 @@ case $1 in
 
     'mac')
         set -x
+        checkIsLinux
+        if [[ $? == 0 ]]; then
+            cat << "_EOF"
+------------------------------------------------------
+YOUR SYSTEM IS LINUX
+please run 'sh onekey.sh [home | root]' instead
+------------------------------------------------------
+_EOF
+            exit 1
+        fi
         commInstdir=$homeInstDir
         execPrefix=""
         installForMac
