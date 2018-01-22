@@ -12,7 +12,7 @@
 
 - On Ubuntu and MacOS whole installation takes little time
 
-- On CentOS 6, too old version gcc and missing clang make compiling them takes huge time
+- On CentOS 6, too old version gcc and missing clang make compiling them taking huge time
     - however it is still a whole stage automatical solution that is very helpful.
 
 ## Installation Guide

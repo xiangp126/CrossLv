@@ -385,10 +385,12 @@ _EOF
 REPLACING SOME KEY FILES FIRST ...
 ------------------------------------------------------
 _EOF
+    # let .vimrc in place
     cp -f ./confirm/_.vimrc ${baseDir}/.vimrc
-    # replace darkcoding.vim ahead of whole restore
-    mkdir -p ${baseDir}/${tackleDir[0]}/colors
-    cp -f ./confirm/_darkcoding.vim ${baseDir}/${tackleDir[0]}/colors/darkcoding.vim
+    # comment color scheme line
+    matchStr=':colorscheme'
+    sed -i --regexp-extended \
+        "s/$matchStr/\" $matchStr/" $HOME/.vimrc
 
     # call sub-functions to install each module
     installBashCompletion

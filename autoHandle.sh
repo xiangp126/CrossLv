@@ -12,7 +12,7 @@ bkFiles=(
     ".bashrc"
     ".tmux.conf"
     ".ycm_extra_conf.py"
-    ".vim/colors/darkcoding.vim"
+    ".vim/colors/mydefault.vim"
 )
 # global parameters.
 backupDir=./backup
