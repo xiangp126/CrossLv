@@ -116,7 +116,7 @@ installBashCompletion() {
     fi
     cat << "_EOF"
 ------------------------------------------------------
-STEP : INSTALLING BASH COMPLETION ...
+INSTALLING BASH COMPLETION ...
 ------------------------------------------------------
 _EOF
     bashCompInstDir=$commInstdir
@@ -181,6 +181,32 @@ _EOF
     fi
 }
 
+# install extra bash completion
+installExtraBashComp() {
+    cat << _EOF
+------------------------------------------------------
+INSTALLING EXTRA BASH COMPLETION FILES ...
+------------------------------------------------------
+_EOF
+    # extra bash completion dir
+    compDir=./completion
+    # dir to install extra bash comp
+    myCompleteDir=$HOME/.completion.d
+    mkdir -p $myCompleteDir
+    for file in `find $compDir -regex ".*.bash" -type f`
+    do
+        cp $file $myCompleteDir/
+    done
+
+    cat << _EOF
+------------------------------------------------------
+FINDING BASH-COMPLETION SUCCESSFULLY COPIED ...
+------------------------------------------------------
+_EOF
+    find $myCompleteDir -type f
+    echo ------------------------------------------------------
+}
+
 # gcc must support C++11 to compile YCM
 checkGccVersion() {
     # loop to find if there exists gcc version meets requirement
@@ -235,7 +261,7 @@ _EOF
 installGcc() {
     cat << "_EOF"
 ------------------------------------------------------
-STEP : INSTALLING GCC 5 ...
+INSTALLING GCC 5 ...
 ------------------------------------------------------
 _EOF
     gccInstDir=$commInstdir
@@ -337,14 +363,14 @@ installBone() {
     # run backup first of all.
     cat << _EOF
 ------------------------------------------------------
-STEP : RUN BACKUP FIRST ...
+RUN BACKUP ROUTINE FIRST ...
 ------------------------------------------------------
 _EOF
     sh autoHandle.sh backup
 
 cat << "_EOF"
 ------------------------------------------------------
-STEP : INSTALLING VIM-PLUGIN MANAGER ...
+INSTALLING VIM-PLUGIN MANAGER ...
 ------------------------------------------------------
 _EOF
     gitClonePath=https://github.com/VundleVim/Vundle.vim
@@ -362,7 +388,7 @@ _EOF
     fi
     cat << "_EOF"
 ------------------------------------------------------
-STEP : INSTALLING TMUX-PLUGIN MANAGER
+INSTALLING TMUX-PLUGIN MANAGER
 ------------------------------------------------------
 _EOF
     gitClonePath=https://github.com/tmux-plugins/tpm
@@ -381,19 +407,19 @@ _EOF
 
     cat << _EOF
 ------------------------------------------------------
-REPLACING SOME KEY FILES FIRST ...
+COPYING SOME KEY FILES FIRST ...
 ------------------------------------------------------
 _EOF
     # let .vimrc in place
-    cp -f ./confirm/_.vimrc ${baseDir}/.vimrc
-    # comment color scheme line
+    cp ./track/vimrc $baseDir/.vimrc
+    # comment on color scheme line
     matchStr=':colorscheme'
     sed -i --regexp-extended \
         "s/$matchStr/\" $matchStr/" $HOME/.vimrc
 
     # call sub-functions to install each module
     installBashCompletion
-    installVimColors
+    installExtraBashComp
     installTmuxPlugins
     installVimPlugins
 }
@@ -401,7 +427,7 @@ _EOF
 installTmuxPlugins() {
     cat << "_EOF"
 ------------------------------------------------------
-STEP : INSTALLING TMUX PLUGINS ...
+INSTALLING TMUX PLUGINS ...
 ------------------------------------------------------
 _EOF
     tmuxInstallScript=$HOME/.tmux/plugins/tpm/bin/install_plugins
@@ -412,7 +438,7 @@ _EOF
 installVimPlugins() {
     cat << "_EOF"
 ------------------------------------------------------
-STEP : INSTALLING VIM PLUGINS ...
+INSTALLING VIM PLUGINS ...
 ------------------------------------------------------
 _EOF
     cd $mainWd
@@ -424,7 +450,12 @@ _EOF
 
     # source $HOME/.vimrc if needed
     vim +"source $HOME/.vimrc" +PluginInstall +qall
-    # run restore routine
+
+    cat << "_EOF"
+------------------------------------------------------
+RUN RESTORE ROUTINE NOW ...
+------------------------------------------------------
+_EOF
     sh autoHandle.sh restore
     # load new .bashrc after 'restore' routine
     source $HOME/.bashrc 2> /dev/null
@@ -481,7 +512,7 @@ installPython3() {
 
     cat << "_EOF"
 ------------------------------------------------------
-STEP : INSTALLING PYTHON3 ...
+INSTALLING PYTHON3 ...
 ------------------------------------------------------
 _EOF
     python3InstDir=$commInstdir
@@ -558,7 +589,7 @@ installvim() {
     fi
     cat << "_EOF"
 ------------------------------------------------------
-STEP : INSTALLING NEWLY VIM VERSION 8 ...
+INSTALLING NEWLY VIM VERSION 8 ...
 ------------------------------------------------------
 _EOF
     vimInstDir=$commInstdir
@@ -648,7 +679,7 @@ installCmake() {
     fi
     cat << "_EOF"
 ------------------------------------------------------
-STEP : INSTALLING CMAKE 3.10 ...
+INSTALLING CMAKE 3.10 ...
 ------------------------------------------------------
 _EOF
     cmakeInstDir=$commInstdir
@@ -725,7 +756,7 @@ installClang() {
 
     cat << "_EOF"
 ------------------------------------------------------
-STEP : PREPARE TO INSTALL CLANG 5 ...
+PREPARE TO INSTALL CLANG 5 ...
 ------------------------------------------------------
 _EOF
     # clang version, change it if you need other version
@@ -734,7 +765,7 @@ _EOF
     $execPrefix mkdir -p $clangInstDir
     cat << "_EOF"
 ------------------------------------------------------
-STEP : DOWNLOADING LLVM 5 ...
+DOWNLOADING LLVM 5 ...
 ------------------------------------------------------
 _EOF
     # comm attribute to get source 'llvm'
@@ -768,7 +799,7 @@ _EOF
     fi
     cat << "_EOF"
 ------------------------------------------------------
-STEP : DOWNLOADING CFE 5 ...
+DOWNLOADING CFE 5 ...
 ------------------------------------------------------
 _EOF
     # comm attribute to get source 'cfe'
@@ -803,7 +834,7 @@ _EOF
     fi
     cat << "_EOF"
 ------------------------------------------------------
-STEP : DOWNLOADING COMPILER-RT 5 ...
+DOWNLOADING COMPILER-RT 5 ...
 ------------------------------------------------------
 _EOF
     # comm attribute to get source 'compiler-rt'
@@ -838,7 +869,7 @@ _EOF
     fi
     cat << "_EOF"
 ------------------------------------------------------
-STEP : DOWNLOADING CLANG-TOOLS-EXTRA 5 ...
+DOWNLOADING CLANG-TOOLS-EXTRA 5 ...
 ------------------------------------------------------
 _EOF
 # CMake Error at tools/clang/tools/extra/cmake/Modules/AddCompilerRT.cmake:58 (add_library):
@@ -882,7 +913,7 @@ _EOF
        # fi
     cat << "_EOF"
 ------------------------------------------------------
-STEP : START TO COMPILE CLANG 5 ...
+START TO COMPILE CLANG 5 ...
 ------------------------------------------------------
 _EOF
     cd $llvmUntarName
@@ -945,7 +976,7 @@ compileYcm() {
     # cmakePath=`which cmake 2> /dev/null`
     cat << "_EOF"
 ------------------------------------------------------
-STEP : COMPILING YOUCOMPLETEME ...
+COMPILING YOUCOMPLETEME ...
 ------------------------------------------------------
 _EOF
     # comm attribute for getting source ycm
@@ -1038,29 +1069,6 @@ _EOF
                 break
             fi
         done
-    fi
-}
-
-installVimColors() {
-    cat << _EOF
-------------------------------------------------------
-INSTALLING VIM-COLORS TO $HOME/.VIM/COLORS
-------------------------------------------------------
-_EOF
-    cd $mainWd
-    tackleDir=./vim-colors
-    privateColorDir=$HOME/.vim/colors
-    if [[ ! -d $privateColorDir ]]; then
-        mkdir -p $privateColorDir
-    fi
-    for colorName in `find $tackleDir -regex '.*.vim' -type f`
-    do
-        cp $colorName $privateColorDir
-    done
-    # check return status
-    retVal=$?
-    if [[ $retVal != 0 ]]; then
-        echo "[Warning]: copy color returns $retVal ..."
     fi
 }
 
@@ -1174,7 +1182,7 @@ install() {
     checkOsCpus
     installBone
         # | - installBashCompletion
-        #   - installVimColors
+        #   - installExtraBashComp
         #   - installTmuxPlugins
         #   - installVimPlugins
     installPython3
@@ -1210,7 +1218,7 @@ _EOF
 compileYcmForMac() {
     cat << "_EOF"
 ------------------------------------------------------
-STEP : COMPILING YOUCOMPLETEME ...
+COMPILING YOUCOMPLETEME ...
 ------------------------------------------------------
 _EOF
     # comm attribute for getting source ycm
@@ -1253,7 +1261,7 @@ installForMac() {
     checkOsCpus
     installBone
         # | - installBashCompletion
-        #   - installVimColors
+        #   - installExtraBashComp
         #   - installTmuxPlugins
         #   - installVimPlugins
     compileYcmForMac

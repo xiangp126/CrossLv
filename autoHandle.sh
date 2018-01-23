@@ -14,12 +14,18 @@ bkFiles=(
     ".ycm_extra_conf.py"
     # ".vim/colors/mydefault.vim"
 )
-# global parameters.
+# private colors needed to track
+privateColorDir=$HOME/.vim/colors
+# backup directory
 backupDir=./backup
+# backup private colors
+bkColorDir=$backupDir/colors
+# track dir under try mode, only for test
 dryDir=./dry-restore
+# dir to store tracked files
 trackDir=./track
-# bash completion
-compDir=./completion
+# dir to store tracked color files
+trackedColorDir=./vim-colors
 # array to store file names that was trully processed.
 bkkArray=()
 # backup postfix, need not the first '.'
@@ -91,11 +97,29 @@ _EOF
         cp $realFile $backupDir/$backedName
     done
 
+    # backup private colors
+    cd $mainWd
+    if [[ ! -d $privateColorDir ]]; then
+        return
+    fi
+    if [[ ! -d $bkColorDir ]]; then
+        mkdir -p $bkColorDir
+    fi
+    cat << _EOF
+---------------------------------------------------------
+START TO BACKUP PRIVATE COLORS ...
+---------------------------------------------------------
+_EOF
+    for file in `find $privateColorDir -regex ".*.vim$"`; do
+        echo cp $file $bkColorDir/
+        cp $file $bkColorDir/
+    done
     cat << _EOF
 ------------------------------------------------------
 FINDING FILES BACKUPED SUCCESSFULLY ...
 ------------------------------------------------------
-$(find $backupDir -type f)
+$(find $backupDir -maxdepth 1 -type f 2> /dev/null)
+$(find $backupDir -mindepth 2 -type f 2> /dev/null)
 ------------------------------------------------------
 _EOF
 }
@@ -119,7 +143,7 @@ restore() {
     fi
     cat << _EOF
 ------------------------------------------------------
-START TO RESTORE TRACKED FILES ...
+INSTALLING TRACKED FILES TO $restoreDir/ ...
 ------------------------------------------------------
 _EOF
     copiedPathArray=()
@@ -134,20 +158,40 @@ _EOF
             echo "[Warning]: Not found $backedName under $trackDir, omitting $backedName ..."
             continue
         fi
-        # backup original file before restored
+        # move original file to bk before restored
         realFile=$restoreDir/$file
         if [[ -f $realFile ]]; then
-            echo [Warning]: found $file under $restoreDir, back it up ...
+            # echo [Warning]: found $file under $restoreDir, back it up first ...
             realBackedFile=$restoreDir/$file.$bkPostfix
             echo mv $realFile $realBackedFile
             mv $realFile $realBackedFile
         fi
         echo cp $trackDir/$backedName $realFile
         cp $trackDir/$backedName $realFile
-
         # fill in copiedPathArray
         copiedPathArray[((index++))]=$realFile
     done
+
+    cat << _EOF
+------------------------------------------------------
+INSTALLING VIM-COLORS TO $restoreDir/ ...
+------------------------------------------------------
+_EOF
+    cd $mainWd
+    # trackedColorDir=./vim-colors
+    # compatible with dry mode
+    privateColorDir=$restoreDir/.vim/colors
+    if [[ ! -d $privateColorDir ]]; then
+        mkdir -p $privateColorDir
+    fi
+    for colorName in `find $trackedColorDir -regex '.*.vim' -type f`
+    do
+        echo cp $colorName $privateColorDir
+        cp $colorName $privateColorDir
+        # fill in copiedPathArray
+        copiedPathArray[((index++))]=$privateColorDir/$(echo ${colorName#*/})
+    done
+
     cat << _EOF
 ------------------------------------------------------
 FINDING FILES RESTORED SUCCESSFULLY ...
@@ -156,26 +200,6 @@ _EOF
     for file in ${copiedPathArray[@]}; do
         echo $file
     done
-
-    cat << _EOF
-------------------------------------------------------
-START TO COPYING BASH COMPLETION FILES ...
-------------------------------------------------------
-_EOF
-    myCompleteDir=$HOME/.completion.d
-    mkdir -p $myCompleteDir
-    for file in `find $compDir -regex ".*.bash" -type f`
-    do
-        echo cp -f $file $myCompleteDir/
-        cp $file $myCompleteDir/
-    done
-
-    cat << _EOF
-------------------------------------------------------
-FINDING BASH-COMPLETION SUCCESSFULLY COPIED ...
-------------------------------------------------------
-_EOF
-    find $myCompleteDir -type f
     echo ------------------------------------------------------
 }
 
@@ -214,7 +238,7 @@ track() {
 COPY TRACKED FILES FROM $backupDir TO $trackDir ...
 ---------------------------------------------------------
 _EOF
-    for file in `find $backupDir -type f`; do
+    for file in `find $backupDir -maxdepth 1 -type f`; do
         fileName=`echo ${file##*/}`
         echo cp $file $trackDir/$fileName
         cp $file $trackDir/$fileName
@@ -223,17 +247,13 @@ _EOF
 ------------------------------------------------------
 FINDING TRACK FILES TRACKED SUCCESSFULLY ...
 ------------------------------------------------------
+$(find $trackDir -type f 2> /dev/null)
 _EOF
-    find $trackDir -type f
 
     cd $mainWd
-    privateColorDir=$HOME/.vim/colors
-    trackedColorDir=./vim-colors
-    if [[ ! -d $trackedColorDir ]]; then
-        echo "[Error]: Not found tracked color $trackedColorDir/, please check it ..."
-        exit 1
-    fi
-    if [[ ! -d $privateColorDir ]]; then
+    # privateColorDir=$HOME/.vim/colors
+    # trackedColorDir=./vim-colors
+    if [[ ! -d $bkColorDir ]]; then
         return
     fi
     cat << _EOF
@@ -241,13 +261,16 @@ _EOF
 START TO TRACK PRIVATE COLORS ...
 ---------------------------------------------------------
 _EOF
-    for file in `find $privateColorDir -regex ".*.vim$"`; do
+    for file in `find $bkColorDir -regex ".*.vim$"`; do
         echo cp $file $trackedColorDir/
         cp $file $trackedColorDir/
     done
+
     cat << _EOF
 ------------------------------------------------------
-FINDING TRACK FILES TRACKED SUCCESSFULLY ...
+FINDING COLORS TRACKED SUCCESSFULLY ...
+------------------------------------------------------
+$(find $trackedColorDir -type f 2> /dev/null)
 ------------------------------------------------------
 _EOF
 }

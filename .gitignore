@@ -8,7 +8,7 @@ backup/
 downloads/
 backup.*/
 dry_install/
-dry_restore/
+dry-restore/
 __pycache__/
 gccenv.txt
 !gccenv.txt.template
