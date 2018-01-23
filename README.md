@@ -3,10 +3,9 @@
     - fix dependency and skipping already installed packages
     - correct key parameter of config file adjusting to current system
 
-- Three modes deploy selection
+- Two modes deploy selection
     - home -> without root privilege, normally installed into $HOME/.usr
     - root -> with root privilege, normally installed into /usr/local
-    - mac  -> 'mac' has some difference with basic Linux, and install to $HOME/.usr
 
 - This tool itself end up with compiling YouCompleteMe done
 
@@ -25,12 +24,11 @@ $ sh oneKey.sh
              | - gcc | - python3 | - etc
 
 [SYNOPSIS]
-    sh oneKey.sh [home | root | mac | help]
+    sh oneKey.sh [home | root | help]
 
 [DESCRIPTION]
     home -- build required packages to ~/.usr/
     root -- build required packages to /usr/local/
-    mac  -- build required packages to ~/.usr/ on MacOS
 
 [TROUBLESHOOTING]
     sudo ln -s /bin/bash /bin/sh, ensure /bin/sh was linked to /bin/bash.
@@ -44,7 +42,7 @@ $ sh oneKey.sh
 
 ```
 ```bash
-$ sh oneKey.sh [home | root | mac]
+$ sh oneKey.sh [home | root]
 ```
 
 ## Project Outline

@@ -93,12 +93,11 @@ usage() {
              | - gcc | - python3 | - etc
 
 [SYNOPSIS]
-    sh $exeName [home | root | mac | help]
+    sh $exeName [home | root | help]
 
 [DESCRIPTION]
     home -- build required packages to $homeInstDir/
     root -- build required packages to $rootInstDir/
-    mac  -- build required packages to $homeInstDir/ on MacOS
 
 [TROUBLESHOOTING]
     sudo ln -s /bin/bash /bin/sh, ensure /bin/sh was linked to /bin/bash.
@@ -1188,16 +1187,20 @@ install() {
 }
 
 checkIsLinux() {
-    if [[ "$(uname -s)" != "Linux" ]]; then
+    arch=$(uname -s)
+    if [[ $arch == "Linux" ]]; then
+        echo "Platform is Linux"
+        return 1
+    elif [[ $arch == "Darwin" ]]; then
+        echo "Platform is MacOS"
+        return 2
+    else
         cat << "_EOF"
 ------------------------------------------------------
 WE ONLY SUPPORT LINUX AND MACOS
-please run 'sh onekey.sh mac' if it is MacOS
 ------------------------------------------------------
 _EOF
-        exit 1
     fi
-    return 0
 }
 
 #####################################################
@@ -1264,38 +1267,35 @@ installForMac() {
 case $1 in
     'home')
         set -x
-        checkIsLinux
         commInstdir=$homeInstDir
         execPrefix=""
-        install
+        # auto figure which platform is
+        checkIsLinux
+        retVal=$?
+        if [[ $retVal == 1 ]]; then
+            install
+        elif [[ $retVal == 2 ]]; then
+            installForMac
+        fi
     ;;
 
     'root')
         set -x
         # run fix dependency routine as has root privilege
         # sh -x ./tools/fixosdepends.sh
-        checkIsLinux
         commInstdir=$rootInstDir
         execPrefix=sudo
-        install
-   ;;
-
-    'mac')
-        set -x
+        # auto figure which platform is
         checkIsLinux
-        if [[ $? == 0 ]]; then
-            cat << "_EOF"
-------------------------------------------------------
-YOUR SYSTEM IS LINUX
-please run 'sh onekey.sh [home | root]' instead
-------------------------------------------------------
-_EOF
-            exit 1
+        retVal=$?
+        if [[ $retVal == 1 ]]; then
+            install
+        elif [[ $retVal == 2 ]]; then
+            commInstdir=$homeInstDir
+            execPrefix=""
+            installForMac
         fi
-        commInstdir=$homeInstDir
-        execPrefix=""
-        installForMac
-    ;;
+   ;;
 
     *)
         usage
