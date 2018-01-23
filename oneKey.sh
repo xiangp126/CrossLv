@@ -1099,7 +1099,8 @@ _EOF
     matchStr=':colorscheme'
     replacedTo="mydefault"
     # Linux use :colorscheme mydefault, Mac use darkcoding
-    if [[ $1 == "mac" ]]; then
+    # all use darkcoding
+    if [[ 1 == 1 || $1 == "mac" ]]; then
         replacedTo=darkcoding
     fi
     sed -i --regexp-extended \
