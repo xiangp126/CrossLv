@@ -28,9 +28,9 @@ $ sh oneKey.sh
     sh oneKey.sh [home | root | mac | help]
 
 [DESCRIPTION]
-    home -- build required packages to /Users/xiang/.usr/
+    home -- build required packages to ~/.usr/
     root -- build required packages to /usr/local/
-    mac  -- build required packages to /Users/xiang/.usr/ on MacOS
+    mac  -- build required packages to ~/.usr/ on MacOS
 
 [TROUBLESHOOTING]
     sudo ln -s /bin/bash /bin/sh, ensure /bin/sh was linked to /bin/bash.
@@ -80,78 +80,92 @@ $ sh oneKey.sh [home | root | mac]
 
 ## Example for autoHandle.sh
 ```bash
-> sh autoHandle.sh
+$ sh autoHandle.sh
 [NAME]
-    autoHandle.sh -- auto backup/restore key files of my linux env.
+    autoHandle.sh -- auto backup/restore key files of current linux env.
 
 [SYNOPSIS]
-    sh autoHandle.sh backup | dry | restore | regret | confirm | clean
+    sh autoHandle.sh [backup | restore | track | regret | dry | clean]
 
 [EXAMPLE]
     sh autoHandle.sh backup
     sh autoHandle.sh dry
     sh autoHandle.sh restore
+    sh autoHandle.sh track
 
 [TROUBLESHOOTING]
-    # sh autoHandle.sh can not be excuted.
-    > ll /bin/sh
+    if 'sh autoHandle.sh' can not be excuted.
+    $ ll /bin/sh
     lrwxrwxrwx 1 root root 9 Dec  7 01:00 /bin/sh -> /bin/bash*
     # on some distribution, sh was linked to dash, not bash.
     # you have to excute following command mannually. -f if needed.
-    > ln -s /bin/bash /bin/sh
+    $ ln -s /bin/bash /bin/sh
 
 [DESCRIPTION]
-    backup  -> backup key files under environment to ./widget/
-    dry     -> run restore in dry mode, thought trial/ as ~/
-    restore -> restore key files to environment from ./confirm/
-    regret  -> regret previous 'restore'/'dry' action.
-    confirm -> confirm to copy files in ./widget/ to ./confirm/
-    clean   -> clean ./widget.*/, but reserve main backup dir
+    backup  -> backup key files under environment to ./backup/
+    restore -> restore key files to environment from ./track/
+    track   -> confirm to copy files in ./backup/ to ./track/
+    regret  -> regret previous 'restore' action as medicine
+    dry     -> run restore in dry mode, thought ./dry-restore/ as ~/
+    clean   -> clean ./backup.*/, but reserve main backup dir
 ```
-
-``` bash
-> sh autoUpdate.sh restore
-missing restore directory, please check it first ...
-
-> mkdir haha
-> sh autoUpdate.sh restore
-......
+```bash
+$ sh autoHandle.sh backup
 ------------------------------------------------------
-Finding Files Copied Successfully ...
+START TO BACKUP TRACKED FILES ...
 ------------------------------------------------------
-./trial/./.vimrc
-./trial/./.bashrc
-./trial/./.tmux.conf
-./trial/./.vim/colors/corsair.vim
-./trial/./.vim/bundle/snipMate/snippets/c.snippets
-./trial/./.vim/bundle/snipMate/snippets/cpp.snippets
+cp ~/.vimrc ./backup/vimrc ...
+cp ~/.bashrc ./backup/bashrc ...
+cp ~/.tmux.conf ./backup/tmux.conf ...
+cp ~/.ycm_extra_conf.py ./backup/ycm_extra_conf.py ...
+------------------------------------------------------
+FINDING FILES BACKUPED SUCCESSFULLY ...
+------------------------------------------------------
+./backup/bashrc
+./backup/tmux.conf
+./backup/vimrc
+./backup/ycm_extra_conf.py
 ------------------------------------------------------
 ```
-
-``` bash
-> sh autoUpdate.sh backup
-mkdir -p widget/.vim/colors
-mkdir -p widget/.vim/bundle/snipMate/snippets
-Backup /home/virl/./.vimrc to widget/./_.vimrc ...
-Backup /home/virl/./.bashrc to widget/./_.bashrc ...
-Backup /home/virl/./.tmux.conf to widget/./_.tmux.conf ...
-......
-```
-
-``` bash
-> sh autoUpdate.sh confirm
-start to copying files from widget to ./confirm ...
+```bash
+$ sh autoHandle.sh restore
 ------------------------------------------------------
-find ./confirm -type f
+START TO RESTORE TRACKED FILES ...
 ------------------------------------------------------
-./confirm/_.bashrc
-./confirm/_.vimrc
-./confirm/_corsair.vim
-./confirm/_cpp.snippets
-./confirm/_c.snippets
-./confirm/_.tmux.conf
+[Warning]: found .vimrc under ~, back it up ...
+mv ~/.vimrc ~/.vimrc.old
+cp ./track/vimrc ~/.vimrc
+[Warning]: found .bashrc under ~, back it up ...
+mv ~/.bashrc ~/.bashrc.old
+cp ./track/bashrc ~/.bashrc
+[Warning]: found .tmux.conf under ~, back it up ...
+mv ~/.tmux.conf ~/.tmux.conf.old
+cp ./track/tmux.conf ~/.tmux.conf
+[Warning]: found .ycm_extra_conf.py under ~, back it up ...
+mv ~/.ycm_extra_conf.py ~/.ycm_extra_conf.py.old
+cp ./track/ycm_extra_conf.py ~/.ycm_extra_conf.py
 ------------------------------------------------------
-
+FINDING FILES RESTORED SUCCESSFULLY ...
+------------------------------------------------------
+~/.vimrc
+~/.bashrc
+~/.tmux.conf
+~/.ycm_extra_conf.py
+------------------------------------------------------
+START TO COPYING BASH COMPLETION FILES ...
+------------------------------------------------------
+cp -f ./completion/git-completion.bash ~/.completion.d/
+cp -f ./completion/git_flow.completion.bash ~/.completion.d/
+cp -f ./completion/git_flow_avh.completion.bash ~/.completion.d/
+cp -f ./completion/tmux-completion.bash ~/.completion.d/
+------------------------------------------------------
+FINDING BASH-COMPLETION SUCCESSFULLY COPIED ...
+------------------------------------------------------
+~/.completion.d/git-completion.bash
+~/.completion.d/git_flow.completion.bash
+~/.completion.d/git_flow_avh.completion.bash
+~/.completion.d/tmux-completion.bash
+------------------------------------------------------
 ```
 
 ## Features

@@ -2,7 +2,7 @@
 # only works for Ubuntu by 15 Dec, 2017.
 
 mytools=(
-    "figlet"            
+    "figlet"
 #    "tldr"
     "xclip"
     "shellcheck"
@@ -37,10 +37,10 @@ usage() {
     exeName=${0##*/}
     cat << _EOF
 [NAME]
-    $exeName -- install usefule tools from source-list directly 
+    $exeName -- install usefule tools from source-list directly
         - do not use sudo to run this script
 
-[SYNOPSIS] 
+[SYNOPSIS]
     sh $exeName [install | uninstall | source | help]
 _EOF
     cat << "_EOF"

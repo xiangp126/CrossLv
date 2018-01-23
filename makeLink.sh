@@ -25,7 +25,7 @@ usage() {
     cat << _EOF
 [NAME]
     $exeName -- make linke from $handleDir/
-                           to   $installDir/ 
+                           to   $installDir/
 [USAGE]
     sh $exeName [install | uninstall | help]
 
@@ -40,7 +40,7 @@ makeLink() {
     cd $handleDir
     cat << _EOF
 ------------------------------------------------------
-ENTERING INTO $handleDir/ 
+ENTERING INTO $handleDir/
 ------------------------------------------------------
 _EOF
 
@@ -53,7 +53,7 @@ _EOF
         echo Founding tool $realName to make link ...
         # show message
         cat << _EOF
-ln $para $handleDir/$realName 
+ln $para $handleDir/$realName
             to ${installDir}/${linkName}
 
 _EOF
@@ -70,7 +70,7 @@ rmLink() {
     cd $handleDir
     cat << _EOF
 ------------------------------------------------------
-ENTERING INTO $handleDir/ 
+ENTERING INTO $handleDir/
 ------------------------------------------------------
 _EOF
     handleFiles=`find . -regex ".*.[sh|py]" -type f -executable`
@@ -92,12 +92,12 @@ _EOF
     done
 }
 
-case $1 in 
+case $1 in
     'install')
         makeLink
         exit 0
     ;;
-    
+
     'uninstall')
         rmLink
         exit 0
