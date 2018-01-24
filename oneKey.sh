@@ -1262,25 +1262,39 @@ install() {
     installvim
     installCmake
     installClang
-    compileYcm
+    if [[ $1 == "Ubuntu" ]]; then
+        compileYcmForMac
+    else
+        compileYcm
+    fi
     finalAdjustParams
     installSummary
 }
 
 checkIsLinux() {
     arch=$(uname -s)
-    if [[ $arch == "Linux" ]]; then
-        echo "Platform is Linux"
-        return 1
-    elif [[ $arch == "Darwin" ]]; then
+    if [[ $arch == "Darwin" ]]; then
         echo "Platform is MacOS"
-        return 2
+        return 1
+    elif [[ $arch == "Linux" ]]; then
+		linuxType=`sed -n '1p' /etc/issue | tr -s " " | cut -d " " -f 1`
+        if [[ $linuxType == "Ubuntu" ]]; then
+            echo "Platform is Ubuntu"
+            return 2
+        elif [[ $linuxType == "CentOS" ]]; then
+            echo "Platform is CentOS"
+            return 3
+        elif [[ $linuxType == "Red" ]]; then
+            echo "Platform is Red Hat"
+            return 3
+        fi
     else
         cat << "_EOF"
 ------------------------------------------------------
 WE ONLY SUPPORT LINUX AND MACOS
 ------------------------------------------------------
 _EOF
+        exit 255
     fi
 }
 
@@ -1369,9 +1383,11 @@ case $1 in
         checkIsLinux
         retVal=$?
         if [[ $retVal == 1 ]]; then
-            install
-        elif [[ $retVal == 2 ]]; then
             installForMac
+        elif [[ $retVal == 2 ]]; then
+            install Ubuntu
+        elif [[ $retVal == 3 ]]; then
+            install
         fi
     ;;
 
@@ -1385,11 +1401,13 @@ case $1 in
         checkIsLinux
         retVal=$?
         if [[ $retVal == 1 ]]; then
-            install
-        elif [[ $retVal == 2 ]]; then
             commInstdir=$homeInstDir
             execPrefix=""
             installForMac
+        elif [[ $retVal == 2 ]]; then
+            install Ubuntu
+        elif [[ $retVal == 3 ]]; then
+            install
         fi
    ;;
 
