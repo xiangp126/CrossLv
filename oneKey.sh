@@ -1231,9 +1231,10 @@ _EOF
 installSummary() {
     cat << _EOF
 ------------------------------------------------------
-INSTALLATION SUMMARY
+ONEKEY INSTALLATION SUMMARY
 ------------------------------------------------------
--- OS CPU CORES = $osCpus
+os has cpu(s) = $osCpus
+------------- >
 gcc path = $CC
 cxx path = $CXX
 universal path = $uCtagsInstDir/bin/ctags
@@ -1322,10 +1323,23 @@ installForMac() {
     mkdir -p $downloadPath
     whereIsBrew=`which brew`
     if [[ "$whereIsBrew" == "" ]]; then
-        echo "[Error]: Not found brew, please install homebrew first "
-        exit 1
+        cat << "_EOF"
+------------------------------------------------------
+INSTALLING HOMEBREW INTO SYSTEM
+------------------------------------------------------
+_EOF
+        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+        if [[ $? != 0 ]]; then
+            echo "install homebrew returns error, quitting now "
+            exit 1
+        fi
     fi
     # fix dependency
+        cat << "_EOF"
+------------------------------------------------------
+INSTALLING DEPENDENCY PACKAGES
+------------------------------------------------------
+_EOF
     brew upgrade ctags python python3 cmake vim  astyle -y
     # use gnu-sed as compatible with that under Linux
     brew upgrade gnu-sed --with-default-names -y

@@ -24,7 +24,8 @@ set nocompatible      " be iMproved, required
 "------ :help ins-completion-menu -----
 set pumheight=12      " maximum height of popup menu
 set shell=/bin/bash   " set vim default shell
-set mouse=n           " set mouse for normal mode
+set mouse=a           " set mouse for all mode
+" set mouse=n         " set mouse for normal mode
 set t_Co=256
 set background=dark
 "------ private under ~/.vim/colors -----
@@ -47,6 +48,8 @@ map <leader>6 :buffer6 <CR>
 map <leader>7 :buffer7 <CR>
 map <leader>8 :buffer8 <CR>
 map <leader>9 :buffer9 <CR>
+" unnamed register is same "* register"
+set clipboard=unnamed
 " copy to system clipboard
 noremap <silent> <Leader>y "*y <CR>
 noremap <silent> <Leader>p "*p <CR>
