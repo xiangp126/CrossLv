@@ -7,12 +7,12 @@ mainWd=$(cd $(dirname $0); pwd)
 # primary dir to handle
 baseDir=$HOME
 # files array needed to track
+# ".vim/colors/mydefault.vim"
 bkFiles=(
     ".vimrc"
-    ".bashrc"
     ".tmux.conf"
+    ".bashrc"
     ".ycm_extra_conf.py"
-    # ".vim/colors/mydefault.vim"
 )
 # private colors needed to track
 privateColorDir=$HOME/.vim/colors
@@ -238,11 +238,21 @@ track() {
 COPY TRACKED FILES FROM $backupDir TO $trackDir ...
 ---------------------------------------------------------
 _EOF
-    for file in `find $backupDir -maxdepth 1 -type f`; do
-        fileName=`echo ${file##*/}`
-        echo cp $file $trackDir/$fileName
-        cp $file $trackDir/$fileName
+    cd $mainWd
+    for file in ${bkFiles[@]}; do
+        # .vim/.vimrc => vimrc
+        # delete slash if exist, EXp: .vim/colors/.bashrc
+        backedName=$(echo ${file##*/})  # .bashrc
+        backedName=$(echo ${file#*.})   # bashrc
+        realFile=$backupDir/$backedName
+        if [[ ! -f $realFile ]]; then
+            echo [Warning]: Not found $backedName under $backupDir, omitting it ...
+            continue
+        fi
+        echo cp $realFile $trackDir/
+        cp $realFile $trackDir/
     done
+
     cat << _EOF
 ------------------------------------------------------
 FINDING TRACK FILES TRACKED SUCCESSFULLY ...

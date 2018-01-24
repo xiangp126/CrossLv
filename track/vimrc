@@ -39,6 +39,16 @@ noremap <F10> :set invnumber <CR>
 map <C-L> :buffers <CR>
 map <C-J> :bnext <CR>
 map <C-K> :bprev <CR>
+" map leader NO. switch between buffers
+map <leader>1 :buffer1 <CR>
+map <leader>2 :buffer2 <CR>
+map <leader>3 :buffer3 <CR>
+map <leader>4 :buffer4 <CR>
+map <leader>5 :buffer5 <CR>
+map <leader>6 :buffer6 <CR>
+map <leader>7 :buffer7 <CR>
+map <leader>8 :buffer8 <CR>
+map <leader>9 :buffer9 <CR>
 
 """"""""""""""""""""""""""""""
 " SUMMARIZE PLUGIN MAPPING
@@ -111,6 +121,12 @@ let g:airline#extensions#tabline#formatter = 'unique_tail'
 """"""""""""""""""""""""""""""
 let g:airline_theme = 'base16_grayscale'
 nnoremap <silent> <F6> :AirlineToggle <CR>
+
+""""""""""""""""""""""""""""""
+" CONFIG LEADERF
+""""""""""""""""""""""""""""""
+let g:Lf_StlColorscheme = 'default'
+let g:Lf_CommandMap = {'<C-C>': ['<Esc>', '<C-C>']}
 
 """"""""""""""""""""""""""""""
 " CONFIG TAGBAR
@@ -221,7 +237,7 @@ let g:ycm_cache_omnifunc = 0
 let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
 let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
 "do not delete next line | specify python3 interpreter
-let g:ycm_server_python_interpreter = '/usr/bin/python3'
+let g:ycm_server_python_interpreter = '/usr/local/bin/python3'
 let g:ycm_add_preview_to_completeopt = 0
 let g:ycm_autoclose_preview_window_after_insertion = 0
 let g:ycm_autoclose_preview_window_after_completion = 0

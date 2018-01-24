@@ -370,7 +370,7 @@ _EOF
 
 cat << "_EOF"
 ------------------------------------------------------
-INSTALLING VIM-PLUGIN MANAGER ...
+INSTALLING MANAGER for VIM-PLUGIN ...
 ------------------------------------------------------
 _EOF
     gitClonePath=https://github.com/VundleVim/Vundle.vim
@@ -388,7 +388,7 @@ _EOF
     fi
     cat << "_EOF"
 ------------------------------------------------------
-INSTALLING TMUX-PLUGIN MANAGER
+INSTALLING MANAGER for TMUX-PLUGIN 
 ------------------------------------------------------
 _EOF
     gitClonePath=https://github.com/tmux-plugins/tpm
@@ -404,19 +404,22 @@ _EOF
             exit
         fi
     fi
-
     cat << _EOF
 ------------------------------------------------------
-COPYING SOME KEY FILES FIRST ...
+COPYING .VIMRC FIRST ...
 ------------------------------------------------------
 _EOF
     # let .vimrc in place
     cp ./track/vimrc $baseDir/.vimrc
+    cat << _EOF
+------------------------------------------------------
+COMMENT ON COLORSCHEME IN .VIMRC ...
+------------------------------------------------------
+_EOF
     # comment on color scheme line
     matchStr=':colorscheme'
     sed -i --regexp-extended \
         "s/$matchStr/\" $matchStr/" $HOME/.vimrc
-
     # call sub-functions to install each module
     installBashCompletion
     installExtraBashComp
@@ -459,6 +462,26 @@ _EOF
     sh autoHandle.sh restore
     # load new .bashrc after 'restore' routine
     source $HOME/.bashrc 2> /dev/null
+    # extra install actions for vim plugins
+    installExtraForLeaderF
+}
+
+installExtraForLeaderF() {
+    leaderfInstDir=$HOME/.vim/bundle/LeaderF
+    if [[ ! -d $leaderfInstDir ]]; then
+        return
+    fi
+    cat << "_EOF"
+------------------------------------------------------
+INSTALLING FUZZY MATCHING ALGORITHM FOR LEADERF ...
+------------------------------------------------------
+_EOF
+    cd $leaderfInstDir
+    sh -x ./install.sh
+    retVal=$?
+    if [[ $retVal != 0 ]]; then
+        echo "[Warning]: Install fuzzy for LeaderF return with value $retVal ..."
+    fi
 }
 
 installPython3() {
@@ -1186,6 +1209,7 @@ install() {
         #   - installExtraBashComp
         #   - installTmuxPlugins
         #   - installVimPlugins
+        #       | - installExtraForLeaderF
     installPython3
     installvim
     installCmake
@@ -1265,6 +1289,7 @@ installForMac() {
         #   - installExtraBashComp
         #   - installTmuxPlugins
         #   - installVimPlugins
+        #       | - installExtraForLeaderF
     compileYcmForMac
     finalAdjustParams mac
     # installSummary
