@@ -111,12 +111,12 @@ installBashCompletion() {
     whereIsLibBashComp=`pkg-config --list-all | grep -i bash-completion \
         2> /dev/null`
     if [[ $whereIsLibBashComp != "" ]]; then
-        echo "[Warning]: already has full bash completion installed, omitting this step ..."
+        echo "[Warning]: already has full bash completion installed, omitting this step "
         return
     fi
     cat << "_EOF"
 ------------------------------------------------------
-INSTALLING BASH COMPLETION ...
+INSTALLING BASH COMPLETION
 ------------------------------------------------------
 _EOF
     bashCompInstDir=$commInstdir
@@ -130,7 +130,7 @@ _EOF
     cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $tarName ]]; then
-        echo [Warning]: Tar Ball $tarName already exists, Omitting wget ...
+        echo [Warning]: Tar Ball $tarName already exists, Omitting wget
     else
         wget --no-cookies \
              --no-check-certificate \
@@ -139,7 +139,7 @@ _EOF
              -O $tarName
         # check if wget returns successfully
         if [[ $? != 0 ]]; then
-            echo [Error]: wget returns error, quitting now ...
+            echo [Error]: wget returns error, quitting now
             exit
         fi
     fi
@@ -151,20 +151,20 @@ _EOF
     make -j $osCpus
     # check if make returns successfully
     if [[ $? != 0 ]]; then
-        echo [error]: make returns error, quitting now ...
+        echo [error]: make returns error, quitting now
         exit
     fi
 
     $execPrefix make install
     if [[ $? != 0 ]]; then
-        echo [error]: make install returns error, quitting now ...
+        echo [error]: make install returns error, quitting now
         exit
     fi
 
     checkName=bash_completion.sh
     ls -l $checkName
     if [[ $? != 0 ]]; then
-        echo [error]: $checkName did not exist, quitting now ...
+        echo [error]: $checkName did not exist, quitting now
         exit
     fi
     cp bash_completion.sh $HOME/.bash_completion.sh
@@ -176,7 +176,7 @@ _EOF
 
     ls -l $itDstPkgPath/bash-completion.pc
     if [[ $? != 0 ]]; then
-        echo [error]: copy bash-compile.pc failed, quitting now ...
+        echo [error]: copy bash-compile.pc failed, quitting now
         exit
     fi
 }
@@ -185,7 +185,7 @@ _EOF
 installExtraBashComp() {
     cat << _EOF
 ------------------------------------------------------
-INSTALLING EXTRA BASH COMPLETION FILES ...
+INSTALLING EXTRA BASH COMPLETION FILES
 ------------------------------------------------------
 _EOF
     # extra bash completion dir
@@ -200,11 +200,11 @@ _EOF
 
     cat << _EOF
 ------------------------------------------------------
-FINDING BASH-COMPLETION SUCCESSFULLY COPIED ...
+FINDING BASH-COMPLETION SUCCESSFULLY COPIED
+------------------------------------------------------
+`find $myCompleteDir -type f`
 ------------------------------------------------------
 _EOF
-    find $myCompleteDir -type f
-    echo ------------------------------------------------------
 }
 
 # gcc must support C++11 to compile YCM
@@ -261,7 +261,7 @@ _EOF
 installGcc() {
     cat << "_EOF"
 ------------------------------------------------------
-INSTALLING GCC 5 ...
+INSTALLING GCC 5
 ------------------------------------------------------
 _EOF
     gccInstDir=$commInstdir
@@ -275,7 +275,7 @@ _EOF
     cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $tarName ]]; then
-        echo [Warning]: Tar Ball $tarName already exists, Omitting wget ...
+        echo [Warning]: Tar Ball $tarName already exists, Omitting wget
     else
         wget --no-cookies \
              --no-check-certificate \
@@ -284,7 +284,7 @@ _EOF
              -O $tarName
         # check if wget returns successfully
         if [[ $? != 0 ]]; then
-            echo [Error]: wget returns error, quitting now ...
+            echo [Error]: wget returns error, quitting now
             exit
         fi
     fi
@@ -296,8 +296,8 @@ _EOF
     ./contrib/download_prerequisites
     # for ubuntu has privilege, use apt-get install libmpc-dev fix error.
     if [[ $? != 0 ]]; then
-        echo [error]: fix depends returns error, quitting now ...
-        echo Ubuntu use apt-get install libmpc-dev may fix error ...
+        echo [error]: fix depends returns error, quitting now
+        echo Ubuntu use apt-get install libmpc-dev may fix error
         exit
     fi
     gccBuildDir=build_dir
@@ -311,14 +311,14 @@ _EOF
     make -j $osCpus
     # check if make returns successfully
     if [[ $? != 0 ]]; then
-        echo [error]: make returns error, quitting now ...
+        echo [error]: make returns error, quitting now
         exit
     fi
 
     $execPrefix make install
     # check if make install returns successfully
     if [[ $? != 0 ]]; then
-        echo [error]: make install returns error, quitting now ...
+        echo [error]: make install returns error, quitting now
         exit
     fi
 
@@ -332,7 +332,7 @@ _EOF
 
     cat << _EOF
 ------------------------------------------------------
-INSTALLING GCC DONE ...
+INSTALLING GCC DONE
 `$gccInstDir/bin/gcc --version`
 GCC/C++/G++ path = $gccInstDir/bin/
 ------------------------------------------------------
@@ -341,7 +341,7 @@ _EOF
 
 checkOsCpus() {
     if [[ "`which lscpu 2> /dev/null`" == "" ]]; then
-        echo [Warning]: OS has no lscpu installed, omitting this ...
+        echo [Warning]: OS has no lscpu installed, omitting this
         return
     fi
     # set new os cpus
@@ -363,57 +363,57 @@ installBone() {
     # run backup first of all.
     cat << _EOF
 ------------------------------------------------------
-RUN BACKUP ROUTINE FIRST ...
+RUN BACKUP ROUTINE FIRST
 ------------------------------------------------------
 _EOF
     sh autoHandle.sh backup
 
 cat << "_EOF"
 ------------------------------------------------------
-INSTALLING MANAGER for VIM-PLUGIN ...
+INSTALLING MANAGER for VIM-PLUGIN
 ------------------------------------------------------
 _EOF
     gitClonePath=https://github.com/VundleVim/Vundle.vim
     clonedName=${baseDir}/${tackleDir[0]}/bundle/Vundle.vim
     # check if target directory already exists
     if [[ -d $clonedName ]]; then
-        echo [Warning]: target $clonedName already exists, Omitting clone ...
+        echo [Warning]: target $clonedName already exists, Omitting clone
     else
         git clone $gitClonePath $clonedName
         # check if git returns successfully
         if [[ $? != 0 ]]; then
-            echo "[Error]: git returns error, quitting now ..."
+            echo "[Error]: git returns error, quitting now "
             exit
         fi
     fi
     cat << "_EOF"
 ------------------------------------------------------
-INSTALLING MANAGER for TMUX-PLUGIN 
+INSTALLING MANAGER for TMUX-PLUGIN
 ------------------------------------------------------
 _EOF
     gitClonePath=https://github.com/tmux-plugins/tpm
     clonedName=${baseDir}/${tackleDir[1]}/plugins/tpm
     # check if target directory already exists
     if [[ -d $clonedName ]]; then
-        echo [Warning]: target $clonedName already exists, Omitting clone ...
+        echo [Warning]: target $clonedName already exists, Omitting clone
     else
         git clone $gitClonePath $clonedName
         # check if git returns successfully
         if [[ $? != 0 ]]; then
-            echo "[Error]: git returns error, quitting now ..."
+            echo "[Error]: git returns error, quitting now "
             exit
         fi
     fi
     cat << _EOF
 ------------------------------------------------------
-COPYING .VIMRC FIRST ...
+COPYING .VIMRC FIRST
 ------------------------------------------------------
 _EOF
     # let .vimrc in place
     cp ./track/vimrc $baseDir/.vimrc
     cat << _EOF
 ------------------------------------------------------
-COMMENT ON COLORSCHEME IN .VIMRC ...
+COMMENT ON COLORSCHEME IN .VIMRC
 ------------------------------------------------------
 _EOF
     # comment on color scheme line
@@ -430,7 +430,7 @@ _EOF
 installTmuxPlugins() {
     cat << "_EOF"
 ------------------------------------------------------
-INSTALLING TMUX PLUGINS ...
+INSTALLING TMUX PLUGINS
 ------------------------------------------------------
 _EOF
     tmuxInstallScript=$HOME/.tmux/plugins/tpm/bin/install_plugins
@@ -441,7 +441,7 @@ _EOF
 installVimPlugins() {
     cat << "_EOF"
 ------------------------------------------------------
-INSTALLING VIM PLUGINS ...
+INSTALLING VIM PLUGINS
 ------------------------------------------------------
 _EOF
     cd $mainWd
@@ -456,7 +456,7 @@ _EOF
 
     cat << "_EOF"
 ------------------------------------------------------
-RUN RESTORE ROUTINE NOW ...
+RUN RESTORE ROUTINE NOW
 ------------------------------------------------------
 _EOF
     sh autoHandle.sh restore
@@ -473,14 +473,14 @@ installExtraForLeaderF() {
     fi
     cat << "_EOF"
 ------------------------------------------------------
-INSTALLING FUZZY MATCHING ALGORITHM FOR LEADERF ...
+INSTALLING FUZZY MATCHING ALGORITHM FOR LEADERF
 ------------------------------------------------------
 _EOF
     cd $leaderfInstDir
     sh -x ./install.sh
     retVal=$?
     if [[ $retVal != 0 ]]; then
-        echo "[Warning]: Install fuzzy for LeaderF return with value $retVal ..."
+        echo "[Warning]: Install fuzzy for LeaderF return with value $retVal "
     fi
 }
 
@@ -504,9 +504,9 @@ installPython3() {
 
             # check if any error occurs
             if [[ "$libPython3Path" == "" || "$?" != 0  ]]; then
-                echo "[Warning]: locate checking python3 path/lib failed, start find checking ..."
+                echo "[Warning]: locate checking python3 path/lib failed, start find checking "
             else
-                echo [Warning]: python3/lib already installed, omitting this step ...
+                echo [Warning]: python3/lib already installed, omitting this step
                 return
             fi
         fi
@@ -525,9 +525,9 @@ installPython3() {
 
             # check if any error occurs
             if [[ $? != 0 ]]; then
-                echo "[Warning]: find checking python3 path/lib failed, re-install python3 ..."
+                echo "[Warning]: find checking python3 path/lib failed, re-install python3 "
             else
-                echo [Warning]: python3/lib already installed, omitting this step ...
+                echo [Warning]: python3/lib already installed, omitting this step
                 return
             fi
         fi
@@ -535,7 +535,7 @@ installPython3() {
 
     cat << "_EOF"
 ------------------------------------------------------
-INSTALLING PYTHON3 ...
+INSTALLING PYTHON3
 ------------------------------------------------------
 _EOF
     python3InstDir=$commInstdir
@@ -549,7 +549,7 @@ _EOF
     cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $tarName ]]; then
-        echo [Warning]: Tar Ball $tarName already exists, Omitting wget ...
+        echo [Warning]: Tar Ball $tarName already exists, Omitting wget
     else
         wget --no-cookies \
              --no-check-certificate \
@@ -558,13 +558,13 @@ _EOF
              -O $tarName
         # check if wget returns successfully
         if [[ $? != 0 ]]; then
-            echo [Error]: wget returns error, quitting now ...
+            echo [Error]: wget returns error, quitting now
             exit
         fi
     fi
     # check if already untared
     if [[ -d $untarName ]]; then
-        echo [Warning]: found $untarName, omitting this step ...
+        echo [Warning]: found $untarName, omitting this step
     else
         tar -zxv -f $tarName
     fi
@@ -574,26 +574,26 @@ _EOF
     make -j $osCpus
     # check if make returns successfully
     if [[ $? != 0 ]]; then
-        echo [Error]: make returns error, quitting now ...
+        echo [Error]: make returns error, quitting now
         exit
     fi
 
     $execPrefix make install
     # check if make returns successfully
     if [[ $? != 0 ]]; then
-        echo [Error]: make install returns error, quitting now ...
+        echo [Error]: make install returns error, quitting now
         exit
     fi
     python3Path=$python3InstDir/bin/python3
     libPython3Path=$python3InstDir/lib/libpython3.6m.so
     if [[ ! -f $libPython3Path ]]; then
-        echo [Error]: can not find lib-python3, quitting now ...
+        echo [Error]: can not find lib-python3, quitting now
         exit
     fi
 
     cat << _EOF
 ------------------------------------------------------
-INSTALLING python3 DONE ...
+INSTALLING python3 DONE
 `$python3InstDir/bin/python3 --version`
 python3 path = $python3InstDir/bin/python3
 libpython3 path = $libPython3Path
@@ -605,14 +605,14 @@ installvim() {
     # check if vim 8 was installed
     checkCmd=`vim --version | head -n 1 | grep -i "Vi IMproved 8" 2> /dev/null`
     if [[ "$checkCmd" != "" ]]; then
-        echo "[Warning]: Vim 8 was already installed, omitting this step ..."
+        echo "[Warning]: Vim 8 was already installed, omitting this step "
         whereIsVim=`which vim`
         vimInstDir=`echo ${whereIsVim%/bin*}`
         return
     fi
     cat << "_EOF"
 ------------------------------------------------------
-INSTALLING NEWLY VIM VERSION 8 ...
+INSTALLING NEWLY VIM VERSION 8
 ------------------------------------------------------
 _EOF
     vimInstDir=$commInstdir
@@ -626,12 +626,12 @@ _EOF
     cd $downloadPath
     # check if already has this tar ball.
     if [[ -d $clonedName ]]; then
-        echo [Warning]: target $clonedName/ already exists, Omitting now ...
+        echo [Warning]: target $clonedName/ already exists, Omitting now
     else
         git clone ${vimClonePath} $clonedName
         # check if git clone returns successfully
         if [[ $? != 0 ]]; then
-            echo [Error]: git clone returns error, quitting now ...
+            echo [Error]: git clone returns error, quitting now
             exit
         fi
     fi
@@ -645,7 +645,7 @@ _EOF
     python2Config=`python2-config --configdir 2> /dev/null`
     python3Config=`python3-config --configdir 2> /dev/null`
     if [[ "$python2Config" == "" && "$python3Config" == "" ]]; then
-        echo [Error]: Not found python2 or python3, please install either of them ...
+        echo [Error]: Not found python2 or python3, please install either of them
         exit
     fi
 
@@ -664,7 +664,7 @@ _EOF
     make -j $checkOsCpus
     # check if make returns successfully
     if [[ $? != 0 ]]; then
-        echo [Error]: make returns error, try below commands ...
+        echo [Error]: make returns error, try below commands
         echo "sudo yum -y install perl-devel perl-ExtUtils-Embed"
         echo or "sudo apt-get install perl-* lib32ncursesw5-dev"
         exit
@@ -673,7 +673,7 @@ _EOF
 
     cat << _EOF
 ------------------------------------------------------
-INSTALLING VIM DONE ...
+INSTALLING VIM DONE
 `$vimInstDir/bin/vim --version`
 vim path = $vimInstDir/bin/
 ------------------------------------------------------
@@ -696,13 +696,13 @@ installCmake() {
         basicCmakeV=3.0
         # if installed cmake already meets the requirement
         if [[ `echo "$cmakeV >= $basicCmakeV" | bc` -eq 1 ]]; then
-            echo "[Warning]: system cmake $cmakeVersion  already >= $basicCmakeV ..."
+            echo "[Warning]: system cmake $cmakeVersion  already >= $basicCmakeV "
             return
         fi
     fi
     cat << "_EOF"
 ------------------------------------------------------
-INSTALLING CMAKE 3.10 ...
+INSTALLING CMAKE 3.10
 ------------------------------------------------------
 _EOF
     cmakeInstDir=$commInstdir
@@ -716,7 +716,7 @@ _EOF
     cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $tarName ]]; then
-        echo [Warning]: Tar Ball $tarName already exists, Omitting wget ...
+        echo [Warning]: Tar Ball $tarName already exists, Omitting wget
     else
         wget --no-cookies \
              --no-check-certificate \
@@ -725,7 +725,7 @@ _EOF
              -O $tarName
         # check if wget returns successfully
         if [[ $? != 0 ]]; then
-            echo [Error]: wget returns error, quitting now ...
+            echo [Error]: wget returns error, quitting now
             exit
         fi
     fi
@@ -736,14 +736,14 @@ _EOF
     make -j $osCpus
     # check if make returns successfully
     if [[ $? != 0 ]]; then
-        echo [Error]: make returns error, quitting now ...
+        echo [Error]: make returns error, quitting now
         exit
     fi
     $execPrefix make install
     cmakePath=$cmakeInstDir/bin/cmake
     cat << _EOF
 ------------------------------------------------------
-INSTALLING cmake 3 DONE ...
+INSTALLING cmake 3 DONE
 `$cmakeInstDir/bin/cmake --version`
 cmake path = $cmakeInstDir/bin/
 ------------------------------------------------------
@@ -772,14 +772,14 @@ installClang() {
         fi
         libClangPath=`find $pathLoc -name libclang.so | head -n 1 2> /dev/null`
         if [[ "$libClangPath" != "" ]]; then
-            echo "[Warning]: $libClangName was already installed, omitting this step ..."
+            echo "[Warning]: $libClangName was already installed, omitting this step "
             return
         fi
     done
 
     cat << "_EOF"
 ------------------------------------------------------
-PREPARE TO INSTALL CLANG 5 ...
+PREPARE TO INSTALL CLANG 5
 ------------------------------------------------------
 _EOF
     # clang version, change it if you need other version
@@ -788,7 +788,7 @@ _EOF
     $execPrefix mkdir -p $clangInstDir
     cat << "_EOF"
 ------------------------------------------------------
-DOWNLOADING LLVM 5 ...
+DOWNLOADING LLVM 5
 ------------------------------------------------------
 _EOF
     # comm attribute to get source 'llvm'
@@ -801,7 +801,7 @@ _EOF
     cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $llvmTarName ]]; then
-        echo [Warning]: Tar Ball $llvmTarName already exists, Omitting wget ...
+        echo [Warning]: Tar Ball $llvmTarName already exists, Omitting wget
     else
         wget --no-cookies \
              --no-check-certificate \
@@ -810,19 +810,19 @@ _EOF
              -O $llvmTarName
         # check if wget returns successfully
         if [[ $? != 0 ]]; then
-            echo [Error]: wget returns error, quitting now ...
+            echo [Error]: wget returns error, quitting now
             exit
         fi
     fi
     # check if dir already exist
     if [[ -d $llvmUntarName ]]; then
-        echo [Warning]: $llvmUntarName already exist, Omitting untar ...
+        echo [Warning]: $llvmUntarName already exist, Omitting untar
     else
         tar -xv -f $llvmTarName
     fi
     cat << "_EOF"
 ------------------------------------------------------
-DOWNLOADING CFE 5 ...
+DOWNLOADING CFE 5
 ------------------------------------------------------
 _EOF
     # comm attribute to get source 'cfe'
@@ -835,7 +835,7 @@ _EOF
     cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $cfeTarName ]]; then
-        echo [Warning]: Tar Ball $cfeTarName already exists, Omitting wget ...
+        echo [Warning]: Tar Ball $cfeTarName already exists, Omitting wget
     else
         wget --no-cookies \
              --no-check-certificate \
@@ -844,20 +844,20 @@ _EOF
              -O $cfeTarName
         # check if wget returns successfully
         if [[ $? != 0 ]]; then
-            echo [Error]: wget returns error, quitting now ...
+            echo [Error]: wget returns error, quitting now
             exit
         fi
     fi
     # check if dir already exist
     if [[ -d $cfeUntarName ]]; then
-        echo [Warning]: $cfeUntarName already exist, Omitting untar ...
+        echo [Warning]: $cfeUntarName already exist, Omitting untar
     else
         mkdir -p $cfeUntarName
         tar -xv -f $cfeTarName --strip-components=1 -C $cfeUntarName
     fi
     cat << "_EOF"
 ------------------------------------------------------
-DOWNLOADING COMPILER-RT 5 ...
+DOWNLOADING COMPILER-RT 5
 ------------------------------------------------------
 _EOF
     # comm attribute to get source 'compiler-rt'
@@ -870,7 +870,7 @@ _EOF
     cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $crtTarName ]]; then
-        echo [Warning]: Tar Ball $crtTarName already exists, Omitting wget ...
+        echo [Warning]: Tar Ball $crtTarName already exists, Omitting wget
     else
         wget --no-cookies \
              --no-check-certificate \
@@ -879,20 +879,20 @@ _EOF
              -O $crtTarName
         # check if wget returns successfully
         if [[ $? != 0 ]]; then
-            echo [Error]: wget returns error, quitting now ...
+            echo [Error]: wget returns error, quitting now
             exit
         fi
     fi
     # check if dir already exist
     if [[ -d $crtUntarName ]]; then
-        echo [Warning]: $crtUntarName already exist, Omitting untar ...
+        echo [Warning]: $crtUntarName already exist, Omitting untar
     else
         mkdir -p $crtUntarName
         tar -xv -f $crtTarName --strip-components=1 -C $crtUntarName
     fi
     cat << "_EOF"
 ------------------------------------------------------
-DOWNLOADING CLANG-TOOLS-EXTRA 5 ...
+DOWNLOADING CLANG-TOOLS-EXTRA 5
 ------------------------------------------------------
 _EOF
 # CMake Error at tools/clang/tools/extra/cmake/Modules/AddCompilerRT.cmake:58 (add_library):
@@ -914,7 +914,7 @@ _EOF
     cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $cteTarName ]]; then
-        echo [Warning]: Tar Ball $cteTarName already exists, Omitting wget ...
+        echo [Warning]: Tar Ball $cteTarName already exists, Omitting wget
     else
         wget --no-cookies \
              --no-check-certificate \
@@ -923,20 +923,20 @@ _EOF
              -O $cteTarName
         # check if wget returns successfully
         if [[ $? != 0 ]]; then
-            echo [Error]: wget returns error, quitting now ...
+            echo [Error]: wget returns error, quitting now
             exit
         fi
     fi
     # check if dir already exist
        # if [[ -d $cteUntarName ]]; then
-           # echo [Warning]: $cteUntarName already exist, Omitting untar ...
+           # echo [Warning]: $cteUntarName already exist, Omitting untar
        # else
            # mkdir -p $cteUntarName
            # tar -xv -f $crtTarName --strip-components=1 -C $cteUntarName
        # fi
     cat << "_EOF"
 ------------------------------------------------------
-START TO COMPILE CLANG 5 ...
+START TO COMPILE CLANG 5
 ------------------------------------------------------
 _EOF
     cd $llvmUntarName
@@ -961,7 +961,7 @@ _EOF
     make -j $osCpus
     # check if make returns successfully
     if [[ $? != 0 ]]; then
-        echo [Error]: make returns error, quitting now ...
+        echo [Error]: make returns error, quitting now
         exit
     fi
 
@@ -979,12 +979,12 @@ _EOF
 
     # check if make install/cp returns successfully
     if [[ $? != 0 ]]; then
-        echo [Error]: make install or cp $libClangPath returns error, quitting now ...
+        echo [Error]: make install or cp $libClangPath returns error, quitting now
         exit
     fi
     cat << _EOF
 ------------------------------------------------------
-INSTALLING LLVM DONE ...
+INSTALLING LLVM DONE
 libclang.so path = $libClangPath
 ------ suggest (need not do)
 cd $HOME/.vim/bundle/YouCompleteMe/third_party/ycmd
@@ -999,7 +999,7 @@ compileYcm() {
     # cmakePath=`which cmake 2> /dev/null`
     cat << "_EOF"
 ------------------------------------------------------
-COMPILING YOUCOMPLETEME ...
+COMPILING YOUCOMPLETEME
 ------------------------------------------------------
 _EOF
     # comm attribute for getting source ycm
@@ -1007,12 +1007,12 @@ _EOF
     repoName=YouCompleteMe
     ycmDir=$HOME/.vim/bundle/YouCompleteMe
     if [[ -d $ycmDir ]]; then
-        echo [Warning]: already has YCM repo cloned, omitting now ...
+        echo [Warning]: already has YCM repo cloned, omitting now
     else
         git clone $repoLink/$repoName $ycmDir
         # check if clone returns successfully
         if [[ $? != 0 ]]; then
-            echo [Error]: git clone returns error, quitting now ...
+            echo [Error]: git clone returns error, quitting now
             exit
         fi
     fi
@@ -1042,19 +1042,19 @@ _EOF
                $ycmDir/third_party/ycmd/cpp
     # check if install returns successfully
     if [[ $? != 0 ]]; then
-        echo "cmake -G "Unix Makefiles" error, quitting now ..."
+        echo "cmake -G "Unix Makefiles" error, quitting now "
         exit
     fi
     cat << "_EOF"
 ------------------------------------------------------
-BUILDING YCM_CORE NOW ...
+BUILDING YCM_CORE NOW
 ------------------------------------------------------
 _EOF
     # $cmakePath --build . --target ycm_core
     make -j $osCpus
     # check if make returns successfully
     if [[ $? != 0 ]]; then
-        echo "[Error]: make ycm_core error, quitting now ..."
+        echo "[Error]: make ycm_core error, quitting now "
         exit
     fi
 
@@ -1111,7 +1111,7 @@ _EOF
     # check return status
     retVal=$?
     if [[ $retVal != 0 ]]; then
-        echo "[Warning]: replace python3 interpreter path returns $retVal ..."
+        echo "[Warning]: replace python3 interpreter path returns $retVal "
     fi
 
     cat << _EOF
@@ -1131,7 +1131,7 @@ _EOF
     # check return status
     retVal=$?
     if [[ $retVal != 0 ]]; then
-        echo "[Warning]: replace color scheme returns $retVal ..."
+        echo "[Warning]: replace color scheme returns $retVal "
     fi
 
     # find c++ header include directory
@@ -1154,7 +1154,7 @@ _EOF
     # check return status
     retVal=$?
     if [[ $retVal != 0 ]]; then
-        echo "[Warning]: replace c++ header directory returns $retVal ..."
+        echo "[Warning]: replace c++ header directory returns $retVal "
     fi
 
     # only mac needed, for mac not support --color=auto
@@ -1173,7 +1173,7 @@ _EOF
     # check return status
     retVal=$?
     if [[ $retVal != 0 ]]; then
-        echo "[Warning]: deleting --color=auto returns $retVal ..."
+        echo "[Warning]: deleting --color=auto returns $retVal "
     fi
 
 cat << "_EOF"
@@ -1243,7 +1243,7 @@ _EOF
 compileYcmForMac() {
     cat << "_EOF"
 ------------------------------------------------------
-COMPILING YOUCOMPLETEME ...
+COMPILING YOUCOMPLETEME
 ------------------------------------------------------
 _EOF
     # comm attribute for getting source ycm
@@ -1251,12 +1251,12 @@ _EOF
     repoName=YouCompleteMe
     ycmDir=$HOME/.vim/bundle/YouCompleteMe
     if [[ -d $ycmDir ]]; then
-        echo [Warning]: already has YCM repo cloned, omitting now ...
+        echo [Warning]: already has YCM repo cloned, omitting now
     else
         git clone $repoLink/$repoName $ycmDir
         # check if clone returns successfully
         if [[ $? != 0 ]]; then
-            echo [Error]: git clone returns error, quitting now ...
+            echo [Error]: git clone returns error, quitting now
             exit
         fi
     fi
@@ -1266,7 +1266,7 @@ _EOF
     python3 ./install.py --clang-completer --system-libclang
 
     if [[ $? != 0 ]]; then
-        echo "install YCM returns error, quitting now ..."
+        echo "install YCM returns error, quitting now "
         exit 1
     fi
 }
@@ -1275,7 +1275,7 @@ installForMac() {
     mkdir -p $downloadPath
     whereIsBrew=`which brew`
     if [[ "$whereIsBrew" == "" ]]; then
-        echo "[Error]: Not fould brew, please install homebrew first ..."
+        echo "[Error]: Not found brew, please install homebrew first "
         exit 1
     fi
     # fix dependency
