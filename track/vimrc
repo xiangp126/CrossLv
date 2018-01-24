@@ -35,6 +35,8 @@ set background=dark
 """"""""""""""""""""""""""""""
 set pastetoggle=<F12>
 noremap <F10> :set invnumber <CR>
+" move among buffers with CTRL, case ignorance
+" map <C-L> :buffers <CR>
 " map leader NO. switch between buffers
 map <leader>1 :buffer1 <CR>
 map <leader>2 :buffer2 <CR>
@@ -46,15 +48,11 @@ map <leader>7 :buffer7 <CR>
 map <leader>8 :buffer8 <CR>
 map <leader>9 :buffer9 <CR>
 " copy to system clipboard
-noremap <silent> <Leader>y "*y <CR> 
+noremap <silent> <Leader>y "*y <CR>
 noremap <silent> <Leader>p "*p <CR>
 noremap <silent> <Leader>Y "+y <CR>
 noremap <silent> <Leader>P "+p <CR>
 
-" move among buffers with CTRL, case ignorance
-map <C-L> :buffers <CR>
-map <C-J> :bnext <CR>
-map <C-K> :bprev <CR>
 """"""""""""""""""""""""""""""
 " SUMMARIZE PLUGIN MAPPING
 """"""""""""""""""""""""""""""
