@@ -49,6 +49,7 @@ _EOF
 checkOsCpus() {
     if [[ "`which lscpu 2> /dev/null`" == "" ]]; then
         echo [Warning]: OS has no lscpu installed, omitting this ...
+        osCpus=""
         return
     fi
     #set new os cpus
@@ -90,11 +91,12 @@ _EOF
     # if need checkout
     git checkout $checkoutVersion
 	# clean before ./configure
-	make distclean
+	# make distclean
     python2Config=`python2-config --configdir 2> /dev/null`
     python3Config=`python3-config --configdir 2> /dev/null`
     ./configure --prefix=$vimInstDir \
                 --with-features=huge \
+                --with-x \
                 --enable-multibyte \
                 --enable-rubyinterp=yes \
                 --enable-pythoninterp=yes \
