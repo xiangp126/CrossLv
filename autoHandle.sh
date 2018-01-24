@@ -71,7 +71,7 @@ backup() {
     mkdir -p $backupDir
     cat << _EOF
 ------------------------------------------------------
-START TO BACKUP TRACKED FILES ...
+START TO BACKUP TRACKED FILES
 ------------------------------------------------------
 _EOF
     # test if backupDir was trully not empty, backup it first if so.
@@ -86,14 +86,14 @@ _EOF
     for file in ${bkFiles[@]}; do
         realFile=$baseDir/$file
         if [[ ! -f $realFile ]]; then
-            echo [Warning]: Not found $file under $baseDir, omitting it ...
+            echo [Warning]: Not found $file under $baseDir, omitting it
             continue
         fi
         # .vim/.vimrc => vimrc
         # delete slash if exist, EXp: .vim/colors/.bashrc
         backedName=$(echo ${file##*/})  # .bashrc
         backedName=$(echo ${file#*.})   # bashrc
-        echo cp $realFile $backupDir/$backedName ...
+        echo cp $realFile $backupDir/$backedName
         cp $realFile $backupDir/$backedName
     done
 
@@ -107,7 +107,7 @@ _EOF
     fi
     cat << _EOF
 ---------------------------------------------------------
-START TO BACKUP PRIVATE COLORS ...
+START TO BACKUP PRIVATE COLORS
 ---------------------------------------------------------
 _EOF
     for file in `find $privateColorDir -regex ".*.vim$"`; do
@@ -116,7 +116,7 @@ _EOF
     done
     cat << _EOF
 ------------------------------------------------------
-FINDING FILES BACKUPED SUCCESSFULLY ...
+FINDING FILES UNDER BACKUP DIRECTORY $backupDir/
 ------------------------------------------------------
 $(find $backupDir -maxdepth 1 -type f 2> /dev/null)
 $(find $backupDir -mindepth 2 -type f 2> /dev/null)
@@ -130,20 +130,20 @@ restore() {
     restoreDir=$1
     # check if exist trackDir && restoreDir.
     if [ ! -d $trackDir ]; then
-        echo [Error]: missing track $trackDir/, please check it first ...
+        echo [Error]: missing track $trackDir/, please check it first
         exit
     fi
     if [[ "$restoreDir" != "$baseDir" ]]; then
         mkdir -p $restoreDir
     else
         if [ ! -d $baseDir ]; then
-            echo [FatalError]: missing baseDir $baseDir/, please check it first ...
+            echo [FatalError]: missing baseDir $baseDir/, please check it first
             exit 1
         fi
     fi
     cat << _EOF
 ------------------------------------------------------
-INSTALLING TRACKED FILES TO $restoreDir/ ...
+INSTALLING TRACKED FILES TO $restoreDir/
 ------------------------------------------------------
 _EOF
     copiedPathArray=()
@@ -155,13 +155,13 @@ _EOF
         backedName=$(echo ${file##*/})  # .bashrc
         backedName=$(echo ${file#*.})   # bashrc
         if [[ ! -f $trackDir/$backedName ]]; then
-            echo "[Warning]: Not found $backedName under $trackDir, omitting $backedName ..."
+            echo "[Warning]: Not found $backedName under $trackDir, omitting $backedName "
             continue
         fi
         # move original file to bk before restored
         realFile=$restoreDir/$file
         if [[ -f $realFile ]]; then
-            # echo [Warning]: found $file under $restoreDir, back it up first ...
+            # echo [Warning]: found $file under $restoreDir, back it up first
             realBackedFile=$restoreDir/$file.$bkPostfix
             echo mv $realFile $realBackedFile
             mv $realFile $realBackedFile
@@ -174,7 +174,7 @@ _EOF
 
     cat << _EOF
 ------------------------------------------------------
-INSTALLING VIM-COLORS TO $restoreDir/ ...
+INSTALLING VIM-COLORS TO $restoreDir/
 ------------------------------------------------------
 _EOF
     cd $mainWd
@@ -194,7 +194,7 @@ _EOF
 
     cat << _EOF
 ------------------------------------------------------
-FINDING FILES RESTORED SUCCESSFULLY ...
+FINDING FILES RESTORED SUCCESSFULLY
 ------------------------------------------------------
 _EOF
     for file in ${copiedPathArray[@]}; do
@@ -208,7 +208,7 @@ regret() {
     regretDir=$1
     # check if exist trackDir && regretDir.
     if [ ! -d ${regretDir} ]; then
-        echo [Error]: missing regret $regretDir/, please check it first ...
+        echo [Error]: missing regret $regretDir/, please check it first
         exit
     fi
 
@@ -216,7 +216,7 @@ regret() {
     for file in ${bkFiles[@]}; do
         realBkFile=$regretDir/$file.$bkPostfix
         if [[ ! -f $realBkFile ]]; then
-            echo [Warning]: not found $file.$bkPostfix under $regretDir, omitting it ...
+            echo [Warning]: not found $file.$bkPostfix under $regretDir, omitting it
             continue
         fi
         echo mv $realBkFile $regretDir/$file
@@ -235,7 +235,7 @@ track() {
     fi
     cat << _EOF
 ---------------------------------------------------------
-COPY TRACKED FILES FROM $backupDir TO $trackDir ...
+UPDATING TRACKED FILES FROME BACKUP
 ---------------------------------------------------------
 _EOF
     cd $mainWd
@@ -246,7 +246,7 @@ _EOF
         backedName=$(echo ${file#*.})   # bashrc
         realFile=$backupDir/$backedName
         if [[ ! -f $realFile ]]; then
-            echo [Warning]: Not found $backedName under $backupDir, omitting it ...
+            echo [Warning]: Not found $backedName under $backupDir, omitting it
             continue
         fi
         echo cp $realFile $trackDir/
@@ -255,7 +255,7 @@ _EOF
 
     cat << _EOF
 ------------------------------------------------------
-FINDING TRACK FILES TRACKED SUCCESSFULLY ...
+FINDING FILES UNDER TRACK DIRECTORY $trackDir/
 ------------------------------------------------------
 $(find $trackDir -type f 2> /dev/null)
 _EOF
@@ -268,7 +268,7 @@ _EOF
     fi
     cat << _EOF
 ---------------------------------------------------------
-START TO TRACK PRIVATE COLORS ...
+UPDATING PRIVATE COLORS FROM BACKUP
 ---------------------------------------------------------
 _EOF
     for file in `find $bkColorDir -regex ".*.vim$"`; do
@@ -278,7 +278,7 @@ _EOF
 
     cat << _EOF
 ------------------------------------------------------
-FINDING COLORS TRACKED SUCCESSFULLY ...
+FINDING COLORS UNDER TRACK COLOR $trackedColorDir/
 ------------------------------------------------------
 $(find $trackedColorDir -type f 2> /dev/null)
 ------------------------------------------------------

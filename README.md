@@ -78,6 +78,16 @@ $ sh oneKey.sh [home | root]
 
 ## Example for autoHandle.sh
 ```bash
+comment on/off one of them to add/remove from tracking
+bkFiles=(
+    ".vimrc"
+    ".tmux.conf"
+    ".bashrc"
+    ".ycm_extra_conf.py"
+)
+```
+
+```bash
 $ sh autoHandle.sh
 [NAME]
     autoHandle.sh -- auto backup/restore key files of current linux env.
