@@ -35,10 +35,6 @@ set background=dark
 """"""""""""""""""""""""""""""
 set pastetoggle=<F12>
 noremap <F10> :set invnumber <CR>
-" move among buffers with CTRL, case ignorance
-map <C-L> :buffers <CR>
-map <C-J> :bnext <CR>
-map <C-K> :bprev <CR>
 " map leader NO. switch between buffers
 map <leader>1 :buffer1 <CR>
 map <leader>2 :buffer2 <CR>
@@ -49,7 +45,16 @@ map <leader>6 :buffer6 <CR>
 map <leader>7 :buffer7 <CR>
 map <leader>8 :buffer8 <CR>
 map <leader>9 :buffer9 <CR>
+" copy to system clipboard
+noremap <silent> <Leader>y "*y <CR> 
+noremap <silent> <Leader>p "*p <CR>
+noremap <silent> <Leader>Y "+y <CR>
+noremap <silent> <Leader>P "+p <CR>
 
+" move among buffers with CTRL, case ignorance
+map <C-L> :buffers <CR>
+map <C-J> :bnext <CR>
+map <C-K> :bprev <CR>
 """"""""""""""""""""""""""""""
 " SUMMARIZE PLUGIN MAPPING
 """"""""""""""""""""""""""""""
@@ -72,24 +77,23 @@ Plugin 'VundleVim/Vundle.vim'
 " Plugin 'davidhalter/jedi'
 " Plugin 'tell-k/vim-autopep8'
 " Plugin 'Raimondi/delimitMate'
-Plugin 'Chiel92/vim-autoformat'
-Plugin 'Yggdroot/LeaderF'
+" Plugin 'Chiel92/vim-autoformat'
 "------ NEW PLUGINS -----
 Plugin 'scrooloose/nerdtree'
 Plugin 'scrooloose/nerdcommenter'
 Plugin 'jiangmiao/auto-pairs'
 Plugin 'majutsushi/tagbar'
 Plugin 'Yggdroot/indentLine'
+Plugin 'Yggdroot/LeaderF'
 "------ BEAUTIFY LINE -----
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
-"------ THREE ALGOTHER -----
+"------ CODE EXPAND -----
 Plugin 'ervandew/supertab'
 Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
-"------ END OF THREE  -----
+"------ CODE COMPLETION -----
 Plugin 'Valloric/YouCompleteMe'
-" complete parameter after type '('
 Plugin 'tenfyzhong/CompleteParameter.vim'
 
 call vundle#end()            " required
@@ -127,6 +131,10 @@ nnoremap <silent> <F6> :AirlineToggle <CR>
 """"""""""""""""""""""""""""""
 let g:Lf_StlColorscheme = 'default'
 let g:Lf_CommandMap = {'<C-C>': ['<Esc>', '<C-C>']}
+map <leader>F :LeaderfFunction <CR>
+map <leader>Fa :LeaderfFunctionAll <CR>
+map <leader>L :LeaderfLine <CR>
+map <leader>La :LeaderfLineAll <CR>
 
 """"""""""""""""""""""""""""""
 " CONFIG TAGBAR

@@ -21,6 +21,8 @@ execPrefix=""
 # required packages install info
 # gcc install
 gccInstDir=$commInstdir
+# universal ctags install
+uCtagsInstDir=$commInstdir
 # python3 install
 python3InstDir=$commInstdir
 python3Path=`which python3 2> /dev/null`
@@ -342,6 +344,8 @@ _EOF
 checkOsCpus() {
     if [[ "`which lscpu 2> /dev/null`" == "" ]]; then
         echo [Warning]: OS has no lscpu installed, omitting this
+        # mac did not has lscpu, so remomve [job] restrict
+        osCpus=""
         return
     fi
     # set new os cpus
@@ -481,6 +485,47 @@ _EOF
     retVal=$?
     if [[ $retVal != 0 ]]; then
         echo "[Warning]: Install fuzzy for LeaderF return with value $retVal "
+    fi
+}
+
+installuCtags() {
+    # check if already installed
+    checkCmd=`ctags --version | grep -i universal`
+    if [[ $checkCmd != "" ]]; then
+        return
+    fi
+    cat << "_EOF"
+------------------------------------------------------
+INSTALLING UNIVERSAL CTAGS
+------------------------------------------------------
+_EOF
+    uCtagsInstDir=$commInstdir
+    cd $downloadPath
+    clonedName=ctags
+    if [[ -d "$clonedName" ]]; then
+        echo [Warning]: $clonedName/ already exists, omitting this step
+    else
+        git clone https://github.com/universal-ctags/ctags
+        # check if git clone returns successfully
+        if [[ $? != 0 ]]; then
+            echo [Error]: git clone returns error, quiting now
+            exit
+        fi
+    fi
+    cd $clonedName
+    ./autogen.sh
+    ./configure --prefix=$uCtagsInstDir
+    make -j $osCpus
+    # check if make returns successfully
+    if [[ $? != 0 ]]; then
+        echo [Error]: make returns error, quitting now ...
+        exit
+    fi
+    $execPrefix make install
+    # check if make returns successfully
+    if [[ $? != 0 ]]; then
+        echo [Error]: make install returns error, quitting now ...
+        exit 255
     fi
 }
 
@@ -1191,6 +1236,7 @@ INSTALLATION SUMMARY
 -- OS CPU CORES = $osCpus
 gcc path = $CC
 cxx path = $CXX
+universal path = $uCtagsInstDir/bin/ctags
 python3 path = $python3Path
 vim path = $vimInstDir/bin/vim
 cmake path = $cmakeInstDir/bin/cmake
@@ -1210,6 +1256,7 @@ install() {
         #   - installTmuxPlugins
         #   - installVimPlugins
         #       | - installExtraForLeaderF
+    installuCtags
     installPython3
     installvim
     installCmake
@@ -1279,10 +1326,10 @@ installForMac() {
         exit 1
     fi
     # fix dependency
-    brew upgrade ctags python python3 cmake vim -y
+    brew upgrade ctags python python3 cmake vim  astyle -y
     # use gnu-sed as compatible with that under Linux
     brew upgrade gnu-sed --with-default-names -y
-
+    # begin install routine
     checkOsCpus
     installBone
         # | - installBashCompletion
@@ -1290,6 +1337,7 @@ installForMac() {
         #   - installTmuxPlugins
         #   - installVimPlugins
         #       | - installExtraForLeaderF
+    installuCtags
     compileYcmForMac
     finalAdjustParams mac
     # installSummary

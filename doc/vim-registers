@@ -1,0 +1,67 @@
+https://vi.stackexchange.com/questions/84/how-can-i-copy-text-to-the-system-clipboard-from-vim
+
+For X11-based systems (ie. Linux and most other UNIX-like systems) there are two clipboards which are independent of each other:
+
+PRIMARY - This is copy-on-select, and can be pasted with the middle mouse button.
+CLIPBOARD - This is copied with (usually) ^C, and pasted with ^V (It's like MS Windows).
+OS X and Windows systems only have 1 clipboard.
+
+For X11 systems there are also number of tools that synchronize these clipboards for you; so if they appear to be the same, you may have one of them running.
+
+Vim has 2 special registers corresponding to these clipboards:
+
+* uses PRIMARY; mnemonic: star is select (for copy-on-select)
++ uses CLIPBOARD; mnemonic: CTRL + C (for the common keybind)
+On Windows & OS X there is no difference between + and *, since these systems only have a single clipboard, and both registers refer to the same thing (it doesn't matter which one you use).
+
+You can use these registers as any register. For example, using the PRIMARY clipboard * with the y and p commands:
+
+"*yy
+"*p
+You could maybe use this as more convenient keybinds:
+
+noremap <Leader>y "*y
+noremap <Leader>p "*p
+noremap <Leader>Y "+y
+noremap <Leader>P "+p
+If you want to "automatically" interface with the system's clipboard instead of referring to it manually all the time, you can set the clipboard variable:
+
+Set it to unnamed to use * (PRIMARY, on select)
+Set it to unnamedplus to use + (CLIPBOARD, ^C)
+Now, just using yy will go to the system's clipboard, instead of Vim's unnamed register, and p will paste the system's clipboard.
+
+You can also assign to these registers just like any register with let:
+
+:let @+=42
+:let @*=42
+The clipboard setting has some more options (such as exclude filters); but these are the basics. See :help 'clipboard' for the full story ;-)
+
+gVim
+If you use gVim, you can get copy-on-select behaviour when using :set guioptions+=a.
+This is enabled by default on X11 systems (copies to PRIMARY), but not on MS Windows & OSX (as selecting any text would override your clipboard).
+
+No +clipboard?
+Vim requires the +clipboard feature flag for any of this to work; you can check if your Vim has this by using :echo has('clipboard') from within Vim (if the output is 0, it not present, if it's 1, it is), or checking the output of vim --version.
+
+Most Linux distributions ship with a "minimal" Vim build by default, which doesn't have +clipboard, but you can usually install it:
+
+Debian & Ubuntu: Install vim-gtk or vim-gnome.
+Fedora: install vim-X11, and run vimx instead of vim (more info).
+Arch Linux: install gvim (this will enable +clipboard for normal vim as well).
+You could also use xclip, xcopy, or xsel to copy text to the clipboard; see the following questions for solutions:
+
+Define custom commands for the * and + registers
+How can I copy over an ssh session without +clipboard?
+SSH
+You can also use a clipboard on remote machines if you enable X11 forwarding over SSH. This is especially useful with the above tip since you can then use xclip to access your desktop's clipboard. The Vim on the machine you're ssh-ing to will still need the +clipboard feature.
+
+This requires the ForwardX11Trusted setting, and should only be done with trusted servers, as this gives the server almost complete control over your X11 session:
+
+$ ssh -XY myhost
+To make these settings persistent (so you don't need to add -XY every time), you could do something like this in your ~/.ssh/config:
+
+# Do **NOT** set this globally; it gives the server complete control over
+# your X11 session.
+Host myhost
+    ForwardX11 yes
+    ForwardX11Trusted yes
