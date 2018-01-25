@@ -1277,7 +1277,7 @@ checkIsLinux() {
         echo "Platform is MacOS"
         return 1
     elif [[ $arch == "Linux" ]]; then
-		linuxType=`sed -n '1p' /etc/issue | tr -s " " | cut -d " " -f 1`
+        linuxType=`sed -n '1p' /etc/issue | tr -s " " | cut -d " " -f 1`
         if [[ $linuxType == "Ubuntu" ]]; then
             echo "Platform is Ubuntu"
             return 2

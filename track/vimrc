@@ -132,10 +132,13 @@ nnoremap <silent> <F6> :AirlineToggle <CR>
 """"""""""""""""""""""""""""""
 let g:Lf_StlColorscheme = 'default'
 let g:Lf_CommandMap = {'<C-C>': ['<Esc>', '<C-C>']}
-map <leader>F :LeaderfFunction <CR>
-map <leader>Fa :LeaderfFunctionAll <CR>
-map <leader>L :LeaderfLine <CR>
-map <leader>La :LeaderfLineAll <CR>
+map <leader>F  :LeaderfFile <CR>
+map <leader>f  :LeaderfFunction <CR>
+map <leader>fa :LeaderfFunctionAll <CR>
+map <leader>l  :LeaderfLine <CR>
+map <leader>la :LeaderfLineAll <CR>
+map <leader>m  :LeaderfMruCwd <CR>
+map <leader>ma  :LeaderfMru <CR>
 
 """"""""""""""""""""""""""""""
 " CONFIG TAGBAR

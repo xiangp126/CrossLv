@@ -13,7 +13,7 @@ commInstdir=$homeInstDir
 #sudo or empty
 execPrefix=""
 #how many cpus os has, used for make -j 
-osCpus=1
+osCpus=""
 # store all downloaded packages here
 downloadPath=$mainWd/downloads
 
@@ -96,15 +96,18 @@ _EOF
     python3Config=`python3-config --configdir 2> /dev/null`
     ./configure --prefix=$vimInstDir \
                 --with-features=huge \
-                --with-x \
                 --enable-multibyte \
+                --enable-gui=auto \
+                --enable-gtk2-check \
+                --enable-gtk3-check \
+                --enable-gnome-check \
+                --with-x \
                 --enable-rubyinterp=yes \
                 --enable-pythoninterp=yes \
                 --enable-python3interp=yes \
                 --with-python3-config-dir=$python3Config \
                 --enable-perlinterp=yes \
                 --enable-luainterp=yes \
-                --enable-gui=gtk2 \
                 --enable-cscope
     make -j $osCpus
     # check if make returns successfully
