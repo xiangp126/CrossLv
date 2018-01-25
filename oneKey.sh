@@ -4,7 +4,7 @@
 startDir=`pwd`
 # main work directory, not influenced by start dir
 mainWd=$(cd $(dirname $0); pwd)
-# .vim/.tmux installation dir
+# .vim/.tmux config files location
 baseDir=$HOME
 tackleDir=(
     ".vim"
@@ -40,6 +40,8 @@ clangInstDir=$commInstdir/$clangSubDir
 osCpus=1
 # store all downloaded packages here
 downloadPath=$mainWd/downloads
+# dir storing tracked files
+trackDir=./track-files
 
 logo() {
     cat << "_EOF"
@@ -413,8 +415,9 @@ _EOF
 COPYING .VIMRC FIRST
 ------------------------------------------------------
 _EOF
+    cd $mainWd
     # let .vimrc in place
-    cp ./track/vimrc $baseDir/.vimrc
+    cp $trackDir/vimrc $baseDir/.vimrc
     cat << _EOF
 ------------------------------------------------------
 COMMENT ON COLORSCHEME IN .VIMRC
