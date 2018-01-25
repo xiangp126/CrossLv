@@ -4,11 +4,11 @@
 startDir=`pwd`
 # main work directory, not influenced by start dir
 mainWd=$(cd $(dirname $0); pwd)
-# primary dir to handle
-baseDir=$HOME
+# track files baseline directory
+tkBaseDir=$HOME
 # files array needed to track
 # ".vim/colors/mydefault.vim"
-bkFiles=(
+trackFiles=(
     ".vimrc"
     ".tmux.conf"
     ".bashrc"
@@ -23,7 +23,7 @@ bkColorDir=$backupDir/colors
 # track dir under try mode, only for test
 dryDir=./dry-restore
 # dir to store tracked files
-trackDir=./track
+trackDir=./track-files
 # dir to store tracked color files
 trackedColorDir=./vim-colors
 # array to store file names that was trully processed.
@@ -83,10 +83,10 @@ _EOF
     #     mv ${backupDir} ${backupDir}.`date +"%Y-%m-%d-%H:%M:%S"`
     # fi
     cd $mainWd
-    for file in ${bkFiles[@]}; do
-        realFile=$baseDir/$file
+    for file in ${trackFiles[@]}; do
+        realFile=$tkBaseDir/$file
         if [[ ! -f $realFile ]]; then
-            echo [Warning]: Not found $file under $baseDir, omitting it
+            echo [Warning]: Not found $file under $tkBaseDir, omitting it
             continue
         fi
         # .vim/.vimrc => vimrc
@@ -133,11 +133,11 @@ restore() {
         echo [Error]: missing track $trackDir/, please check it first
         exit
     fi
-    if [[ "$restoreDir" != "$baseDir" ]]; then
+    if [[ "$restoreDir" != "$tkBaseDir" ]]; then
         mkdir -p $restoreDir
     else
-        if [ ! -d $baseDir ]; then
-            echo [FatalError]: missing baseDir $baseDir/, please check it first
+        if [ ! -d $tkBaseDir ]; then
+            echo [FatalError]: missing track files base dir $tkBaseDir/
             exit 1
         fi
     fi
@@ -149,7 +149,7 @@ _EOF
     copiedPathArray=()
     index=0
     cd $mainWd
-    for file in ${bkFiles[@]}; do
+    for file in ${trackFiles[@]}; do
         # .vim/.vimrc => vimrc
         # real name under track/
         backedName=$(echo ${file##*/})  # .bashrc
@@ -213,7 +213,7 @@ regret() {
     fi
 
     cd $mainWd
-    for file in ${bkFiles[@]}; do
+    for file in ${trackFiles[@]}; do
         realBkFile=$regretDir/$file.$bkPostfix
         if [[ ! -f $realBkFile ]]; then
             echo [Warning]: not found $file.$bkPostfix under $regretDir, omitting it
@@ -239,7 +239,7 @@ UPDATING TRACKED FILES FROME BACKUP
 ---------------------------------------------------------
 _EOF
     cd $mainWd
-    for file in ${bkFiles[@]}; do
+    for file in ${trackFiles[@]}; do
         # .vim/.vimrc => vimrc
         # delete slash if exist, EXp: .vim/colors/.bashrc
         backedName=$(echo ${file##*/})  # .bashrc
