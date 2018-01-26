@@ -52,10 +52,8 @@ map <leader>9 :buffer9 <CR>
 " unnamed register is same "* register"
 set clipboard=unnamed
 " copy to system clipboard
-noremap <silent> <Leader>y "*y <CR>
-noremap <silent> <Leader>p "*p <CR>
-noremap <silent> <Leader>Y "+y <CR>
-noremap <silent> <Leader>P "+p <CR>
+" noremap <silent> <Leader>y "*y <CR>
+" noremap <silent> <Leader>p "*p <CR>
 
 """"""""""""""""""""""""""""""
 " SUMMARIZE PLUGIN MAPPING

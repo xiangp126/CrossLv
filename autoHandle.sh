@@ -38,13 +38,13 @@ usage() {
     $execName -- auto backup/restore key files of current linux env.
 
 [SYNOPSIS]
-    sh $execName [backup | restore | track | regret | dry | clean]
+    sh $execName [restore | backup | track | auto | regret | clean]
 
 [EXAMPLE]
     sh $execName backup
-    sh $execName dry
-    sh $execName restore
     sh $execName track
+    sh $execName restore
+    sh $execName auto
 
 [TROUBLESHOOTING]
     if 'sh $execName' can not be excuted.
@@ -55,11 +55,11 @@ usage() {
     $ ln -s /bin/bash /bin/sh
 
 [DESCRIPTION]
-    backup  -> backup key files under environment to ${backupDir}/
-    restore -> restore key files to environment from ${trackDir}/
-    track   -> copy need tracked files to ${trackDir}/
+    backup  -> backup tracked files under environment to ${backupDir}/
+    track   -> deploy tracked files from 'backup-ed' to ${trackDir}/
+    restore -> restore tracked files to environment from ${trackDir}/
     regret  -> regret previous 'restore' action as medicine
-    dry     -> run restore in dry mode, thought $dryDir/ as $HOME/
+    auto    -> run 'backup' & 'track' as pack
     clean   -> clean ${backupDir}.*/, but reserve main backup dir
 
 _EOF
@@ -288,31 +288,36 @@ _EOF
 case $1 in
     'backup')
         backup
-    ;;
+        ;;
 
     'dry')
         restore $dryDir
-    ;;
+        ;;
 
     'restore')
         restore $HOME
-    ;;
+        ;;
 
     'regret')
         regret $HOME
-    ;;
+        ;;
 
     'track')
         track
-    ;;
+        ;;
+
+    'auto')
+        backup
+        track
+        ;;
 
     'clean')
         echo rm -rf ${backupDir}.*
         rm -rf ${backupDir}.*
-    ;;
+        ;;
 
     *)
         usage
         exit
-    ;;
+        ;;
 esac

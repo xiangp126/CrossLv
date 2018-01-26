@@ -108,7 +108,7 @@ hi doxygenparam guifg=#fdd090 guibg=NONE guisp=NONE gui=NONE ctermfg=222 ctermbg
 hi doxygensmallspecial guifg=#fdd090 guibg=NONE guisp=NONE gui=NONE ctermfg=222 ctermbg=NONE cterm=NONE
 hi doxygenprev guifg=#fdd090 guibg=NONE guisp=NONE gui=NONE ctermfg=222 ctermbg=NONE cterm=NONE
 hi perlspecialmatch guifg=#c080d0 guibg=#404040 guisp=#404040 gui=NONE ctermfg=176 ctermbg=238 cterm=NONE
-hi cformat guifg=#c080d0 guibg=#404040 guisp=#404040 gui=NONE ctermfg=176 ctermbg=NONE cterm=NONE
+hi cformat guifg=#c080d0 guibg=#404040 guisp=#404040 gui=NONE ctermfg=176 ctermbg=238 cterm=NONE
 hi lcursor guifg=NONE guibg=#d3d7cf guisp=#d3d7cf gui=NONE ctermfg=NONE ctermbg=151 cterm=NONE
 hi doxygenspecialmultilinedesc guifg=#ad600b guibg=NONE guisp=NONE gui=NONE ctermfg=130 ctermbg=NONE cterm=NONE
 hi taglisttagname guifg=#808bed guibg=NONE guisp=NONE gui=NONE ctermfg=105 ctermbg=NONE cterm=NONE
@@ -150,6 +150,8 @@ hi PmenuSel ctermfg=DarkYellow ctermbg=0 term=Bold
 hi MatchParen ctermbg=Black ctermfg=DarkMagenta term=standout
 hi Directory ctermfg=Blue
 hi StatusLine ctermfg=DarkGrey ctermbg=0
+hi cformat ctermfg=176 ctermbg=NONE cterm=NONE
+hi Repeat ctermfg=140 ctermbg=NONE cterm=NONE
 " hi Comment ctermfg=Grey guifg=green
 " ------------- visual mode selection --------------------
 " hi Visual ctermfg=Grey ctermbg=237 term=Bold
