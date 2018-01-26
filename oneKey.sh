@@ -264,7 +264,7 @@ checkGccVersion() {
 # -----------------------------------------------------
 # _EOF
         return 255
-    else 
+    else
         return 0
     fi
 }
@@ -358,7 +358,7 @@ _EOF
 
 checkCpuCoreNum() {
     if [[ "`which lscpu 2> /dev/null`" == "" ]]; then
-        echo [Warning]: OS has no lscpu installed, omitting this
+        # echo [Warning]: OS has no lscpu installed, omitting this
         # macos did not has lscpu, so remomve [job] restrict
         cpuCoreNum=""
         return
@@ -368,7 +368,7 @@ checkCpuCoreNum() {
     if [[ "$cpuCoreNum" == "" ]]; then
         cpuCoreNum=1
     fi
-    echo "OS has CPU(S): $cpuCoreNum"
+    # echo "OS has CPU(S): $cpuCoreNum"
 }
 
 # install vim and tmux
@@ -1366,8 +1366,8 @@ cmake path = $cmakePath
 _EOF
     if [[ $platOsType != "macos" ]]; then
         cat << _EOF
-        libpython3 path = $libPython3Path
-        libclang.so path = $libClangPath
+libpython3 path = $libPython3Path
+libclang.so path = $libClangPath
 ------------------------------------------------------
 _EOF
     fi
@@ -1394,6 +1394,7 @@ install() {
         #       | - installExtraForLeaderF
     installuCtags
     if [[ $platOsType != 'macos' ]]; then
+        installAck
         installPython3
         installvim
         installCmake
@@ -1449,8 +1450,22 @@ case $1 in
 
     'root')
         set -x
-        # run fix dependency routine as has root privilege
-        # sh -x ./tools/fixosdepends.sh
+        # only run this for the first time
+        if [[ ! -f $mainWd/$mRunFlagFile ]]; then
+            sh -x $mainWd/tools/fixosdepends.sh install
+            cat << "_EOF"
+------------------------------------------------------
+CREATING MORE TIMES RUNNING FLAG FILE
+------------------------------------------------------
+_EOF
+            touch $mainWd/$mRunFlagFile
+        else
+            cat << _EOF
+------------------------------------------------------
+[WARNING]: YOU MAY NEED DELETE ./$mRunFlagFile
+------------------------------------------------------
+_EOF
+        fi
         commInstdir=$rootInstDir
         execPrefix=sudo
         install

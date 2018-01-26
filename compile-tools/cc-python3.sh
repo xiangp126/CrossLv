@@ -11,8 +11,8 @@ rootInstDir=/usr/local
 # default is home mode
 commInstdir=$homeInstDir
 #sudo or empty
-execPrefix=""      
-#how many cpus os has, used for make -j 
+execPrefix=""
+#how many cpus os has, used for make -j
 osCpus=1
 # store all downloaded packages here
 downloadPath=$mainWd/downloads
@@ -33,7 +33,7 @@ usage() {
     exeName=${0##*/}
     cat << _EOF
 [NAME]
-    $exeName -- setup newly python3 
+    $exeName -- setup newly python3
 
 [SYNOPSIS]
     sh $exeName [home | root | help]
@@ -44,7 +44,7 @@ usage() {
 
 _EOF
     set +x
-	logo
+    logo
 }
 
 checkOsCpus() {
@@ -70,7 +70,7 @@ _EOF
     $execPrefix mkdir -p $commInstdir
     # comm attribute to get source 'python3'
     wgetLink=https://www.python.org/ftp/python/3.6.4
-	tarName=Python-3.6.4.tgz
+    tarName=Python-3.6.4.tgz
     untarName=Python-3.6.4
 
     # rename download package if needed
@@ -97,13 +97,13 @@ _EOF
     ./configure --prefix=$python3InstDir \
                 --enable-shared
     make -j $osCpus
-	# check if make returns successfully
-	if [[ $? != 0 ]]; then
-		echo [Error]: make returns error, quiting now ...
-		exit
-	fi
+    # check if make returns successfully
+    if [[ $? != 0 ]]; then
+        echo [Error]: make returns error, quiting now ...
+        exit
+    fi
     $execPrefix make install
-    
+
     cat << _EOF
 ------------------------------------------------------
 INSTALLING python3 DONE ...
@@ -124,16 +124,16 @@ case $1 in
         commInstdir=$homeInstDir
         execPrefix=""
         install
-    ;;
+        ;;
 
     'root')
         commInstdir=$rootInstDir
         execPrefix=sudo
-		install
-    ;;
+        install
+        ;;
 
     *)
         set +x
         usage
-    ;;
+        ;;
 esac

@@ -3,19 +3,20 @@
 
 #dependency for Ubuntu
 ubuntuDepends=(
-    #clang use
+    # for compile ag/ack
+    "libpcre3-dev"
+    "liblzma-dev"
     "libclang-5.0-dev"
     "clang-5.0"
-    "libclang-3.9-dev"
-    "clang-3.9"
-    #completion
+    # "libclang-3.9-dev"
+    # "clang-3.9"
     "bash-completion"
     "python-optcomplete"
     #build tools
     "build-essential"
     "cmake"
     "cmake3"
-    "ctags"
+    # "ctags"
     "python-dev"
     "python3-dev"
     "libmpc-dev"  #for compile gcc
@@ -28,30 +29,32 @@ ubuntuDepends=(
     #for compile vim8
     "perl"
     "lib32ncursesw5-dev"
-    #common tools
-    "figlet"            
-    "shellcheck"
-    "htop"
-    "iftop"
-    "tcpdump"
-    "netcat"        # also known as nc
-    "bridge-utils"
-    "tmux"          # terminal multiplexer
-    "checkinstall"
-    "mosh"          # mobile ssh tool
-    "realpath"
+    # additional common tools
+    # "shellcheck"
+    # "figlet"            
+    # "htop"
+    # "iftop"
+    # "tcpdump"
+    # "netcat"        # also known as nc
+    # "bridge-utils"
+    # "tmux"          # terminal multiplexer
+    # "checkinstall"
+    # "mosh"          # mobile ssh tool
+    # "realpath"
 )
 
 #dependency for CentOS
 centosDepends=(
+    "pcre-devel"
     "mlocate"
     "bash-completion"
     "python-optcomplete"
     #compile tools
     "cmake"
     "ncurses*"
-    "ctags"
+    # "ctags"
     "python-devel"
+    "python3"
     "gmp-devel"
     "gcc"
     "gcc-c++"
@@ -64,11 +67,11 @@ centosDepends=(
     "perl-devel"
     # common tools
     "figlet"            
-    "mosh"          # mobile ssh tool
-    "htop"
-    "iftop"
-    #"netcat"        # also known as nc
-    "bridge-utils"
+    # "mosh"          # mobile ssh tool
+    # "htop"
+    # "iftop"
+    # "netcat"        # also known as nc
+    # "bridge-utils"
     "tmux"          # terminal multiplexer
 )
 

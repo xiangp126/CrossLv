@@ -40,29 +40,29 @@ set pastetoggle=<F12>
 noremap <F10> :set invnumber <CR>
 noremap <silent> <C-L> :buffers <CR>
 " map leader NO. switch between buffers
-map <leader>1 :buffer1 <CR>
-map <leader>2 :buffer2 <CR>
-map <leader>3 :buffer3 <CR>
-map <leader>4 :buffer4 <CR>
-map <leader>5 :buffer5 <CR>
-map <leader>6 :buffer6 <CR>
-map <leader>7 :buffer7 <CR>
-map <leader>8 :buffer8 <CR>
-map <leader>9 :buffer9 <CR>
+map <leader>1 :buffer1<CR>
+map <leader>2 :buffer2<CR>
+map <leader>3 :buffer3<CR>
+map <leader>4 :buffer4<CR>
+map <leader>5 :buffer5<CR>
+map <leader>6 :buffer6<CR>
+map <leader>7 :buffer7<CR>
+map <leader>8 :buffer8<CR>
+map <leader>9 :buffer9<CR>
 " unnamed register is same "* register"
 set clipboard=unnamed
 " copy to system clipboard
-" noremap <silent> <Leader>y "*y <CR>
-" noremap <silent> <Leader>p "*p <CR>
+" noremap <silent> <Leader>y "*y<CR>
+" noremap <silent> <Leader>p "*p<CR>
 
 """"""""""""""""""""""""""""""
 " SUMMARIZE PLUGIN MAPPING
 """"""""""""""""""""""""""""""
-" nnoremap <silent> <F2> :IndentLinesToggle <CR>
+" nnoremap <silent> <F2> :IndentLinesToggle<CR>
 " nnoremap <silent> <F3> :NERDTreeToggle<CR>
 " map <F4> <leader>ci <CR>
-" nnoremap <silent> <F5> :call TagbarMyOpen() <CR>
-" nnoremap <silent> <F6> :AirlineToggle <CR>
+" nnoremap <silent> <F5> :call TagbarMyOpen()<CR>
+" nnoremap <silent> <F6> :AirlineToggle<CR>
 
 """"""""""""""""""""""""""""""
 " VIM BUNDLE
@@ -122,20 +122,20 @@ let g:airline#extensions#tabline#formatter = 'unique_tail'
 " CONFIG VIMAIRLINE-THEME
 """"""""""""""""""""""""""""""
 let g:airline_theme = 'base16_grayscale'
-nnoremap <silent> <F6> :AirlineToggle <CR>
+nnoremap <silent> <F6> :AirlineToggle<CR>
 
 """"""""""""""""""""""""""""""
 " CONFIG LEADERF
 """"""""""""""""""""""""""""""
 let g:Lf_StlColorscheme = 'default'
 let g:Lf_CommandMap = {'<C-C>': ['<Esc>', '<C-C>']}
-map <leader>F  :LeaderfFile <CR>
-map <leader>f  :LeaderfFunction <CR>
-map <leader>fa :LeaderfFunctionAll <CR>
-map <leader>l  :LeaderfLine <CR>
-map <leader>la :LeaderfLineAll <CR>
-map <leader>m  :LeaderfMruCwd <CR>
-map <leader>ma  :LeaderfMru <CR>
+map <leader>F  :LeaderfFile<CR>
+map <leader>f  :LeaderfFunction<CR>
+map <leader>fa :LeaderfFunctionAll<CR>
+map <leader>l  :LeaderfLine<CR>
+map <leader>la :LeaderfLineAll<CR>
+map <leader>m  :LeaderfMruCwd<CR>
+map <leader>ma  :LeaderfMru<CR>
 
 """"""""""""""""""""""""""""""
 " CONFIG ACK.VIM
@@ -143,12 +143,14 @@ map <leader>ma  :LeaderfMru <CR>
 if executable('ag')
   let g:ackprg = 'ag --vimgrep'
 endif
+" :help key-notation
+map <leader>a  :Ack<Space>
 
 """"""""""""""""""""""""""""""
 " CONFIG TAGBAR
 """"""""""""""""""""""""""""""
 " let g:tagbar_ctags_bin = "/usr/bin/ctags"
-nnoremap <silent> <F5> :call TagbarMyOpen() <CR>
+nnoremap <silent> <F5> :call TagbarMyOpen()<CR>
 let g:Tagbar_title = "[Tagbar]"
 let g:tagbar_left = 0
 let g:tagbar_width = 25
@@ -164,7 +166,7 @@ endfunction
 """"""""""""""""""""""""""""""
 let g:indentLine_char = '|'
 let g:indentLine_enabled = 0
-nnoremap <silent> <F2> :IndentLinesToggle <CR>
+nnoremap <silent> <F2> :IndentLinesToggle<CR>
 
 """"""""""""""""""""""""""""""
 " CONFIG NERDTREE
