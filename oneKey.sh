@@ -1,6 +1,5 @@
 #!/bin/bash
 # COPYRIGHT BY PENG, 2018. XIANGP126@SJTU.EDU.CN.
-# where is shell executed
 startDir=`pwd`
 # main work directory, not influenced by start dir
 mainWd=$(cd $(dirname $0); pwd)
@@ -18,9 +17,16 @@ rootInstDir=/usr/local
 commInstdir=$homeInstDir
 # execute prefix: "" or sudo
 execPrefix=""
+# if first run this script, it'll generate mRunFlagFile
+# if checked has this file, will skip many install
+mRunFlagFile=.MORETIME.txt
+# ubuntu | centos | macos
+platOsType=ubuntu
 # required packages install info
 # gcc install
 gccInstDir=$commInstdir
+# silver searcher install
+ackInstDir=$commInstdir
 # universal ctags install
 uCtagsInstDir=$commInstdir
 # python3 install
@@ -37,7 +43,7 @@ clangVersion=5.0.1
 clangSubDir=clang-$clangVersion
 clangInstDir=$commInstdir/$clangSubDir
 # how many cpus os has, used for make -j
-osCpus=1
+cpuCoreNum=1
 # store all downloaded packages here
 downloadPath=$mainWd/downloads
 # dir storing tracked files
@@ -152,7 +158,7 @@ _EOF
     fi
     cd $untarName
     ./configure --prefix=$bashCompInstDir
-    make -j $osCpus
+    make -j $cpuCoreNum
     # check if make returns successfully
     if [[ $? != 0 ]]; then
         echo [error]: make returns error, quitting now
@@ -213,7 +219,7 @@ _EOF
 
 # gcc must support C++11 to compile YCM
 checkGccVersion() {
-    # loop to find if there exists gcc version meets requirement
+    # loop to find if there exists gcc and version meets requirement
     pathLoopLoc=(
         "$HOME/.usr/bin"
         "/usr/local/bin"
@@ -245,24 +251,31 @@ checkGccVersion() {
     done
     # compile new version gcc if not found suitable
     if [[ "$CC" == "" ]]; then
-        cat << _EOF
-[FatalWarning]: Gcc version < 4.8.0, not support c++11
------------------------------------------------------
-FOR EXAMPLE: compile gcc(version > 4.8) to /usr/local
---
-export CC=/usr/local/bin/gcc
-export CXX=/usr/local/bin/c++
-# export LDFLAGS="-L/usr/local/lib -L/usr/local/lib64"
--- or
-use 'source sample/gen-gccenv.sh root' to export env
------------------------------------------------------
-_EOF
-        # start to compile newly gcc/c++
-        installGcc
+#         cat << _EOF
+# [FatalWarning]: Gcc version < 4.8.0, not support c++11
+# -----------------------------------------------------
+# FOR EXAMPLE: compile gcc(version > 4.8) to /usr/local
+# --
+# export CC=/usr/local/bin/gcc
+# export CXX=/usr/local/bin/c++
+# # export LDFLAGS="-L/usr/local/lib -L/usr/local/lib64"
+# -- or
+# use 'source sample/gen-gccenv.sh root' to export env
+# -----------------------------------------------------
+# _EOF
+        return 255
+    else 
+        return 0
     fi
 }
 
 installGcc() {
+    # if gcc version meets requirement, return 0
+    checkGccVersion
+    retVal=$?
+    if [[ $retVal == 0 ]]; then
+        return
+    fi
     cat << "_EOF"
 ------------------------------------------------------
 INSTALLING GCC 5
@@ -312,7 +325,7 @@ _EOF
     ../configure --prefix=$gccInstDir \
                  --disable-multilib \
                  --enable-checking=release
-    make -j $osCpus
+    make -j $cpuCoreNum
     # check if make returns successfully
     if [[ $? != 0 ]]; then
         echo [error]: make returns error, quitting now
@@ -343,19 +356,19 @@ GCC/C++/G++ path = $gccInstDir/bin/
 _EOF
 }
 
-checkOsCpus() {
+checkCpuCoreNum() {
     if [[ "`which lscpu 2> /dev/null`" == "" ]]; then
         echo [Warning]: OS has no lscpu installed, omitting this
-        # mac did not has lscpu, so remomve [job] restrict
-        osCpus=""
+        # macos did not has lscpu, so remomve [job] restrict
+        cpuCoreNum=""
         return
     fi
     # set new os cpus
-    osCpus=`lscpu | grep -i "^CPU(s):" | tr -s " " | cut -d " " -f 2`
-    if [[ "$osCpus" == "" ]]; then
-        osCpus=1
+    cpuCoreNum=`lscpu | grep -i "^CPU(s):" | tr -s " " | cut -d " " -f 2`
+    if [[ "$cpuCoreNum" == "" ]]; then
+        cpuCoreNum=1
     fi
-    echo "OS has CPU(S): $osCpus"
+    echo "OS has CPU(S): $cpuCoreNum"
 }
 
 # install vim and tmux
@@ -491,10 +504,61 @@ _EOF
     fi
 }
 
+# replace of grep
+installAck() {
+    # ag linked to ack
+    ackPath=`which ack 2> /dev/null`
+    if [[ $ackPath != "" ]]; then
+        return
+    fi
+    cat << "_EOF"
+------------------------------------------------------
+INSTALLING SILVER SEARCHER(ACK)
+------------------------------------------------------
+_EOF
+    ackInstDir=$commInstdir
+    gitClonePath=https://github.com/ggreer/the_silver_searcher
+    clonedName=the_silver_searcher
+    cd $downloadPath
+    if [[ -d "$clonedName" ]]; then
+        echo [Warning]: $clonedName/ already exists, omitting this step
+    else
+        git clone $gitClonePath
+        # check if git clone returns successfully
+        if [[ $? != 0 ]]; then
+            echo [Error]: git clone returns error, quiting now
+            exit
+        fi
+    fi
+    # begin to build
+    cd $clonedName
+    ./autogen.sh
+    ./configure --prefix=$ackInstDir
+    if [[ $? != 0 ]]; then
+        echo [Error]: ./configure returns error, quitting now ...
+        exit
+    fi
+    make -j $cpuCoreNum
+    # check if make returns successfully
+    if [[ $? != 0 ]]; then
+        echo [Error]: make returns error, quitting now ...
+        exit
+    fi
+
+    $execPrefix make install
+    # check if make install returns successfully
+    if [[ $? != 0 ]]; then
+        echo [Error]: make install returns error, quitting now ...
+        exit 255
+    fi
+    ackPath=$ackInstDir/bin/ag
+}
+
 installuCtags() {
     # check if already installed
-    checkCmd=`ctags --version | grep -i universal`
+    checkCmd=`ctags --version | grep -i universal 2> /dev/null`
     if [[ $checkCmd != "" ]]; then
+        uCtagsPath=`which ctags`
         return
     fi
     cat << "_EOF"
@@ -518,7 +582,7 @@ _EOF
     cd $clonedName
     ./autogen.sh
     ./configure --prefix=$uCtagsInstDir
-    make -j $osCpus
+    make -j $cpuCoreNum
     # check if make returns successfully
     if [[ $? != 0 ]]; then
         echo [Error]: make returns error, quitting now ...
@@ -530,6 +594,7 @@ _EOF
         echo [Error]: make install returns error, quitting now ...
         exit 255
     fi
+    uCtagsPath=$uCtagsInstDir/bin/ctags
 }
 
 installPython3() {
@@ -619,7 +684,7 @@ _EOF
     cd $untarName
     ./configure --prefix=$python3InstDir \
                 --enable-shared
-    make -j $osCpus
+    make -j $cpuCoreNum
     # check if make returns successfully
     if [[ $? != 0 ]]; then
         echo [Error]: make returns error, quitting now
@@ -654,8 +719,7 @@ installvim() {
     checkCmd=`vim --version | head -n 1 | grep -i "Vi IMproved 8" 2> /dev/null`
     if [[ "$checkCmd" != "" ]]; then
         echo "[Warning]: Vim 8 was already installed, omitting this step "
-        whereIsVim=`which vim`
-        vimInstDir=`echo ${whereIsVim%/bin*}`
+        vimPath=`which vim`
         return
     fi
     cat << "_EOF"
@@ -709,7 +773,7 @@ _EOF
                 --enable-luainterp=yes \
                 --enable-gui=gtk2 \
                 --enable-cscope
-    make -j $checkOsCpus
+    make -j $cpuCoreNum
     # check if make returns successfully
     if [[ $? != 0 ]]; then
         echo [Error]: make returns error, try below commands
@@ -718,14 +782,11 @@ _EOF
         exit
     fi
     $execPrefix make install
-
-    cat << _EOF
-------------------------------------------------------
-INSTALLING VIM DONE
-`$vimInstDir/bin/vim --version`
-vim path = $vimInstDir/bin/
-------------------------------------------------------
-_EOF
+    if [[ $? != 0 ]]; then
+        echo [error]: make install returns error, quitting now
+        exit
+    fi
+    vimPath=$vimInstDir/bin/vim
     # uncomment YouCompleteMe in $HOME/.vimrc, no need after run 'restore'
     # sed -i --regexp-extended "s/\" (Plugin 'Valloric)/\1/" confirm/_.vimrc
 }
@@ -781,7 +842,7 @@ _EOF
     cd $untarName
     ./configure --prefix=$cmakeInstDir
 
-    make -j $osCpus
+    make -j $cpuCoreNum
     # check if make returns successfully
     if [[ $? != 0 ]]; then
         echo [Error]: make returns error, quitting now
@@ -1006,7 +1067,7 @@ _EOF
                -DPYTHON_EXECUTABLE=$python3Path \
                -DLLVM_INCLUDE_TESTS=OFF \
                $downloadPath/$llvmUntarName
-    make -j $osCpus
+    make -j $cpuCoreNum
     # check if make returns successfully
     if [[ $? != 0 ]]; then
         echo [Error]: make returns error, quitting now
@@ -1043,7 +1104,7 @@ _EOF
 }
 
 # compile YouCompleteMe
-compileYcm() {
+installYcm() {
     # cmakePath=`which cmake 2> /dev/null`
     cat << "_EOF"
 ------------------------------------------------------
@@ -1067,15 +1128,23 @@ _EOF
 
     cd $ycmDir
     git submodule update --init --recursive
+    if [[ $platOsType == 'macos' || $platOsType == 'ubuntu' ]]; then
+        python3 ./install.py --clang-completer --system-libclang
+        if [[ $? != 0 ]]; then
+            echo "install YCM returns error, quitting now "
+            exit 1
+        fi
+        return
+    fi
 
-    # not use official install script now
+    # not use official install script, self compile it
     # $python3Path ./install.py --clang-completer
-
     ycmBuildDir=ycm_build
     mkdir -p $ycmBuildDir
     cd $ycmBuildDir
     # remove old CMakeCache.txt
     rm -rf CMakeCache.txt
+
     # -DUSE_PYTHON2=OFF, do not use python2 library
     # -- Found PythonLibs: ~/.usr/lib/libpython3.6m.so
     # (found suitable version "3.6.4", minimum required is "3.3")
@@ -1099,7 +1168,7 @@ BUILDING YCM_CORE NOW
 ------------------------------------------------------
 _EOF
     # $cmakePath --build . --target ycm_core
-    make -j $osCpus
+    make -j $cpuCoreNum
     # check if make returns successfully
     if [[ $? != 0 ]]; then
         echo "[Error]: make ycm_core error, quitting now "
@@ -1143,6 +1212,54 @@ _EOF
     fi
 }
 
+brewInstallForMacos() {
+    whereIsBrew=`which brew 2> /dev/null`
+    if [[ "$whereIsBrew" == "" ]]; then
+        cat << "_EOF"
+------------------------------------------------------
+INSTALLING HOMEBREW INTO SYSTEM
+------------------------------------------------------
+_EOF
+        /usr/bin/ruby -e "$(curl -fsSL \
+            https://raw.githubusercontent.com/Homebrew/install/master/install)"
+        if [[ $? != 0 ]]; then
+            echo "install homebrew returns error, quitting now "
+            exit 1
+        fi
+    fi
+    cat << "_EOF"
+------------------------------------------------------
+BREW INSTALLING NEEDED PACKAGES
+------------------------------------------------------
+_EOF
+    if [[ ! -f $mainWd/$mRunFlagFile ]]; then
+        # as ordinary user run brew
+        brew upgrade python python3 cmake vim -y
+        # use gnu-sed as compatible with that under Linux
+        brew upgrade gnu-sed --with-default-names -y
+        brew install the_silver_searcher
+        cat << "_EOF"
+------------------------------------------------------
+CREATING MORE TIMES RUNNING FLAG FILE
+------------------------------------------------------
+_EOF
+        touch $mainWd/$mRunFlagFile
+    else
+        cat << _EOF
+------------------------------------------------------
+[WARNING]: YOU MAY NEED DELETE ./$mRunFlagFile
+------------------------------------------------------
+_EOF
+    fi
+    # set path vars for use in installSummary
+    CC=`which clang`
+    CXX=`which clang++`
+    ackPath=`which ag`
+    python3Path=`which python3`
+    vimPath=`which vim`
+    cmakePath=`which cmake`
+}
+
 # auto correct path of key packages according to the system
 finalAdjustParams() {
     cat << _EOF
@@ -1169,9 +1286,9 @@ CORRECTING COLOR SCHEME IN $HOME/.VIMRC
 _EOF
     matchStr=':colorscheme'
     replacedTo="mydefault"
-    # Linux use :colorscheme mydefault, Mac use darkcoding
+    # Linux use :colorscheme mydefault, macos use darkcoding
     # all use darkcoding
-    if [[ 1 == 1 || $1 == "mac" ]]; then
+    if [[ 1 == 1 || $platOsType == "macos" ]]; then
         replacedTo=darkcoding
     fi
     sed -i --regexp-extended \
@@ -1205,8 +1322,8 @@ _EOF
         echo "[Warning]: replace c++ header directory returns $retVal "
     fi
 
-    # only mac needed, for mac not support --color=auto
-    if [[ ! $1 == "mac" ]]; then
+    # only macos needed, for macos not support --color=auto
+    if [[ $platOsType != "macos" ]]; then
         return
     fi
     cat << _EOF
@@ -1232,28 +1349,43 @@ _EOF
 }
 
 installSummary() {
+    ackPath=$ackInstDir/bin/ag
+    vimPath=$vimInstDir/bin/vim
     cat << _EOF
 ------------------------------------------------------
-ONEKEY INSTALLATION SUMMARY
+INSTALLATION THROUGH ONEKEY DONE - CONGRATULATION
 ------------------------------------------------------
-os has cpu(s) = $osCpus
-------------- >
 gcc path = $CC
 cxx path = $CXX
-universal path = $uCtagsInstDir/bin/ctags
+ag/ack path = $ackPath
+u-ctags path = $uCtagsPath
 python3 path = $python3Path
-vim path = $vimInstDir/bin/vim
-cmake path = $cmakeInstDir/bin/cmake
-libpython3 path = $libPython3Path
-libclang.so path = $libClangPath
+vim path = $vimPath
+cmake path = $cmakePath
 ------------------------------------------------------
 _EOF
+    if [[ $platOsType != "macos" ]]; then
+        cat << _EOF
+        libpython3 path = $libPython3Path
+        libclang.so path = $libClangPath
+------------------------------------------------------
+_EOF
+    fi
+}
+
+preInstallCheck() {
+    checkPlatOsType
+    checkCpuCoreNum
 }
 
 install() {
     mkdir -p $downloadPath
-    checkGccVersion
-    checkOsCpus
+    if [[ $platOsType == 'macos' ]]; then
+        brewInstallForMacos
+    else
+        # check and/or install gcc first of all
+        installGcc
+    fi
     installBone
         # | - installBashCompletion
         #   - installExtraBashComp
@@ -1261,138 +1393,59 @@ install() {
         #   - installVimPlugins
         #       | - installExtraForLeaderF
     installuCtags
-    installPython3
-    installvim
-    installCmake
-    installClang
-    if [[ $1 == "Ubuntu" ]]; then
-        compileYcmForMac
-    else
-        compileYcm
+    if [[ $platOsType != 'macos' ]]; then
+        installPython3
+        installvim
+        installCmake
+        installClang
     fi
+    installYcm
     finalAdjustParams
     installSummary
 }
 
-checkIsLinux() {
+checkPlatOsType() {
     arch=$(uname -s)
-    if [[ $arch == "Darwin" ]]; then
-        echo "Platform is MacOS"
-        return 1
-    elif [[ $arch == "Linux" ]]; then
-        linuxType=`sed -n '1p' /etc/issue | tr -s " " | cut -d " " -f 1`
-        if [[ $linuxType == "Ubuntu" ]]; then
-            echo "Platform is Ubuntu"
-            return 2
-        elif [[ $linuxType == "CentOS" ]]; then
-            echo "Platform is CentOS"
-            return 3
-        elif [[ $linuxType == "Red" ]]; then
-            echo "Platform is Red Hat"
-            return 3
-        fi
-    else
-        cat << "_EOF"
+    case $arch in
+        Darwin)
+            # echo "Platform is MacOS"
+            platOsType=macos
+            ;;
+        Linux)
+            linuxType=`sed -n '1p' /etc/issue | tr -s " " | cut -d " " -f 1`
+            if [[ $linuxType == "Ubuntu" ]]; then
+                # echo "Platform is Ubuntu"
+                platOsType=ubuntu
+            elif [[ $linuxType == "CentOS" ]]; then
+                # echo "Platform is CentOS"
+                platOsType=centos
+            elif [[ $linuxType == "Red" ]]; then
+                # echo "Platform is Red Hat"
+                platOsType=redhat
+            fi
+            ;;
+        *)
+            cat << "_EOF"
 ------------------------------------------------------
-WE ONLY SUPPORT LINUX AND MACOS
+WE ONLY SUPPORT LINUX AND MACOS SO FAR
 ------------------------------------------------------
 _EOF
-        exit 255
-    fi
+            exit 255
+            ;;
+    esac
 }
 
-#####################################################
-# two func for installation under mac
-#####################################################
-# compile YouCompleteMe for Mac
-compileYcmForMac() {
-    cat << "_EOF"
-------------------------------------------------------
-COMPILING YOUCOMPLETEME
-------------------------------------------------------
-_EOF
-    # comm attribute for getting source ycm
-    repoLink=https://github.com/Valloric
-    repoName=YouCompleteMe
-    ycmDir=$HOME/.vim/bundle/YouCompleteMe
-    if [[ -d $ycmDir ]]; then
-        echo [Warning]: already has YCM repo cloned, omitting now
-    else
-        git clone $repoLink/$repoName $ycmDir
-        # check if clone returns successfully
-        if [[ $? != 0 ]]; then
-            echo [Error]: git clone returns error, quitting now
-            exit
-        fi
-    fi
-
-    cd $ycmDir
-    git submodule update --init --recursive
-    python3 ./install.py --clang-completer --system-libclang
-
-    if [[ $? != 0 ]]; then
-        echo "install YCM returns error, quitting now "
-        exit 1
-    fi
-}
-
-installForMac() {
-    mkdir -p $downloadPath
-    whereIsBrew=`which brew`
-    if [[ "$whereIsBrew" == "" ]]; then
-        cat << "_EOF"
-------------------------------------------------------
-INSTALLING HOMEBREW INTO SYSTEM
-------------------------------------------------------
-_EOF
-        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-        if [[ $? != 0 ]]; then
-            echo "install homebrew returns error, quitting now "
-            exit 1
-        fi
-    fi
-    # fix dependency
-        cat << "_EOF"
-------------------------------------------------------
-INSTALLING DEPENDENCY PACKAGES
-------------------------------------------------------
-_EOF
-    brew upgrade ctags python python3 cmake vim  astyle -y
-    # use gnu-sed as compatible with that under Linux
-    brew upgrade gnu-sed --with-default-names -y
-    # begin install routine
-    checkOsCpus
-    installBone
-        # | - installBashCompletion
-        #   - installExtraBashComp
-        #   - installTmuxPlugins
-        #   - installVimPlugins
-        #       | - installExtraForLeaderF
-    installuCtags
-    compileYcmForMac
-    finalAdjustParams mac
-    # installSummary
-}
-#####################################################
-# end of two func for installation under mac
-#####################################################
-
+# check platform & os type and set proper value
+preInstallCheck
+    # | - checkPlatOsType
+    #   - checkCpuCoreNum
 case $1 in
     'home')
         set -x
         commInstdir=$homeInstDir
         execPrefix=""
-        # auto figure which platform is
-        checkIsLinux
-        retVal=$?
-        if [[ $retVal == 1 ]]; then
-            installForMac
-        elif [[ $retVal == 2 ]]; then
-            install Ubuntu
-        elif [[ $retVal == 3 ]]; then
-            install
-        fi
-    ;;
+        install
+        ;;
 
     'root')
         set -x
@@ -1400,22 +1453,11 @@ case $1 in
         # sh -x ./tools/fixosdepends.sh
         commInstdir=$rootInstDir
         execPrefix=sudo
-        # auto figure which platform is
-        checkIsLinux
-        retVal=$?
-        if [[ $retVal == 1 ]]; then
-            commInstdir=$homeInstDir
-            execPrefix=""
-            installForMac
-        elif [[ $retVal == 2 ]]; then
-            install Ubuntu
-        elif [[ $retVal == 3 ]]; then
-            install
-        fi
-   ;;
+        install
+        ;;
 
     *)
         usage
         exit
-   ;;
+        ;;
 esac

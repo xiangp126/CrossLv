@@ -73,7 +73,6 @@ call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
 
 "------ OPTIONAL PLUGINS -----
-" Plugin 'L9'
 " Plugin 'davidhalter/jedi'
 " Plugin 'tell-k/vim-autopep8'
 " Plugin 'Raimondi/delimitMate'
@@ -85,6 +84,7 @@ Plugin 'jiangmiao/auto-pairs'
 Plugin 'majutsushi/tagbar'
 Plugin 'Yggdroot/indentLine'
 Plugin 'Yggdroot/LeaderF'
+Plugin 'mileszs/ack.vim'
 "------ BEAUTIFY LINE -----
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
@@ -106,9 +106,6 @@ filetype plugin indent on    " required
 " :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
 " :PluginSearch foo - searches for foo; append `!` to refresh local cache
 " :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
-"
-" see :h vundle for more details or wiki for FAQ
-" Put your non-Plugin stuff after this line
 
 """"""""""""""""""""""""""""""
 " CONFIG VIM-AIRLINE
@@ -139,6 +136,13 @@ map <leader>l  :LeaderfLine <CR>
 map <leader>la :LeaderfLineAll <CR>
 map <leader>m  :LeaderfMruCwd <CR>
 map <leader>ma  :LeaderfMru <CR>
+
+""""""""""""""""""""""""""""""
+" CONFIG ACK.VIM
+""""""""""""""""""""""""""""""
+if executable('ag')
+  let g:ackprg = 'ag --vimgrep'
+endif
 
 """"""""""""""""""""""""""""""
 " CONFIG TAGBAR
