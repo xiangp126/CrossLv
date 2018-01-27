@@ -1406,7 +1406,7 @@ PRE INSTALL FOR MACOS PLATFORM - WITH BREW
 _EOF
     if [[ ! -f $mainWd/$mRunFlagFile ]]; then
         # as ordinary user run brew
-        brew upgrade python python3 cmake vim -y
+        brew upgrade python python3 cmake vim git -y
         # use gnu-sed as compatible with that under Linux
         brew upgrade gnu-sed --with-default-names -y
         brew install the_silver_searcher

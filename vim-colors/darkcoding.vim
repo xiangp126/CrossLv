@@ -143,10 +143,11 @@ hi normal ctermfg=247 ctermbg=NONE cterm=NONE
 hi Function ctermfg=137 guifg=#fad07a
 hi Identifier ctermfg=140 ctermbg=NONE cterm=NONE
 hi Operator ctermfg=144 ctermbg=None cterm=NONE
-" --------------------- pop up menu ---------------------
+hi Search ctermfg=130 ctermbg=None cterm=underline
+" -------------------- pop up menu ---------------------
 hi PMenu ctermfg=DarkGrey ctermbg=16
 hi PmenuSel ctermfg=DarkYellow ctermbg=0 term=Bold
-" ------------------ match parentheses ------------------
+" ------------------ math parentheses ------------------
 hi MatchParen ctermbg=Black ctermfg=DarkMagenta term=standout
 hi Directory ctermfg=Blue
 hi StatusLine ctermfg=DarkGrey ctermbg=0
