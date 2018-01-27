@@ -504,6 +504,120 @@ _EOF
     fi
 }
 
+installLibpcre() {
+    whereIsLibpcre=`pkg-config --libs libpcre 2> /dev/null`
+    if [[ $whereIsLibpcre != "" ]]; then
+        return
+    fi
+    cat << "_EOF"
+------------------------------------------------------
+INSTALLING LIBPCRE
+------------------------------------------------------
+_EOF
+    libpcreInstDir=$commInstdir
+    $execPrefix mkdir -p $commInstdir
+    wgetLink=ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre
+    tarName=pcre-8.41.tar.gz
+    untarName=pcre-8.41
+
+    # rename download package if needed
+    cd $downloadPath
+    # check if already has this tar ball.
+    if [[ -f $tarName ]]; then
+        echo [Warning]: Tar Ball $tarName already exists, Omitting wget
+    else
+        wget --no-cookies \
+             --no-check-certificate \
+             --header "Cookie: oraclelicense=accept-securebackup-cookie" \
+             "${wgetLink}/${tarName}" \
+             -O $tarName
+        # check if wget returns successfully
+        if [[ $? != 0 ]]; then
+            echo [Error]: wget returns error, quitting now
+            exit
+        fi
+    fi
+    # check if already untared
+    if [[ -d $untarName ]]; then
+        echo [Warning]: found $untarName, omitting this step
+    else
+        tar -zxv -f $tarName
+    fi
+    cd $untarName
+    ./configure --prefix=$python3InstDir \
+                --enable-shared
+    make -j $cpuCoreNum
+    # check if make returns successfully
+    if [[ $? != 0 ]]; then
+        echo [Error]: make returns error, quitting now
+        exit
+    fi
+
+    $execPrefix make install
+    # check if make returns successfully
+    if [[ $? != 0 ]]; then
+        echo [Error]: make install returns error, quitting now
+        exit
+    fi
+}
+
+installLiblzma() {
+    whereIsLiblzma=`pkg-config --libs liblzma 2> /dev/null`
+    if [[ $whereIsLiblzma != "" ]]; then
+        return
+    fi
+    cat << "_EOF"
+------------------------------------------------------
+INSTALLING XZ-UTILS(LIBLZMAI)
+------------------------------------------------------
+_EOF
+    liblzmaInstDir=$commInstdir
+    $execPrefix mkdir -p $commInstdir
+    wgetLink=http://cdn-fastly.deb.debian.org/debian/pool/main/x/xz-utils
+    tarName=xz-utils_5.2.2.orig.tar.xz
+    untarName=xz-5.2.2
+
+    # rename download package if needed
+    cd $downloadPath
+    # check if already has this tar ball.
+    if [[ -f $tarName ]]; then
+        echo [Warning]: Tar Ball $tarName already exists, Omitting wget
+    else
+        wget --no-cookies \
+             --no-check-certificate \
+             --header "Cookie: oraclelicense=accept-securebackup-cookie" \
+             "${wgetLink}/${tarName}" \
+             -O $tarName
+        # check if wget returns successfully
+        if [[ $? != 0 ]]; then
+            echo [Error]: wget returns error, quitting now
+            exit
+        fi
+    fi
+    # check if already untared
+    if [[ -d $untarName ]]; then
+        echo [Warning]: found $untarName, omitting this step
+    else
+        tar -xv -f $tarName
+    fi
+    cd $untarName
+    ./configure --prefix=$python3InstDir \
+                --enable-shared
+    make -j $cpuCoreNum
+    # check if make returns successfully
+    if [[ $? != 0 ]]; then
+        echo [Error]: make returns error, quitting now
+        exit
+    fi
+
+    $execPrefix make install
+    # check if make returns successfully
+    if [[ $? != 0 ]]; then
+        echo [Error]: make install returns error, quitting now
+        exit
+    fi
+}
+
 # replace of grep
 installAck() {
     # ag linked to ack
@@ -516,6 +630,11 @@ installAck() {
 INSTALLING SILVER SEARCHER(ACK)
 ------------------------------------------------------
 _EOF
+    if [[ $execPrefix != 'sudo' ]]; then
+        # only use without root privilege need manual compile them
+        installLibpcre
+        installLiblzma
+    fi
     ackInstDir=$commInstdir
     gitClonePath=https://github.com/ggreer/the_silver_searcher
     clonedName=the_silver_searcher
