@@ -50,8 +50,8 @@ map <leader>6 :buffer6<CR>
 map <leader>7 :buffer7<CR>
 map <leader>8 :buffer8<CR>
 map <leader>9 :buffer9<CR>
-" unnamed register is same "* register"
-set clipboard=unnamed
+" unnamed for '* register', unnamedplus for '+ register'
+set clipboard=unnamedplus,unnamed
 " copy to system clipboard
 " noremap <silent> <Leader>y "*y <CR>
 " noremap <silent> <Leader>p "*p <CR>
