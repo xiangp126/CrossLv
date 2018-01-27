@@ -10,8 +10,8 @@ rootInstDir=/usr/local
 # default is home mode
 commInstdir=$homeInstDir
 #sudo or empty
-execPrefix=""      
-#how many cpus os has, used for make -j 
+execPrefix=""
+#how many cpus os has, used for make -j
 osCpus=1
 # store all downloaded packages here
 downloadPath=$mainWd/downloads
@@ -42,7 +42,7 @@ usage() {
 
 _EOF
     set +x
-	logo
+    logo
 }
 
 checkOsCpus() {
@@ -69,7 +69,7 @@ checkGccVersion() {
     echo $gccVersion
     #if gcc < 4.8, exit
     if [[ `echo "$gccVersion >= $basicVersion" | bc` -ne 1 ]]; then
-        echo 
+        echo
     fi
 }
 
@@ -107,16 +107,22 @@ _EOF
         tar -zxv -f $tarName
     fi
     cd $untarName
-    ./configure --prefix=$cmakeInstDir
+    rm -rf CMakeCache.txt
+    # ./configure --prefix=$cmakeInstDir
+    ./bootstrap --prefix=$cmakeInstDir
 
     make -j $osCpus
-	# check if make returns successfully
-	if [[ $? != 0 ]]; then
-		echo [Error]: make returns error, quiting now ...
-		exit
-	fi
+
+    # if changing cmake versions between package and source
+    hash -r
+
+    # check if make returns successfully
+    if [[ $? != 0 ]]; then
+        echo [Error]: make returns error, quiting now ...
+        exit
+    fi
     $execPrefix make install
-    
+
     cat << _EOF
 ------------------------------------------------------
 INSTALLING cmake 3 DONE ...
@@ -137,16 +143,16 @@ case $1 in
         commInstdir=$homeInstDir
         execPrefix=""
         install
-    ;;
+        ;;
 
     'root')
         commInstdir=$rootInstDir
         execPrefix=sudo
-		install
-    ;;
+        install
+        ;;
 
     *)
         set +x
         usage
-    ;;
+        ;;
 esac
