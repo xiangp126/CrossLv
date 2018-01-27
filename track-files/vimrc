@@ -37,8 +37,9 @@ set background=dark
 " map: recursive mapping, case ignorance
 " nnoremap: no recursive mapping
 set pastetoggle=<F12>
-noremap <F10> :set invnumber <CR>
-noremap <silent> <C-L> :buffers <CR>
+noremap <F10> :set invnumber<CR>
+noremap <silent> <C-L> :buffers<CR>
+noremap <silent> <A-K> :bprevious<CR>
 " map leader NO. switch between buffers
 map <leader>1 :buffer1<CR>
 map <leader>2 :buffer2<CR>
@@ -52,17 +53,17 @@ map <leader>9 :buffer9<CR>
 " unnamed register is same "* register"
 set clipboard=unnamed
 " copy to system clipboard
-" noremap <silent> <Leader>y "*y<CR>
-" noremap <silent> <Leader>p "*p<CR>
+" noremap <silent> <Leader>y "*y <CR>
+" noremap <silent> <Leader>p "*p <CR>
 
 """"""""""""""""""""""""""""""
 " SUMMARIZE PLUGIN MAPPING
 """"""""""""""""""""""""""""""
-" nnoremap <silent> <F2> :IndentLinesToggle<CR>
+" nnoremap <silent> <F2> :IndentLinesToggle <CR>
 " nnoremap <silent> <F3> :NERDTreeToggle<CR>
 " map <F4> <leader>ci <CR>
-" nnoremap <silent> <F5> :call TagbarMyOpen()<CR>
-" nnoremap <silent> <F6> :AirlineToggle<CR>
+" nnoremap <silent> <F5> :call TagbarMyOpen() <CR>
+" nnoremap <silent> <F6> :AirlineToggle <CR>
 
 """"""""""""""""""""""""""""""
 " VIM BUNDLE
@@ -140,11 +141,12 @@ map <leader>ma  :LeaderfMru<CR>
 """"""""""""""""""""""""""""""
 " CONFIG ACK.VIM
 """"""""""""""""""""""""""""""
+let g:ack_autoclose = 1
 if executable('ag')
   let g:ackprg = 'ag --vimgrep'
 endif
-" :help key-notation
-map <leader>a  :Ack<Space>
+cnoreabbrev Ack Ack!
+nnoremap <Leader>a :Ack!<Space>
 
 """"""""""""""""""""""""""""""
 " CONFIG TAGBAR
@@ -182,7 +184,7 @@ let g:NERDTreeWinPos = 'left' " only left or right
 " CONFIG NERDCOMMENTER
 """"""""""""""""""""""""""""""
 "quick comment/uncomment
-map <F4> <leader>ci <CR>
+map <F4> <leader>ci<CR>
 "add a space after comment flag
 let g:NERDSpaceDelims = 1
 
@@ -263,3 +265,9 @@ let g:ycm_goto_buffer_command = 'new-tab'
 nnoremap <leader>gl :YcmCompleter GoToDeclaration<CR>
 nnoremap <leader>gf :YcmCompleter GoToDefinition<CR>
 nnoremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<CR>
+
+""""""""""""""""""""""""""""""
+" LAST CHANGE COLOR - BOTTOM
+""""""""""""""""""""""""""""""
+" highlight Search maybe modified by ack.vim, so change it back here
+hi Search ctermfg=130 ctermbg=None cterm=underline

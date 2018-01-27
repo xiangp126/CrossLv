@@ -67,7 +67,7 @@ checkOsCpus() {
 checkDepends() {
     #check python3 version
     python3Path=`which python3 2> /dev/null`
-	python3Config=`python3-config --configdir 2> /dev/null`
+    python3Config=`python3-config --configdir 2> /dev/null`
     if [[ "$python3Config" == "" ]]; then
         echo [Error]: please install python3/python3-config first ...
         exit
@@ -278,11 +278,11 @@ _EOF
                -DLLVM_INCLUDE_TESTS=OFF \
                $downloadPath/$llvmUntarName
     make -j $osCpus
-	# check if make returns successfully
-	if [[ $? != 0 ]]; then
-		echo [Error]: make returns error, quiting now ...
-		exit
-	fi
+    # check if make returns successfully
+    if [[ $? != 0 ]]; then
+        echo [Error]: make returns error, quiting now ...
+        exit
+    fi
     libClangPath=$clangInstDir/lib/libclang.so
     #clangNeedInstall=TRUE
     clangNeedInstall=FALSE
@@ -324,16 +324,16 @@ case $1 in
         commInstdir=$homeInstDir
         execPrefix=""
         install
-    ;;
+        ;;
 
     'root')
         commInstdir=$rootInstDir
         execPrefix=sudo
-		install
-    ;;
+        install
+        ;;
 
     *)
         set +x
         usage
-    ;;
+        ;;
 esac
