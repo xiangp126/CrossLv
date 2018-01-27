@@ -12,7 +12,7 @@ rootInstDir=/usr/local
 commInstdir=$homeInstDir
 #sudo or empty
 execPrefix=""
-#how many cpus os has, used for make -j 
+#how many cpus os has, used for make -j
 osCpus=""
 # store all downloaded packages here
 downloadPath=$mainWd/downloads
@@ -43,7 +43,7 @@ usage() {
 
 _EOF
     set +x
-	logo
+    logo
 }
 
 checkOsCpus() {
@@ -90,10 +90,13 @@ _EOF
     cd $clonedName
     # if need checkout
     git checkout $checkoutVersion
-	# clean before ./configure
-	# make distclean
+    # clean before ./configure
+    # make distclean
     python2Config=`python2-config --configdir 2> /dev/null`
     python3Config=`python3-config --configdir 2> /dev/null`
+    # https://stackoverflow.com/questions/10101488/cut-to-the-system-clipboard-from-vim-on-ubuntu
+    # fix issue for ubuntu/vim no X11 support after trully has installed associage packages
+    find . -name config.cache -delete 2> /dev/null
     ./configure --prefix=$vimInstDir \
                 --with-features=huge \
                 --enable-multibyte \
@@ -136,16 +139,16 @@ case $1 in
         commInstdir=$homeInstDir
         execPrefix=""
         install
-    ;;
+        ;;
 
     'root')
         commInstdir=$rootInstDir
         execPrefix=sudo
-		install
-    ;;
+        install
+        ;;
 
     *)
         set +x
         usage
-    ;;
+        ;;
 esac

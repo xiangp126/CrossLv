@@ -505,9 +505,9 @@ _EOF
 }
 
 # replace of grep
-installAck() {
+nstallAck() {
     # ag linked to ack
-    ackPath=`which ack 2> /dev/null`
+    ackPath=`which ag 2> /dev/null`
     if [[ $ackPath != "" ]]; then
         return
     fi
@@ -760,6 +760,10 @@ _EOF
         echo [Error]: Not found python2 or python3, please install either of them
         exit
     fi
+
+    # https://stackoverflow.com/questions/10101488/cut-to-the-system-clipboard-from-vim-on-ubuntu
+    # fix issue for ubuntu/vim no X11 support after trully has installed associage packages
+    find . -name config.cache -delete 2> /dev/null
 
     # --with-python-config-dir=$python2Config
     ./configure --prefix=$vimInstDir \
@@ -1212,7 +1216,54 @@ _EOF
     fi
 }
 
-brewInstallForMacos() {
+preInstallForLinux() {
+    cat << "_EOF"
+------------------------------------------------------
+PRE INSTALL FOR LINUX PLATFORM - WITH SUDO
+------------------------------------------------------
+_EOF
+    # only run this for the first time
+    if [[ ! -f $mainWd/$mRunFlagFile ]]; then
+        if [[ $platOsType == "ubuntu" && $execPrefix == "sudo" ]]; then
+            sudo apt-get install \
+                bash-completion python-optcomplete build-essential cmake \
+                automake asciidoc xmlto tmux \
+                libpcre3-dev liblzma-dev libclang-5.0-dev clang-5.0 \
+                libmpc-dev libcurl4-openssl-dev libncurses5 libperl-dev \
+                perl lib32ncursesw5-dev libgnome2-dev libgnomeui-dev \
+                libgtk2.0-dev libatk1.0-dev libbonoboui2-dev \
+                libcairo2-dev libx11-dev libxpm-dev libxt-dev \
+                python-dev python3-dev ruby-dev lua5.1 lua5.1-dev -y
+
+        elif [[ $platOsType = 'centos' && $execPrefix == 'sudo' ]]; then
+            sudo yum install \
+                pcre-devel mlocate bash-completion python-optcomplete \
+                cmake ncurses* gmp-devel gcc gcc-c++ automake asciidoc \
+                xmlto perl-devel tmux git \
+                ruby ruby-devel lua lua-devel luajit \
+                luajit-devel python python-devel \
+                python3 python3-devel tcl-devel \
+                curl libcurl-devel perl perl-devel perl-ExtUtils-ParseXS \
+                perl-ExtUtils-XSpp perl-ExtUtils-CBuilder \
+                perl-ExtUtils-Embed
+        fi
+        cat << "_EOF"
+------------------------------------------------------
+CREATING MORE TIMES RUNNING FLAG FILE
+------------------------------------------------------
+_EOF
+        touch $mainWd/$mRunFlagFile
+    else
+        cat << _EOF
+------------------------------------------------------
+[WARNING]: YOU MAY NEED DELETE ./$mRunFlagFile
+------------------------------------------------------
+_EOF
+        return
+    fi
+}
+
+preInstallForMacos() {
     whereIsBrew=`which brew 2> /dev/null`
     if [[ "$whereIsBrew" == "" ]]; then
         cat << "_EOF"
@@ -1227,9 +1278,10 @@ _EOF
             exit 1
         fi
     fi
+
     cat << "_EOF"
 ------------------------------------------------------
-BREW INSTALLING NEEDED PACKAGES
+PRE INSTALL FOR MACOS PLATFORM - WITH BREW
 ------------------------------------------------------
 _EOF
     if [[ ! -f $mainWd/$mRunFlagFile ]]; then
@@ -1238,6 +1290,7 @@ _EOF
         # use gnu-sed as compatible with that under Linux
         brew upgrade gnu-sed --with-default-names -y
         brew install the_silver_searcher
+
         cat << "_EOF"
 ------------------------------------------------------
 CREATING MORE TIMES RUNNING FLAG FILE
@@ -1381,8 +1434,10 @@ preInstallCheck() {
 install() {
     mkdir -p $downloadPath
     if [[ $platOsType == 'macos' ]]; then
-        brewInstallForMacos
+        preInstallForMacos
     else
+        # if had root privilege, sudo install needed packages
+        preInstallForLinux
         # check and/or install gcc first of all
         installGcc
     fi
@@ -1450,22 +1505,6 @@ case $1 in
 
     'root')
         set -x
-        # only run this for the first time
-        if [[ ! -f $mainWd/$mRunFlagFile ]]; then
-            sh -x $mainWd/tools/fixosdepends.sh install
-            cat << "_EOF"
-------------------------------------------------------
-CREATING MORE TIMES RUNNING FLAG FILE
-------------------------------------------------------
-_EOF
-            touch $mainWd/$mRunFlagFile
-        else
-            cat << _EOF
-------------------------------------------------------
-[WARNING]: YOU MAY NEED DELETE ./$mRunFlagFile
-------------------------------------------------------
-_EOF
-        fi
         commInstdir=$rootInstDir
         execPrefix=sudo
         install
