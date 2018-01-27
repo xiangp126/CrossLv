@@ -1,4 +1,4 @@
----------------------------------- Ubuntu 
+---------------------------------- Ubuntu
 # cd /etc/sudoers.d
 # sudo vim You-Name
 

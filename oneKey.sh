@@ -505,7 +505,7 @@ _EOF
 }
 
 # replace of grep
-nstallAck() {
+installAck() {
     # ag linked to ack
     ackPath=`which ag 2> /dev/null`
     if [[ $ackPath != "" ]]; then
@@ -1237,15 +1237,16 @@ _EOF
 
         elif [[ $platOsType = 'centos' && $execPrefix == 'sudo' ]]; then
             sudo yum install \
+                xz-devel libX11-devel libXpm-devel libXt-devel \
                 pcre-devel mlocate bash-completion python-optcomplete \
                 cmake ncurses* gmp-devel gcc gcc-c++ automake asciidoc \
                 xmlto perl-devel tmux git \
                 ruby ruby-devel lua lua-devel luajit \
                 luajit-devel python python-devel \
-                python3 python3-devel tcl-devel \
+                python3 python3-devel python34 python34-devel tcl-devel \
                 curl libcurl-devel perl perl-devel perl-ExtUtils-ParseXS \
                 perl-ExtUtils-XSpp perl-ExtUtils-CBuilder \
-                perl-ExtUtils-Embed
+                perl-ExtUtils-Embed -y
         fi
         cat << "_EOF"
 ------------------------------------------------------
