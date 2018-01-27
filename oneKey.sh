@@ -489,6 +489,7 @@ _EOF
 installExtraForLeaderF() {
     leaderfInstDir=$HOME/.vim/bundle/LeaderF
     if [[ ! -d $leaderfInstDir ]]; then
+        echo "[Warning]: found no LeaderF, please check it"
         return
     fi
     cat << "_EOF"
@@ -501,6 +502,22 @@ _EOF
     retVal=$?
     if [[ $retVal != 0 ]]; then
         echo "[Warning]: Install fuzzy for LeaderF return with value $retVal "
+    fi
+
+    cat << "_EOF"
+------------------------------------------------------
+COPYING DARK_LEADERF.VIM AS DEFAULT LEADERF COLORSCHEME
+------------------------------------------------------
+_EOF
+    myLeaderFColor=./leaderf-colors/dark_leaderf.vim
+    cpColorDst=$HOME/.vim/bundle/LeaderF/autoload/leaderf/colorscheme/
+
+    cd $mainWd
+    cp $myLeaderFColor $cpColorDst
+    retVal=$?
+    if [[ $retVal != 0 ]]; then
+        echo "[Error]: copy private leaderf color return with value $retVal"
+        exit 255
     fi
 }
 

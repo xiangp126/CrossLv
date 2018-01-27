@@ -128,9 +128,18 @@ nnoremap <silent> <F6> :AirlineToggle<CR>
 """"""""""""""""""""""""""""""
 " CONFIG LEADERF
 """"""""""""""""""""""""""""""
-let g:Lf_StlColorscheme = 'default'
+" map <leader>F  :LeaderfFile<CR>
+let g:Lf_ShortcutF = '<leader>F'
+let g:Lf_StlColorscheme = 'dark_leaderf'
+let g:Lf_WindowHeight = 0.50
+let g:Lf_WildIgnore = {
+   \ 'dir': ['.svn','.git','.hg'],
+   \ 'file': ['*.sw?','~$*','*.bak','*.exe','*.o','*.so','*.py[co]']
+   \}
+let g:Lf_DelimiterChar = ';'
+let g:Lf_MruFileExclude = ['*.so']
 let g:Lf_CommandMap = {'<C-C>': ['<Esc>', '<C-C>']}
-map <leader>F  :LeaderfFile<CR>
+let g:Lf_HighlightIndividual = 0
 map <leader>f  :LeaderfFunction<CR>
 map <leader>fa :LeaderfFunctionAll<CR>
 map <leader>l  :LeaderfLine<CR>
