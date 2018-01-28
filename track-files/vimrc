@@ -111,6 +111,7 @@ filetype plugin indent on    " required
 """"""""""""""""""""""""""""""
 " CONFIG VIM-AIRLINE
 """"""""""""""""""""""""""""""
+nnoremap <silent> <F6> :AirlineToggle<CR>
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#buffer_nr_show = 1
 let g:airline#extensions#tabline#left_sep = ' '
@@ -123,7 +124,6 @@ let g:airline#extensions#tabline#formatter = 'unique_tail'
 " CONFIG VIMAIRLINE-THEME
 """"""""""""""""""""""""""""""
 let g:airline_theme = 'base16_grayscale'
-nnoremap <silent> <F6> :AirlineToggle<CR>
 
 """"""""""""""""""""""""""""""
 " CONFIG LEADERF

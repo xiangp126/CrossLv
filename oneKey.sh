@@ -1330,12 +1330,12 @@ _EOF
             isSomeNotFound=`$lddPath $ycmCorePath | grep -i 'not found'`
             if [[ "$isSomeNotFound" != "" ]]; then
                 cat << _EOF
------------------------------------------------------- link bad
+------------------------------------------------------ LINK BAD
 _EOF
                 $lddPath $ycmCorePath
                 # try to fix issue libclang.so.5 not found
                 cat << _EOF
------------------------------------------------------- try fix
+------------------------------------------------------ TRY FIX
 _EOF
                 cd $ycmCoreDir
                 linkedName=libclang.so.5
@@ -1343,7 +1343,7 @@ _EOF
                 ls -l $linkedName
             else
                 cat << _EOF
------------------------------------------------------- link well
+------------------------------------------------------ LINK WELL
 _EOF
                 $lddPath $ycmCorePath
                 break

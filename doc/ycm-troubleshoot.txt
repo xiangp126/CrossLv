@@ -2,7 +2,7 @@
 build gcc/c++ supporting c++11
 build python3 support python3-config
 build cmake > 3.4
-build clang 
+build clang
 build vim > 7.4
 compile YouCompleteMe
 
@@ -13,7 +13,7 @@ compile YouCompleteMe
 ./install.py downloaded one pre-compiled clang(compiled on Ubuntu 14.04) that is newer than CennOS
 you should self-compile clang with your glibc version on your OS
 
-and at last 
+and at last
 cd ~/.vim/bundle/YouCompleteMe/third_party/ycmd
 ln -s ~/myGit/mylx-vundle/sample/llvm-5.0.1.src/build_dir/lib/libclang.so.5 libclang.so.5
 

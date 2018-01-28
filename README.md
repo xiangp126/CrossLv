@@ -1,6 +1,6 @@
 ## lx-Vundle
-- Goal to handle working environment crossing different Linux/MAC platform through 'oneKey' stroke
-    - fix dependency and skipping already installed packages
+- Goal to handle working environment crossing different Linux-like platform through 'oneKey' stroke
+    - auto detect os platform | skipping already installed packages
     - correct key parameter of config file adjusting to current system
 
 - Two modes deploy selection
@@ -8,6 +8,11 @@
     - root -> with root privilege, normally installed into /usr/local
 
 - This tool itself end up with compiling YouCompleteMe done
+
+- Support Platform
+    - Ubuntu
+    _ CentOS
+    - MacOS
 
 - On Ubuntu and MacOS whole installation takes little time
 
@@ -79,7 +84,7 @@ $ sh oneKey.sh [home | root]
 ## Example for autoHandle.sh
 ```bash
 comment on/off one of them to add/remove from tracking
-bkFiles=(
+trackFiles=(
     ".vimrc"
     ".tmux.conf"
     ".bashrc"
@@ -90,32 +95,32 @@ bkFiles=(
 ```bash
 $ sh autoHandle.sh
 [NAME]
-    autoHandle.sh -- auto backup/restore key files of current linux env.
+    $execName -- auto backup/restore key files of current linux env.
 
 [SYNOPSIS]
-    sh autoHandle.sh [backup | restore | track | regret | dry | clean]
+    sh $execName [restore | backup | track | auto | regret | clean]
 
 [EXAMPLE]
-    sh autoHandle.sh backup
-    sh autoHandle.sh dry
-    sh autoHandle.sh restore
-    sh autoHandle.sh track
+    sh $execName backup
+    sh $execName track
+    sh $execName restore
+    sh $execName auto
 
 [TROUBLESHOOTING]
-    if 'sh autoHandle.sh' can not be excuted.
-    $ ll /bin/sh
+    if 'sh $execName' can not be excuted.
+    $ ll `which sh`
     lrwxrwxrwx 1 root root 9 Dec  7 01:00 /bin/sh -> /bin/bash*
     # on some distribution, sh was linked to dash, not bash.
     # you have to excute following command mannually. -f if needed.
     $ ln -s /bin/bash /bin/sh
 
 [DESCRIPTION]
-    backup  -> backup key files under environment to ./backup/
-    restore -> restore key files to environment from ./track/
-    track   -> confirm to copy files in ./backup/ to ./track/
+    backup  -> backup tracked files under environment to ${backupDir}/
+    track   -> deploy tracked files from 'backup-ed' to ${trackDir}/
+    restore -> restore tracked files to environment from ${trackDir}/
     regret  -> regret previous 'restore' action as medicine
-    dry     -> run restore in dry mode, thought ./dry-restore/ as ~/
-    clean   -> clean ./backup.*/, but reserve main backup dir
+    auto    -> run 'backup' & 'track' as pack
+    clean   -> clean ${backupDir}.*/, but reserve main backup dir
 ```
 ```bash
 $ sh autoHandle.sh backup
@@ -178,7 +183,6 @@ FINDING BASH-COMPLETION SUCCESSFULLY COPIED ...
 
 ## Features
 V3.9
-
 * add support for MAC system
 * .ycm_extra_conf.py adjust c++ include dir/version
 * .vimrc adjust python3 interpreter path
