@@ -1,7 +1,5 @@
 ## lx-Vundle
-- Goal to handle working environment crossing different Linux-like platform through 'oneKey' stroke
-    - auto detect os platform | skipping already installed packages
-    - correct key parameter of config file adjusting to current system
+- Goal to handle working environment crossing different Linux like platform through 'oneKey' stroke
 
 - Two modes deploy selection
     - home -> without root privilege, normally installed into $HOME/.usr
@@ -11,13 +9,12 @@
 
 - Support Platform
     - Ubuntu
-    _ CentOS
+    - CentOS
     - MacOS
 
 - On Ubuntu and MacOS whole installation takes little time
 
-- On CentOS 6, too old version gcc and missing clang make compiling them taking huge time
-    - however it is still a whole stage automatical solution that is very helpful.
+- On CentOS expecially 6 this tool may compile GCC supporting C++11 first, taking disk space 5G+
 
 ## Installation Guide
 ```bash
@@ -183,6 +180,8 @@ FINDING BASH-COMPLETION SUCCESSFULLY COPIED ...
 
 ## Features
 V3.9
+* auto detect os platform | skipping already installed packages
+* correct key parameter of config file adjusting to current system
 * add support for MAC system
 * .ycm_extra_conf.py adjust c++ include dir/version
 * .vimrc adjust python3 interpreter path
