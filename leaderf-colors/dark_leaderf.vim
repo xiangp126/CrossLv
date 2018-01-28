@@ -1,10 +1,7 @@
 " ============================================================================
-" File:        default.vim
-" Description:
-" Author:      Yggdroot <archofortune@gmail.com>
-" Website:     https://github.com/Yggdroot
-" Note:
-" License:     Apache License, Version 2.0
+" FileName:    dark_leaderf.vim
+" Description: change from default.vim by peng, dark color style
+" Usage:       copy to .vim/bundle/LeaderF/autoload/leaderf/colorscheme/
 " ============================================================================
 
 " stlName -> leaderf
