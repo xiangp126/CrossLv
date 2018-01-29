@@ -117,16 +117,35 @@ _EOF
 }
 
 installBashCompletion() {
+    cat << _EOF
+------------------------------------------------------
+INSTALLING PRIVATE EXTRA BASH COMPLETION FILES
+------------------------------------------------------
+_EOF
+    cd $mainWd
+    # extra bash completion dir
+    copyFromDir=./completion
+    # dir to install extra bash comp
+    extraBashCompInstDir=$HOME/.completion.d
+    mkdir -p $extraBashCompInstDir
+    for file in `find $copyFromDir -regex ".*.bash" -type f`
+    do
+        cp $file $extraBashCompInstDir/
+    done
+    retVal=$?
+    if [[ $retVal != 0 ]]; then
+        echo [Warning]: copy extra bash completion files return with value $retVal
+    fi
+
     # bash-completion bash-completion - programmable completion for the bash shell
     whereIsLibBashComp=`pkg-config --list-all | grep -i bash-completion \
         2> /dev/null`
     if [[ $whereIsLibBashComp != "" ]]; then
-        echo "[Warning]: already has full bash completion installed, omitting this step "
         return
     fi
     cat << "_EOF"
 ------------------------------------------------------
-INSTALLING BASH COMPLETION
+INSTALLING EXTENDED BASH-COMPLETION PACKAGES
 ------------------------------------------------------
 _EOF
     bashCompInstDir=$commInstdir
@@ -191,28 +210,60 @@ _EOF
     fi
 }
 
-# install extra bash completion
-installExtraBashComp() {
+installFonts() {
     cat << _EOF
 ------------------------------------------------------
-INSTALLING EXTRA BASH COMPLETION FILES
+INSTALLING PRIVATE FONTS
 ------------------------------------------------------
 _EOF
-    # extra bash completion dir
-    compDir=./completion
-    # dir to install extra bash comp
-    myCompleteDir=$HOME/.completion.d
-    mkdir -p $myCompleteDir
-    for file in `find $compDir -regex ".*.bash" -type f`
+    cd $mainWd
+    copyFromDir=./fonts
+    fontsInstDir=$HOME/.local/share/fonts
+    if [[ $platOsType == 'macos' ]]; then
+        fontsInstDir=$HOME/Library/Fonts
+    fi
+    mkdir -p $fontsInstDir
+
+    for file in `find $copyFromDir -regex '.*.tt[f|c]$' -type f`
     do
-        cp $file $myCompleteDir/
+        fontName=${file##*/}
+        fontName=${fontName%.*}
+        checkCmd=`fc-list | grep -i $fontName 2> /dev/null`
+        if [[ $checkCmd == "" ]]; then
+            cp $file $fontsInstDir
+            retVal=$?
+            if [[ $retVal != 0 ]]; then
+                echo [Warning]: copy extra bash completion files return with value $retVal
+            fi
+        fi
     done
 
-    cat << _EOF
+    cat << "_EOF"
 ------------------------------------------------------
-FINDING BASH-COMPLETION SUCCESSFULLY COPIED
+INSTALLING POWERLINE SYMBOLS FOR AIRLINE
 ------------------------------------------------------
-`find $myCompleteDir -type f`
+_EOF
+    cd $mainWd/fonts
+    powerSymbolConf=10-powerline-symbols.conf
+    powerSymbolOtf=PowerlineSymbols.otf
+
+    if [[ ! -f $fontsInstDir/$powerSymbolOtf ]]; then
+        cp $powerSymbolOtf $fontsInstDir
+        fc-cache -fv $fontsInstDir
+    fi
+
+    fontConfDir=$HOME/.config/fontconfig/conf.d/
+    mkdir -p $fontConfDir
+    if [[ ! -f $powerSymbolConf ]]; then
+        cp $powerSymbolConf $fontConfDir
+    fi
+
+    fc-cache -fv $fontsInstDir
+    cat << "_EOF"
+------------------------------------------------------
+If custom symbols still cannot be seen then try
+closing all instances of the terminal emulator.
+Restarting X may be needed for the changes to take effect.
 ------------------------------------------------------
 _EOF
 }
@@ -441,10 +492,10 @@ _EOF
     sed -i --regexp-extended \
         "s/$matchStr/\" $matchStr/" $HOME/.vimrc
     # call sub-functions to install each module
-    installBashCompletion
-    installExtraBashComp
     installTmuxPlugins
     installVimPlugins
+    installBashCompletion
+    installFonts
 }
 
 installTmuxPlugins() {
@@ -482,8 +533,10 @@ _EOF
     sh autoHandle.sh restore
     # load new .bashrc after 'restore' routine
     source $HOME/.bashrc 2> /dev/null
+
     # extra install actions for vim plugins
     installExtraForLeaderF
+    installPowerlineSymbols
 }
 
 installExtraForLeaderF() {
@@ -1362,11 +1415,12 @@ _EOF
     if [[ ! -f $mainWd/$mRunFlagFile ]]; then
         if [[ $platOsType == "ubuntu" && $execPrefix == "sudo" ]]; then
             sudo apt-get install \
+                pkg-config libevent-dev libncurses5 libncurses5-dev \
                 bash-completion python-optcomplete build-essential cmake \
                 automake asciidoc xmlto tmux \
                 libpcre3-dev liblzma-dev libclang-5.0-dev clang-5.0 \
-                libmpc-dev libcurl4-openssl-dev libncurses5 libperl-dev \
-                perl lib32ncursesw5-dev libgnome2-dev libgnomeui-dev \
+                libmpc-dev libcurl4-openssl-dev perl libperl-dev \
+                libncursesw5 libncursesw5-dev libgnome2-dev libgnomeui-dev \
                 libgtk2.0-dev libatk1.0-dev libbonoboui2-dev \
                 libcairo2-dev libx11-dev libxpm-dev libxt-dev \
                 python-dev python3-dev ruby-dev lua5.1 lua5.1-dev -y
@@ -1423,10 +1477,9 @@ PRE INSTALL FOR MACOS PLATFORM - WITH BREW
 _EOF
     if [[ ! -f $mainWd/$mRunFlagFile ]]; then
         # as ordinary user run brew
-        brew upgrade python python3 cmake vim git -y
         # use gnu-sed as compatible with that under Linux
-        brew upgrade gnu-sed --with-default-names -y
-        brew install the_silver_searcher
+        brew upgrade python python3 cmake vim git the_silver_searcher \
+            fontconfig gnu-sed --with-default-names -y
 
         cat << "_EOF"
 ------------------------------------------------------
@@ -1580,7 +1633,6 @@ install() {
     fi
     installBone
         # | - installBashCompletion
-        #   - installExtraBashComp
         #   - installTmuxPlugins
         #   - installVimPlugins
         #       | - installExtraForLeaderF

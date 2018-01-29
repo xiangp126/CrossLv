@@ -212,6 +212,6 @@ V1.0
 ## Reference
 [Vundle Introduction Guide](http://www.jianshu.com/p/8d416ac4ad11)
 
-[how does cat eof work in bash](https://stackoverflow.com/questions/2500436/how-does-cat-eof-work-in-bash)
+[How Does Cat Eof Work in Bash](https://stackoverflow.com/questions/2500436/how-does-cat-eof-work-in-bash)
 
 [VIM-YouCompleteMe clang+llvm](https://www.jianshu.com/p/c24f919097b3)
