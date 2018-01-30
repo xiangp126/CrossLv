@@ -38,18 +38,18 @@ set background=dark
 " nnoremap: no recursive mapping
 set pastetoggle=<F12>
 noremap <F10> :set invnumber<CR>
-noremap <silent> <leader><leader> :bprevious<CR>
 map <leader>k :mark<Space>
 " map leader NO. switch between buffers
-map <leader>1 :buffer1<CR>
-map <leader>2 :buffer2<CR>
-map <leader>3 :buffer3<CR>
-map <leader>4 :buffer4<CR>
-map <leader>5 :buffer5<CR>
-map <leader>6 :buffer6<CR>
-map <leader>7 :buffer7<CR>
-map <leader>8 :buffer8<CR>
-map <leader>9 :buffer9<CR>
+nmap <leader>1 :buffer1<CR>
+nmap <leader>2 :buffer2<CR>
+nmap <leader>3 :buffer3<CR>
+nmap <leader>4 :buffer4<CR>
+nmap <leader>5 :buffer5<CR>
+nmap <leader>6 :buffer6<CR>
+nmap <leader>7 :buffer7<CR>
+nmap <leader>8 :buffer8<CR>
+nmap <leader>9 :buffer9<CR>
+nmap <leader><leader> :bprevious<CR>
 " unnamed for '* register', unnamedplus for '+ register'
 set clipboard=unnamedplus,unnamed
 " copy to system clipboard
@@ -123,9 +123,13 @@ endif
 let g:airline_theme = 'base16_grayscale'
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#buffer_nr_show = 1
+let g:airline#extensions#tabline#show_tab_type = 0
+let airline#extensions#tabline#disable_refresh = 0
 let g:airline#parts#ffenc#skip_expected_string='utf-8[unix]'
-let g:airline#extensions#tabline#formatter = 'unique_tail'
 " let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
+let g:airline#extensions#tabline#formatter = 'unique_tail'
+let g:tmuxline_powerline_separators = 0
+let g:airline#extensions#tmuxline#enabled = 0
 
 """"""""""""""""""""""""""""""
 " CONFIG LEADERF
