@@ -25,7 +25,7 @@ set nocompatible      " be iMproved, required
 set pumheight=12      " maximum height of popup menu
 set shell=/bin/bash   " set vim default shell
 set mouse=a           " set mouse for all mode
-" set mouse=n         " set mouse for normal mode
+" set mouse=ni        " set mouse for normal and insert mode
 set t_Co=256
 set background=dark
 "------ private under ~/.vim/colors -----
@@ -38,8 +38,8 @@ set background=dark
 " nnoremap: no recursive mapping
 set pastetoggle=<F12>
 noremap <F10> :set invnumber<CR>
-noremap <silent> <C-L> :buffers<CR>
-noremap <silent> <A-K> :bprevious<CR>
+noremap <silent> <leader><leader> :bprevious<CR>
+map <leader>k :mark<Space>
 " map leader NO. switch between buffers
 map <leader>1 :buffer1<CR>
 map <leader>2 :buffer2<CR>
@@ -53,8 +53,12 @@ map <leader>9 :buffer9<CR>
 " unnamed for '* register', unnamedplus for '+ register'
 set clipboard=unnamedplus,unnamed
 " copy to system clipboard
-" noremap <silent> <Leader>y "*y <CR>
-" noremap <silent> <Leader>p "*p <CR>
+noremap <silent> <Leader>y "*y <CR>
+noremap <silent> <Leader>p "*p <CR>
+noremap <silent> <Leader>Y "+y <CR>
+noremap <silent> <Leader>P "+p <CR>
+" vmap <leader>y :!xclip -f -sel clip<CR>
+" map <leader>p  :-1r !xclip -o -sel clip<CR>
 
 """"""""""""""""""""""""""""""
 " SUMMARIZE PLUGIN MAPPING
@@ -112,7 +116,6 @@ filetype plugin indent on    " required
 " CONFIG VIM-AIRLINE
 """"""""""""""""""""""""""""""
 nnoremap <silent> <F6> :AirlineToggle<CR>
-let g:airline_powerline_fonts = 1
 let g:airline_theme = 'base16_grayscale'
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#buffer_nr_show = 1
@@ -137,11 +140,16 @@ let g:Lf_DelimiterChar = ';'
 let g:Lf_MruFileExclude = ['*.so']
 let g:Lf_CommandMap = {'<C-C>': ['<Esc>', '<C-C>']}
 let g:Lf_HighlightIndividual = 0
-map <leader>f  :LeaderfFunction<CR>
-map <leader>fa :LeaderfFunctionAll<CR>
-map <leader>l  :LeaderfLine<CR>
-map <leader>la :LeaderfLineAll<CR>
-map <leader>m  :LeaderfMruCwd<CR>
+map <leader>f   :LeaderfFunction<CR>
+map <leader>fa  :LeaderfFunctionAll<CR>
+" search line match word
+map <leader>l   :LeaderfLine<CR>
+map <leader>la  :LeaderfLineAll<CR>
+" Cword -> current word under cursor in vim
+map <leader>w   :LeaderfLineCword<CR>
+map <leader>wa  :LeaderfLineAllCword<CR>
+" search line match word | end
+map <leader>m   :LeaderfMruCwd<CR>
 map <leader>ma  :LeaderfMru<CR>
 
 """"""""""""""""""""""""""""""
@@ -268,9 +276,9 @@ let g:ycm_add_preview_to_completeopt = 0
 let g:ycm_autoclose_preview_window_after_insertion = 0
 let g:ycm_autoclose_preview_window_after_completion = 0
 let g:ycm_goto_buffer_command = 'new-tab'
-nnoremap <leader>gl :YcmCompleter GoToDeclaration<CR>
-nnoremap <leader>gf :YcmCompleter GoToDefinition<CR>
-nnoremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<CR>
+" nnoremap <leader>jl :YcmCompleter GoToDeclaration<CR>
+" nnoremap <leader>jf :YcmCompleter GoToDefinition<CR>
+nnoremap <leader>j :YcmCompleter GoToDefinitionElseDeclaration<CR>
 
 """"""""""""""""""""""""""""""
 " LAST CHANGE COLOR - BOTTOM

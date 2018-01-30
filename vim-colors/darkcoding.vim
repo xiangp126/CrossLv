@@ -152,7 +152,8 @@ hi MatchParen ctermbg=Black ctermfg=DarkMagenta term=standout
 hi Directory ctermfg=Blue
 hi StatusLine ctermfg=DarkGrey ctermbg=0
 hi cformat ctermfg=176 ctermbg=NONE cterm=NONE
-hi Repeat ctermfg=140 ctermbg=NONE cterm=NONE
+hi Label ctermfg=132 ctermbg=None
+hi Repeat ctermfg=137 ctermbg=None term=None
 " ------------------ leaderf use ------------------
 hi CursorLineNr ctermfg=130 term=underline
 " hi Comment ctermfg=Grey guifg=green
