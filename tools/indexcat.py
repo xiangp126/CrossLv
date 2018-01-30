@@ -15,8 +15,8 @@ def parseIndex(myfile):
           | Index SHA-1   ...           ...            ...            |
         6 | ...                                                       |
 
-   --->> 
-        2 | Mode - 32 bit     |      4 | Flags - 16 bit                
+   --->>
+        2 | Mode - 32 bit     |      4 | Flags - 16 bit
           |-------------------|        |-------------------------|
           | 16-bit unknown    |        | 1-bit assume-valid flag |
           | 4-bit object type |        | 1-bit extended flag     |
@@ -51,9 +51,9 @@ def parseIndex(myfile):
             fileCount = int.from_bytes(byte, byteorder = "big")
             print("File Count: %d" %fileCount)
 
-        ''' A number of sorted index entries 
+        ''' A number of sorted index entries
             32-bit ctime seconds, the last time a file's metadata changed
-            this is stat(2) data. 
+            this is stat(2) data.
         '''
         byte = fRd.read(4)
         if byte != b"":
@@ -67,7 +67,7 @@ def parseIndex(myfile):
             #print("nano seconds: %d" %val)
 
         ''' 32-bit mtime seconds, the last time a file's metadata changed
-            this is stat(2) data. 
+            this is stat(2) data.
         '''
         byte = fRd.read(4)
         if byte != b"":
@@ -100,7 +100,7 @@ def parseIndex(myfile):
             if byte != b"":
                 val = int.from_bytes(byte, byteorder = "big")
                 print("Inode : %d" %val)
-    
+
             ''' 32-bit mode this is stat(2) data.
                 Included 4-bit object type
                 valid values in binary are 1000 (regular file), 1010 (symbolic link)
@@ -110,35 +110,35 @@ def parseIndex(myfile):
             if byte != b"":
                 val = int.from_bytes(byte, byteorder = "big")
                 checkModeField(val)
-    
+
             ''' 32-bit uid
                 this is stat(2) data. '''
             byte = fRd.read(4)
             if byte != b"":
                 val = int.from_bytes(byte, byteorder = "big")
                 print("UID: %d" %val)
-    
+
             ''' 32-bit gid
                 this is stat(2) data. '''
             byte = fRd.read(4)
             if byte != b"":
                 val = int.from_bytes(byte, byteorder = "big")
                 print("GID: %d" %val)
-    
+
             ''' 32-bit file size
                 This is the on-disk size from stat(2), truncated to 32-bit. '''
             byte = fRd.read(4)
             if byte != b"":
                 val = int.from_bytes(byte, byteorder = "big")
                 print("File Size: %d [Char]" %val)
-    
+
             ''' 160-bit SHA-1 for the represented object. '''
             byte = fRd.read(20)
             if byte != b"":
                 # val = int.from_bytes(byte, byteorder = "big")
                 # print("SHA-1: %x" %val)
                 print("SHA-1: {}".format(binascii.hexlify(byte).decode('utf-8')))
-    
+
             ''' A 16-bit 'flags' field split into (high to low bits).
             '''
             byte = fRd.read(2)
@@ -152,16 +152,16 @@ def parseIndex(myfile):
                 print("Extended Flag: %d" %extendedFlag)
                 print("Stage : %d" %stage)
                 print("File Name Length: %d" %fileNameLen)
-    
+
             ''' file name (variable), ended with 0x0000. '''
             byte = fRd.read(fileNameLen)
             if byte != b'':
                 print("File Name: %s" %byte.decode('ascii'))
-    
+
             ''' 1-8 nul bytes as necessary to pad the entry to a multiple
                 of eight bytes while keeping the name NUL-terminated. '''
-            ''' only entry, header(DIRC + Ver + File-Count) not included. ''' 
-            entryDataLen = 10 * 4 + 20 + 2 
+            ''' only entry, header(DIRC + Ver + File-Count) not included. '''
+            entryDataLen = 10 * 4 + 20 + 2
             entryPlusFileLen = entryDataLen + fileNameLen
             # calculate how many b'\x00' be appended after file name.
             trueLen = (math.floor(entryPlusFileLen / 8) + 1) * 8
@@ -173,7 +173,7 @@ def parseIndex(myfile):
             if loop == fileCount - 1:
                 ''' - Extensions
                      4-byte extension signature. If the first byte is 'A'..
-                     'Z' the extension is optional and can be ignored. 
+                     'Z' the extension is optional and can be ignored.
                 '''
                 byte = fRd.read(4)
                 if byte != b'':
@@ -191,10 +191,10 @@ def parseIndex(myfile):
                         print("Extension Size: %d" %extSize)
 
                     ''' Ext Data. End of Extension. '''
-                    ''' NUL-terminated path component (relative to its 
+                    ''' NUL-terminated path component (relative to its
                                             parent directory) '''
                     # byte = fRd.read(1)
-                    
+
                     # skip reading extension data
                     byte = fRd.read(extSize)
                     if byte != b'':
@@ -206,13 +206,13 @@ def parseIndex(myfile):
                     print("-----------------------------------------------------")
                     fRd.seek(-4, 1)
 
-                ''' 160-bit SHA-1 over the content of the index file 
+                ''' 160-bit SHA-1 over the content of the index file
                                             before this checksum  '''
                 byte = fRd.read(20)
                 if byte != b'':
                     val = int.from_bytes(byte, byteorder = "big")
                     print("CheckSum: %x" %val)
-                    
+
             else:
                  # skip 20 bytes, originally know as checksum
                  byte = fRd.read(20)
