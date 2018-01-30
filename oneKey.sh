@@ -228,7 +228,7 @@ _EOF
     do
         fontName=${file##*/}
         fontName=${fontName%.*}
-        checkCmd=`fc-list | grep -i $fontName 2> /dev/null`
+        checkCmd=`fc-list | grep -i $fontName`
         if [[ $checkCmd == "" ]]; then
             cp $file $fontsInstDir
             retVal=$?
@@ -238,6 +238,9 @@ _EOF
         fi
     done
 
+    fc-cache -fv $fontsInstDir
+    # disable this until found trylly need
+    return
     cat << "_EOF"
 ------------------------------------------------------
 INSTALLING POWERLINE SYMBOLS FOR AIRLINE
@@ -247,17 +250,20 @@ _EOF
     powerSymbolConf=10-powerline-symbols.conf
     powerSymbolOtf=PowerlineSymbols.otf
 
-    if [[ ! -f $fontsInstDir/$powerSymbolOtf ]]; then
-        cp $powerSymbolOtf $fontsInstDir
-        fc-cache -fv $fontsInstDir
+    checkCmd=`fc-list | grep -i PowerlineSymbols`
+    if [[ $checkCmd == "" ]]; then
+        if [[ ! -f $fontsInstDir/$powerSymbolOtf ]]; then
+            cp $powerSymbolOtf $fontsInstDir
+        fi
     fi
 
-    fontConfDir=$HOME/.config/fontconfig/conf.d/
-    mkdir -p $fontConfDir
-    if [[ ! -f $powerSymbolConf ]]; then
-        cp $powerSymbolConf $fontConfDir
+    fontsConfDir=$HOME/.config/fontconfig/conf.d/
+    mkdir -p $fontsConfDir
+    if [[ ! -f $fontsConfDir/$powerSymbolConf ]]; then
+        cp $powerSymbolConf $fontsConfDir
     fi
 
+    # update font cache as a whole
     fc-cache -fv $fontsInstDir
     cat << "_EOF"
 ------------------------------------------------------

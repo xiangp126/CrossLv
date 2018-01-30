@@ -112,6 +112,7 @@ filetype plugin indent on    " required
 " CONFIG VIM-AIRLINE
 """"""""""""""""""""""""""""""
 nnoremap <silent> <F6> :AirlineToggle<CR>
+let g:airline_powerline_fonts = 1
 let g:airline_theme = 'base16_grayscale'
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#buffer_nr_show = 1
