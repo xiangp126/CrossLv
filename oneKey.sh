@@ -216,6 +216,9 @@ installFonts() {
 INSTALLING PRIVATE FONTS
 ------------------------------------------------------
 _EOF
+    # check if trylly need do fc-cache
+    needUpdateCnt=0
+
     cd $mainWd
     copyFromDir=./fonts
     fontsInstDir=$HOME/.local/share/fonts
@@ -230,6 +233,7 @@ _EOF
         fontName=${fontName%.*}
         checkCmd=`fc-list | grep -i $fontName`
         if [[ $checkCmd == "" ]]; then
+            ((needUpdateCnt++))
             cp $file $fontsInstDir
             retVal=$?
             if [[ $retVal != 0 ]]; then
@@ -238,9 +242,6 @@ _EOF
         fi
     done
 
-    fc-cache -fv $fontsInstDir
-    # disable this until found trylly need
-    return
     cat << "_EOF"
 ------------------------------------------------------
 INSTALLING POWERLINE SYMBOLS FOR AIRLINE
@@ -252,6 +253,7 @@ _EOF
 
     checkCmd=`fc-list | grep -i PowerlineSymbols`
     if [[ $checkCmd == "" ]]; then
+        ((needUpdateCnt++))
         if [[ ! -f $fontsInstDir/$powerSymbolOtf ]]; then
             cp $powerSymbolOtf $fontsInstDir
         fi
@@ -264,9 +266,14 @@ _EOF
     fi
 
     # update font cache as a whole
-    fc-cache -fv $fontsInstDir
+    if [[ $needUpdateCnt != 0 ]]; then
+        fc-cache -fv $fontsInstDir
+    fi
     cat << "_EOF"
 ------------------------------------------------------
+FONT -> monaco 17pt
+NON-ASCII font PowerlineSymbols 14pt
+--- usually need not do
 If custom symbols still cannot be seen then try
 closing all instances of the terminal emulator.
 Restarting X may be needed for the changes to take effect.
@@ -542,7 +549,6 @@ _EOF
 
     # extra install actions for vim plugins
     installExtraForLeaderF
-    installPowerlineSymbols
 }
 
 installExtraForLeaderF() {
