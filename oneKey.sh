@@ -118,6 +118,7 @@ _EOF
 
 # compare software version
 cmpSoftVersion() {
+    set +x
     # usage: cmpSoftVersion TrueVer $BasicVer , format xx.xx(3.10)
     # return '1' if $1 >= $2
     # return '0' else
@@ -136,8 +137,10 @@ cmpSoftVersion() {
         leftPartial=$(echo ${leftVal%%.*})
         rightPartial=$(echo ${rightVal%%.*})
         if [[ $(echo "$leftPartial > $rightPartial" | bc ) -eq 1 ]]; then
+            set -x
             return 1
         elif [[ $(echo "$leftPartial < $rightPartial" | bc ) -eq 1 ]]; then
+            set -x
             return 0
         fi
         # update leftVal and rightVal for next loop compare
@@ -152,6 +155,8 @@ cmpSoftVersion() {
             rightVal=${rightVal#*.}
         fi
     done
+
+    set -x
     return 1
 }
 
@@ -1057,7 +1062,7 @@ installCmake() {
         cmakeVersion=`cmake --version`
         # 2.8.12.2
         cmakeV=`echo ${cmakeVersion} | tr -s "" | cut -d " " -f 3`
-        basicCmakeV=2.8
+        basicCmakeV=3.4
         cmpSoftVersion $cmakeV $basicCmakeV
         if [[ $? == '1' ]]; then
             return
