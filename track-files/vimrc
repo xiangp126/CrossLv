@@ -70,47 +70,35 @@ noremap <silent> <Leader>P "+p <CR>
 " nnoremap <silent> <F6> :AirlineToggle <CR>
 
 """"""""""""""""""""""""""""""
-" VIM BUNDLE
+" VIM-PLUG CONFIG
 """"""""""""""""""""""""""""""
-filetype off          " Vundle required
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-Plugin 'VundleVim/Vundle.vim'
+call plug#begin('~/.vim/bundle')
 
 "------ OPTIONAL PLUGINS -----
-" Plugin 'davidhalter/jedi'
-" Plugin 'tell-k/vim-autopep8'
-" Plugin 'Raimondi/delimitMate'
-" Plugin 'Chiel92/vim-autoformat'
+" Plug 'davidhalter/jedi'
+" Plug 'tell-k/vim-autopep8'
+" Plug 'Chiel92/vim-autoformat'
 "------ NEW PLUGINS -----
-Plugin 'scrooloose/nerdtree'
-Plugin 'scrooloose/nerdcommenter'
-Plugin 'jiangmiao/auto-pairs'
-Plugin 'majutsushi/tagbar'
-Plugin 'Yggdroot/indentLine'
-Plugin 'Yggdroot/LeaderF'
-Plugin 'mileszs/ack.vim'
+Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+Plug 'scrooloose/nerdcommenter'
+Plug 'jiangmiao/auto-pairs'
+Plug 'majutsushi/tagbar', { 'on': 'TagbarToggle' }
+Plug 'Yggdroot/indentLine'
+Plug 'Yggdroot/LeaderF', { 'do': './install.sh'  }
+Plug 'mileszs/ack.vim'
 "------ BEAUTIFY LINE -----
-Plugin 'vim-airline/vim-airline'
-Plugin 'vim-airline/vim-airline-themes'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
 "------ CODE EXPAND -----
-Plugin 'ervandew/supertab'
-Plugin 'SirVer/ultisnips'
-Plugin 'honza/vim-snippets'
+Plug 'ervandew/supertab'
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
 "------ CODE COMPLETION -----
-Plugin 'Valloric/YouCompleteMe'
-Plugin 'tenfyzhong/CompleteParameter.vim'
+Plug 'Valloric/YouCompleteMe'
+Plug 'tenfyzhong/CompleteParameter.vim'
 
-call vundle#end()            " required
-filetype plugin indent on    " required
-" To ignore plugin indent changes, instead use:
-"filetype plugin on
-"
-" Brief help
-" :PluginList       - lists configured plugins
-" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
-" :PluginSearch foo - searches for foo; append `!` to refresh local cache
-" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
+" Initialize plugin system
+call plug#end()
 
 """"""""""""""""""""""""""""""
 " CONFIG VIM-AIRLINE
@@ -147,6 +135,7 @@ let g:Lf_DelimiterChar = ';'
 let g:Lf_MruFileExclude = ['*.so']
 let g:Lf_CommandMap = {'<C-C>': ['<Esc>', '<C-C>']}
 let g:Lf_HighlightIndividual = 0
+let g:Lf_StlSeparator = { 'left': '', 'right': ''  }
 map <leader>f   :LeaderfFunction<CR>
 map <leader>fa  :LeaderfFunctionAll<CR>
 " search line match word
@@ -173,16 +162,13 @@ nnoremap <Leader>a :Ack!<Space>
 " CONFIG TAGBAR
 """"""""""""""""""""""""""""""
 " let g:tagbar_ctags_bin = "/usr/bin/ctags"
-nnoremap <silent> <F5> :call TagbarMyOpen()<CR>
+nnoremap <silent> <F5> :TagbarToggle<CR>
 let g:Tagbar_title = "[Tagbar]"
 let g:tagbar_left = 0
 let g:tagbar_width = 25
 " originally Yellow value 11
-highlight Search ctermbg=88
+" highlight Search ctermbg=88
 highlight TagbarSignature ctermfg=68
-function! TagbarMyOpen()
-    exec 'TagbarToggle'
-endfunction
 
 """"""""""""""""""""""""""""""
 " CONFIG INDENTLINE
@@ -292,4 +278,4 @@ nnoremap <leader>j :YcmCompleter GoToDefinitionElseDeclaration<CR>
 " LAST CHANGE COLOR - BOTTOM
 """"""""""""""""""""""""""""""
 " highlight Search maybe modified by ack.vim, so change it back here
-hi Search ctermfg=130 ctermbg=None cterm=underline
+" hi Search ctermfg=130 ctermbg=None cterm=underline

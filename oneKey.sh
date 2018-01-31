@@ -116,6 +116,45 @@ _EOF
     logo
 }
 
+# compare software version
+cmpSoftVersion() {
+    # usage: cmpSoftVersion TrueVer $BasicVer , format xx.xx(3.10)
+    # return '1' if $1 >= $2
+    # return '0' else
+    leftVal=$1
+    rightVal=$2
+    if [[ $leftVal == "" || $rightVal == "" ]]; then
+        echo Error: syntax not match, please check
+        exit 255
+    fi
+
+    # with max loop
+    for (( i = 0; i < 5; i++ )); do
+        if [[ $leftVal == "0" && $rightVal == "0" ]]; then
+            break
+        fi
+        leftPartial=$(echo ${leftVal%%.*})
+        rightPartial=$(echo ${rightVal%%.*})
+        if [[ $(echo "$leftPartial > $rightPartial" | bc ) -eq 1 ]]; then
+            return 1
+        elif [[ $(echo "$leftPartial < $rightPartial" | bc ) -eq 1 ]]; then
+            return 0
+        fi
+        # update leftVal and rightVal for next loop compare
+        if [[ ${leftVal#*.} == $leftVal ]]; then
+            leftVal='0'
+        else
+            leftVal=${leftVal#*.}
+        fi
+        if [[ ${rightVal#*.} == $rightVal ]]; then
+            rightVal='0'
+        else
+            rightVal=${rightVal#*.}
+        fi
+    done
+    return 1
+}
+
 installBashCompletion() {
     cat << _EOF
 ------------------------------------------------------
@@ -289,31 +328,31 @@ checkGccVersion() {
         "/usr/local/bin"
         "/usr/bin"
     )
-    basicGccVersion=4.8
     CC=""
     for pathLoc in ${pathLoopLoc[@]}
     do
         if [[ ! -d $pathLoc ]]; then
             continue
         fi
-        # check if version matches
         gccLoc="$pathLoc/gcc"
         if [[ ! -x "$gccLoc" ]]; then
             continue
         fi
+
+        # check if gcc found version matches
+        basicGccV=4.8
         # 4.4.7
-        gccVersion=`$gccLoc -dumpversion`
-        # 4.4
-        gccV=$(echo $gccVersion | cut -d "." -f 1,2)
-        # if found, set env CC/CXX
-        if [[ `echo "$gccV >= $basicGccVersion" | bc` -eq 1 ]]; then
+        gccV=`$gccLoc -dumpversion`
+        cmpSoftVersion $gccV $basicGccV
+        if [[ $? == '1' ]]; then
+            # found one matchs
             CC=$pathLoc/gcc
             CXX=$pathLoc/c++
-            # if found one matchs, quit this 'for' loop
             break
         fi
     done
-    # compile new version gcc if not found suitable
+
+    # compiling new gcc to support c++11
     if [[ "$CC" == "" ]]; then
 #         cat << _EOF
 # [FatalWarning]: Gcc version < 4.8.0, not support c++11
@@ -327,9 +366,9 @@ checkGccVersion() {
 # use 'source sample/gen-gccenv.sh root' to export env
 # -----------------------------------------------------
 # _EOF
-        return 255
-    else
         return 0
+    else
+        return 1
     fi
 }
 
@@ -337,7 +376,7 @@ installGcc() {
     # if gcc version meets requirement, return 0
     checkGccVersion
     retVal=$?
-    if [[ $retVal == 0 ]]; then
+    if [[ $retVal == '1' ]]; then
         return
     fi
     cat << "_EOF"
@@ -456,19 +495,27 @@ cat << "_EOF"
 INSTALLING MANAGER for VIM-PLUGIN
 ------------------------------------------------------
 _EOF
-    gitClonePath=https://github.com/VundleVim/Vundle.vim
-    clonedName=${baseDir}/${tackleDir[0]}/bundle/Vundle.vim
-    # check if target directory already exists
-    if [[ -d $clonedName ]]; then
-        echo [Warning]: target $clonedName already exists, Omitting clone
+    # only download one file from this git repo
+    curlPath=`which curl 2> /dev/null`
+    if [[ $curlPath == "" ]]; then
+        echo [FatalError]: please install curl first
+        exit 255
+    fi
+    curlDownPath=https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    installPath=$HOME/.vim/autoload/plug.vim
+
+    # check if target file already exists
+    if [[ -f $installPath ]]; then
+        echo [Warning]: target $installPath already exists, Omitting clone
     else
-        git clone $gitClonePath $clonedName
+        curl -fLo $installPath --create-dirs $curlDownPath
         # check if git returns successfully
         if [[ $? != 0 ]]; then
-            echo "[Error]: git returns error, quitting now "
+            echo "[Error]: curl returns error, quitting now "
             exit
         fi
     fi
+
     cat << "_EOF"
 ------------------------------------------------------
 INSTALLING MANAGER for TMUX-PLUGIN
@@ -493,17 +540,20 @@ COPYING .VIMRC FIRST
 ------------------------------------------------------
 _EOF
     cd $mainWd
-    # let .vimrc in place
+    # let .vimrc in place ahead
     cp $trackDir/vimrc $baseDir/.vimrc
     cat << _EOF
 ------------------------------------------------------
 COMMENT ON COLORSCHEME IN .VIMRC
 ------------------------------------------------------
 _EOF
-    # comment on color scheme line
-    matchStr=':colorscheme'
-    sed -i --regexp-extended \
-        "s/$matchStr/\" $matchStr/" $HOME/.vimrc
+    # comment on color scheme line if default color not found
+    defColorPath=$HOME/.vim/colors/darkcoding.vim
+    if [[ ! -f $defColorPath ]]; then
+        matchStr=':colorscheme'
+        sed -i --regexp-extended \
+            "s/$matchStr/\" $matchStr/" $HOME/.vimrc
+    fi
     # call sub-functions to install each module
     installTmuxPlugins
     installVimPlugins
@@ -536,7 +586,7 @@ _EOF
     sed -i --regexp-extended "s/(^Plugin 'Valloric)/\" \1/" $tackleFile
 
     # source $HOME/.vimrc if needed
-    vim +"source $HOME/.vimrc" +PluginInstall +qall
+    vim +"source $HOME/.vimrc" +PlugInstall +qall
 
     cat << "_EOF"
 ------------------------------------------------------
@@ -552,6 +602,24 @@ _EOF
 }
 
 installExtraForLeaderF() {
+    cat << "_EOF"
+------------------------------------------------------
+COPYING DARK_LEADERF.VIM AS DEFAULT LEADERF COLORSCHEME
+------------------------------------------------------
+_EOF
+    myLeaderFColor=./leaderf-colors/dark_leaderf.vim
+    cpColorDst=$HOME/.vim/bundle/LeaderF/autoload/leaderf/colorscheme/
+
+    cd $mainWd
+    cp $myLeaderFColor $cpColorDst
+    retVal=$?
+    if [[ $retVal != 0 ]]; then
+        echo "[Error]: copy private leaderf color return with value $retVal"
+        exit 255
+    fi
+
+    # no need do this when using vim-plug as plugin manager
+    return 0
     leaderfInstDir=$HOME/.vim/bundle/LeaderF
     if [[ ! -d $leaderfInstDir ]]; then
         echo "[Warning]: found no LeaderF, please check it"
@@ -567,22 +635,6 @@ _EOF
     retVal=$?
     if [[ $retVal != 0 ]]; then
         echo "[Warning]: Install fuzzy for LeaderF return with value $retVal "
-    fi
-
-    cat << "_EOF"
-------------------------------------------------------
-COPYING DARK_LEADERF.VIM AS DEFAULT LEADERF COLORSCHEME
-------------------------------------------------------
-_EOF
-    myLeaderFColor=./leaderf-colors/dark_leaderf.vim
-    cpColorDst=$HOME/.vim/bundle/LeaderF/autoload/leaderf/colorscheme/
-
-    cd $mainWd
-    cp $myLeaderFColor $cpColorDst
-    retVal=$?
-    if [[ $retVal != 0 ]]; then
-        echo "[Error]: copy private leaderf color return with value $retVal"
-        exit 255
     fi
 }
 
@@ -700,7 +752,7 @@ _EOF
     fi
 }
 
-# replace of grep
+# install silver searcher
 installAck() {
     # ag linked to ack
     ackPath=`which ag 2> /dev/null`
@@ -1004,13 +1056,10 @@ installCmake() {
         # cmake version 2.8.12.2
         cmakeVersion=`cmake --version`
         # 2.8.12.2
-        cmakeVer=`echo ${cmakeVersion} | tr -s "" | cut -d " " -f 3`
-        # 2.8
-        cmakeV=$(echo $cmakeVer | cut -d "." -f 1,2)
-        basicCmakeV=3.0
-        # if installed cmake already meets the requirement
-        if [[ `echo "$cmakeV >= $basicCmakeV" | bc` -eq 1 ]]; then
-            echo "[Warning]: system cmake $cmakeVersion  already >= $basicCmakeV "
+        cmakeV=`echo ${cmakeVersion} | tr -s "" | cut -d " " -f 3`
+        basicCmakeV=2.8
+        cmpSoftVersion $cmakeV $basicCmakeV
+        if [[ $? == '1' ]]; then
             return
         fi
     fi
@@ -1321,7 +1370,7 @@ _EOF
     repoName=YouCompleteMe
     ycmDir=$HOME/.vim/bundle/YouCompleteMe
     if [[ -d $ycmDir ]]; then
-        echo [Warning]: already has YCM repo cloned, omitting now
+        echo [Warning]: already has YCM repo cloned, omitting it now
     else
         git clone $repoLink/$repoName $ycmDir
         # check if clone returns successfully
