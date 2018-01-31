@@ -142,6 +142,7 @@ let g:Lf_WildIgnore = {
    \ 'dir': ['.svn','.git','.hg'],
    \ 'file': ['*.sw?','~$*','*.bak','*.exe','*.o','*.so','*.py[co]']
    \}
+" press <F5> to refresh the cache.
 let g:Lf_DelimiterChar = ';'
 let g:Lf_MruFileExclude = ['*.so']
 let g:Lf_CommandMap = {'<C-C>': ['<Esc>', '<C-C>']}
