@@ -323,6 +323,34 @@ closing all instances of the terminal emulator.
 Restarting X may be needed for the changes to take effect.
 ------------------------------------------------------
 _EOF
+
+    return 0
+    cat << "_EOF"
+------------------------------------------------------
+INSTALLING MANY POWERLINE-PACHED FONTS
+------------------------------------------------------
+_EOF
+    pFontClonePath=https://github.com/powerline/fonts
+    clonedName=fonts
+
+    # rename download package
+    cd $downloadPath
+    # check if already has this tar ball.
+    if [[ -d $clonedName ]]; then
+        echo [Warning]: target $clonedName/ already exists, Omitting now
+    else
+        git clone $pFontClonePath $clonedName --depth=1
+        # check if git clone returns successfully
+        if [[ $? != 0 ]]; then
+            echo [Error]: git clone returns error, quitting now
+            exit
+        fi
+    fi
+
+    # install
+    cd $clonedName
+    sh -x install.sh
+    fc-cache -fv $fontsInstDir
 }
 
 # gcc must support C++11 to compile YCM
@@ -588,7 +616,7 @@ _EOF
     tackleFile=$HOME/.vimrc
     # comment YouCompleteMe in $HOME/.vimrc
     # it takes too long time, manually compile in cc-ycm.sh
-    sed -i --regexp-extended "s/(^Plugin 'Valloric)/\" \1/" $tackleFile
+    sed -i --regexp-extended "s/(^Plug 'Valloric)/\" \1/" $tackleFile
 
     # source $HOME/.vimrc if needed
     vim +"source $HOME/.vimrc" +PlugInstall +qall
@@ -623,8 +651,6 @@ _EOF
         exit 255
     fi
 
-    # no need do this when using vim-plug as plugin manager
-    return 0
     leaderfInstDir=$HOME/.vim/bundle/LeaderF
     if [[ ! -d $leaderfInstDir ]]; then
         echo "[Warning]: found no LeaderF, please check it"
@@ -1111,7 +1137,7 @@ _EOF
     cmakePath=$cmakeInstDir/bin/cmake
     cat << _EOF
 ------------------------------------------------------
-INSTALLING cmake 3 DONE
+INSTALLING CMAKE 3 DONE
 `$cmakeInstDir/bin/cmake --version`
 cmake path = $cmakeInstDir/bin/
 ------------------------------------------------------
@@ -1483,7 +1509,7 @@ _EOF
             sudo apt-get install \
                 pkg-config libevent-dev libncurses5 libncurses5-dev \
                 bash-completion python-optcomplete build-essential cmake \
-                automake asciidoc xmlto tmux \
+                automake asciidoc xmlto tmux curl \
                 libpcre3-dev liblzma-dev libclang-5.0-dev clang-5.0 \
                 libmpc-dev libcurl4-openssl-dev perl libperl-dev \
                 libncursesw5 libncursesw5-dev libgnome2-dev libgnomeui-dev \
@@ -1573,7 +1599,7 @@ _EOF
 finalAdjustParams() {
     cat << _EOF
 ------------------------------------------------------
-CORRECTING PYTHON3 INTERPRETER PATH IN $HOME/.VIMRC
+CORRECTING PYTHON3 INTERPRETER PATH IN $HOME/.vimrc
 ------------------------------------------------------
 _EOF
     if [[ $python3Path == "" ]]; then
@@ -1590,7 +1616,7 @@ _EOF
 
     cat << _EOF
 ------------------------------------------------------
-CORRECTING COLOR SCHEME IN $HOME/.VIMRC
+CORRECTING COLOR SCHEME IN $HOME/.vimrc
 ------------------------------------------------------
 _EOF
     matchStr=':colorscheme'
@@ -1614,7 +1640,7 @@ _EOF
     if [[ -d $cppTackleDir ]]; then
         cat << _EOF
 ----------------------------------------------------------
-CORRECTING C++ INCLUDE DIRECTORY IN $HOME/.YCM_EXTRA_CONF.PY
+CORRECTING C++ INCLUDE DIRECTORY IN $HOME/.ycm_extra_conf.py
 ----------------------------------------------------------
 _EOF
         cppHeaderPath=`find  $cppTackleDir -maxdepth 1 -mindepth 1 -type d \

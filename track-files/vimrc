@@ -78,13 +78,14 @@ call plug#begin('~/.vim/bundle')
 " Plug 'davidhalter/jedi'
 " Plug 'tell-k/vim-autopep8'
 " Plug 'Chiel92/vim-autoformat'
+" Plug 'Yggdroot/LeaderF', { 'do': './install.sh'  }
 "------ NEW PLUGINS -----
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 Plug 'scrooloose/nerdcommenter'
 Plug 'jiangmiao/auto-pairs'
 Plug 'majutsushi/tagbar', { 'on': 'TagbarToggle' }
 Plug 'Yggdroot/indentLine'
-Plug 'Yggdroot/LeaderF', { 'do': './install.sh'  }
+Plug 'Yggdroot/LeaderF'
 Plug 'mileszs/ack.vim'
 "------ BEAUTIFY LINE -----
 Plug 'vim-airline/vim-airline'
