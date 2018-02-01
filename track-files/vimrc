@@ -273,9 +273,3 @@ let g:ycm_goto_buffer_command = 'new-tab'
 " nnoremap <leader>jl :YcmCompleter GoToDeclaration<CR>
 " nnoremap <leader>jf :YcmCompleter GoToDefinition<CR>
 nnoremap <leader>j :YcmCompleter GoToDefinitionElseDeclaration<CR>
-
-""""""""""""""""""""""""""""""
-" LAST CHANGE COLOR - BOTTOM
-""""""""""""""""""""""""""""""
-" highlight Search maybe modified by ack.vim, so change it back here
-" hi Search ctermfg=130 ctermbg=None cterm=underline

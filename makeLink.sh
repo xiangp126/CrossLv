@@ -44,7 +44,11 @@ ENTERING INTO $handleDir/
 ------------------------------------------------------
 _EOF
 
-    handleFiles=`find . -regex ".*.[sh|py]" -type f -executable`
+    handleFiles=`find . -regex ".*.[sh|py]$" -type f -executable`
+    # find on macos did not support -executable
+    if [[ `uname -s` == "Darwin" ]]; then
+        handleFiles=`find . -regex ".*.[sh|py]$" -type f`
+    fi
     for file in ${handleFiles[@]}
     # ./sshproxy.sh
     do
