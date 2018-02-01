@@ -1022,7 +1022,7 @@ _EOF
     # comm attribute to get source 'vim'
     vimClonePath=https://github.com/vim/vim
     clonedName=vim
-    checkoutVersion=v8.0.1428
+    checkoutVersion=v8.0.1450
 
     # rename download package
     cd $downloadPath
@@ -1037,11 +1037,13 @@ _EOF
             exit
         fi
     fi
+
     cd $clonedName
-    # if need checkout
-    git checkout $checkoutVersion
+    git checkout master
+    git pull
+    # git checkout $checkoutVersion
     # clean before ./configure
-    make distclean
+    # make distclean
 
     # find python2 & python3 config dir
     python2Config=`python2-config --configdir 2> /dev/null`
