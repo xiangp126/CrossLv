@@ -1,11 +1,9 @@
 ## lx-Vundle
-- Goal to handle working environment crossing different Linux like platform through 'oneKey' stroke
+- Goal to handle working environment crossing different Linux-like platform through 'oneKey' stroke
 
 - Two modes deploy selection
     - home -> without root privilege, normally installed into $HOME/.usr
     - root -> with root privilege, normally installed into /usr/local
-
-- This tool itself end up with compiling YouCompleteMe done
 
 - Support Platform
     - Ubuntu
@@ -48,28 +46,12 @@ $ sh oneKey.sh [home | root]
 ```
 
 ## Project Outline
-- confirm/  => key files to track on the system, for backup and restore
+- track-files/  => key files to track on the system, for backup and restore
 - oneKey.sh => main 'one key stroke' shell, will auto call
     - makeLink.sh   => additional shell to make link for that in tools/
     - autoHandle.sh => assistant for handling files tracked in confirm/
 - tools/    => written for better or understanding some logics
-    - ./mygit.py
-    - ./indexcat.py
-    - ./addtools.sh
-    - ./mkfonts.sh
-    - ./tmuxhelp.sh
-    - ./sshjumphost.sh
-    - ./fixosdepends.sh
-    - ./sshproxy-git.sh
-    - ./httproxy-git.sh
 - compile-tools/  => some useful automatically compiling tools, as name indicated
-    -  ./cc-vim.sh
-    -  ./cc-git.sh
-    -  ./cc-gcc.sh
-    -  ./cc-clang.sh # compiling GCC and Clang may take up 5G+ disk space
-    -  ./cc-cmake.sh
-    -  ./cc-python3.sh
-    -  ./gen-gccenv.sh
 - doc/   => frequently used document
 - fonts/ => beautifully and recommended open source fonts
 - template/ => some templates generated or used by this project

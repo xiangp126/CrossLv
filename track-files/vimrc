@@ -128,7 +128,7 @@ let g:Lf_ShortcutF = '<leader>F'
 let g:Lf_StlColorscheme = 'dark_leaderf'
 let g:Lf_WindowHeight = 0.50
 let g:Lf_WildIgnore = {
-   \ 'dir': ['.svn','.git','.hg'],
+   \ 'dir': ['.svn','.git','.hg', '.acme_project', '.ACMEROOT'],
    \ 'file': ['*.sw?','~$*','*.bak','*.exe','*.o','*.so','*.py[co]']
    \}
 " press <F5> to refresh the cache.
@@ -139,12 +139,11 @@ let g:Lf_HighlightIndividual = 0
 let g:Lf_StlSeparator = { 'left': '', 'right': ''  }
 map <leader>f   :LeaderfFunction<CR>
 map <leader>fa  :LeaderfFunctionAll<CR>
-" search line match word
+map <leader>fw  :LeaderfFunctionCword<CR>
+" search line which has the word
 map <leader>l   :LeaderfLine<CR>
 map <leader>la  :LeaderfLineAll<CR>
-" Cword -> current word under cursor in vim
-map <leader>w   :LeaderfLineCword<CR>
-map <leader>wa  :LeaderfLineAllCword<CR>
+map <leader>lw   :LeaderfLineCword<CR>
 " search line match word | end
 map <leader>m   :LeaderfMruCwd<CR>
 map <leader>ma  :LeaderfMru<CR>

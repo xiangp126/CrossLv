@@ -203,7 +203,7 @@ _EOF
     cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $tarName ]]; then
-        echo [Warning]: Tar Ball $tarName already exists, Omitting wget
+        echo [Warning]: Tar Ball $tarName already exists
     else
         wget --no-cookies \
              --no-check-certificate \
@@ -337,7 +337,7 @@ _EOF
     cd $downloadPath
     # check if already has this tar ball.
     if [[ -d $clonedName ]]; then
-        echo [Warning]: target $clonedName/ already exists, Omitting now
+        echo [Warning]: target $clonedName/ already exists
     else
         git clone $pFontClonePath $clonedName --depth=1
         # check if git clone returns successfully
@@ -428,7 +428,7 @@ _EOF
     cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $tarName ]]; then
-        echo [Warning]: Tar Ball $tarName already exists, Omitting wget
+        echo [Warning]: Tar Ball $tarName already exists
     else
         wget --no-cookies \
              --no-check-certificate \
@@ -510,12 +510,11 @@ checkCpuCoreNum() {
 # install vim and tmux
 installBone() {
     if [ ! -d $baseDir ]; then
-        echo mkdir -p $baseDir
-        mkdir -p $baseDir
+        echo FatalError: Could not found $baseDir/, please check it
+        exit 255
     fi
 
     cd $mainWd
-    # run backup first of all.
     cat << _EOF
 ------------------------------------------------------
 RUN BACKUP ROUTINE FIRST
@@ -525,40 +524,47 @@ _EOF
 
 cat << "_EOF"
 ------------------------------------------------------
-INSTALLING MANAGER for VIM-PLUGIN
+INSTALLING MANAGER FOR VIM PLUGINS
 ------------------------------------------------------
 _EOF
     # only download one file from this git repo
-    curlPath=`which curl 2> /dev/null`
-    if [[ $curlPath == "" ]]; then
-        echo [FatalError]: please install curl first
-        exit 255
-    fi
-    curlDownPath=https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    installPath=$HOME/.vim/autoload/plug.vim
+    vmDownPath=https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    vmInstDir=$HOME/.vim/autoload
+    vmInstPath=$vmInstDir/plug.vim
 
     # check if target file already exists
-    if [[ -f $installPath ]]; then
-        echo [Warning]: target $installPath already exists, Omitting clone
+    if [[ -f $vmInstPath ]]; then
+        echo [Warning]: target $vmInstPath already exists
     else
-        curl -fLo $installPath --create-dirs $curlDownPath
-        # check if git returns successfully
-        if [[ $? != 0 ]]; then
-            echo "[Error]: curl returns error, quitting now "
-            exit
+        curlPath=`which curl 2> /dev/null`
+        if [[ $curlPath == "" ]]; then
+            # did not has curl, use wget instead
+            mkdir -p $vmInstDir
+            wget $vmDownPath -O $vmInstPath
+            if [[ $? != 0 ]]; then
+                echo [Error]: wget returns error, quitting now
+                exit 255
+            fi
+        else
+            curl -fLo $vmInstPath --create-dirs $vmDownPath
+            # check if git returns successfully
+            if [[ $? != 0 ]]; then
+                echo "[Error]: curl returns error, quitting now "
+                exit 255
+            fi
         fi
     fi
 
     cat << "_EOF"
 ------------------------------------------------------
-INSTALLING MANAGER for TMUX-PLUGIN
+INSTALLING MANAGER FOR TMUX PLUGINS
 ------------------------------------------------------
 _EOF
     gitClonePath=https://github.com/tmux-plugins/tpm
     clonedName=${baseDir}/${tackleDir[1]}/plugins/tpm
     # check if target directory already exists
     if [[ -d $clonedName ]]; then
-        echo [Warning]: target $clonedName already exists, Omitting clone
+        echo [Warning]: target $clonedName already exists
     else
         git clone $gitClonePath $clonedName
         # check if git returns successfully
@@ -689,7 +695,7 @@ _EOF
     cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $tarName ]]; then
-        echo [Warning]: Tar Ball $tarName already exists, Omitting wget
+        echo [Warning]: Tar Ball $tarName already exists
     else
         wget --no-cookies \
              --no-check-certificate \
@@ -704,7 +710,7 @@ _EOF
     fi
     # check if already untared
     if [[ -d $untarName ]]; then
-        echo [Warning]: found $untarName, omitting this step
+        echo [Warning]: untarname $untarName already exists
     else
         tar -zxv -f $tarName
     fi
@@ -746,7 +752,7 @@ _EOF
     cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $tarName ]]; then
-        echo [Warning]: Tar Ball $tarName already exists, Omitting wget
+        echo [Warning]: Tar Ball $tarName already exists
     else
         wget --no-cookies \
              --no-check-certificate \
@@ -761,7 +767,7 @@ _EOF
     fi
     # check if already untared
     if [[ -d $untarName ]]; then
-        echo [Warning]: found $untarName, omitting this step
+        echo [Warning]: untarName $untarName already exists
     else
         tar -xv -f $tarName
     fi
@@ -805,7 +811,7 @@ _EOF
     clonedName=the_silver_searcher
     cd $downloadPath
     if [[ -d "$clonedName" ]]; then
-        echo [Warning]: $clonedName/ already exists, omitting this step
+        echo [Warning]: clonedName $clonedName/ already exists
     else
         git clone $gitClonePath
         # check if git clone returns successfully
@@ -854,7 +860,7 @@ _EOF
     cd $downloadPath
     clonedName=ctags
     if [[ -d "$clonedName" ]]; then
-        echo [Warning]: $clonedName/ already exists, omitting this step
+        echo [Warning]: clonedName $clonedName/ already exists
     else
         git clone https://github.com/universal-ctags/ctags
         # check if git clone returns successfully
@@ -903,7 +909,7 @@ installPython3() {
             if [[ "$libPython3Path" == "" || "$?" != 0  ]]; then
                 echo "[Warning]: locate checking python3 path/lib failed, start find checking "
             else
-                echo [Warning]: python3/lib already installed, omitting this step
+                echo [Warning]: python3/lib already installed
                 return
             fi
         fi
@@ -924,7 +930,7 @@ installPython3() {
             if [[ $? != 0 ]]; then
                 echo "[Warning]: find checking python3 path/lib failed, re-install python3 "
             else
-                echo [Warning]: python3/lib already installed, omitting this step
+                echo [Warning]: python3/lib already installed
                 return
             fi
         fi
@@ -946,7 +952,7 @@ _EOF
     cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $tarName ]]; then
-        echo [Warning]: Tar Ball $tarName already exists, Omitting wget
+        echo [Warning]: Tar Ball $tarName already exists
     else
         wget --no-cookies \
              --no-check-certificate \
@@ -961,7 +967,7 @@ _EOF
     fi
     # check if already untared
     if [[ -d $untarName ]]; then
-        echo [Warning]: found $untarName, omitting this step
+        echo [Warning]: found $untarName
     else
         tar -zxv -f $tarName
     fi
@@ -1002,7 +1008,7 @@ installvim() {
     # check if vim 8 was installed
     checkCmd=`vim --version | head -n 1 | grep -i "Vi IMproved 8" 2> /dev/null`
     if [[ "$checkCmd" != "" ]]; then
-        echo "[Warning]: Vim 8 was already installed, omitting this step "
+        echo "[Warning]: Vim 8 was already installed"
         vimPath=`which vim`
         return
     fi
@@ -1022,7 +1028,7 @@ _EOF
     cd $downloadPath
     # check if already has this tar ball.
     if [[ -d $clonedName ]]; then
-        echo [Warning]: target $clonedName/ already exists, Omitting now
+        echo [Warning]: target $clonedName/ already exists
     else
         git clone ${vimClonePath} $clonedName
         # check if git clone returns successfully
@@ -1110,7 +1116,7 @@ _EOF
     cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $tarName ]]; then
-        echo [Warning]: Tar Ball $tarName already exists, Omitting wget
+        echo [Warning]: Tar Ball $tarName already exists
     else
         wget --no-cookies \
              --no-check-certificate \
@@ -1166,7 +1172,7 @@ installClang() {
         fi
         libClangPath=`find $pathLoc -name libclang.so | head -n 1 2> /dev/null`
         if [[ "$libClangPath" != "" ]]; then
-            echo "[Warning]: $libClangName was already installed, omitting this step "
+            echo "[Warning]: $libClangName was already installed"
             return
         fi
     done
@@ -1195,7 +1201,7 @@ _EOF
     cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $llvmTarName ]]; then
-        echo [Warning]: Tar Ball $llvmTarName already exists, Omitting wget
+        echo [Warning]: Tar Ball $llvmTarName already exists
     else
         wget --no-cookies \
              --no-check-certificate \
@@ -1210,7 +1216,7 @@ _EOF
     fi
     # check if dir already exist
     if [[ -d $llvmUntarName ]]; then
-        echo [Warning]: $llvmUntarName already exist, Omitting untar
+        echo [Warning]: untarName $llvmUntarName already exist
     else
         tar -xv -f $llvmTarName
     fi
@@ -1229,7 +1235,7 @@ _EOF
     cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $cfeTarName ]]; then
-        echo [Warning]: Tar Ball $cfeTarName already exists, Omitting wget
+        echo [Warning]: Tar Ball $cfeTarName already exists
     else
         wget --no-cookies \
              --no-check-certificate \
@@ -1244,7 +1250,7 @@ _EOF
     fi
     # check if dir already exist
     if [[ -d $cfeUntarName ]]; then
-        echo [Warning]: $cfeUntarName already exist, Omitting untar
+        echo [Warning]: untarName $cfeUntarName already exist
     else
         mkdir -p $cfeUntarName
         tar -xv -f $cfeTarName --strip-components=1 -C $cfeUntarName
@@ -1264,7 +1270,7 @@ _EOF
     cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $crtTarName ]]; then
-        echo [Warning]: Tar Ball $crtTarName already exists, Omitting wget
+        echo [Warning]: Tar Ball $crtTarName already exists
     else
         wget --no-cookies \
              --no-check-certificate \
@@ -1279,7 +1285,7 @@ _EOF
     fi
     # check if dir already exist
     if [[ -d $crtUntarName ]]; then
-        echo [Warning]: $crtUntarName already exist, Omitting untar
+        echo [Warning]: untarName $crtUntarName already exist
     else
         mkdir -p $crtUntarName
         tar -xv -f $crtTarName --strip-components=1 -C $crtUntarName
@@ -1308,7 +1314,7 @@ _EOF
     cd $downloadPath
     # check if already has this tar ball.
     if [[ -f $cteTarName ]]; then
-        echo [Warning]: Tar Ball $cteTarName already exists, Omitting wget
+        echo [Warning]: Tar Ball $cteTarName already exists
     else
         wget --no-cookies \
              --no-check-certificate \
@@ -1323,7 +1329,7 @@ _EOF
     fi
     # check if dir already exist
        # if [[ -d $cteUntarName ]]; then
-           # echo [Warning]: $cteUntarName already exist, Omitting untar
+           # echo [Warning]: untarName $cteUntarName already exist
        # else
            # mkdir -p $cteUntarName
            # tar -xv -f $crtTarName --strip-components=1 -C $cteUntarName
@@ -1390,7 +1396,12 @@ _EOF
 
 # compile YouCompleteMe
 installYcm() {
-    # cmakePath=`which cmake 2> /dev/null`
+    ycmCoreDir="$HOME/.vim/bundle/YouCompleteMe/third_party/ycmd"
+    ycmCorePath="$ycmCoreDir/ycm_core.so"
+    if [[ -f $ycmCorePath ]]; then
+        echo 'Warning: already has YouCompleteMe installed'
+        return 0
+    fi
     cat << "_EOF"
 ------------------------------------------------------
 COMPILING YOUCOMPLETEME
@@ -1399,11 +1410,11 @@ _EOF
     # comm attribute for getting source ycm
     repoLink=https://github.com/Valloric
     repoName=YouCompleteMe
-    ycmDir=$HOME/.vim/bundle/YouCompleteMe
-    if [[ -d $ycmDir ]]; then
-        echo [Warning]: already has YCM repo cloned, omitting it now
+    ycmInstDir=$HOME/.vim/bundle/YouCompleteMe
+    if [[ -d $ycmInstDir ]]; then
+        echo [Warning]: already has YCM repo cloned
     else
-        git clone $repoLink/$repoName $ycmDir
+        git clone $repoLink/$repoName $ycmInstDir
         # check if clone returns successfully
         if [[ $? != 0 ]]; then
             echo [Error]: git clone returns error, quitting now
@@ -1411,7 +1422,7 @@ _EOF
         fi
     fi
 
-    cd $ycmDir
+    cd $ycmInstDir
     git submodule update --init --recursive
     if [[ $platOsType == 'macos' || $platOsType == 'ubuntu' ]]; then
         python3 ./install.py --clang-completer --system-libclang
@@ -1419,7 +1430,7 @@ _EOF
             echo "install YCM returns error, quitting now "
             exit 1
         fi
-        return
+        return 0
     fi
 
     # not use official install script, self compile it
@@ -1441,7 +1452,7 @@ _EOF
                -DPYTHON_EXECUTABLE=$python3Path \
                -DPYTHON_LIBRARY=$libPython3Path \
                -DUSE_PYTHON2=OFF \
-               $ycmDir/third_party/ycmd/cpp
+               $ycmInstDir/third_party/ycmd/cpp
     # check if install returns successfully
     if [[ $? != 0 ]]; then
         echo "cmake -G "Unix Makefiles" error, quitting now "
@@ -1465,8 +1476,8 @@ _EOF
 CHECK IF ANY DYNAMIC LIBRARY LINK ISSUE
 ------------------------------------------------------
 _EOF
-    ycmCoreDir="$HOME/.vim/bundle/YouCompleteMe/third_party/ycmd"
-    ycmCorePath="$ycmCoreDir/ycm_core.so"
+    # ycmCoreDir="$HOME/.vim/bundle/YouCompleteMe/third_party/ycmd"
+    # ycmCorePath="$ycmCoreDir/ycm_core.so"
     lddPath=`which ldd 2> /dev/null`
     if [[ $lddPath != "" ]]; then
         # loop to check and fix issue
