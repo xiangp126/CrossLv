@@ -163,7 +163,7 @@ cmpSoftVersion() {
 installBashCompletion() {
     cat << _EOF
 ------------------------------------------------------
-INSTALLING PRIVATE EXTRA BASH COMPLETION FILES
+INSTALLING EXTRA BASH COMPLETION FOR GIT, TMUX, ETC
 ------------------------------------------------------
 _EOF
     cd $mainWd
@@ -189,12 +189,12 @@ _EOF
     fi
     cat << "_EOF"
 ------------------------------------------------------
-INSTALLING EXTENDED BASH-COMPLETION PACKAGES
+INSTALLING STANDARD BASH-COMPLETION FOR SED, FIND, ETC
 ------------------------------------------------------
 _EOF
     bashCompInstDir=$commInstdir
     $execPrefix mkdir -p $commInstdir
-    # comm attribute to get source 'gcc'
+    # comm attribute to get source
     wgetLink=http://archive.ubuntu.com/ubuntu/pool/main/b/bash-completion
     tarName=bash-completion_2.1.orig.tar.bz2
     untarName=bash-completion-2.1
@@ -257,7 +257,7 @@ _EOF
 installFonts() {
     cat << _EOF
 ------------------------------------------------------
-INSTALLING PRIVATE FONTS
+INSTALLING WONDERFUL PROGRAMMING FONTS
 ------------------------------------------------------
 _EOF
     # check if trylly need do fc-cache
@@ -592,7 +592,18 @@ _EOF
         matchStr=':colorscheme'
         sed -i --regexp-extended \
             "s/$matchStr/\" $matchStr/" $HOME/.vimrc
+    else
+        # replace exist colorscheme to darkcoding
+        replacedTo=darkcoding
+        sed -i --regexp-extended \
+            "/$matchStr/c $matchStr $replacedTo" $HOME/.vimrc
+        # check return status
+        retVal=$?
+        if [[ $retVal != 0 ]]; then
+            echo "[Warning]: replace color scheme returns $retVal "
+        fi
     fi
+
     # call sub-functions to install each module
     installTmuxPlugins
     installVimPlugins
@@ -646,7 +657,7 @@ installExtraForLeaderF() {
 COPYING DARK_LEADERF.VIM AS DEFAULT LEADERF COLORSCHEME
 ------------------------------------------------------
 _EOF
-    myLeaderFColor=./leaderf-colors/dark_leaderf.vim
+    myLeaderFColor=./template/dark_leaderf.vim
     cpColorDst=$HOME/.vim/bundle/LeaderF/autoload/leaderf/colorscheme/
 
     cd $mainWd
@@ -1584,7 +1595,7 @@ _EOF
         # as ordinary user run brew
         # use gnu-sed as compatible with that under Linux
         brew upgrade python python3 cmake vim git the_silver_searcher \
-            fontconfig gnu-sed --with-default-names -y
+            bash-completion fontconfig gnu-sed --with-default-names -y
 
         cat << "_EOF"
 ------------------------------------------------------
@@ -1627,25 +1638,25 @@ _EOF
         echo "[Warning]: replace python3 interpreter path returns $retVal "
     fi
 
-    cat << _EOF
-------------------------------------------------------
-CORRECTING COLOR SCHEME IN $HOME/.vimrc
-------------------------------------------------------
-_EOF
-    matchStr=':colorscheme'
-    replacedTo="mydefault"
-    # Linux use :colorscheme mydefault, macos use darkcoding
-    # all use darkcoding
-    if [[ 1 == 1 || $platOsType == "macos" ]]; then
-        replacedTo=darkcoding
-    fi
-    sed -i --regexp-extended \
-        "/$matchStr/c $matchStr $replacedTo" $HOME/.vimrc
-    # check return status
-    retVal=$?
-    if [[ $retVal != 0 ]]; then
-        echo "[Warning]: replace color scheme returns $retVal "
-    fi
+#    cat << _EOF
+#------------------------------------------------------
+#CORRECTING COLOR SCHEME IN $HOME/.vimrc
+#------------------------------------------------------
+#_EOF
+#    matchStr=':colorscheme'
+#    replacedTo="mydefault"
+#    # Linux use :colorscheme mydefault, macos use darkcoding
+#    # all use darkcoding
+#    if [[ 1 == 1 || $platOsType == "macos" ]]; then
+#        replacedTo=darkcoding
+#    fi
+#    sed -i --regexp-extended \
+#        "/$matchStr/c $matchStr $replacedTo" $HOME/.vimrc
+#    # check return status
+#    retVal=$?
+#    if [[ $retVal != 0 ]]; then
+#        echo "[Warning]: replace color scheme returns $retVal "
+#    fi
 
     # find c++ header include directory
     sysTackleDir=/usr/include
