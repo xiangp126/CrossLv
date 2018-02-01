@@ -1,11 +1,11 @@
 ## lx-Vundle
-- Goal to handle working environment crossing different Linux-like platform through 'oneKey' stroke
+- Goal to handle working environment crossing Linux/Mac platform through 'oneKey' stroke
 
 - Two modes deploy selection
-    - home -> without root privilege, normally installed into $HOME/.usr
-    - root -> with root privilege, normally installed into /usr/local
+    - home -> without root privilege, normally install packages into $HOME/.usr
+    - root -> with root privilege, normally install packages into /usr/local
 
-- Support Platform
+- Verified Platform
     - Ubuntu
     - CentOS
     - MacOS
@@ -14,7 +14,7 @@
 
 - On CentOS expecially 6 this tool may compile GCC supporting C++11 first, taking disk space 5G+
 
-## Installation Guide
+## Quick Start
 ```bash
 $ sh oneKey.sh
 [NAME]
