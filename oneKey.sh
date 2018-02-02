@@ -806,7 +806,7 @@ _EOF
 }
 
 # install silver searcher
-installAck() {
+installSilverSearcher() {
     # ag linked to ack
     ackPath=`which ag 2> /dev/null`
     if [[ $ackPath != "" ]]; then
@@ -814,7 +814,7 @@ installAck() {
     fi
     cat << "_EOF"
 ------------------------------------------------------
-INSTALLING SILVER SEARCHER(ACK)
+INSTALLING SILVER SEARCHER (ALIAS TO ACK)
 ------------------------------------------------------
 _EOF
     if [[ $execPrefix != 'sudo' ]]; then
@@ -858,6 +858,45 @@ _EOF
         exit 255
     fi
     ackPath=$ackInstDir/bin/ag
+}
+
+# command-line fuzzy finder
+installFzf() {
+    # ag linked to ack
+    fzfPath=`which fzf 2> /dev/null`
+    if [[ $fzfPath != "" ]]; then
+        return
+    fi
+    cat << "_EOF"
+------------------------------------------------------
+INSTALLING COMMAND-LINE FUZZY FINDER FZF
+------------------------------------------------------
+_EOF
+    fzfInstDir=$commInstdir/fzf
+    gitClonePath=https://github.com/junegunn/fzf
+
+    # Exp: /usr/local/fzf
+    $execPrefix git clone --depth 1 $gitClonePath $fzfInstDir
+
+    cd $fzfInstDir
+    sh install.sh --all
+    if [[ $? != 0 ]]; then
+        echo [Error]: install fzf returns error, quitting now ...
+        exit
+    fi
+
+    # cat << "_EOF"
+# ------------------------------------------------------
+# MAKING SOFT LINK OF FZF INTO $commInstdir/
+# ------------------------------------------------------
+# _EOF
+    oriFzfPath=$fzfInstDir/bin/fzf
+    $execPrefix ln -sf $fzfInstDir/bin/fzf $commInstdir/bin/fzf
+    if [[ $? != 0 ]]; then
+        echo [Error]: make fzf soft link return error, quitting now ...
+        exit 255
+    fi
+    fzfPath=$commInstdir/bin/fzf
 }
 
 installuCtags() {
@@ -1600,7 +1639,7 @@ _EOF
         # as ordinary user run brew
         # use gnu-sed as compatible with that under Linux
         brew install python python3 cmake vim git the_silver_searcher \
-            bash-completion fontconfig tmux \
+            bash-completion fontconfig tmux fzf \
             gnu-sed --with-default-names -y
 
         cat << "_EOF"
@@ -1761,7 +1800,8 @@ install() {
       #   - installFonts
     installuCtags
     if [[ $platOsType != 'macos' ]]; then
-        installAck
+        installSilverSearcher
+        installFzf
         installPython3
         installvim
         installCmake
