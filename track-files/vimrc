@@ -19,16 +19,15 @@ set termencoding=utf-8
 set backspace=indent,eol,start
 " Reference from /etc/vim/vimrc on Ubuntu
 set nocompatible    " No vi compatible
-set showcmd		    " Show (partial) command in status line.
-set showmatch	    " Show matching brackets.
-set ignorecase	    " Do case insensitive matching
-set smartcase	    " Do smart case matching
-set incsearch	    " Incremental search
-set autowrite	    " Automatically save before commands like :next and :make
-set hidden		    " Hide buffers when they are abandoned
-set mouse=a		    " Enable mouse usage (all modes)
-" set mouse=ni        " Set mouse for normal and insert mode
-set noautochdir       " No need change dir with help of leaderF
+set showmatch       " Show matching brackets.
+set ignorecase      " Do case insensitive matching
+set smartcase       " Do smart case matching
+set incsearch       " Incremental search
+set hidden          " Hide buffers when they are abandoned
+set mouse=a         " Enable mouse usage (all modes), or 'ni' for normal & insert
+set noautochdir     " No need change dir with help of leaderF
+" set showcmd       " Show (partial) command in status line.
+" set autowrite     " Automatically save before commands like :next and :make
 filetype plugin indent on
 " jump to the last position when reopening a file
 if has("autocmd")
