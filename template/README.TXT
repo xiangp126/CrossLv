@@ -3,3 +3,5 @@ Do not edit or rename any file under this directory
     -- original bash color copied from Ubuntu
 - dark_leaderf.vim
     -- used for leaderf colorscheme
+- vimrc
+    -- /etc/vim/vimrc under Ubuntu, global vimrc
