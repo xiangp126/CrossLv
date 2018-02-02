@@ -2,31 +2,44 @@
 " BASIC CONFIG
 """"""""""""""""""""""""""""""
 syntax on
-set ignorecase
 set number
 set ruler
+set laststatus=1
 set autoindent
 set cindent
 set tabstop=4
-set laststatus=1
 set softtabstop=4
 set shiftwidth=4
-set expandtab         "set TAB expands to spaces
+set expandtab       " Set Tab expands to spaces
 set cinoptions={0,1s,t0,n-2,p2s,(03s,=.5s,>1s,=1s,:1s
 set encoding=utf-8
 set fileencoding=utf-8
 set fileencodings=utf-8,gb2312,gb18030,gbk,ucs-bom,cp936,latin1
 set termencoding=utf-8
 set backspace=indent,eol,start
-let mapleader='\'     " leader key, default is '\''
-set nocompatible      " be iMproved, required
-" set autochdir         " not change dir with help of leaderF
+" Reference from /etc/vim/vimrc on Ubuntu
+set nocompatible    " No vi compatible
+set showcmd		    " Show (partial) command in status line.
+set showmatch	    " Show matching brackets.
+set ignorecase	    " Do case insensitive matching
+set smartcase	    " Do smart case matching
+set incsearch	    " Incremental search
+set autowrite	    " Automatically save before commands like :next and :make
+set hidden		    " Hide buffers when they are abandoned
+set mouse=a		    " Enable mouse usage (all modes)
+" set mouse=ni        " Set mouse for normal and insert mode
+set noautochdir       " No need change dir with help of leaderF
+filetype plugin indent on
+" jump to the last position when reopening a file
+if has("autocmd")
+    au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$")
+                \ | exe "normal! g'\"" | endif
+endif
 "------ :help ins-completion-menu -----
 set pumheight=12      " maximum height of popup menu
 set shell=/bin/bash   " set vim default shell
-set mouse=a           " set mouse for all mode
-" set mouse=ni        " set mouse for normal and insert mode
-set t_Co=256
+let mapleader='\'   " leader key, default is '\'
+set t_Co=256        " number of colors
 set background=dark
 "------ private under ~/.vim/colors -----
 :colorscheme darkcoding
@@ -36,6 +49,7 @@ set background=dark
 """"""""""""""""""""""""""""""
 " map: recursive mapping, case ignorance
 " nnoremap: no recursive mapping
+cmap w!! w !sudo tee %
 set pastetoggle=<F12>
 noremap <F10> :set invnumber<CR>
 map <leader>k :mark<Space>
@@ -53,10 +67,10 @@ nmap <leader><leader> :bprevious<CR>
 " unnamed for '* register', unnamedplus for '+ register'
 set clipboard=unnamedplus,unnamed
 " copy to system clipboard
-noremap <silent> <Leader>y "*y <CR>
-noremap <silent> <Leader>p "*p <CR>
-noremap <silent> <Leader>Y "+y <CR>
-noremap <silent> <Leader>P "+p <CR>
+noremap <silent> <leader>y "*y <CR>
+noremap <silent> <leader>p "*p <CR>
+noremap <silent> <leader>Y "+y <CR>
+noremap <silent> <leader>P "+p <CR>
 " vmap <leader>y :!xclip -f -sel clip<CR>
 " map <leader>p  :-1r !xclip -o -sel clip<CR>
 
@@ -166,6 +180,7 @@ nnoremap <silent> <F5> :TagbarToggle<CR>
 let g:Tagbar_title = "[Tagbar]"
 let g:tagbar_left = 0
 let g:tagbar_width = 25
+let g:tagbar_indent = 1
 " originally Yellow value 11
 " highlight Search ctermbg=88
 highlight TagbarSignature ctermfg=68

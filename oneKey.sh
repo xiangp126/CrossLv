@@ -255,6 +255,11 @@ _EOF
 }
 
 installFonts() {
+    # only platform used for Desktop will install extra fonts
+    if [[ $platOsType == 'redhat' ]]; then
+        return
+    fi
+
     cat << _EOF
 ------------------------------------------------------
 INSTALLING WONDERFUL PROGRAMMING FONTS
@@ -291,7 +296,7 @@ _EOF
 INSTALLING POWERLINE SYMBOLS FOR AIRLINE
 ------------------------------------------------------
 _EOF
-    cd $mainWd/fonts
+    cd $mainWd./fonts/powerline-symbols
     powerSymbolConf=10-powerline-symbols.conf
     powerSymbolOtf=PowerlineSymbols.otf
 
@@ -912,7 +917,7 @@ installPython3() {
             # 3.5
             python3V=$(echo $python3Ver | cut -d "." -f 1,2)
             # libpython3.5m.so
-            libPython3Name=libpython${python3V}.so
+            libPython3Name=libpython${python3V}m.so
             # may need run 'sudo updatedb'
             libPython3Path=$(locate $libPython3Name | head -n 1 2> /dev/null)
 
@@ -1543,7 +1548,7 @@ _EOF
 
         elif [[ $platOsType = 'centos' && $execPrefix == 'sudo' ]]; then
             sudo yum install \
-                xz-devel libX11-devel libXpm-devel libXt-devel \
+                xz-devel libX11-devel libXpm-devel libXt-devel libevent-devel \
                 pcre-devel mlocate bash-completion python-optcomplete \
                 cmake ncurses* gmp-devel gcc gcc-c++ automake asciidoc \
                 xmlto perl-devel tmux git \
@@ -1594,8 +1599,9 @@ _EOF
     if [[ ! -f $mainWd/$mRunFlagFile ]]; then
         # as ordinary user run brew
         # use gnu-sed as compatible with that under Linux
-        brew upgrade python python3 cmake vim git the_silver_searcher \
-            bash-completion fontconfig gnu-sed --with-default-names -y
+        brew install python python3 cmake vim git the_silver_searcher \
+            bash-completion fontconfig tmux \
+            gnu-sed --with-default-names -y
 
         cat << "_EOF"
 ------------------------------------------------------
@@ -1748,10 +1754,11 @@ install() {
         installGcc
     fi
     installBone
-        # | - installBashCompletion
-        #   - installTmuxPlugins
-        #   - installVimPlugins
-        #       | - installExtraForLeaderF
+      # | - installTmuxPlugins
+      #   - installVimPlugins
+      #       | - installExtraForLeaderF
+      #   - installBashCompletion
+      #   - installFonts
     installuCtags
     if [[ $platOsType != 'macos' ]]; then
         installAck

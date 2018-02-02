@@ -61,7 +61,7 @@ usage() {
 
 _EOF
     set +x
-	logo
+    logo
 }
 
 checkOsCpus() {
@@ -215,7 +215,7 @@ _EOF
     fi
 
     cd $clonedName
-    # checkout 
+    # checkout
     git checkout $checkoutVersion
     # run make routine
     autoconf
