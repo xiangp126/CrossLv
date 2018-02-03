@@ -176,6 +176,7 @@ _EOF
 ------------------------------------------------------
 INSTALLING VIM-COLORS TO $restoreDir/
 ------------------------------------------------------
+please wait ...
 _EOF
     cd $mainWd
     # trackedColorDir=./vim-colors
@@ -184,17 +185,20 @@ _EOF
     if [[ ! -d $privateColorDir ]]; then
         mkdir -p $privateColorDir
     fi
-    for colorName in `find $trackedColorDir -regex '.*.vim' -type f`
+    for colorName in `find $trackedColorDir -regex '.*.vim$' -type f`
     do
-        echo cp $colorName $privateColorDir
-        cp $colorName $privateColorDir
-        # fill in copiedPathArray
-        copiedPathArray[((index++))]=$privateColorDir/$(echo ${colorName#*/})
+        onlyFileName=${colorName##*/}
+        if [[ ! -f $privateColorDir/$onlyFileName ]]; then
+            echo cp $colorName $privateColorDir
+            cp $colorName $privateColorDir
+            # fill in copiedPathArray
+            copiedPathArray[((index++))]=$privateColorDir/$(echo ${colorName#*/})
+        fi
     done
 
     cat << _EOF
 ------------------------------------------------------
-FINDING FILES RESTORED SUCCESSFULLY
+FINDING FILES NEWLY RESTORED SUCCESSFULLY
 ------------------------------------------------------
 _EOF
     for file in ${copiedPathArray[@]}; do

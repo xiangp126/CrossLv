@@ -174,7 +174,10 @@ _EOF
     mkdir -p $extraBashCompInstDir
     for file in `find $copyFromDir -regex ".*.bash" -type f`
     do
-        cp $file $extraBashCompInstDir/
+        onlyFileName=${file##*/}
+        if [[ ! -f $extraBashCompInstDir/$onlyFileName ]]; then
+            cp $file $extraBashCompInstDir/
+        fi
     done
     retVal=$?
     if [[ $retVal != 0 ]]; then
@@ -872,31 +875,40 @@ installFzf() {
 INSTALLING COMMAND-LINE FUZZY FINDER FZF
 ------------------------------------------------------
 _EOF
+    # Exp: /usr/local/fzf
     fzfInstDir=$commInstdir/fzf
     gitClonePath=https://github.com/junegunn/fzf
 
-    # Exp: /usr/local/fzf
-    $execPrefix git clone --depth 1 $gitClonePath $fzfInstDir
-
+    if [[ ! -d $fzfInstDir ]]; then
+        $execPrefix git clone --depth 1 $gitClonePath $fzfInstDir
+    fi
     cd $fzfInstDir
-    sh install.sh --all
+    $execPrefix sh install --bin
     if [[ $? != 0 ]]; then
         echo [Error]: install fzf returns error, quitting now ...
         exit
     fi
 
-    # cat << "_EOF"
-# ------------------------------------------------------
-# MAKING SOFT LINK OF FZF INTO $commInstdir/
-# ------------------------------------------------------
-# _EOF
-    oriFzfPath=$fzfInstDir/bin/fzf
-    $execPrefix ln -sf $fzfInstDir/bin/fzf $commInstdir/bin/fzf
+    cat << "_EOF"
+------------------------------------------------------
+MAKING SOFT LINK OF FZF INTO $commInstdir/
+------------------------------------------------------
+_EOF
+    linkFromDir=bin
+    for file in `find $linkFromDir -executable -type f`; do
+        $execPrefix ln -sf $fzfInstDir/$file $commInstdir/bin/
+    done
+
     if [[ $? != 0 ]]; then
         echo [Error]: make fzf soft link return error, quitting now ...
         exit 255
     fi
-    fzfPath=$commInstdir/bin/fzf
+    # change fzf-tmux to tfzf
+    cd $fzfInstDir/bin
+    if [[ -f fzf-tmux ]]; then
+        mv fzf-tmux tfzf
+    fi
+    fzfPath=$fzfInstDir/bin/fzf
 }
 
 installuCtags() {
@@ -1662,6 +1674,7 @@ _EOF
     python3Path=`which python3`
     vimPath=`which vim`
     cmakePath=`which cmake`
+    fzfPath=`which fzf`
 }
 
 # auto correct path of key packages according to the system
@@ -1753,28 +1766,30 @@ _EOF
 }
 
 installSummary() {
+    set +x
     ackPath=$ackInstDir/bin/ag
     vimPath=$vimInstDir/bin/vim
     cat << _EOF
 ------------------------------------------------------
 INSTALLATION THROUGH ONEKEY DONE - CONGRATULATION
 ------------------------------------------------------
-gcc path = $CC
-cxx path = $CXX
-ag/ack path = $ackPath
+gcc   path = $CC
+cxx   path = $CXX
+ag    path = $ackPath
+fzf   path = $fzfPath
+vim   path = $vimPath
+cmake path = $cmakePath
 u-ctags path = $uCtagsPath
 python3 path = $python3Path
-vim path = $vimPath
-cmake path = $cmakePath
-------------------------------------------------------
 _EOF
     if [[ $platOsType != "macos" ]]; then
         cat << _EOF
-libpython3 path = $libPython3Path
-libclang.so path = $libClangPath
-------------------------------------------------------
+-- > ☕
+$libPython3Path
+$libClangPath
 _EOF
     fi
+    echo ------------------------------------------------------
 }
 
 preInstallCheck() {

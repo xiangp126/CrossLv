@@ -1,6 +1,7 @@
 *.swp
 *.swo
 *.diff
+tags
 .MORETIME.txt
 core
 core-*

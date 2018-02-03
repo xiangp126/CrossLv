@@ -90,27 +90,22 @@ fi
 # loop to source extra completion for tmux/git etc
 extraCompDir=$HOME/.completion.d
 if [[ -d "$extraCompDir" ]]; then
-    for file in `find $extraCompDir -regex ".*.bash" -type f`
+    for file in `find $extraCompDir -regex ".*.bash$" -type f`
     do
         source $file
     done
 fi
 
 # TEST IF COMMAND 'TMUX' EXIST.
-if [[ "`which tmux`" != "" ]]; then
+if [[ "`which tmux 2> /dev/null`" != "" ]]; then
+    # already under tmux env
     if [[ "$TMUX" == "" ]]; then
-        cat << "_EOF"
- _____   __  __   _   _  __  __
-|_   _| |  \/  | | | | | \ \/ /
-  | |   | |\/| | | | | |  \  /
-  | |   | |  | | | |_| |  /  \
-  |_|   |_|  |_|  \___/  /_/\_\
-
-_EOF
         tmuxSession=`tmux ls`
         firstSession=`echo ${tmuxSession%%:*}`
-        echo "tmux attach -t $firstSession"
+        cat << _EOF
+------------------------------------------------------
+tmux attach -t $firstSession
+------------------------------------------------------
+_EOF
     fi
-else
-    echo "tmux does not exist."
 fi
