@@ -1,0 +1,25 @@
+[user]
+	name = corsair
+	email = xiangp126@126.com
+[core]
+	excludesfile = /Users/xiang/.gitignore
+	editor = vim
+[help]
+	autocorrect = 1
+[clean]
+	requireForce = false
+[alias]
+	st = status
+	ck = checkout
+	ls-files = lf
+	lf = ls-files
+	ad = add
+	df = diff
+	lgg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)'
+	cm = commit -v
+	cp = cherry-pick
+[color]
+	ui = auto
+[push]
+	followTags = true
+	default = current

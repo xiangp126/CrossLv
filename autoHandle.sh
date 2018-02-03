@@ -11,6 +11,8 @@ tkBaseDir=$HOME
 trackFiles=(
     ".vimrc"
     ".tmux.conf"
+    ".gitconfig"
+    ".gitignore"
     ".bashrc"
     ".ycm_extra_conf.py"
 )
@@ -66,12 +68,12 @@ _EOF
 }
 
 backup() {
-    # -p , --parent, no error if existing, make parent directories as needed
-    cd $mainWd
-    mkdir -p $backupDir
+    if [[ ! -d $backupDir ]]; then
+        mkdir -p $backupDir
+    fi
     cat << _EOF
 ------------------------------------------------------
-START TO BACKUP TRACKED FILES
+READY TO BACKUP TRACKED FILES
 ------------------------------------------------------
 _EOF
     # test if backupDir was trully not empty, backup it first if so.
@@ -89,10 +91,9 @@ _EOF
             echo [Warning]: Not found $file under $tkBaseDir, omitting it
             continue
         fi
-        # .vim/.vimrc => vimrc
         # delete slash if exist, EXp: .vim/colors/.bashrc
-        backedName=$(echo ${file##*/})  # .bashrc
-        backedName=$(echo ${file#*.})   # bashrc
+        bkName=${file##*/}        # .bashrc
+        backedName=${bkName#*.}   # bashrc
         echo cp $realFile $backupDir/$backedName
         cp $realFile $backupDir/$backedName
     done
@@ -107,7 +108,7 @@ _EOF
     fi
     cat << _EOF
 ---------------------------------------------------------
-START TO BACKUP PRIVATE COLORS
+READY TO BACKUP PRIVATE COLORS
 ---------------------------------------------------------
 _EOF
     for file in `find $privateColorDir -regex ".*.vim$"`; do
@@ -115,12 +116,13 @@ _EOF
         cp $file $bkColorDir/
     done
     cat << _EOF
-------------------------------------------------------
-FINDING FILES UNDER BACKUP DIRECTORY $backupDir/
-------------------------------------------------------
+---------------------------------------------------------
+FINDING FILES BACKUPED SUCCESSFULLY
+---------------------------------------------------------
 $(find $backupDir -maxdepth 1 -type f 2> /dev/null)
+-------> ✄
 $(find $backupDir -mindepth 2 -type f 2> /dev/null)
-------------------------------------------------------
+---------------------------------------------------------
 _EOF
 }
 
@@ -131,19 +133,19 @@ restore() {
     # check if exist trackDir && restoreDir.
     if [ ! -d $trackDir ]; then
         echo [Error]: missing track $trackDir/, please check it first
-        exit
+        exit 255
     fi
     if [[ "$restoreDir" != "$tkBaseDir" ]]; then
         mkdir -p $restoreDir
     else
         if [ ! -d $tkBaseDir ]; then
             echo [FatalError]: missing track files base dir $tkBaseDir/
-            exit 1
+            exit 255
         fi
     fi
     cat << _EOF
 ------------------------------------------------------
-INSTALLING TRACKED FILES TO $restoreDir/
+UPDATING TRACK FILES TO SYSTEM ENVIRONMENT
 ------------------------------------------------------
 _EOF
     copiedPathArray=()
@@ -152,31 +154,40 @@ _EOF
     for file in ${trackFiles[@]}; do
         # .vim/.vimrc => vimrc
         # real name under track/
-        backedName=$(echo ${file##*/})  # .bashrc
-        backedName=$(echo ${file#*.})   # bashrc
-        if [[ ! -f $trackDir/$backedName ]]; then
-            echo "[Warning]: Not found $backedName under $trackDir, omitting $backedName "
+        bkName=${file##*/}        # .bashrc
+        trackName=${bkName#*.}    # bashrc
+
+        trackFile=$trackDir/$trackName
+        if [[ ! -f $trackFile ]]; then
+            echo "[Warning]: Not found $trackName under $trackDir/, omitting it"
             continue
         fi
-        # move original file to bk before restored
         realFile=$restoreDir/$file
         if [[ -f $realFile ]]; then
-            # echo [Warning]: found $file under $restoreDir, back it up first
-            realBackedFile=$restoreDir/$file.$bkPostfix
-            echo mv $realFile $realBackedFile
-            mv $realFile $realBackedFile
+            # # move original file to *.old before restored
+            # realBackedFile=$restoreDir/$file.$bkPostfix
+            # echo mv $realFile $realBackedFile
+            # mv $realFile $realBackedFile
+
+            # only restore when has difference
+            diffContent=`diff $trackFile $realFile`
+            if [[ $diffContent == "" ]]; then
+                continue
+            fi
         fi
-        echo cp $trackDir/$backedName $realFile
-        cp $trackDir/$backedName $realFile
+        echo cp $trackDir/$trackName $realFile
+        cp $trackDir/$trackName $realFile
         # fill in copiedPathArray
         copiedPathArray[((index++))]=$realFile
     done
+    if [[ $index == '0' ]]; then
+        echo Clean ...
+    fi
 
     cat << _EOF
 ------------------------------------------------------
-INSTALLING VIM-COLORS TO $restoreDir/
+UPDATING TRACK COLORS TO SYSTEM ENVIRONMENT
 ------------------------------------------------------
-please wait ...
 _EOF
     cd $mainWd
     # trackedColorDir=./vim-colors
@@ -185,21 +196,44 @@ _EOF
     if [[ ! -d $privateColorDir ]]; then
         mkdir -p $privateColorDir
     fi
+
+    colorCnt=0
     for colorName in `find $trackedColorDir -regex '.*.vim$' -type f`
     do
         onlyFileName=${colorName##*/}
-        if [[ ! -f $privateColorDir/$onlyFileName ]]; then
-            echo cp $colorName $privateColorDir
-            cp $colorName $privateColorDir
-            # fill in copiedPathArray
-            copiedPathArray[((index++))]=$privateColorDir/$(echo ${colorName#*/})
+        toUpdateFile=$privateColorDir/$onlyFileName
+        if [[ -f $toUpdateFile ]]; then
+            diffContent=`diff $colorName $toUpdateFile`
+            if [[ $diffContent == "" ]]; then
+                continue
+            fi
         fi
+        echo cp $colorName $privateColorDir
+        cp $colorName $toUpdateFile
+        # fill in copiedPathArray
+        copiedPathArray[((index++))]=$toUpdateFile
+        # color count plus
+        ((colorCnt++))
     done
 
+    if [[ $colorCnt == '0' ]]; then
+        echo Clean ...
+    elif [[ $index == '0' ]]; then
+        return
+    fi
+
+    if [[ $index == '0' ]]; then
+        cat << _EOF
+------------------------------------------------------
+YOUR ENVIRONMENT ALREADY THE LATEST VERSION
+------------------------------------------------------
+_EOF
+        return
+    fi
     cat << _EOF
 ------------------------------------------------------
 FINDING FILES NEWLY RESTORED SUCCESSFULLY
-------------------------------------------------------
+-------> ✄
 _EOF
     for file in ${copiedPathArray[@]}; do
         echo $file
@@ -207,86 +241,206 @@ _EOF
     echo ------------------------------------------------------
 }
 
-regret() {
-    # regret dir as $1
-    regretDir=$1
-    # check if exist trackDir && regretDir.
-    if [ ! -d ${regretDir} ]; then
-        echo [Error]: missing regret $regretDir/, please check it first
-        exit
-    fi
-
-    cd $mainWd
-    for file in ${trackFiles[@]}; do
-        realBkFile=$regretDir/$file.$bkPostfix
-        if [[ ! -f $realBkFile ]]; then
-            echo [Warning]: not found $file.$bkPostfix under $regretDir, omitting it
-            continue
-        fi
-        echo mv $realBkFile $regretDir/$file
-        mv $realBkFile $regretDir/$file
-    done
-}
-
 track() {
     if [ ! -d $backupDir ]; then
         echo "[FatalError]: missing backup directory, run '$execName backup' first."
-        exit
+        exit 255
     fi
     # track directory.
     if [[ ! -d $trackDir ]]; then
-        mkdir -p ${trackDir}
+        echo "FatalError: missing $trackDir/, please check first"
+        exit 255
     fi
     cat << _EOF
 ---------------------------------------------------------
-UPDATING TRACKED FILES FROME BACKUP
+UPDATING TRACK FILES FROME BACKUP DIRECTORY
 ---------------------------------------------------------
 _EOF
     cd $mainWd
+    copiedPathArray=()
+    index=0
     for file in ${trackFiles[@]}; do
         # .vim/.vimrc => vimrc
         # delete slash if exist, EXp: .vim/colors/.bashrc
-        backedName=$(echo ${file##*/})  # .bashrc
-        backedName=$(echo ${file#*.})   # bashrc
-        realFile=$backupDir/$backedName
-        if [[ ! -f $realFile ]]; then
-            echo [Warning]: Not found $backedName under $backupDir, omitting it
+        bkName=${file##*/}        # .bashrc
+        backedName=${bkName#*.}   # bashrc
+
+        realFile=$backupDir/$backedName      # ./backup/bashrc
+        toTrackedFile=$trackDir/$backedName  # ./track-files/bashrc
+        if [[ ! -f $realFile || ! -f $toTrackedFile ]]; then
+            continue
+        fi
+        # only copy when has difference
+        diffContent=`diff $realFile $toTrackedFile`
+        if [[ $diffContent == "" ]]; then
             continue
         fi
         echo cp $realFile $trackDir/
-        cp $realFile $trackDir/
+        cp $realFile $toTrackedFile
+        copiedPathArray[((index++))]=$toTrackedFile
     done
 
-    cat << _EOF
-------------------------------------------------------
-FINDING FILES UNDER TRACK DIRECTORY $trackDir/
-------------------------------------------------------
-$(find $trackDir -type f 2> /dev/null)
-_EOF
+    if [[ $index == '0' ]]; then
+        echo Clean ...
+    fi
 
+    cat << _EOF
+---------------------------------------------------------
+UPDATING TRACK COLORS FROM BACKUP DIRECTORY
+---------------------------------------------------------
+_EOF
     cd $mainWd
     # privateColorDir=$HOME/.vim/colors
     # trackedColorDir=./vim-colors
     if [[ ! -d $bkColorDir ]]; then
         return
     fi
-    cat << _EOF
----------------------------------------------------------
-UPDATING PRIVATE COLORS FROM BACKUP
----------------------------------------------------------
-_EOF
-    for file in `find $bkColorDir -regex ".*.vim$"`; do
-        echo cp $file $trackedColorDir/
-        cp $file $trackedColorDir/
+
+    colorCnt=0
+    for colorName in `find $bkColorDir -regex '.*.vim$' -type f`
+    do
+        onlyFileName=${colorName##*/}
+        toTrackedFile=$trackedColorDir/$onlyFileName
+        if [[ ! -f $toTrackedFile ]]; then
+            continue
+        else
+            diffContent=`diff $colorName $toTrackedFile`
+            if [[ $diffContent == "" ]]; then
+                continue
+            fi
+        fi
+        echo cp $colorName $trackedColorDir
+        cp $colorName $toTrackedFile
+        # fill in copiedPathArray
+        copiedPathArray[((index++))]=$toTrackedFile
+        # color cnt plus
+        ((colorCnt++))
     done
 
+    if [[ $colorCnt == '0' ]]; then
+        echo Clean ...
+    elif [[ $index == '0' ]]; then
+        return
+    fi
+
+    if [[ $index == '0' ]]; then
     cat << _EOF
-------------------------------------------------------
-FINDING COLORS UNDER TRACK COLOR $trackedColorDir/
-------------------------------------------------------
-$(find $trackedColorDir -type f 2> /dev/null)
-------------------------------------------------------
+---------------------------------------------------------
+NOTHING TO UPDATE, ALREADY THE SAME
+---------------------------------------------------------
 _EOF
+        return
+    fi
+    cat << _EOF
+---------------------------------------------------------
+FINDING FILES NEWLY UPDATED SUCCESSFULLY
+-------> ✄
+_EOF
+    for file in ${copiedPathArray[@]}; do
+        echo $file
+    done
+    echo ---------------------------------------------------------
+}
+
+regret() {
+    regretDir=$HOME
+    if [ ! -d $regretDir ]; then
+        echo "[FatalError]: missing backup directory, can not run 'regret'"
+        exit 255
+    fi
+
+    cat << _EOF
+---------------------------------------------------------
+REGRETTING TRACK FILES FROME BACKUP DIRECTORY
+---------------------------------------------------------
+_EOF
+    cd $mainWd
+    copiedPathArray=()
+    index=0
+    for file in ${trackFiles[@]}; do
+        # .vim/.vimrc => vimrc
+        # delete slash if exist, EXp: .vim/colors/.bashrc
+        bkName=${file##*/}        # .bashrc
+        backedName=${bkName#*.}   # bashrc
+        realBkFile=$backupDir/$backedName        # ./backup/bashrc
+        toRegretedFile=$regretDir/$bkName        # $HOME/.bashrc
+
+        # if missing real backuped file
+        if [[ ! -f $realBkFile ]]; then
+            continue
+        fi
+
+        if [[ -f $toRegretedFile ]]; then
+            # only copy when has difference
+            diffContent=`diff $realBkFile $toRegretedFile`
+            if [[ $diffContent == "" ]]; then
+                continue
+            fi
+        fi
+        echo cp $realBkFile $regretDir/
+        cp $realBkFile $toRegretedFile
+        copiedPathArray[((index++))]=$toRegretedFile
+    done
+
+    if [[ $index == '0' ]]; then
+        echo Clean ...
+    fi
+
+    cat << _EOF
+---------------------------------------------------------
+REGRETTING TRACK COLORS FROM BACKUP DIRECTORY
+---------------------------------------------------------
+_EOF
+    cd $mainWd
+    # privateColorDir=$HOME/.vim/colors
+    # trackedColorDir=./vim-colors
+    # bkColorDir=$backupDir/colors
+    if [[ ! -d $bkColorDir ]]; then
+        return
+    fi
+
+    colorCnt=0
+    for colorName in `find $bkColorDir -regex '.*.vim$' -type f`
+    do
+        onlyFileName=${colorName##*/}
+        toRegretedFile=$privateColorDir/$onlyFileName
+        if [[ -f $toRegretedFile ]]; then
+            diffContent=`diff $colorName $toRegretedFile`
+            if [[ $diffContent == "" ]]; then
+                continue
+            fi
+        fi
+        echo cp $colorName $privateColorDir
+        cp $colorName $toRegretedFile
+        # fill in copiedPathArray
+        copiedPathArray[((index++))]=$toRegretedFile
+        # color cnt plus
+        ((colorCnt++))
+    done
+
+    if [[ $colorCnt == '0' ]]; then
+        echo Clean ...
+    elif [[ $index == '0' ]]; then
+        return
+    fi
+
+    if [[ $index == '0' ]]; then
+    cat << _EOF
+---------------------------------------------------------
+NOTHING TO REGRET, ALREADY THE SAME
+---------------------------------------------------------
+_EOF
+        return
+    fi
+    cat << _EOF
+---------------------------------------------------------
+FINDING FILES REGRETED SUCCESSFULLY
+-------> ✄
+_EOF
+    for file in ${copiedPathArray[@]}; do
+        echo $file
+    done
+    echo ---------------------------------------------------------
 }
 
 case $1 in
@@ -312,6 +466,7 @@ case $1 in
 
     'auto')
         backup
+        echo
         track
         ;;
 

@@ -1,0 +1,11 @@
+*.swp
+*.swo
+*.diff
+tags
+*.o
+*.pyc
+__pycache__/
+.DS_Store
+core
+.nfs*
+!lib.o
