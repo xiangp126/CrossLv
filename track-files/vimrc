@@ -62,7 +62,8 @@ nmap <leader>6 :buffer6<CR>
 nmap <leader>7 :buffer7<CR>
 nmap <leader>8 :buffer8<CR>
 nmap <leader>9 :buffer9<CR>
-nmap <leader><leader> :bprevious<CR>
+nmap <leader>- :bprevious<CR>
+nmap <leader>+ :bnext<CR>
 " unnamed for '* register', unnamedplus for '+ register'
 set clipboard=unnamedplus,unnamed
 " copy to system clipboard
@@ -91,15 +92,19 @@ call plug#begin('~/.vim/bundle')
 " Plug 'davidhalter/jedi'
 " Plug 'tell-k/vim-autopep8'
 " Plug 'Chiel92/vim-autoformat'
+" Plug 'mileszs/ack.vim'
 " Plug 'Yggdroot/LeaderF', { 'do': './install.sh'  }
 "------ NEW PLUGINS -----
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 Plug 'scrooloose/nerdcommenter'
 Plug 'jiangmiao/auto-pairs'
+" Plug 'majutsushi/tagbar'
 Plug 'majutsushi/tagbar', { 'on': 'TagbarToggle' }
 Plug 'Yggdroot/indentLine'
+"------ FUZZY FINDER -----
 Plug 'Yggdroot/LeaderF'
-Plug 'mileszs/ack.vim'
+Plug 'junegunn/fzf'
+Plug 'junegunn/fzf.vim'
 "------ BEAUTIFY LINE -----
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
@@ -156,20 +161,102 @@ map <leader>fw  :LeaderfFunctionCword<CR>
 " search line which has the word
 map <leader>l   :LeaderfLine<CR>
 map <leader>la  :LeaderfLineAll<CR>
-map <leader>lw   :LeaderfLineCword<CR>
+map <leader>lw  :LeaderfLineCword<CR>
 " search line match word | end
 map <leader>m   :LeaderfMruCwd<CR>
 map <leader>ma  :LeaderfMru<CR>
+" similar as :buffers
+map <leader>b   :LeaderfBuffer<CR>
+
+""""""""""""""""""""""""""""""
+" CONFIG FZF.VIM
+""""""""""""""""""""""""""""""
+let g:fzf_layout = { 'down': '~50%'  }
+" [Buffers] Jump to the existing window if possible
+let g:fzf_buffers_jump = 1
+" [Tags] Command to generate tags file
+let g:fzf_tags_command = 'ctags -R −−fields=S'
+" [[B]Commits] Customize the options used by 'git log':
+let g:fzf_commits_log_options = '--graph --color=always
+   \ --format="%C(auto)%h%d %s %C(black)%C(bold)%cr"'
+" Customize fzf colors to match your color scheme
+let g:fzf_colors =
+\ { 'fg':      ['fg', 'Normal'],
+  \ 'bg':      ['bg', 'Normal'],
+  \ 'hl':      ['fg', 'Comment'],
+  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+  \ 'hl+':     ['fg', 'Statement'],
+  \ 'info':    ['fg', 'PreProc'],
+  \ 'border':  ['fg', 'Ignore'],
+  \ 'prompt':  ['fg', 'Conditional'],
+  \ 'pointer': ['fg', 'Exception'],
+  \ 'marker':  ['fg', 'Keyword'],
+  \ 'spinner': ['fg', 'Label'],
+  \ 'header':  ['fg', 'Comment'] }
+let g:fzf_history_dir = '~/.local/share/fzf-history'
+" hot key mapping, different from LeaderF
+let g:fzf_command_prefix = 'Fzf'
+map <leader><leader>f   :FzfFiles<CR>
+map <leader><leader>F   :FzfGFiles<CR>
+map <leader><leader>l   :FzfBLines<CR>
+map <leader><leader>la  :FzfLines<CR>
+map <leader><leader>t   :FzfBTags<CR>
+map <leader><leader>ta  :FzfTags<CR>
+map <leader><leader>b   :FzfBCommits<CR>
+map <leader><leader>ba  :FzfCommits<CR>
+map <leader><leader>gg  :GGrep<CR>
+nnoremap <Leader>r :Rg<CR>
+
+" command! -bang -nargs=* FzfAg call
+"   \ fzf#vim#ag(<q-args>, {'options': '--delimiter : --nth 4..'}, <bang>0)
+
+" command! -bang -nargs=* Rg
+"   \ call fzf#vim#grep(
+"   \   'rg --column --line-number --no-heading --color=always
+"   \   --fixed-strings --ignore-case --no-ignore --hidden --follow'.shellescape(<q-args>), 1,
+"   \   <bang>0 ? fzf#vim#with_preview('up:60%')
+"   \           : fzf#vim#with_preview('right:50%:hidden', '?'),
+"   \   <bang>0)
+
+"  --glob "!.git/*" --color "always" '.shellescape(<q-args>).'| tr -d "\017"', 1,
+
+" command! -bang -nargs=* FzfFind call \
+"   \ fzf#vim#grep('rg --column --line-number
+"   \ --no-heading --fixed-strings --ignore-case --no-ignore --hidden --follow
+"   \ --glob "!.git/*" --color "always" '.shellescape(<q-args>).'| tr -d "\017"', 1, <bang>0)')
+
+" Command for git grep
+" - fzf#vim#grep(command, with_column, [options], [fullscreen])
+command! -bang -nargs=* GGrep
+  \ call fzf#vim#grep('git grep --line-number '.shellescape(<q-args>), 0, <bang>0)
+
+" Override Colors command. You can safely do this in your .vimrc as fzf.vim
+" will not override existing commands.
+command! -bang Colors
+  \ call fzf#vim#colors({'left': '15%', 'options': '--reverse --margin 30%,0'}, <bang>0)
+
+" Similarly, we can apply it to fzf#vim#grep. To use ripgrep instead of ag:
+command! -bang -nargs=* Rg
+  \ call fzf#vim#grep(
+  \   'rg --column --line-number --no-heading --color=always '.shellescape(<q-args>), 1,
+  \   <bang>0 ? fzf#vim#with_preview('up:60%')
+  \           : fzf#vim#with_preview('right:50%:hidden', '?'),
+  \   <bang>0)
+
+" Likewise, Files command with preview window
+command! -bang -nargs=? -complete=dir FzfFiles
+  \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
 
 """"""""""""""""""""""""""""""
 " CONFIG ACK.VIM
 """"""""""""""""""""""""""""""
-let g:ack_autoclose = 1
-if executable('ag')
-  let g:ackprg = 'ag --vimgrep'
-endif
-cnoreabbrev Ack Ack!
-nnoremap <Leader>a :Ack!<Space>
+" let g:ack_autoclose = 1
+" if executable('ag')
+"   let g:ackprg = 'ag --vimgrep'
+" endif
+" cnoreabbrev Ack Ack!
+" nnoremap <Leader>a :Ack!<Space>
 
 """"""""""""""""""""""""""""""
 " CONFIG TAGBAR

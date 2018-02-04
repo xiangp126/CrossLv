@@ -299,7 +299,7 @@ _EOF
 INSTALLING POWERLINE SYMBOLS FOR AIRLINE
 ------------------------------------------------------
 _EOF
-    cd $mainWd./fonts/powerline-symbols
+    cd $mainWd/fonts/powerline-symbols
     powerSymbolConf=10-powerline-symbols.conf
     powerSymbolOtf=PowerlineSymbols.otf
 
@@ -657,6 +657,7 @@ _EOF
 
     # extra install actions for vim plugins
     installExtraForLeaderF
+    installExtraForFzf
 }
 
 installExtraForLeaderF() {
@@ -808,6 +809,73 @@ _EOF
     fi
 }
 
+installRipGrep() {
+    whereIsRg=`which rg 2> /dev/null`
+    if [[ $whereIsRg != "" ]]; then
+        return
+    fi
+    cat << "_EOF"
+------------------------------------------------------
+INSTALLING RUST FIRST
+------------------------------------------------------
+_EOF
+    whereIsCargo=`which cargo 2> /dev/null`
+    if [[ $whereIsCargo == "" ]]; then
+        rustUpShell=sh.rustup.rs
+        cd $downloadPath
+        if [[ ! -x $rustUpShell ]]; then
+            wget https://sh.rustup.rs -O $rustUpShell
+            if [[ $? != 0 ]]; then
+                echo [Error]: wget returns error, please check it
+                exit
+            fi
+            chmod +x $rustUpShell
+        fi
+        # sed -i "2a source ${mainWd}/${envName}" $daeName
+        ./$rustUpShell -y
+        if [[ $? != 0 ]]; then
+            echo [Error]: rust setup failed, please check it
+            exit
+        fi
+        cargoPath=$HOME/.cargo/bin/cargo
+    else
+        cargoPath=$whereIsCargo
+    fi
+
+    cat << "_EOF"
+------------------------------------------------------
+INSTALLING RIPGREP - ENHANCED GREP
+------------------------------------------------------
+_EOF
+    gitClonePath=https://github.com/BurntSushi/ripgrep
+    clonedName=ripgrep
+
+    cd $downloadPath
+    # check if already has this git repo
+    if [[ ! -d $clonedName ]]; then
+        git clone $gitClonePath $clonedName
+        # check if git clone returns successfully
+        if [[ $? != 0 ]]; then
+            echo [Error]: git clone returns error, quitting now
+            exit
+        fi
+    fi
+
+    # build routine
+    cd $clonedName
+    # export PATH=$HOM/.cargo/bin:$HOME
+    $cargoPath build --release
+    rgBuildBinPath=`pwd`/target/release/rg
+    $execPrefix cp $rgBuildBinPath $commInstdir/bin/
+    $rgPath="$commInstdir/bin/rg"
+#    ls -l $rgPath
+#    if [[ $? != 0 ]]; then
+#        echo [Error]: copy rg binary returns error, quitting now
+#        exit
+#    fi
+    $rgPath --version
+}
+
 # install silver searcher
 installSilverSearcher() {
     # ag linked to ack
@@ -864,8 +932,7 @@ _EOF
 }
 
 # command-line fuzzy finder
-installFzf() {
-    # ag linked to ack
+installExtraForFzf() {
     fzfPath=`which fzf 2> /dev/null`
     if [[ $fzfPath != "" ]]; then
         return
@@ -876,14 +943,14 @@ INSTALLING COMMAND-LINE FUZZY FINDER FZF
 ------------------------------------------------------
 _EOF
     # Exp: /usr/local/fzf
-    fzfInstDir=$commInstdir/fzf
-    gitClonePath=https://github.com/junegunn/fzf
-
+    fzfInstDir=$HOME/.vim/bundle/fzf
     if [[ ! -d $fzfInstDir ]]; then
-        $execPrefix git clone --depth 1 $gitClonePath $fzfInstDir
+        echo 'Error: not found plugin fzf installed, please check it'
+        exit 255
     fi
+
     cd $fzfInstDir
-    $execPrefix sh install --bin
+    sh install --bin
     if [[ $? != 0 ]]; then
         echo [Error]: install fzf returns error, quitting now ...
         exit
@@ -895,7 +962,7 @@ MAKING SOFT LINK OF FZF INTO $commInstdir/
 ------------------------------------------------------
 _EOF
     linkFromDir=bin
-    for file in `find $linkFromDir -executable -type f`; do
+    for file in `find $linkFromDir -type f`; do
         $execPrefix ln -sf $fzfInstDir/$file $commInstdir/bin/
     done
 
@@ -904,11 +971,11 @@ _EOF
         exit 255
     fi
     # change fzf-tmux to tfzf
-    cd $fzfInstDir/bin
+    cd $commInstdir/bin
     if [[ -f fzf-tmux ]]; then
-        mv fzf-tmux tfzf
+        $execPrefix mv fzf-tmux tzf
     fi
-    fzfPath=$fzfInstDir/bin/fzf
+    fzfPath=$commInstdir/bin/fzf
 }
 
 installuCtags() {
@@ -1651,7 +1718,7 @@ _EOF
         # as ordinary user run brew
         # use gnu-sed as compatible with that under Linux
         brew install python python3 cmake vim git the_silver_searcher \
-            bash-completion fontconfig tmux fzf \
+            bash-completion fontconfig tmux \
             gnu-sed --with-default-names -y
 
         cat << "_EOF"
@@ -1776,6 +1843,7 @@ INSTALLATION THROUGH ONEKEY DONE - CONGRATULATION
 gcc   path = $CC
 cxx   path = $CXX
 ag    path = $ackPath
+rg    path = $rgPath
 fzf   path = $fzfPath
 vim   path = $vimPath
 cmake path = $cmakePath
@@ -1814,9 +1882,12 @@ install() {
       #   - installBashCompletion
       #   - installFonts
     installuCtags
+
+    installRipGrep
+
     if [[ $platOsType != 'macos' ]]; then
-        installSilverSearcher
-        installFzf
+        installRipGrep
+        # installSilverSearcher
         installPython3
         installvim
         installCmake

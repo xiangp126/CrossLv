@@ -14,8 +14,8 @@ rootInstDir=/opt/glibc-$glibcVersion
 # default is home mode
 commInstdir=$homeInstDir
 #sudo or empty
-execPrefix=""      
-#how many cpus os has, used for make -j 
+execPrefix=""
+#how many cpus os has, used for make -j
 osCpus=1
 
 logo() {
@@ -46,7 +46,7 @@ usage() {
 
 _EOF
     set +x
-	logo
+    logo
 }
 
 checkOsCpus() {
@@ -94,29 +94,29 @@ _EOF
         fi
     fi
 
-	if [[ ! -d $untarName ]]; then
-		tar -zxv -f $tarName
-	fi
-	echo [Error]: Tar Ball already untared, omitting untar routine ...
+    if [[ ! -d $untarName ]]; then
+        tar -zxv -f $tarName
+    fi
+    echo [Error]: Tar Ball already untared, omitting untar routine ...
 
     cd $untarName
-	# make a separate build directory
-	buildir=build_tmp
-	mkdir -p $buildir
-	cd $buildir
+    # make a separate build directory
+    buildir=build_tmp
+    mkdir -p $buildir
+    cd $buildir
     ../configure --prefix=$glibcInstDir \
                  --disable-sanity-checks
     make -j $osCpus
-	# check if make returns successfully
-	if [[ $? != 0 ]]; then
-		echo [Error]: make returns error, quiting now ...
-		exit
-	fi
+    # check if make returns successfully
+    if [[ $? != 0 ]]; then
+        echo [Error]: make returns error, quiting now ...
+        exit
+    fi
     $execPrefix make install
 
-    #back to start directory
+    # back to start directory
     cd $startDir
-    
+
     set +x
     echo ------------------------------------------------------
     echo COMPILING GLIBC DONE ...
@@ -127,7 +127,7 @@ _EOF
 }
 
 install() {
-	checkOsCpus
+    checkOsCpus
     compileGlibc
 }
 
@@ -136,16 +136,16 @@ case $1 in
         commInstdir=$homeInstDir
         execPrefix=""
         install
-    ;;
+        ;;
 
     'root')
         commInstdir=$rootInstDir
         execPrefix=sudo
-		install
-    ;;
+        install
+        ;;
 
     *)
         set +x
         usage
-    ;;
+        ;;
 esac
