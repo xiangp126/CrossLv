@@ -48,6 +48,8 @@ cpuCoreNum=1
 downloadPath=$mainWd/downloads
 # dir storing tracked files
 trackDir=./track-files
+# git repo need update
+needPull=false
 
 logo() {
     cat << "_EOF"
@@ -759,7 +761,7 @@ installLiblzma() {
     fi
     cat << "_EOF"
 ------------------------------------------------------
-INSTALLING XZ-UTILS(LIBLZMAI)
+INSTALLING XZ-UTILS (LIBLZMAI)
 ------------------------------------------------------
 _EOF
     liblzmaInstDir=$commInstdir
@@ -828,8 +830,9 @@ _EOF
             exit
         fi
         chmod +x $rustUpShell
+        # ensure only sed 'add' once
+        sed -i "2a set -x" $rustUpShell
     fi
-    # sed -i "2a source ${mainWd}/${envName}" $daeName
     ./$rustUpShell -y
     if [[ $? != 0 ]]; then
         echo [Error]: rust setup failed, please check it
@@ -850,36 +853,16 @@ installRipGrep() {
     fi
     cat << "_EOF"
 ------------------------------------------------------
-INSTALLING RIPGREP - ENHANCED GREP
+INSTALLING RIPGREP -- REPLACEMENT of GREP
 ------------------------------------------------------
 _EOF
-    gitClonePath=https://github.com/BurntSushi/ripgrep
-    clonedName=ripgrep
-
-    cd $downloadPath
-    # check if already has this git repo
-    if [[ ! -d $clonedName ]]; then
-        git clone $gitClonePath $clonedName
-        # check if git clone returns successfully
-        if [[ $? != 0 ]]; then
-            echo [Error]: git clone returns error, quitting now
-            exit
-        fi
-    fi
-    # build routine
-    cd $clonedName
-    # export PATH=$HOM/.cargo/bin:$HOME
-    $cargoPath build --release
-    # copy rg binary to PATH directory
-    rgBuildBinPath=`pwd`/target/release/rg
-    $execPrefix cp $rgBuildBinPath $commInstdir/bin/
-    rgPath=$commInstdir/bin/rg
-    ls -l $rgPath
+    cargo install ripgrep
+    rgPath=$HOME/.cargo/bin/rg
+    $rgPath --version
     if [[ $? != 0 ]]; then
-        echo [Error]: copy rg binary returns error, quitting now
+        echo [Error]: ripgrep install error, quitting now
         exit
     fi
-    $rgPath --version
 }
 
 # replacement of gnu find
@@ -888,6 +871,11 @@ installFd() {
     if [[ $fdPath != "" ]]; then
         return
     fi
+    cat << "_EOF"
+------------------------------------------------------
+INSTALLING FD -- REPLACEMENT of FIND
+------------------------------------------------------
+_EOF
     cargo install fd-find
     fdPath=$HOME/.cargo/bin/fd
     $fdPath --version
@@ -1862,6 +1850,7 @@ INSTALLATION THROUGH ONEKEY DONE - CONGRATULATION
 gcc   path = $CC
 cxx   path = $CXX
 rg    path = $rgPath
+fd    path = $fdPath
 fzf   path = $fzfPath
 vim   path = $vimPath
 cmake path = $cmakePath

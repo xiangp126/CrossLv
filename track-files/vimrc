@@ -170,8 +170,6 @@ map <leader><leader>lw  :LeaderfLineCword<CR>
 " search line match word | end
 map <leader><leader>m   :LeaderfMruCwd<CR>
 map <leader><leader>ma  :LeaderfMru<CR>
-" similar as :buffers
-map <leader><leader>b   :LeaderfBuffer<CR>
 
 """"""""""""""""""""""""""""""
 " CONFIG FZF.VIM
@@ -207,44 +205,57 @@ let g:fzf_colors =
   \ 'spinner': ['fg', 'Label'],
   \ 'header':  ['fg', 'Comment'] }
 let g:fzf_history_dir = '~/.local/share/fzf-history'
-" hot key mapping, different from LeaderF
-let g:fzf_command_prefix = 'Fzf'
-map <leader>f   :FzfFiles<CR>
-map <leader>F   :FzfGFiles<CR>
-map <leader>l   :FzfBLines<CR>
-map <leader>la  :FzfLines<CR>
-map <leader>t   :FzfBTags<CR>
-map <leader>ta  :FzfTags<CR>
-map <leader>b   :FzfBCommits<CR>
-map <leader>ba  :FzfCommits<CR>
-map <leader>gg  :FzfGGrep<CR>
-map <Leader>r   :FzfRg<CR>
-map <Leader>a   :FzfAg<CR>
+" Reset FZF_DEFAULT_OPTS from bash, for Lines/Tags not support cat/head
+let $FZF_DEFAULT_OPTS = ''
+" --------------------- files --------------------------
+map <leader>f   :Files<CR>
 " Likewise, Files command with preview window
-command! -bang -nargs=? -complete=dir FzfFiles
+command! -bang -nargs=? -complete=dir Files
   \ call fzf#vim#files(<q-args>, fzf#vim#with_preview('right:50%:hidden', '?'), <bang>0)
-command! -bang -nargs=? -complete=dir FzfGFiles
-  \ call fzf#vim#gfiles(<q-args>, fzf#vim#with_preview('right:50%:hidden', '?'), <bang>0)
+" --------------------- git-files --------------------------
+map <leader>F   :GFiles<CR>
+command! -bang -nargs=? -complete=dir GFiles
+  \ call fzf#vim#gitfiles(<q-args>, fzf#vim#with_preview('right:50%:hidden', '?'), <bang>0)
+" --------------------- commits --------------------------
+map <silent><leader>c   :BCommits<CR>
+" --------------------- lines --------------------------
+" map <leader>l   :BLines<CR>
+" map <leader>la  :Lines<CR>
+map <leader>l   :call fzf#vim#buffer_lines({'options': '--no-reverse'})<CR>
+map <leader>lw  :call fzf#vim#buffer_lines(expand('<cword>'), {'options': '--no-reverse'})<CR>
+map <leader>la  :call fzf#vim#lines({'options': '--no-reverse'})<CR>
+" --------------------- tags --------------------------
+" map <leader>t   :BTags<CR>
+" map <leader>ta  :Tags<CR>
+map <leader>t   :call fzf#vim#buffer_tags('', {'options': '--no-reverse'})<CR>
+map <leader>tw  :call fzf#vim#buffer_tags(expand('<cword>'), {'options': '--no-reverse'})<CR>
+map <leader>ta  :call fzf#vim#tags('', {'options': '--no-reverse'})<CR>
+" --------------------- git-grep --------------------------
+map <leader>gg  :GGrep<CR>
+" --------------------- rg --------------------------
+map <Leader>r   :Rg<CR>
+" --------------------- ag --------------------------
+map <Leader>a   :Ag<CR>
 
 " Command for git grep
 " - fzf#vim#grep(command, with_column, [options], [fullscreen])
-command! -bang -nargs=* FzfGGrep
+command! -bang -nargs=* GGrep
   \ call fzf#vim#grep('git grep --line-number '.shellescape(<q-args>), 0, <bang>0)
 
 " Override Colors command. You can safely do this in your .vimrc as fzf.vim
 " will not override existing commands.
-command! -bang FzfColors
+command! -bang Colors
   \ call fzf#vim#colors({'left': '15%', 'options': '--reverse --margin 30%,0'}, <bang>0)
 
 " Similarly, we can apply it to fzf#vim#grep. To use ripgrep instead of ag:
-command! -bang -nargs=* FzfRg
+command! -bang -nargs=* Rg
   \ call fzf#vim#grep(
   \   'rg --column --line-number --no-heading --color=always '.shellescape(<q-args>), 1,
   \   <bang>0 ? fzf#vim#with_preview('up:60%')
   \           : fzf#vim#with_preview('right:50%:hidden', '?'),
   \   <bang>0)
 
-command! -bang -nargs=* FzfAg
+command! -bang -nargs=* Ag
   \ call fzf#vim#ag(<q-args>,
   \   '--color-path="01;30" --color-line-number="00" --color-match="00;35"',
   \   <bang>0 ? fzf#vim#with_preview('up:60%')

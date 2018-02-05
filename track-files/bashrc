@@ -97,15 +97,20 @@ if [[ -d "$extraCompDir" ]]; then
 fi
 
 # SETTINGS FOR FZF -- FUZZY FINDER
-export FZF_DEFAULT_COMMAND='fd --type f'
+if [[ "`which fd 2> /dev/null`" != '' ]]; then
+    # export FZF_DEFAULT_COMMAND='fd --type f'
+    export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+    # To apply the command to CTRL-T as well
+    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+fi
 export LINES=100
 # export FZF_DEFAULT_OPTS='--preview "head -$LINES {}" --reverse --inline-info --border'
 export FZF_DEFAULT_OPTS='--preview "head -$LINES {}" --inline-info'
-
-# Use ~~ as the trigger sequence instead of the default **
+# Use * as the trigger sequence instead of the default **
 export FZF_COMPLETION_TRIGGER='*'
 # Options to fzf command
 export FZF_COMPLETION_OPTS='+c -x'
+
 # Use fd (https://github.com/sharkdp/fd) instead of the default find
 # command for listing path candidates.
 # - The first argument to the function ($1) is the base path to start traversal
