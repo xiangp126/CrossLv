@@ -1747,6 +1747,7 @@ _EOF
     CXX=`which clang++`
     agPath=`which ag`
     rgPath=`which rg`
+    fdPath=`which fd`
     python3Path=`which python3`
     vimPath=`which vim`
     cmakePath=`which cmake`

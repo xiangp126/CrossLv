@@ -97,7 +97,6 @@ call plug#begin('~/.vim/bundle')
 " Plug 'davidhalter/jedi'
 " Plug 'tell-k/vim-autopep8'
 " Plug 'Chiel92/vim-autoformat'
-" Plug 'mileszs/ack.vim'
 " Plug 'Yggdroot/LeaderF', { 'do': './install.sh'  }
 "------ NEW PLUGINS -----
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
@@ -232,21 +231,11 @@ map <leader>tw  :call fzf#vim#buffer_tags(expand('<cword>'), {'options': '--no-r
 map <leader>ta  :call fzf#vim#tags('', {'options': '--no-reverse'})<CR>
 " --------------------- git-grep --------------------------
 map <leader>gg  :GGrep<CR>
-" --------------------- rg --------------------------
-map <Leader>r   :Rg<CR>
-" --------------------- ag --------------------------
-map <Leader>a   :Ag<CR>
-
-" Command for git grep
 " - fzf#vim#grep(command, with_column, [options], [fullscreen])
 command! -bang -nargs=* GGrep
   \ call fzf#vim#grep('git grep --line-number '.shellescape(<q-args>), 0, <bang>0)
-
-" Override Colors command. You can safely do this in your .vimrc as fzf.vim
-" will not override existing commands.
-command! -bang Colors
-  \ call fzf#vim#colors({'left': '15%', 'options': '--reverse --margin 30%,0'}, <bang>0)
-
+" --------------------- rg --------------------------
+map <Leader>r   :Rg<CR>
 " Similarly, we can apply it to fzf#vim#grep. To use ripgrep instead of ag:
 command! -bang -nargs=* Rg
   \ call fzf#vim#grep(
@@ -254,23 +243,65 @@ command! -bang -nargs=* Rg
   \   <bang>0 ? fzf#vim#with_preview('up:60%')
   \           : fzf#vim#with_preview('right:50%:hidden', '?'),
   \   <bang>0)
-
+" --------------------- ag --------------------------
+map <Leader>a   :Ag<CR>
 command! -bang -nargs=* Ag
   \ call fzf#vim#ag(<q-args>,
   \   '--color-path="01;30" --color-line-number="00" --color-match="00;35"',
   \   <bang>0 ? fzf#vim#with_preview('up:60%')
   \           : fzf#vim#with_preview('right:50%:hidden', '?'),
   \   <bang>0)
+" --------------------- colors --------------------------
+" Override Colors command. You can safely do this in your .vimrc as fzf.vim
+" will not override existing commands.
+command! -bang Colors
+  \ call fzf#vim#colors({'left': '15%', 'options': '--reverse --margin 30%,0'}, <bang>0)
 
-""""""""""""""""""""""""""""""
-" CONFIG ACK.VIM
-""""""""""""""""""""""""""""""
-" let g:ack_autoclose = 1
-" if executable('ag')
-"   let g:ackprg = 'ag --vimgrep'
-" endif
-" cnoreabbrev Ack Ack!
-" nnoremap <Leader>a :Ack!<Space>
+" ----------------------------------------------------------------------------
+" NBTags
+" ----------------------------------------------------------------------------
+function! s:align_lists(lists)
+  let maxes = {}
+  for list in a:lists
+    let i = 0
+    while i < len(list)
+      let maxes[i] = max([get(maxes, i, 0), len(list[i])])
+      let i += 1
+    endwhile
+  endfor
+  for list in a:lists
+    call map(list, "printf('%-'.maxes[v:key].'s', v:val)")
+  endfor
+  return a:lists
+endfunction
+
+function! s:btags_source()
+  let lines = map(split(system(printf(
+    \ 'ctags -f - --sort=no --excmd=pattern --language-force=%s %s',
+    \ &filetype, expand('%:S'))), "\n"), 'split(v:val, "\t")')
+  if v:shell_error
+    throw 'failed to extract tags'
+  endif
+  return map(s:align_lists(lines), 'join(v:val, "\t")')
+endfunction
+
+function! s:btags_sink(line)
+  execute split(a:line, "\t")[2]
+endfunction
+
+function! s:btags()
+  try
+    call fzf#run({'source':  s:btags_source(),
+                 \'down':    '40%',
+                 \'options': '+m -d "\t" --with-nth 1,4..',
+                 \'sink':    function('s:btags_sink')})
+  catch
+    echohl WarningMsg
+    echom v:exception
+    echohl None
+  endtry
+endfunction
+command! NBTags call s:btags()
 
 """"""""""""""""""""""""""""""
 " CONFIG TAGBAR
