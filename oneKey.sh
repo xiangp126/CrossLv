@@ -809,46 +809,45 @@ _EOF
     fi
 }
 
+installRust() {
+    cargoPath=`which cargo 2> /dev/null`
+    if [[ $cargoPath != "" ]]; then
+        return
+    fi
+    cat << "_EOF"
+------------------------------------------------------
+INSTALLING RUST (CARGO)
+------------------------------------------------------
+_EOF
+    rustUpShell=sh.rustup.rs
+    cd $downloadPath
+    if [[ ! -x $rustUpShell ]]; then
+        wget https://sh.rustup.rs -O $rustUpShell
+        if [[ $? != 0 ]]; then
+            echo [Error]: wget returns error, please check it
+            exit
+        fi
+        chmod +x $rustUpShell
+    fi
+    # sed -i "2a source ${mainWd}/${envName}" $daeName
+    ./$rustUpShell -y
+    if [[ $? != 0 ]]; then
+        echo [Error]: rust setup failed, please check it
+        exit
+    fi
+    cargoPath=$HOME/.cargo/bin/cargo
+    $cargoPath --version
+    if [[ $? != 0 ]]; then
+        echo [Error]: cargo install error, quitting now
+        exit
+    fi
+}
+
 installRipGrep() {
     rgPath=`which rg 2> /dev/null`
     if [[ $rgPath != "" ]]; then
         return
     fi
-    cat << "_EOF"
-------------------------------------------------------
-INSTALLING RUST FIRST
-------------------------------------------------------
-_EOF
-    cargoPath=`which cargo 2> /dev/null`
-    if [[ $cargoPath == "" ]]; then
-        rustUpShell=sh.rustup.rs
-        cd $downloadPath
-        if [[ ! -x $rustUpShell ]]; then
-            wget https://sh.rustup.rs -O $rustUpShell
-            if [[ $? != 0 ]]; then
-                echo [Error]: wget returns error, please check it
-                exit
-            fi
-            chmod +x $rustUpShell
-        fi
-        # sed -i "2a source ${mainWd}/${envName}" $daeName
-        ./$rustUpShell -y
-        if [[ $? != 0 ]]; then
-            echo [Error]: rust setup failed, please check it
-            exit
-        fi
-
-        cargoBuildBinPath=$HOME/.cargo/bin/cargo
-        $execPrefix cp $cargoBuildBinPath $commInstdir/bin/
-        cargoPath=$commInstdir/bin/cargo
-        ls -l $cargoPath
-        if [[ $? != 0 ]]; then
-            echo [Error]: copy cargo binary returns error, quitting now
-            exit
-        fi
-        $cargoPath --version
-    fi
-
     cat << "_EOF"
 ------------------------------------------------------
 INSTALLING RIPGREP - ENHANCED GREP
@@ -867,11 +866,11 @@ _EOF
             exit
         fi
     fi
-
     # build routine
     cd $clonedName
     # export PATH=$HOM/.cargo/bin:$HOME
     $cargoPath build --release
+    # copy rg binary to PATH directory
     rgBuildBinPath=`pwd`/target/release/rg
     $execPrefix cp $rgBuildBinPath $commInstdir/bin/
     rgPath=$commInstdir/bin/rg
@@ -881,6 +880,21 @@ _EOF
         exit
     fi
     $rgPath --version
+}
+
+# replacement of gnu find
+installFd() {
+    fdPath=`which fd 2> /dev/null`
+    if [[ $fdPath != "" ]]; then
+        return
+    fi
+    cargo install fd-find
+    fdPath=$HOME/.cargo/bin/fd
+    $fdPath --version
+    if [[ $? != 0 ]]; then
+        echo [Error]: fd install error, quitting now
+        exit
+    fi
 }
 
 # install silver searcher
@@ -979,7 +993,7 @@ _EOF
     # change fzf-tmux to tfzf
     cd $commInstdir/bin
     if [[ -f fzf-tmux ]]; then
-        $execPrefix mv fzf-tmux tzf
+        $execPrefix ln -sf fzf-tmux tzf
     fi
     fzfPath=$commInstdir/bin/fzf
 }
@@ -1723,9 +1737,8 @@ _EOF
     if [[ ! -f $mainWd/$mRunFlagFile ]]; then
         # as ordinary user run brew
         # use gnu-sed as compatible with that under Linux
-        brew install python python3 cmake vim git \
+        brew install python python3 cmake vim git fd \
             bash-completion fontconfig tmux ripgrep \
-            the_silver_searcher \
             gnu-sed --with-default-names -y
 
         cat << "_EOF"
@@ -1745,6 +1758,7 @@ _EOF
     CC=`which clang`
     CXX=`which clang++`
     agPath=`which ag`
+    rgPath=`which rg`
     python3Path=`which python3`
     vimPath=`which vim`
     cmakePath=`which cmake`
@@ -1841,8 +1855,6 @@ _EOF
 
 installSummary() {
     set +x
-    agPath=$ackInstDir/bin/ag
-    vimPath=$vimInstDir/bin/vim
     cat << _EOF
 ------------------------------------------------------
 INSTALLATION THROUGH ONEKEY DONE - CONGRATULATION
@@ -1890,7 +1902,9 @@ install() {
       #   - installFonts
     installuCtags
     if [[ $platOsType != 'macos' ]]; then
+        installRust
         installRipGrep
+        installFd
         # installSilverSearcher
         installPython3
         installvim

@@ -52,6 +52,10 @@ cmap w!! w !sudo tee %
 set pastetoggle=<F12>
 noremap <F10> :set invnumber<CR>
 map <leader>k :mark<Space>
+" vim easy manipulator
+map <leader>R :source ~/.vimrc<CR>
+map <leader>W :write<CR>
+map <leader>Q :quit<CR>
 " map leader NO. switch between buffers
 nmap <leader>1 :buffer1<CR>
 nmap <leader>2 :buffer2<CR>
@@ -64,6 +68,7 @@ nmap <leader>8 :buffer8<CR>
 nmap <leader>9 :buffer9<CR>
 nmap <leader>- :bprevious<CR>
 nmap <leader>+ :bnext<CR>
+map <leader>d  :bdelete<CR>
 " unnamed for '* register', unnamedplus for '+ register'
 set clipboard=unnamedplus,unnamed
 " copy to system clipboard
@@ -171,14 +176,21 @@ map <leader><leader>b   :LeaderfBuffer<CR>
 """"""""""""""""""""""""""""""
 " CONFIG FZF.VIM
 """"""""""""""""""""""""""""""
+" This is the default extra key bindings
+let g:fzf_action = {
+  \ 'ctrl-t': 'tab split',
+  \ 'ctrl-x': 'split',
+  \ 'ctrl-v': 'vsplit' }
 let g:fzf_layout = { 'down': '~50%'  }
 " [Buffers] Jump to the existing window if possible
 let g:fzf_buffers_jump = 1
-" [Tags] Command to generate tags file
-let g:fzf_tags_command = 'ctags -R −−fields=S'
 " [[B]Commits] Customize the options used by 'git log':
 let g:fzf_commits_log_options = '--graph --color=always
    \ --format="%C(auto)%h%d %s %C(black)%C(bold)%cr"'
+" [Tags] Command to generate tags file
+let g:fzf_tags_command = 'ctags -R −−fields=S'
+" [Commands] --expect expression for directly executing the command
+let g:fzf_commands_expect = 'alt-enter,ctrl-x'
 " Customize fzf colors to match your color scheme
 let g:fzf_colors =
 \ { 'fg':      ['fg', 'Normal'],
@@ -205,48 +217,39 @@ map <leader>t   :FzfBTags<CR>
 map <leader>ta  :FzfTags<CR>
 map <leader>b   :FzfBCommits<CR>
 map <leader>ba  :FzfCommits<CR>
-map <leader>gg  :GGrep<CR>
-map <Leader>r   :Rg<CR>
-
-" command! -bang -nargs=* FzfAg call
-"   \ fzf#vim#ag(<q-args>, {'options': '--delimiter : --nth 4..'}, <bang>0)
-
-" command! -bang -nargs=* Rg
-"   \ call fzf#vim#grep(
-"   \   'rg --column --line-number --no-heading --color=always
-"   \   --fixed-strings --ignore-case --no-ignore --hidden --follow'.shellescape(<q-args>), 1,
-"   \   <bang>0 ? fzf#vim#with_preview('up:60%')
-"   \           : fzf#vim#with_preview('right:50%:hidden', '?'),
-"   \   <bang>0)
-
-"  --glob "!.git/*" --color "always" '.shellescape(<q-args>).'| tr -d "\017"', 1,
-
-" command! -bang -nargs=* FzfFind call \
-"   \ fzf#vim#grep('rg --column --line-number
-"   \ --no-heading --fixed-strings --ignore-case --no-ignore --hidden --follow
-"   \ --glob "!.git/*" --color "always" '.shellescape(<q-args>).'| tr -d "\017"', 1, <bang>0)')
+map <leader>gg  :FzfGGrep<CR>
+map <Leader>r   :FzfRg<CR>
+map <Leader>a   :FzfAg<CR>
+" Likewise, Files command with preview window
+command! -bang -nargs=? -complete=dir FzfFiles
+  \ call fzf#vim#files(<q-args>, fzf#vim#with_preview('right:50%:hidden', '?'), <bang>0)
+command! -bang -nargs=? -complete=dir FzfGFiles
+  \ call fzf#vim#gfiles(<q-args>, fzf#vim#with_preview('right:50%:hidden', '?'), <bang>0)
 
 " Command for git grep
 " - fzf#vim#grep(command, with_column, [options], [fullscreen])
-command! -bang -nargs=* GGrep
+command! -bang -nargs=* FzfGGrep
   \ call fzf#vim#grep('git grep --line-number '.shellescape(<q-args>), 0, <bang>0)
 
 " Override Colors command. You can safely do this in your .vimrc as fzf.vim
 " will not override existing commands.
-command! -bang Colors
+command! -bang FzfColors
   \ call fzf#vim#colors({'left': '15%', 'options': '--reverse --margin 30%,0'}, <bang>0)
 
 " Similarly, we can apply it to fzf#vim#grep. To use ripgrep instead of ag:
-command! -bang -nargs=* Rg
+command! -bang -nargs=* FzfRg
   \ call fzf#vim#grep(
   \   'rg --column --line-number --no-heading --color=always '.shellescape(<q-args>), 1,
   \   <bang>0 ? fzf#vim#with_preview('up:60%')
   \           : fzf#vim#with_preview('right:50%:hidden', '?'),
   \   <bang>0)
 
-" Likewise, Files command with preview window
-command! -bang -nargs=? -complete=dir FzfFiles
-  \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
+command! -bang -nargs=* FzfAg
+  \ call fzf#vim#ag(<q-args>,
+  \   '--color-path="01;30" --color-line-number="00" --color-match="00;35"',
+  \   <bang>0 ? fzf#vim#with_preview('up:60%')
+  \           : fzf#vim#with_preview('right:50%:hidden', '?'),
+  \   <bang>0)
 
 """"""""""""""""""""""""""""""
 " CONFIG ACK.VIM

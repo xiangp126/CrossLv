@@ -62,7 +62,7 @@ export LC_CTYPE=en_US.UTF-8
 export SHELL=/bin/bash
 export EDITOR=vim
 # SET PATH VARIABLES.
-PATH=$HOME/.usr/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin
+PATH=$HOME/.cargo/bin:$HOME/.usr/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin
 # export PKG_CONFIG_PATH=$HOME/.usr/lib/pkgconfig:$PKG_CONFIG_PATH
 PKG_CONFIG_PATH=$HOME/.usr/lib/pkgconfig:/usr/local/lib/pkgconfig
 LD_LIBRARY_PATH=$HOME/.usr/lib:$HOME/.usr/lib64:/usr/local/lib:/usr/local/lib64
@@ -95,6 +95,28 @@ if [[ -d "$extraCompDir" ]]; then
         source $file
     done
 fi
+
+# SETTINGS FOR FZF -- FUZZY FINDER
+export FZF_DEFAULT_COMMAND='fd --type f'
+export LINES=100
+# export FZF_DEFAULT_OPTS='--preview "head -$LINES {}" --reverse --inline-info --border'
+export FZF_DEFAULT_OPTS='--preview "head -$LINES {}" --inline-info'
+
+# Use ~~ as the trigger sequence instead of the default **
+export FZF_COMPLETION_TRIGGER='*'
+# Options to fzf command
+export FZF_COMPLETION_OPTS='+c -x'
+# Use fd (https://github.com/sharkdp/fd) instead of the default find
+# command for listing path candidates.
+# - The first argument to the function ($1) is the base path to start traversal
+# - See the source code (completion.{bash,zsh}) for the details.
+_fzf_compgen_path() {
+  fd --hidden --follow --exclude ".git" . "$1"
+}
+# Use fd to generate the list for directory completion
+_fzf_compgen_dir() {
+  fd --type d --hidden --follow --exclude ".git" . "$1"
+}
 
 # TEST IF COMMAND 'TMUX' EXIST.
 if [[ "`which tmux 2> /dev/null`" != "" ]]; then
