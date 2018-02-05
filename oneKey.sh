@@ -856,7 +856,7 @@ installRipGrep() {
 INSTALLING RIPGREP -- REPLACEMENT of GREP
 ------------------------------------------------------
 _EOF
-    cargo install ripgrep
+    $cargoPath install ripgrep
     rgPath=$HOME/.cargo/bin/rg
     $rgPath --version
     if [[ $? != 0 ]]; then
@@ -876,7 +876,7 @@ installFd() {
 INSTALLING FD -- REPLACEMENT of FIND
 ------------------------------------------------------
 _EOF
-    cargo install fd-find
+    $cargoPath install fd-find
     fdPath=$HOME/.cargo/bin/fd
     $fdPath --version
     if [[ $? != 0 ]]; then

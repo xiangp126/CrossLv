@@ -37,8 +37,8 @@ endif
 "------ :help ins-completion-menu -----
 set pumheight=12      " maximum height of popup menu
 set shell=/bin/bash   " set vim default shell
-let mapleader='\'   " leader key, default is '\'
-set t_Co=256        " number of colors
+let mapleader=';'     " leader key, default is '\'
+set t_Co=256          " number of colors
 set background=dark
 "------ private under ~/.vim/colors -----
 :colorscheme darkcoding
@@ -106,7 +106,7 @@ Plug 'jiangmiao/auto-pairs'
 Plug 'majutsushi/tagbar', { 'on': 'TagbarToggle' }
 Plug 'Yggdroot/indentLine'
 "------ FUZZY FINDER -----
-Plug 'Yggdroot/LeaderF'
+Plug 'Yggdroot/LeaderF', { 'on': 'LeaderfFunction' }
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 "------ BEAUTIFY LINE -----
@@ -207,35 +207,39 @@ let g:fzf_history_dir = '~/.local/share/fzf-history'
 " Reset FZF_DEFAULT_OPTS from bash, for Lines/Tags not support cat/head
 let $FZF_DEFAULT_OPTS = ''
 " --------------------- files --------------------------
-map <leader>f   :Files<CR>
+nnoremap <leader>f   :Files<CR>
 " Likewise, Files command with preview window
 command! -bang -nargs=? -complete=dir Files
-  \ call fzf#vim#files(<q-args>, fzf#vim#with_preview('right:50%:hidden', '?'), <bang>0)
+  \ call fzf#vim#files(<q-args>,
+  \ fzf#vim#with_preview('right:50%:hidden', '?'), <bang>0)
 " --------------------- git-files --------------------------
-map <leader>F   :GFiles<CR>
+nnoremap <leader>F   :GFiles<CR>
 command! -bang -nargs=? -complete=dir GFiles
-  \ call fzf#vim#gitfiles(<q-args>, fzf#vim#with_preview('right:50%:hidden', '?'), <bang>0)
-" --------------------- commits --------------------------
-map <silent><leader>c   :BCommits<CR>
-" --------------------- lines --------------------------
-" map <leader>l   :BLines<CR>
-" map <leader>la  :Lines<CR>
-map <leader>l   :call fzf#vim#buffer_lines({'options': '--no-reverse'})<CR>
-map <leader>lw  :call fzf#vim#buffer_lines(expand('<cword>'), {'options': '--no-reverse'})<CR>
-map <leader>la  :call fzf#vim#lines({'options': '--no-reverse'})<CR>
-" --------------------- tags --------------------------
-" map <leader>t   :BTags<CR>
-" map <leader>ta  :Tags<CR>
-map <leader>t   :call fzf#vim#buffer_tags('', {'options': '--no-reverse'})<CR>
-map <leader>tw  :call fzf#vim#buffer_tags(expand('<cword>'), {'options': '--no-reverse'})<CR>
-map <leader>ta  :call fzf#vim#tags('', {'options': '--no-reverse'})<CR>
+  \ call fzf#vim#gitfiles(<q-args>,
+  \ fzf#vim#with_preview('right:50%:hidden', '?'), <bang>0)
 " --------------------- git-grep --------------------------
-map <leader>gg  :GGrep<CR>
+nnoremap <leader>gr  :GGrep<CR>
 " - fzf#vim#grep(command, with_column, [options], [fullscreen])
 command! -bang -nargs=* GGrep
   \ call fzf#vim#grep('git grep --line-number '.shellescape(<q-args>), 0, <bang>0)
+" --------------------- commits --------------------------
+nnoremap <silent><leader>c   :BCommits<CR>
+" --------------------- lines --------------------------
+" nnoremap <leader>l   :BLines<CR>
+" nnoremap <leader>la  :Lines<CR>
+nnoremap <leader>l   :call fzf#vim#buffer_lines({'options': '--no-reverse'})<CR>
+nnoremap <leader>lw  :call fzf#vim#buffer_lines(expand('<cword>'),
+  \ {'options': '--no-reverse'})<CR>
+nnoremap <leader>la  :call fzf#vim#lines({'options': '--no-reverse'})<CR>
+" --------------------- tags --------------------------
+" nnoremap <leader>t   :BTags<CR>
+" nnoremap <leader>ta  :Tags<CR>
+nnoremap <leader>t   :call fzf#vim#buffer_tags('', {'options': '--no-reverse'})<CR>
+nnoremap <leader>tw  :call fzf#vim#buffer_tags(expand('<cword>'),
+  \ {'options': '--no-reverse'})<CR>
+nnoremap <leader>ta  :call fzf#vim#tags('', {'options': '--no-reverse'})<CR>
 " --------------------- rg --------------------------
-map <Leader>r   :Rg<CR>
+nnoremap <Leader>r   :Rg<CR>
 " Similarly, we can apply it to fzf#vim#grep. To use ripgrep instead of ag:
 command! -bang -nargs=* Rg
   \ call fzf#vim#grep(
@@ -244,7 +248,7 @@ command! -bang -nargs=* Rg
   \           : fzf#vim#with_preview('right:50%:hidden', '?'),
   \   <bang>0)
 " --------------------- ag --------------------------
-map <Leader>a   :Ag<CR>
+nnoremap <Leader>a   :Ag<CR>
 command! -bang -nargs=* Ag
   \ call fzf#vim#ag(<q-args>,
   \   '--color-path="01;30" --color-line-number="00" --color-match="00;35"',
