@@ -155,18 +155,18 @@ let g:Lf_MruFileExclude = ['*.so']
 let g:Lf_CommandMap = {'<C-C>': ['<Esc>', '<C-C>']}
 let g:Lf_HighlightIndividual = 0
 let g:Lf_StlSeparator = { 'left': '', 'right': ''  }
-map <leader>f   :LeaderfFunction<CR>
-map <leader>fa  :LeaderfFunctionAll<CR>
-map <leader>fw  :LeaderfFunctionCword<CR>
+map <leader><leader>f   :LeaderfFunction<CR>
+map <leader><leader>fa  :LeaderfFunctionAll<CR>
+map <leader><leader>fw  :LeaderfFunctionCword<CR>
 " search line which has the word
-map <leader>l   :LeaderfLine<CR>
-map <leader>la  :LeaderfLineAll<CR>
-map <leader>lw  :LeaderfLineCword<CR>
+map <leader><leader>l   :LeaderfLine<CR>
+map <leader><leader>la  :LeaderfLineAll<CR>
+map <leader><leader>lw  :LeaderfLineCword<CR>
 " search line match word | end
-map <leader>m   :LeaderfMruCwd<CR>
-map <leader>ma  :LeaderfMru<CR>
+map <leader><leader>m   :LeaderfMruCwd<CR>
+map <leader><leader>ma  :LeaderfMru<CR>
 " similar as :buffers
-map <leader>b   :LeaderfBuffer<CR>
+map <leader><leader>b   :LeaderfBuffer<CR>
 
 """"""""""""""""""""""""""""""
 " CONFIG FZF.VIM
@@ -197,16 +197,16 @@ let g:fzf_colors =
 let g:fzf_history_dir = '~/.local/share/fzf-history'
 " hot key mapping, different from LeaderF
 let g:fzf_command_prefix = 'Fzf'
-map <leader><leader>f   :FzfFiles<CR>
-map <leader><leader>F   :FzfGFiles<CR>
-map <leader><leader>l   :FzfBLines<CR>
-map <leader><leader>la  :FzfLines<CR>
-map <leader><leader>t   :FzfBTags<CR>
-map <leader><leader>ta  :FzfTags<CR>
-map <leader><leader>b   :FzfBCommits<CR>
-map <leader><leader>ba  :FzfCommits<CR>
-map <leader><leader>gg  :GGrep<CR>
-nnoremap <Leader>r :Rg<CR>
+map <leader>f   :FzfFiles<CR>
+map <leader>F   :FzfGFiles<CR>
+map <leader>l   :FzfBLines<CR>
+map <leader>la  :FzfLines<CR>
+map <leader>t   :FzfBTags<CR>
+map <leader>ta  :FzfTags<CR>
+map <leader>b   :FzfBCommits<CR>
+map <leader>ba  :FzfCommits<CR>
+map <leader>gg  :GGrep<CR>
+map <Leader>r   :Rg<CR>
 
 " command! -bang -nargs=* FzfAg call
 "   \ fzf#vim#ag(<q-args>, {'options': '--delimiter : --nth 4..'}, <bang>0)
@@ -317,7 +317,7 @@ let g:UltiSnipsExpandTrigger="<tab>"
 let g:UltiSnipsJumpForwardTrigger = "<tab>"
 let g:UltiSnipsJumpBackwardTrigger = "<c-b>"
 " If you want :UltiSnipsEdit to split your window.
-let g:UltiSnipsEditSplit="vertical"
+let g:UltiSnipsEditSplit = "vertical"
 
 """"""""""""""""""""""""""""""
 " CONFIG COMPLETEPARAMETER.VIM
@@ -365,7 +365,7 @@ let g:ycm_cache_omnifunc = 0
 " make YCM compatible with UltiSnips (using supertab)
 let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
 let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
-"do not delete next line | specify python3 interpreter
+" Do not delete next line | specify python3 interpreter
 let g:ycm_server_python_interpreter = '/usr/local/bin/python3'
 let g:ycm_add_preview_to_completeopt = 0
 let g:ycm_autoclose_preview_window_after_insertion = 0

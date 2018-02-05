@@ -583,7 +583,7 @@ _EOF
     fi
     cat << _EOF
 ------------------------------------------------------
-COPYING .VIMRC FIRST
+PLACING NEW .VIMRC IN PLACE
 ------------------------------------------------------
 _EOF
     cd $mainWd
@@ -596,8 +596,8 @@ COMMENT ON COLORSCHEME IN .VIMRC
 _EOF
     # comment on color scheme line if default color not found
     defColorPath=$HOME/.vim/colors/darkcoding.vim
+    matchStr=':colorscheme'
     if [[ ! -f $defColorPath ]]; then
-        matchStr=':colorscheme'
         sed -i --regexp-extended \
             "s/$matchStr/\" $matchStr/" $HOME/.vimrc
     else
@@ -656,11 +656,11 @@ _EOF
     source $HOME/.bashrc 2> /dev/null
 
     # extra install actions for vim plugins
-    installExtraForLeaderF
-    installExtraForFzf
+    # doExtraForLeaderF
+    doExtraForFzf
 }
 
-installExtraForLeaderF() {
+doExtraForLeaderF() {
     cat << "_EOF"
 ------------------------------------------------------
 COPYING DARK_LEADERF.VIM AS DEFAULT LEADERF COLORSCHEME
@@ -810,8 +810,8 @@ _EOF
 }
 
 installRipGrep() {
-    whereIsRg=`which rg 2> /dev/null`
-    if [[ $whereIsRg != "" ]]; then
+    rgPath=`which rg 2> /dev/null`
+    if [[ $rgPath != "" ]]; then
         return
     fi
     cat << "_EOF"
@@ -819,8 +819,8 @@ installRipGrep() {
 INSTALLING RUST FIRST
 ------------------------------------------------------
 _EOF
-    whereIsCargo=`which cargo 2> /dev/null`
-    if [[ $whereIsCargo == "" ]]; then
+    cargoPath=`which cargo 2> /dev/null`
+    if [[ $cargoPath == "" ]]; then
         rustUpShell=sh.rustup.rs
         cd $downloadPath
         if [[ ! -x $rustUpShell ]]; then
@@ -837,9 +837,16 @@ _EOF
             echo [Error]: rust setup failed, please check it
             exit
         fi
-        cargoPath=$HOME/.cargo/bin/cargo
-    else
-        cargoPath=$whereIsCargo
+
+        cargoBuildBinPath=$HOME/.cargo/bin/cargo
+        $execPrefix cp $cargoBuildBinPath $commInstdir/bin/
+        cargoPath=$commInstdir/bin/cargo
+        ls -l $cargoPath
+        if [[ $? != 0 ]]; then
+            echo [Error]: copy cargo binary returns error, quitting now
+            exit
+        fi
+        $cargoPath --version
     fi
 
     cat << "_EOF"
@@ -867,20 +874,19 @@ _EOF
     $cargoPath build --release
     rgBuildBinPath=`pwd`/target/release/rg
     $execPrefix cp $rgBuildBinPath $commInstdir/bin/
-    $rgPath="$commInstdir/bin/rg"
-#    ls -l $rgPath
-#    if [[ $? != 0 ]]; then
-#        echo [Error]: copy rg binary returns error, quitting now
-#        exit
-#    fi
+    rgPath=$commInstdir/bin/rg
+    ls -l $rgPath
+    if [[ $? != 0 ]]; then
+        echo [Error]: copy rg binary returns error, quitting now
+        exit
+    fi
     $rgPath --version
 }
 
 # install silver searcher
 installSilverSearcher() {
-    # ag linked to ack
-    ackPath=`which ag 2> /dev/null`
-    if [[ $ackPath != "" ]]; then
+    agPath=`which ag 2> /dev/null`
+    if [[ $agPath != "" ]]; then
         return
     fi
     cat << "_EOF"
@@ -889,7 +895,7 @@ INSTALLING SILVER SEARCHER (ALIAS TO ACK)
 ------------------------------------------------------
 _EOF
     if [[ $execPrefix != 'sudo' ]]; then
-        # only use without root privilege need manual compile them
+        # if has no root privilege need manual compile them
         installLibpcre
         installLiblzma
     fi
@@ -928,11 +934,11 @@ _EOF
         echo [Error]: make install returns error, quitting now ...
         exit 255
     fi
-    ackPath=$ackInstDir/bin/ag
+    agPath=$ackInstDir/bin/ag
 }
 
 # command-line fuzzy finder
-installExtraForFzf() {
+doExtraForFzf() {
     fzfPath=`which fzf 2> /dev/null`
     if [[ $fzfPath != "" ]]; then
         return
@@ -1717,8 +1723,9 @@ _EOF
     if [[ ! -f $mainWd/$mRunFlagFile ]]; then
         # as ordinary user run brew
         # use gnu-sed as compatible with that under Linux
-        brew install python python3 cmake vim git the_silver_searcher \
-            bash-completion fontconfig tmux \
+        brew install python python3 cmake vim git \
+            bash-completion fontconfig tmux ripgrep \
+            the_silver_searcher \
             gnu-sed --with-default-names -y
 
         cat << "_EOF"
@@ -1737,7 +1744,7 @@ _EOF
     # set path vars for use in installSummary
     CC=`which clang`
     CXX=`which clang++`
-    ackPath=`which ag`
+    agPath=`which ag`
     python3Path=`which python3`
     vimPath=`which vim`
     cmakePath=`which cmake`
@@ -1834,7 +1841,7 @@ _EOF
 
 installSummary() {
     set +x
-    ackPath=$ackInstDir/bin/ag
+    agPath=$ackInstDir/bin/ag
     vimPath=$vimInstDir/bin/vim
     cat << _EOF
 ------------------------------------------------------
@@ -1842,7 +1849,6 @@ INSTALLATION THROUGH ONEKEY DONE - CONGRATULATION
 ------------------------------------------------------
 gcc   path = $CC
 cxx   path = $CXX
-ag    path = $ackPath
 rg    path = $rgPath
 fzf   path = $fzfPath
 vim   path = $vimPath
@@ -1878,13 +1884,11 @@ install() {
     installBone
       # | - installTmuxPlugins
       #   - installVimPlugins
-      #       | - installExtraForLeaderF
+      #       | - doExtraForLeaderF
+      #       | - doExtraForFzf
       #   - installBashCompletion
       #   - installFonts
     installuCtags
-
-    installRipGrep
-
     if [[ $platOsType != 'macos' ]]; then
         installRipGrep
         # installSilverSearcher
