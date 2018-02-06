@@ -856,11 +856,40 @@ installRipGrep() {
 INSTALLING RIPGREP -- REPLACEMENT of GREP
 ------------------------------------------------------
 _EOF
-    $cargoPath install ripgrep
+    gitClonePath=https://github.com/BurntSushi/ripgrep
+    clonedName=ripgrep
+
+    cd $downloadPath
+    # check if already has this git repo
+    if [[ ! -d $clonedName ]]; then
+        git clone $gitClonePath $clonedName
+        # check if git clone returns successfully
+        if [[ $? != 0 ]]; then
+            echo [Error]: git clone returns error, quitting now
+            exit
+        fi
+    fi
+
+    if [[ $needPull == 'true' ]]; then
+        git pull
+    fi
+    # build routine
+    cd $clonedName
+    $cargoPath build --release
+    if [[ $? != 0 ]]; then
+        echo [Error]: ripgrep build returns error, quitting now
+        exit
+    fi
+    $cargoPath install
+    if [[ $? != 0 ]]; then
+        echo [Error]: ripgrep install returns error, quitting now
+        exit
+    fi
+
     rgPath=$HOME/.cargo/bin/rg
     $rgPath --version
     if [[ $? != 0 ]]; then
-        echo [Error]: ripgrep install error, quitting now
+        echo [Error]: ripgrep run error, quitting now
         exit
     fi
 }
@@ -876,11 +905,40 @@ installFd() {
 INSTALLING FD -- REPLACEMENT of FIND
 ------------------------------------------------------
 _EOF
-    $cargoPath install fd-find
+    gitClonePath=https://github.com/sharkdp/fd
+    clonedName=fd-find
+
+    cd $downloadPath
+    # check if already has this git repo
+    if [[ ! -d $clonedName ]]; then
+        git clone $gitClonePath $clonedName
+        # check if git clone returns successfully
+        if [[ $? != 0 ]]; then
+            echo [Error]: git clone returns error, quitting now
+            exit
+        fi
+    fi
+
+    if [[ $needPull == 'true' ]]; then
+        git pull
+    fi
+    # build routine
+    cd $clonedName
+    $cargoPath build --release
+    if [[ $? != 0 ]]; then
+        echo [Error]: fd-find build returns error, quitting now
+        exit
+    fi
+    $cargoPath install
+    if [[ $? != 0 ]]; then
+        echo [Error]: fd-find install returns error, quitting now
+        exit
+    fi
+
     fdPath=$HOME/.cargo/bin/fd
     $fdPath --version
     if [[ $? != 0 ]]; then
-        echo [Error]: fd install error, quitting now
+        echo [Error]: fd-find run error, quitting now
         exit
     fi
 }
