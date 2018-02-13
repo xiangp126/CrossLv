@@ -10,7 +10,6 @@
 	requireForce = false
 [alias]
 	st = status
-	ck = checkout
 	ls-files = lf
 	lf = ls-files
 	ad = add
@@ -18,6 +17,8 @@
 	lgg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)'
 	cm = commit -v
 	cp = cherry-pick
+	br = branch
+	co = checkout
 [color]
 	ui = auto
 [push]

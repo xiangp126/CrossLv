@@ -311,7 +311,7 @@ command! NBTags call s:btags()
 " CONFIG TAGBAR
 """"""""""""""""""""""""""""""
 " let g:tagbar_ctags_bin = "/usr/bin/ctags"
-nnoremap <silent> <F5> :TagbarToggle<CR>
+nmap <silent> <F5> :TagbarToggle<CR>
 let g:Tagbar_title = "[Tagbar]"
 let g:tagbar_left = 0
 let g:tagbar_width = 25
