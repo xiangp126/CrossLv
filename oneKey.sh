@@ -53,12 +53,11 @@ needPull=false
 
 logo() {
     cat << "_EOF"
-                   _     _
- _ __ ___  _   _  | |   (_)_ __  _   ___  __
-| '_ ` _ \| | | | | |   | | '_ \| | | \ \/ /
-| | | | | | |_| | | |___| | | | | |_| |>  <
-|_| |_| |_|\__, | |_____|_|_| |_|\__,_/_/\_\
-           |___/
+                        _
+  ___ _ __ ___  ___ ___| |_   __
+ / __| '__/ _ \/ __/ __| \ \ / /
+| (__| | | (_) \__ \__ \ |\ V /
+ \___|_|  \___/|___/___/_| \_/
 
 _EOF
 }
@@ -100,9 +99,10 @@ usage() {
     cat << _EOF
 [NAME]
     $exeName -- onekey to setup my working environment | - tmux
-             | - vim | - vundle -- youcompleteme -- supertab -- vim-snippets
-                      -- ultisnips -- nerdtree -- auto-pairs
-             | - gcc | - python3 | - etc
+             | - vim | - plugins -- youcompleteme -- supertab -- vim-snippets
+                       -- ultisnips -- nerdtree -- auto-pairs -- fzf
+                     | - python3 | - etc
+             | - tmux | - plugins | - etc
 
 [SYNOPSIS]
     sh $exeName [home | root | help]

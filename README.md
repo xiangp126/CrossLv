@@ -1,4 +1,4 @@
-## lx-Vundle
+## crosslv
 - Goal to handle working environment crossing Linux/Mac platform through 'oneKey' stroke
 
 - Two modes deploy selection
@@ -33,12 +33,11 @@ $ sh oneKey.sh
 [TROUBLESHOOTING]
     sudo ln -s /bin/bash /bin/sh, ensure /bin/sh was linked to /bin/bash.
     $ ll /bin/sh lrwxrwxrwx 1 root root 9 Dec  7 01:00 /bin/sh -> /bin/bash*
-                   _     _
- _ __ ___  _   _  | |   (_)_ __  _   ___  __
-| '_ ` _ \| | | | | |   | | '_ \| | | \ \/ /
-| | | | | | |_| | | |___| | | | | |_| |>  <
-|_| |_| |_|\__, | |_____|_|_| |_|\__,_/_/\_\
-           |___/
+                        _
+  ___ _ __ ___  ___ ___| |_   __
+ / __| '__/ _ \/ __/ __| \ \ / /
+| (__| | | (_) \__ \__ \ |\ V /
+ \___|_|  \___/|___/___/_| \_/
 
 ```
 ```bash
