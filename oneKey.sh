@@ -98,7 +98,7 @@ usage() {
     exeName=${0##*/}
     cat << _EOF
 [NAME]
-    $exeName -- onekey to setup my working environment | - tmux
+    $exeName -- onekey to setup my working environment
              | - vim | - plugins -- youcompleteme -- supertab -- vim-snippets
                        -- ultisnips -- nerdtree -- auto-pairs -- fzf
                      | - python3 | - etc

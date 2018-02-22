@@ -18,10 +18,11 @@
 ```bash
 $ sh oneKey.sh
 [NAME]
-    oneKey.sh -- onekey to setup my working environment | - tmux
-             | - vim | - vundle -- youcompleteme -- supertab -- vim-snippets
-                      -- ultisnips -- nerdtree -- auto-pairs
-             | - gcc | - python3 | - etc
+    oneKey.sh -- onekey to setup my working environment
+             | - vim | - plugins -- youcompleteme -- supertab -- vim-snippets
+                       -- ultisnips -- nerdtree -- auto-pairs -- fzf
+                     | - python3 | - etc
+             | - tmux | - plugins | - etc
 
 [SYNOPSIS]
     sh oneKey.sh [home | root | help]
