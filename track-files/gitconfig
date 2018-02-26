@@ -2,7 +2,7 @@
 	name = corsair
 	email = xiangp126@126.com
 [core]
-	excludesfile = /Users/xiang/.gitignore
+	excludesfile = ~/.gitignore
 	editor = vim
 [help]
 	autocorrect = 1
