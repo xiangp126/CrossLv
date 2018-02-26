@@ -1,0 +1,9 @@
+Terminal-> Preferences -> default(rename to Ubuntu)
+
+--- General -> Cursor Shape => Block
+            -> Custom Font => Monaco Regular 16pt
+--- Colors -> Text Color => #909090
+           -> Bold Color => #969696
+           -> Background Color => #000000
+
+Bold Color used for git diff/man git/fzf
