@@ -68,7 +68,7 @@ nmap <leader>8 :buffer8<CR>
 nmap <leader>9 :buffer9<CR>
 nmap <leader>- :bprevious<CR>
 nmap <leader>+ :bnext<CR>
-map <leader>d  :bdelete<CR>
+map <leader>d  :bdelete
 " unnamed for '* register', unnamedplus for '+ register'
 set clipboard=unnamedplus,unnamed
 " copy to system clipboard
@@ -372,10 +372,18 @@ let g:UltiSnipsEditSplit = "vertical"
 " CONFIG COMPLETEPARAMETER.VIM
 """"""""""""""""""""""""""""""
 inoremap <silent><expr> ( complete_parameter#pre_complete("()")
-smap <c-j> <Plug>(complete_parameter#goto_next_parameter)
+nmap <c-j> <Plug>(complete_parameter#goto_next_parameter)
 imap <c-j> <Plug>(complete_parameter#goto_next_parameter)
+smap <c-j> <Plug>(complete_parameter#goto_next_parameter)
+nmap <c-k> <Plug>(complete_parameter#goto_previous_parameter)
+imap <c-k> <Plug>(complete_parameter#goto_previous_parameter)
 smap <c-k> <Plug>(complete_parameter#goto_previous_parameter)
-imap <c-k> <Plug>(complete_parameter#goto_previous_parameter))
+nmap <m-d> <Plug>(complete_parameter#overload_down)
+imap <m-d> <Plug>(complete_parameter#overload_down)
+smap <m-d> <Plug>(complete_parameter#overload_down)
+nmap <m-u> <Plug>(complete_parameter#overload_up)
+imap <m-u> <Plug>(complete_parameter#overload_up)
+smap <m-u> <Plug>(complete_parameter#overload_up)
 " use ultisnips mapping to goto next or previous parameter if set
 let g:complete_parameter_use_ultisnips_mapping = 0
 
@@ -415,7 +423,7 @@ let g:ycm_cache_omnifunc = 0
 let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
 let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
 " Do not delete next line | specify python3 interpreter
-let g:ycm_server_python_interpreter = '/usr/bin/python3'
+let g:ycm_server_python_interpreter = '/usr/local/bin/python3'
 let g:ycm_add_preview_to_completeopt = 0
 let g:ycm_autoclose_preview_window_after_insertion = 0
 let g:ycm_autoclose_preview_window_after_completion = 0
@@ -423,3 +431,4 @@ let g:ycm_goto_buffer_command = 'new-tab'
 " nnoremap <leader>jl :YcmCompleter GoToDeclaration<CR>
 " nnoremap <leader>jf :YcmCompleter GoToDefinition<CR>
 nnoremap <leader>j :YcmCompleter GoToDefinitionElseDeclaration<CR>
+nnoremap <leader>D :YcmDiags<CR>
