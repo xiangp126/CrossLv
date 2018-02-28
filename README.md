@@ -48,11 +48,11 @@ $ sh oneKey.sh [home | root]
 - track-files/  => key files to track on the system, for backup and restore
 - oneKey.sh => main 'one key stroke' shell, will auto call
     - makeLink.sh   => additional shell to make link for that in tools/
-    - autoHandle.sh => assistant for handling files tracked in confirm/
-- tools/    => written for better or understanding some logics
+    - autoHandle.sh => assistant for handling files tracked
+- tools/    => written for better understanding of some logics
 - compile-tools/  => some useful automatically compiling tools, as name indicated
-- doc/   => frequently used document
-- fonts/ => beautifully and recommended open source fonts
+- doc/   => frequently used documents
+- fonts/ => beautiful and recommended open source fonts
 - template/ => some templates generated or used by this project
 - testing/  => derived from compile-tools or tools, but deprecated by far
 - security/ => derived from doc, but has affairs with sccurity
@@ -161,6 +161,7 @@ FINDING BASH-COMPLETION SUCCESSFULLY COPIED ...
 
 ## Features
 V3.9
+* only handle modified files using autoHandle.sh
 * auto detect os platform | skipping already installed packages
 * correct key parameter of config file adjusting to current system
 * add support for MAC system
