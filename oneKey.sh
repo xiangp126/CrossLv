@@ -13,7 +13,8 @@ bkPostfix=old
 # common install dir for home | root mode
 homeInstDir=$HOME/.usr
 rootInstDir=/usr/local
-# default is home mode
+# installation mode, default is home
+instMode=home
 commInstdir=$homeInstDir
 # execute prefix: "" or sudo
 execPrefix=""
@@ -1287,6 +1288,46 @@ _EOF
     # sed -i --regexp-extended "s/\" (Plugin 'Valloric)/\1/" confirm/_.vimrc
 }
 
+installTmux() {
+    # check tmux version, if >= 2.5
+    tmuxPath=`which tmux 2> /dev/null`
+    if [[ "$tmuxPath" != "" ]]; then
+        tmuxVersion=`tmux -V | cut -d ' ' -f 2`
+        basicTmuxV=2.5
+        cmpSoftVersion $tmuxVersion $basicTmuxV
+        if [[ $? == '1' ]]; then
+            return
+        fi
+    fi
+    cat << "_EOF"
+------------------------------------------------------
+INSTALLING NEWLY TMUX VERSION 2.6
+------------------------------------------------------
+_EOF
+    tmuxInstDir=$commInstdir
+    $execPrefix mkdir -p $tmuxInstDir
+    # comm attribute to get source 'cc-tmux'
+    tmuxClonePath=https://github.com/xiangp126/cc-tmux
+    clonedName=cc-tmux
+
+    # rename download package
+    cd $downloadPath
+    # check if already has this repository.
+    if [[ -d $clonedName ]]; then
+        echo [Warning]: target $clonedName/ already exists
+    else
+        git clone $tmuxClonePath $clonedName
+        # check if git clone returns successfully
+        if [[ $? != 0 ]]; then
+            echo [Error]: git clone returns error, quitting now
+            exit
+        fi
+    fi
+    cd $clonedName
+    sh oneKey.sh $instMode
+    tmuxPath=$tmuxInstDir/bin/tmux
+}
+
 # install newly cmake if needed
 installCmake() {
     # check cmake version, if >= 3.0
@@ -1912,13 +1953,14 @@ rg    path = $rgPath
 fd    path = $fdPath
 fzf   path = $fzfPath
 vim   path = $vimPath
+tmux  path = $tmuxPath
 cmake path = $cmakePath
 u-ctags path = $uCtagsPath
 python3 path = $python3Path
 _EOF
     if [[ $platOsType != "macos" ]]; then
         cat << _EOF
--- > ☕
+-- > ✄
 $libPython3Path
 $libClangPath
 _EOF
@@ -1957,6 +1999,7 @@ install() {
         installPython3
         installvim
         installCmake
+        installTmux
         installClang
     fi
     installYcm
@@ -2004,6 +2047,7 @@ case $1 in
         set -x
         commInstdir=$homeInstDir
         execPrefix=""
+        instMode=home
         install
         ;;
 
@@ -2011,6 +2055,7 @@ case $1 in
         set -x
         commInstdir=$rootInstDir
         execPrefix=sudo
+        instMode=root
         install
         ;;
 
