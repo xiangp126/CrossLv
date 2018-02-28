@@ -1,18 +1,17 @@
-## crosslv
-- Goal to handle working environment crossing Linux/Mac platform through 'oneKey' stroke
+## Crosslv
+- Goal to deploy working/programming environment by 'oneKey' stroke
+
+- Save time and enjoy more with help of wonderful tools and plugins
 
 - Two modes deploy selection
-    - home -> without root privilege, normally install packages into $HOME/.usr
-    - root -> with root privilege, normally install packages into /usr/local
+    - home | root
+    - without root privilege, normally install packages into $HOME/.usr
+    - with root privilege, normally install packages into /usr/local
 
-- Verified Platform
-    - Ubuntu
-    - CentOS
-    - MacOS
-
-- On Ubuntu and MacOS whole installation takes little time
-
-- On CentOS expecially 6 this tool may compile GCC supporting C++11 first, taking disk space 5G+
+- Crossing Linux platforms, verified on
+    - Ubuntu | CentOS | MacOS
+    - On Ubuntu and MacOS whole installation takes little time
+    - On CentOS expecially 6 may compile GCC supporting C++11 first, taking disk space 5G+
 
 ## Quick Start
 ```bash

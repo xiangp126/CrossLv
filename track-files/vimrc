@@ -337,6 +337,8 @@ let g:NERDTree_title = "[NERDTree]"
 let g:NERDTreeShowBookmarks = 0
 let g:NERDTreeWinSize = 20 " default 30
 let g:NERDTreeWinPos = 'left' " only left or right
+" all dirs ending in ".d" and all files ending in ".o" to be ignored
+let NERDTreeIgnore=['\.d$[[dir]]', '\.o$[[file]]']
 
 """"""""""""""""""""""""""""""
 " CONFIG NERDCOMMENTER
