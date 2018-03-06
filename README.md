@@ -38,7 +38,6 @@ $ sh oneKey.sh
  / __| '__/ _ \/ __/ __| \ \ / /
 | (__| | | (_) \__ \__ \ |\ V /
  \___|_|  \___/|___/___/_| \_/
-
 ```
 ```bash
 $ sh oneKey.sh [home | root]
@@ -48,23 +47,25 @@ $ sh oneKey.sh [home | root]
 - track-files/  => key files to track on the system, for backup and restore
 - oneKey.sh => main 'one key stroke' shell, will auto call
     - makeLink.sh   => additional shell to make link for that in tools/
-    - autoHandle.sh => assistant for handling files tracked
-- tools/    => written for better understanding of some logics
+    - autoHandle.sh => assistant for handling files tracked in confirm/
+- tools/    => written for better or understanding some logics
 - compile-tools/  => some useful automatically compiling tools, as name indicated
-- doc/   => frequently used documents
-- fonts/ => beautiful and recommended open source fonts
+- doc/   => frequently used document
+- fonts/ => beautifully and recommended open source fonts
 - template/ => some templates generated or used by this project
 - testing/  => derived from compile-tools or tools, but deprecated by far
 - security/ => derived from doc, but has affairs with sccurity
 - vim-colors/ => color schemes for vim use
 - completion/ => bash completion for some extra use
 
-## Example for autoHandle.sh
+## tip of autoHandle.sh
 ```bash
-comment on/off one of them to add/remove from tracking
+# comment on/off one of them to add/remove from tracking
 trackFiles=(
     ".vimrc"
     ".tmux.conf"
+    ".gitconfig"
+    ".gitignore"
     ".bashrc"
     ".ycm_extra_conf.py"
 )
@@ -100,69 +101,10 @@ $ sh autoHandle.sh
     auto    -> run 'backup' & 'track' as pack
     clean   -> clean ${backupDir}.*/, but reserve main backup dir
 ```
-```bash
-$ sh autoHandle.sh backup
-------------------------------------------------------
-START TO BACKUP TRACKED FILES ...
-------------------------------------------------------
-cp ~/.vimrc ./backup/vimrc ...
-cp ~/.bashrc ./backup/bashrc ...
-cp ~/.tmux.conf ./backup/tmux.conf ...
-cp ~/.ycm_extra_conf.py ./backup/ycm_extra_conf.py ...
-------------------------------------------------------
-FINDING FILES BACKUPED SUCCESSFULLY ...
-------------------------------------------------------
-./backup/bashrc
-./backup/tmux.conf
-./backup/vimrc
-./backup/ycm_extra_conf.py
-------------------------------------------------------
-```
-```bash
-$ sh autoHandle.sh restore
-------------------------------------------------------
-START TO RESTORE TRACKED FILES ...
-------------------------------------------------------
-[Warning]: found .vimrc under ~, back it up ...
-mv ~/.vimrc ~/.vimrc.old
-cp ./track/vimrc ~/.vimrc
-[Warning]: found .bashrc under ~, back it up ...
-mv ~/.bashrc ~/.bashrc.old
-cp ./track/bashrc ~/.bashrc
-[Warning]: found .tmux.conf under ~, back it up ...
-mv ~/.tmux.conf ~/.tmux.conf.old
-cp ./track/tmux.conf ~/.tmux.conf
-[Warning]: found .ycm_extra_conf.py under ~, back it up ...
-mv ~/.ycm_extra_conf.py ~/.ycm_extra_conf.py.old
-cp ./track/ycm_extra_conf.py ~/.ycm_extra_conf.py
-------------------------------------------------------
-FINDING FILES RESTORED SUCCESSFULLY ...
-------------------------------------------------------
-~/.vimrc
-~/.bashrc
-~/.tmux.conf
-~/.ycm_extra_conf.py
-------------------------------------------------------
-START TO COPYING BASH COMPLETION FILES ...
-------------------------------------------------------
-cp -f ./completion/git-completion.bash ~/.completion.d/
-cp -f ./completion/git_flow.completion.bash ~/.completion.d/
-cp -f ./completion/git_flow_avh.completion.bash ~/.completion.d/
-cp -f ./completion/tmux-completion.bash ~/.completion.d/
-------------------------------------------------------
-FINDING BASH-COMPLETION SUCCESSFULLY COPIED ...
-------------------------------------------------------
-~/.completion.d/git-completion.bash
-~/.completion.d/git_flow.completion.bash
-~/.completion.d/git_flow_avh.completion.bash
-~/.completion.d/tmux-completion.bash
-------------------------------------------------------
-```
 
-## Features
+## Feature History
 V3.9
-* only handle modified files using autoHandle.sh
-* auto detect os platform | skipping already installed packages
+* auto detect OS platform | skipping already installed packages
 * correct key parameter of config file adjusting to current system
 * add support for MAC system
 * .ycm_extra_conf.py adjust c++ include dir/version
