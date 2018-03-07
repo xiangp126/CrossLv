@@ -58,7 +58,7 @@ $ sh oneKey.sh [home | root]
 - vim-colors/ => color schemes for vim use
 - completion/ => bash completion for some extra use
 
-## tip of autoHandle.sh
+## Tip of autoHandle.sh
 ```bash
 # comment on/off one of them to add/remove from tracking
 trackFiles=(
@@ -102,7 +102,7 @@ $ sh autoHandle.sh
     clean   -> clean ${backupDir}.*/, but reserve main backup dir
 ```
 
-## Feature History
+## Modification Note
 V3.9
 * auto detect OS platform | skipping already installed packages
 * correct key parameter of config file adjusting to current system
