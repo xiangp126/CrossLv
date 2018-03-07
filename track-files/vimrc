@@ -98,6 +98,7 @@ call plug#begin('~/.vim/bundle')
 " Plug 'tell-k/vim-autopep8'
 " Plug 'Chiel92/vim-autoformat'
 " Plug 'Yggdroot/LeaderF', { 'do': './install.sh'  }
+" Plug 'Yggdroot/LeaderF', { 'on': 'LeaderfFunction' }
 "------ NEW PLUGINS -----
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 Plug 'scrooloose/nerdcommenter'
@@ -106,7 +107,6 @@ Plug 'jiangmiao/auto-pairs'
 Plug 'majutsushi/tagbar', { 'on': 'TagbarToggle' }
 Plug 'Yggdroot/indentLine'
 "------ FUZZY FINDER -----
-Plug 'Yggdroot/LeaderF', { 'on': 'LeaderfFunction' }
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 "------ BEAUTIFY LINE -----

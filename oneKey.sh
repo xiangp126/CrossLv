@@ -671,6 +671,10 @@ COPYING DARK_LEADERF.VIM AS DEFAULT LEADERF COLORSCHEME
 _EOF
     myLeaderFColor=./template/dark_leaderf.vim
     cpColorDst=$HOME/.vim/bundle/LeaderF/autoload/leaderf/colorscheme/
+    if [[ ! -d $cpColorDst ]]; then
+        echo "[Error]: no leaderf color dir found, please check it"
+        return 255
+    fi
 
     cd $mainWd
     cp $myLeaderFColor $cpColorDst
@@ -1824,7 +1828,7 @@ _EOF
     if [[ ! -f $mainWd/$mRunFlagFile ]]; then
         # as ordinary user run brew
         # use gnu-sed as compatible with that under Linux
-        brew install python python3 cmake vim git fd \
+        brew install python3 python2 cmake vim git fd \
             bash-completion fontconfig tmux ripgrep \
             gnu-sed --with-default-names -y
 
@@ -1842,15 +1846,16 @@ _EOF
 _EOF
     fi
     # set path vars for use in installSummary
-    CC=`which clang`
-    CXX=`which clang++`
-    agPath=`which ag`
-    rgPath=`which rg`
-    fdPath=`which fd`
-    python3Path=`which python3`
-    vimPath=`which vim`
-    cmakePath=`which cmake`
-    fzfPath=`which fzf`
+    CC=`which clang 2> /dev/null`
+    CXX=`which clang++ 2> /dev/null`
+    agPath=`which ag 2> /dev/null`
+    rgPath=`which rg 2> /dev/null`
+    fdPath=`which fd 2> /dev/null`
+    tmuxPath=`which tmux 2> /dev/null`
+    python3Path=`which python3 2> /dev/null`
+    vimPath=`which vim 2> /dev/null`
+    cmakePath=`which cmake 2> /dev/null`
+    fzfPath=`which fzf 2> /dev/null`
 }
 
 # auto correct path of key packages according to the system
@@ -1957,6 +1962,9 @@ tmux  path = $tmuxPath
 cmake path = $cmakePath
 u-ctags path = $uCtagsPath
 python3 path = $python3Path
+----------------------- ycm core path -----------------------------
+$ycmCorePath
+-------------------------------------------------------------------
 _EOF
     if [[ $platOsType != "macos" ]]; then
         cat << _EOF
@@ -1964,8 +1972,8 @@ _EOF
 $libPython3Path
 $libClangPath
 _EOF
+        echo ------------------------------------------------------
     fi
-    echo ------------------------------------------------------
 }
 
 preInstallCheck() {
