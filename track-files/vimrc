@@ -48,6 +48,16 @@ set background=dark
 """"""""""""""""""""""""""""""
 " map: recursive mapping, case ignorance
 " nnoremap: no recursive mapping
+" <S-...> Shift +
+" <C-...> Control +
+" <M-...> Alt +
+" <A-...> as <M-...>
+" <Esc>   Escape
+" <Up>    Arrow up
+" <Tab>   Tab
+" <CR>    Carriage Return, enter
+" <Space> Space
+" <k0> - <k9> small keyboard 0 - 9
 cmap w!! w !sudo tee %
 set pastetoggle=<F12>
 noremap <F10> :set invnumber<CR>
@@ -66,8 +76,11 @@ nmap <leader>6 :buffer6<CR>
 nmap <leader>7 :buffer7<CR>
 nmap <leader>8 :buffer8<CR>
 nmap <leader>9 :buffer9<CR>
-nmap <leader>- :bprevious<CR>
-nmap <leader>+ :bnext<CR>
+nmap <leader><leader> :buffer
+" jump to previous buffer
+nmap <leader>- <C-o><CR>
+" jump to next buffer
+nmap <leader>+ <C-i><CR>
 map <leader>d  :bdelete
 " unnamed for '* register', unnamedplus for '+ register'
 set clipboard=unnamedplus,unnamed
@@ -429,7 +442,6 @@ let g:ycm_server_python_interpreter = '/usr/local/bin/python3'
 let g:ycm_add_preview_to_completeopt = 0
 let g:ycm_autoclose_preview_window_after_insertion = 0
 let g:ycm_autoclose_preview_window_after_completion = 0
-let g:ycm_goto_buffer_command = 'new-tab'
 " nnoremap <leader>jl :YcmCompleter GoToDeclaration<CR>
 " nnoremap <leader>jf :YcmCompleter GoToDefinition<CR>
 nnoremap <leader>j :YcmCompleter GoToDefinitionElseDeclaration<CR>
