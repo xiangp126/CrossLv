@@ -105,7 +105,8 @@ if [[ "`which fd 2> /dev/null`" != '' ]]; then
 fi
 export LINES=100
 # export FZF_DEFAULT_OPTS='--preview "head -$LINES {}" --reverse --inline-info --border'
-export FZF_DEFAULT_OPTS='--preview "head -$LINES {}" --inline-info --color=fg+:247'
+# export FZF_DEFAULT_OPTS='--preview "head -$LINES {}" --inline-info --color=fg+:247'
+export FZF_DEFAULT_OPTS='--inline-info --color=fg+:247'
 # Use * as the trigger sequence instead of the default **
 export FZF_COMPLETION_TRIGGER='*'
 # Options to fzf command

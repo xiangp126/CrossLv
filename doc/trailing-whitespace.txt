@@ -1,1 +1,10 @@
+---- in vim
 :%s/\s\+$//gc
+
+---- use sed
+-E, -r, --regexp-extended (did not need \ for special symbol)
+use extended regular expressions in the script (for portability use POSIX -E).
+
+sample:
+$ sed --regexp-extended --in-place 's/\s+$//g' server.h
+sed --regexp-extended --in-place 's/\s+$//g'
