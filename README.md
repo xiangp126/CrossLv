@@ -13,6 +13,9 @@
     - On Ubuntu and MacOS whole installation takes little time
     - On CentOS expecially 6 may compile GCC supporting C++11 first, taking disk space 5G+
 
+![](https://github.com/xiangp126/crosslv/blob/master/screenshots/ycm.png)
+![](https://github.com/xiangp126/crosslv/blob/master/screenshots/rg.png)
+
 ## Quick Start
 ```bash
 $ sh oneKey.sh
