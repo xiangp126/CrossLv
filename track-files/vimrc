@@ -47,7 +47,8 @@ set background=dark
 " BASIC KEYBIND
 """"""""""""""""""""""""""""""
 " map: recursive mapping, case ignorance
-" nnoremap: no recursive mapping
+" nnoremap: no recursive mapping, avoid below shortcut key mapping
+" Important: <leader>lw will slow down heavily for <leader>l
 " <S-...> Shift +
 " <C-...> Control +
 " <M-...> Alt +
@@ -76,7 +77,7 @@ nmap <leader>6 :buffer6<CR>
 nmap <leader>7 :buffer7<CR>
 nmap <leader>8 :buffer8<CR>
 nmap <leader>9 :buffer9<CR>
-nmap <leader><leader> :buffer
+nmap <leader>g :buffer
 " jump to previous buffer
 nmap <leader>- <C-o><CR>
 " jump to next buffer
@@ -158,30 +159,30 @@ let g:airline#extensions#tmuxline#enabled = 0
 """"""""""""""""""""""""""""""
 " CONFIG LEADERF
 """"""""""""""""""""""""""""""
-" map <leader>F  :LeaderfFile<CR>
-let g:Lf_ShortcutF = '<leader>F'
-let g:Lf_StlColorscheme = 'dark_leaderf'
-let g:Lf_WindowHeight = 0.50
-let g:Lf_WildIgnore = {
-   \ 'dir': ['.svn','.git','.hg', '.acme_project', '.ACMEROOT'],
-   \ 'file': ['*.sw?','~$*','*.bak','*.exe','*.o','*.so','*.py[co]']
-   \}
-" press <F5> to refresh the cache.
-let g:Lf_DelimiterChar = ';'
-let g:Lf_MruFileExclude = ['*.so']
-let g:Lf_CommandMap = {'<C-C>': ['<Esc>', '<C-C>']}
-let g:Lf_HighlightIndividual = 0
-let g:Lf_StlSeparator = { 'left': '', 'right': ''  }
-map <leader><leader>f   :LeaderfFunction<CR>
-map <leader><leader>fa  :LeaderfFunctionAll<CR>
-map <leader><leader>fw  :LeaderfFunctionCword<CR>
-" search line which has the word
-map <leader><leader>l   :LeaderfLine<CR>
-map <leader><leader>la  :LeaderfLineAll<CR>
-map <leader><leader>lw  :LeaderfLineCword<CR>
-" search line match word | end
-map <leader><leader>m   :LeaderfMruCwd<CR>
-map <leader><leader>ma  :LeaderfMru<CR>
+" " map <leader>F  :LeaderfFile<CR>
+" let g:Lf_ShortcutF = '<leader>F'
+" let g:Lf_StlColorscheme = 'dark_leaderf'
+" let g:Lf_WindowHeight = 0.50
+" let g:Lf_WildIgnore = {
+"    \ 'dir': ['.svn','.git','.hg', '.acme_project', '.ACMEROOT'],
+"    \ 'file': ['*.sw?','~$*','*.bak','*.exe','*.o','*.so','*.py[co]']
+"    \}
+" " press <F5> to refresh the cache.
+" let g:Lf_DelimiterChar = ';'
+" let g:Lf_MruFileExclude = ['*.so']
+" let g:Lf_CommandMap = {'<C-C>': ['<Esc>', '<C-C>']}
+" let g:Lf_HighlightIndividual = 0
+" let g:Lf_StlSeparator = { 'left': '', 'right': ''  }
+" map <leader><leader>f   :LeaderfFunction<CR>
+" map <leader><leader>fa  :LeaderfFunctionAll<CR>
+" map <leader><leader>fw  :LeaderfFunctionCword<CR>
+" " search line which has the word
+" map <leader><leader>l   :LeaderfLine<CR>
+" map <leader><leader>la  :LeaderfLineAll<CR>
+" map <leader><leader>lw  :LeaderfLineCword<CR>
+" " search line match word | end
+" map <leader><leader>m   :LeaderfMruCwd<CR>
+" map <leader><leader>ma  :LeaderfMru<CR>
 
 """"""""""""""""""""""""""""""
 " CONFIG FZF.VIM
@@ -225,32 +226,39 @@ nnoremap <leader>f   :Files<CR>
 command! -bang -nargs=? -complete=dir Files
   \ call fzf#vim#files(<q-args>,
   \ fzf#vim#with_preview('right:50%:hidden', '?'), <bang>0)
+
 " --------------------- git-files --------------------------
 nnoremap <leader>F   :GFiles<CR>
 command! -bang -nargs=? -complete=dir GFiles
   \ call fzf#vim#gitfiles(<q-args>,
   \ fzf#vim#with_preview('right:50%:hidden', '?'), <bang>0)
+
 " --------------------- git-grep --------------------------
-nnoremap <leader>gr  :GGrep<CR>
+nnoremap <leader>G  :GGrep<CR>
 " - fzf#vim#grep(command, with_column, [options], [fullscreen])
 command! -bang -nargs=* GGrep
   \ call fzf#vim#grep('git grep --line-number '.shellescape(<q-args>), 0, <bang>0)
+
 " --------------------- commits --------------------------
-nnoremap <silent><leader>c   :BCommits<CR>
+nnoremap <silent> <leader>c   :BCommits<CR>
+
 " --------------------- lines --------------------------
 " nnoremap <leader>l   :BLines<CR>
 " nnoremap <leader>la  :Lines<CR>
 nnoremap <leader>l   :call fzf#vim#buffer_lines({'options': '--no-reverse'})<CR>
-nnoremap <leader>lw  :call fzf#vim#buffer_lines(expand('<cword>'),
+" <leader>lw will slow down heavily for <leader>l
+nnoremap <leader>L  :call fzf#vim#buffer_lines(expand('<cword>'),
   \ {'options': '--no-reverse'})<CR>
-nnoremap <leader>la  :call fzf#vim#lines({'options': '--no-reverse'})<CR>
+" nnoremap <leader>la  :call fzf#vim#lines({'options': '--no-reverse'})<CR>
+"
 " --------------------- tags --------------------------
 " nnoremap <leader>t   :BTags<CR>
 " nnoremap <leader>ta  :Tags<CR>
 nnoremap <leader>t   :call fzf#vim#buffer_tags('', {'options': '--no-reverse'})<CR>
-nnoremap <leader>tw  :call fzf#vim#buffer_tags(expand('<cword>'),
+nnoremap <leader>T  :call fzf#vim#buffer_tags(expand('<cword>'),
   \ {'options': '--no-reverse'})<CR>
-nnoremap <leader>ta  :call fzf#vim#tags('', {'options': '--no-reverse'})<CR>
+" nnoremap <leader>ta  :call fzf#vim#tags('', {'options': '--no-reverse'})<CR>
+
 " --------------------- rg --------------------------
 nnoremap <Leader>r   :Rg<CR>
 " Similarly, we can apply it to fzf#vim#grep. To use ripgrep instead of ag:
@@ -260,6 +268,7 @@ command! -bang -nargs=* Rg
   \   <bang>0 ? fzf#vim#with_preview('up:60%')
   \           : fzf#vim#with_preview('right:50%:hidden', '?'),
   \   <bang>0)
+
 " --------------------- ag --------------------------
 nnoremap <Leader>a   :Ag<CR>
 command! -bang -nargs=* Ag
@@ -268,6 +277,7 @@ command! -bang -nargs=* Ag
   \   <bang>0 ? fzf#vim#with_preview('up:60%')
   \           : fzf#vim#with_preview('right:50%:hidden', '?'),
   \   <bang>0)
+
 " --------------------- colors --------------------------
 " Override Colors command. You can safely do this in your .vimrc as fzf.vim
 " will not override existing commands.
@@ -442,7 +452,5 @@ let g:ycm_server_python_interpreter = '/usr/local/bin/python3'
 let g:ycm_add_preview_to_completeopt = 0
 let g:ycm_autoclose_preview_window_after_insertion = 0
 let g:ycm_autoclose_preview_window_after_completion = 0
-" nnoremap <leader>jl :YcmCompleter GoToDeclaration<CR>
-" nnoremap <leader>jf :YcmCompleter GoToDefinition<CR>
 nnoremap <leader>j :YcmCompleter GoToDefinitionElseDeclaration<CR>
 nnoremap <leader>D :YcmDiags<CR>
