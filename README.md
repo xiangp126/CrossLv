@@ -1,17 +1,19 @@
 ## Crosslv
 - Goal to deploy working/programming environment by 'oneKey' stroke
+
 - Save time and enjoy more with help of wonderful tools and plugins
+
 - Two modes deploy selection
     - home | root
     - without root privilege, normally install packages into $HOME/.usr
     - with root privilege, normally install packages into /usr/local
+
 - Crossing Linux platforms, verified on
     - Ubuntu | CentOS | MacOS
     - On Ubuntu and MacOS whole installation takes little time
     - On CentOS expecially 6 may compile GCC supporting C++11 first, taking disk space 5G+
-- A glimpse of the screenshots
-![](https://github.com/xiangp126/crosslv/blob/master/screenshots/ycm.png)
-![](https://github.com/xiangp126/crosslv/blob/master/screenshots/rg.png)
+
+![](https://github.com/xiangp126/crosslv/blob/master/gif/crosslv.gif)
 
 ## Quick Start
 ```bash
