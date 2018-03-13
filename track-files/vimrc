@@ -78,6 +78,7 @@ nmap <leader>7 :buffer7<CR>
 nmap <leader>8 :buffer8<CR>
 nmap <leader>9 :buffer9<CR>
 nmap <leader>g :buffer
+nmap <leader>e :buffers<CR>
 " jump to previous buffer
 nmap <leader>- <C-o><CR>
 " jump to next buffer
@@ -87,8 +88,8 @@ map <leader>d  :bdelete
 set clipboard=unnamedplus,unnamed
 " copy to system clipboard
 noremap <silent> <leader>y "*y <CR>
-noremap <silent> <leader>p "*p <CR>
 noremap <silent> <leader>Y "+y <CR>
+noremap <silent> <leader>p "*p <CR>
 noremap <silent> <leader>P "+p <CR>
 " vmap <leader>y :!xclip -f -sel clip<CR>
 " map <leader>p  :-1r !xclip -o -sel clip<CR>
@@ -111,14 +112,14 @@ call plug#begin('~/.vim/bundle')
 " Plug 'davidhalter/jedi'
 " Plug 'tell-k/vim-autopep8'
 " Plug 'Chiel92/vim-autoformat'
-" Plug 'Yggdroot/LeaderF', { 'do': './install.sh'  }
 " Plug 'Yggdroot/LeaderF', { 'on': 'LeaderfFunction' }
+" Plug 'majutsushi/tagbar', { 'on': 'TagbarToggle' }
 "------ NEW PLUGINS -----
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 Plug 'scrooloose/nerdcommenter'
 Plug 'jiangmiao/auto-pairs'
 " Plug 'majutsushi/tagbar'
-Plug 'majutsushi/tagbar', { 'on': 'TagbarToggle' }
+Plug 'majutsushi/tagbar'
 Plug 'Yggdroot/indentLine'
 "------ FUZZY FINDER -----
 Plug 'junegunn/fzf'
@@ -150,6 +151,8 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#buffer_nr_show = 1
 let g:airline#extensions#tabline#show_tab_type = 0
 let airline#extensions#tabline#disable_refresh = 0
+let g:airline#extensions#tabline#buffer_min_count = 2
+let g:airline#extensions#tabline#show_buffers = 1
 let g:airline#parts#ffenc#skip_expected_string='utf-8[unix]'
 " let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
 let g:airline#extensions#tabline#formatter = 'unique_tail'
@@ -219,7 +222,7 @@ let g:fzf_colors =
   \ 'header':  ['fg', 'Comment'] }
 let g:fzf_history_dir = '~/.local/share/fzf-history'
 " Reset FZF_DEFAULT_OPTS from bash, for Lines/Tags not support cat/head
-let $FZF_DEFAULT_OPTS = ''
+let $FZF_DEFAULT_OPTS = '--inline-info --color=fg+:247'
 " --------------------- files --------------------------
 nnoremap <leader>f   :Files<CR>
 " Likewise, Files command with preview window

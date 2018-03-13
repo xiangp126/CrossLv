@@ -19,8 +19,14 @@
 	cp = cherry-pick
 	br = branch
 	co = checkout
+	dt = difftool
+	mt = mergetool
 [color]
 	ui = auto
 [push]
 	followTags = true
 	default = current
+[diff]
+	tool = kdiff3
+[merge]
+	tool = kdiff3

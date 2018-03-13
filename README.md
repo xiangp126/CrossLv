@@ -1,7 +1,7 @@
 ## Crosslv
 - Goal to deploy working/programming environment by 'oneKey' stroke
 
-- Save time and enjoy more with help of wonderful tools and plugins
+- Save time and enjoy more with help of wonderful Open-Source tools and plugins
 
 - Two modes deploy selection
     - home | root
