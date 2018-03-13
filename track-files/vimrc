@@ -10,7 +10,7 @@ set cindent
 set tabstop=4
 set softtabstop=4
 set shiftwidth=4
-set expandtab       " Set Tab expands to spaces
+set expandtab
 set cinoptions={0,1s,t0,n-2,p2s,(03s,=.5s,>1s,=1s,:1s
 set encoding=utf-8
 set fileencoding=utf-8
@@ -62,7 +62,11 @@ set background=dark
 cmap w!! w !sudo tee %
 set pastetoggle=<F12>
 noremap <F10> :set invnumber<CR>
-map <leader>k :mark<Space>
+map  <leader>k :mark<Space>
+" insert mode jump to start of line
+" inoremap <C-H> <ESC>I
+" insert mode jump to end of line
+imap <C-L> <ESC>A
 " vim easy manipulator
 map <leader>R :source ~/.vimrc<CR>
 map <leader>W :write<CR>
@@ -78,11 +82,10 @@ nmap <leader>7 :buffer7<CR>
 nmap <leader>8 :buffer8<CR>
 nmap <leader>9 :buffer9<CR>
 nmap <leader>g :buffer
-nmap <leader>e :buffers<CR>
 " jump to previous buffer
-nmap <leader>- <C-o><CR>
+nmap <leader>- <C-O><CR>
 " jump to next buffer
-nmap <leader>+ <C-i><CR>
+nmap <leader>+ <C-I><CR>
 map <leader>d  :bdelete
 " unnamed for '* register', unnamedplus for '+ register'
 set clipboard=unnamedplus,unnamed
@@ -290,6 +293,9 @@ nnoremap <leader>T   :call fzf#vim#buffer_tags(expand('<cword>'),
 
 " buffers
 nnoremap <leader>b   :Buffers<CR>
+
+" marks
+nnoremap <leader>m   : Marks<CR>
 
 " rg => ripgrep
 nnoremap <Leader>r   :Rg<CR>
