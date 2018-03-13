@@ -190,7 +190,33 @@ let g:airline#extensions#tmuxline#enabled = 0
 """"""""""""""""""""""""""""""
 " CONFIG FZF.VIM
 """"""""""""""""""""""""""""""
-" This is the default extra key bindings
+" -----------------+-----------------------------------------------------------------------
+" Command          | List                                                                  ~
+" -----------------+-----------------------------------------------------------------------
+"  `Files [PATH]`    | Files (similar to  `:FZF` )
+"  `GFiles [OPTS]`   | Git files ( `git ls-files` )
+"  `GFiles?`         | Git files ( `git status` )
+"  `Buffers`         | Open buffers
+"  `Colors`          | Color schemes
+"  `Ag [PATTERN]`    | {ag}{6} search result ( `ALT-A`  to select all,  `ALT-D`  to deselect all)
+"  `Lines [QUERY]`   | Lines in loaded buffers
+"  `BLines [QUERY]`  | Lines in the current buffer
+"  `Tags [QUERY]`    | Tags in the project ( `ctags -R` )
+"  `BTags [QUERY]`   | Tags in the current buffer
+"  `Marks`           | Marks
+"  `Windows`         | Windows
+"  `Locate PATTERN`  |  `locate`  command output
+"  `History`         |  `v:oldfiles`  and open buffers
+"  `History:`        | Command history
+"  `History/`        | Search history
+"  `Snippets`        | Snippets ({UltiSnips}{7})
+"  `Commits`         | Git commits (requires {fugitive.vim}{8})
+"  `BCommits`        | Git commits for the current buffer
+"  `Commands`        | Commands
+"  `Maps`            | Normal mode mappings
+"  `Helptags`        | Help tags [1]
+"  `Filetypes`       | File types
+" -----------------+-----------------------------------------------------------------------
 let g:fzf_action = {
   \ 'ctrl-t': 'tab split',
   \ 'ctrl-x': 'split',
@@ -223,46 +249,49 @@ let g:fzf_colors =
 let g:fzf_history_dir = '~/.local/share/fzf-history'
 " Reset FZF_DEFAULT_OPTS from bash, for Lines/Tags not support cat/head
 let $FZF_DEFAULT_OPTS = '--inline-info --color=fg+:247'
-" --------------------- files --------------------------
+" files
 nnoremap <leader>f   :Files<CR>
 " Likewise, Files command with preview window
 command! -bang -nargs=? -complete=dir Files
   \ call fzf#vim#files(<q-args>,
   \ fzf#vim#with_preview('right:50%:hidden', '?'), <bang>0)
 
-" --------------------- git-files --------------------------
+" git-files
 nnoremap <leader>F   :GFiles<CR>
 command! -bang -nargs=? -complete=dir GFiles
   \ call fzf#vim#gitfiles(<q-args>,
   \ fzf#vim#with_preview('right:50%:hidden', '?'), <bang>0)
 
-" --------------------- git-grep --------------------------
+" git-grep
 nnoremap <leader>G  :GGrep<CR>
 " - fzf#vim#grep(command, with_column, [options], [fullscreen])
 command! -bang -nargs=* GGrep
   \ call fzf#vim#grep('git grep --line-number '.shellescape(<q-args>), 0, <bang>0)
 
-" --------------------- commits --------------------------
+" commits
 nnoremap <silent> <leader>c   :BCommits<CR>
 
-" --------------------- lines --------------------------
+" lines
 " nnoremap <leader>l   :BLines<CR>
 " nnoremap <leader>la  :Lines<CR>
 nnoremap <leader>l   :call fzf#vim#buffer_lines({'options': '--no-reverse'})<CR>
 " <leader>lw will slow down heavily for <leader>l
-nnoremap <leader>L  :call fzf#vim#buffer_lines(expand('<cword>'),
+nnoremap <leader>L   :call fzf#vim#buffer_lines(expand('<cword>'),
   \ {'options': '--no-reverse'})<CR>
 " nnoremap <leader>la  :call fzf#vim#lines({'options': '--no-reverse'})<CR>
-"
-" --------------------- tags --------------------------
+
+" tags
 " nnoremap <leader>t   :BTags<CR>
 " nnoremap <leader>ta  :Tags<CR>
 nnoremap <leader>t   :call fzf#vim#buffer_tags('', {'options': '--no-reverse'})<CR>
-nnoremap <leader>T  :call fzf#vim#buffer_tags(expand('<cword>'),
+nnoremap <leader>T   :call fzf#vim#buffer_tags(expand('<cword>'),
   \ {'options': '--no-reverse'})<CR>
 " nnoremap <leader>ta  :call fzf#vim#tags('', {'options': '--no-reverse'})<CR>
 
-" --------------------- rg --------------------------
+" buffers
+nnoremap <leader>b   :Buffers<CR>
+
+" rg => ripgrep
 nnoremap <Leader>r   :Rg<CR>
 " Similarly, we can apply it to fzf#vim#grep. To use ripgrep instead of ag:
 command! -bang -nargs=* Rg
@@ -281,57 +310,11 @@ command! -bang -nargs=* Ag
   \           : fzf#vim#with_preview('right:50%:hidden', '?'),
   \   <bang>0)
 
-" --------------------- colors --------------------------
+" colors
 " Override Colors command. You can safely do this in your .vimrc as fzf.vim
 " will not override existing commands.
 command! -bang Colors
   \ call fzf#vim#colors({'left': '15%', 'options': '--reverse --margin 30%,0'}, <bang>0)
-
-" ----------------------------------------------------------------------------
-" NBTags
-" ----------------------------------------------------------------------------
-function! s:align_lists(lists)
-  let maxes = {}
-  for list in a:lists
-    let i = 0
-    while i < len(list)
-      let maxes[i] = max([get(maxes, i, 0), len(list[i])])
-      let i += 1
-    endwhile
-  endfor
-  for list in a:lists
-    call map(list, "printf('%-'.maxes[v:key].'s', v:val)")
-  endfor
-  return a:lists
-endfunction
-
-function! s:btags_source()
-  let lines = map(split(system(printf(
-    \ 'ctags -f - --sort=no --excmd=pattern --language-force=%s %s',
-    \ &filetype, expand('%:S'))), "\n"), 'split(v:val, "\t")')
-  if v:shell_error
-    throw 'failed to extract tags'
-  endif
-  return map(s:align_lists(lines), 'join(v:val, "\t")')
-endfunction
-
-function! s:btags_sink(line)
-  execute split(a:line, "\t")[2]
-endfunction
-
-function! s:btags()
-  try
-    call fzf#run({'source':  s:btags_source(),
-                 \'down':    '40%',
-                 \'options': '+m -d "\t" --with-nth 1,4..',
-                 \'sink':    function('s:btags_sink')})
-  catch
-    echohl WarningMsg
-    echom v:exception
-    echohl None
-  endtry
-endfunction
-command! NBTags call s:btags()
 
 """"""""""""""""""""""""""""""
 " CONFIG TAGBAR
