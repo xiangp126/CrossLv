@@ -48,7 +48,7 @@ $ sh oneKey.sh [home | root]
 - oneKey.sh => main 'one key stroke' shell, will auto call
     - makeLink.sh   => additional shell to make link for that in tools/
     - autoHandle.sh => assistant for handling files tracked in confirm/
-- tools/    => written for better or understanding some logics
+- tools/    => written for better use or understanding some logics
 - compile-tools/  => some useful automatically compiling tools, as name indicated
 - doc/   => frequently used document
 - fonts/ => beautifully and recommended open source fonts
