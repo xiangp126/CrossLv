@@ -1,0 +1,7 @@
+# should be placed at ~/.ssh/config
+# Host server
+#     Hostname server.example.org
+#     ProxyCommand ssh jumphost.example.org -W %h:%p
+Host sjc-marsbu-019
+    Hostname sjc-marsbu-019
+    ProxyCommand ssh -p 22 sha-srg-edit7 -W %h:%p

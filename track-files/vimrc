@@ -62,15 +62,15 @@ set background=dark
 cmap w!! w !sudo tee %
 set pastetoggle=<F12>
 noremap <F10> :set invnumber<CR>
-map  <leader>k :mark<Space>
+nmap  <leader>k :mark<Space>
 " insert mode jump to start of line
 " inoremap <C-H> <ESC>I
 " insert mode jump to end of line
 imap <C-L> <ESC>A
 " vim easy manipulator
-map <leader>R :source ~/.vimrc<CR>
-map <leader>W :write<CR>
-map <leader>Q :quit<CR>
+nmap <leader>R :source ~/.vimrc<CR>
+nmap <leader>W :write<CR>
+nmap <leader>Q :qall<CR>
 " map leader NO. switch between buffers
 nmap <leader>1 :buffer1<CR>
 nmap <leader>2 :buffer2<CR>
@@ -81,12 +81,14 @@ nmap <leader>6 :buffer6<CR>
 nmap <leader>7 :buffer7<CR>
 nmap <leader>8 :buffer8<CR>
 nmap <leader>9 :buffer9<CR>
-nmap <leader>g :buffer
-" jump to previous buffer
+nmap <leader>d :bdelete
+" nmap <leader>g :buffer
+" jump to previous/next buffer
 nmap <leader>- <C-O><CR>
-" jump to next buffer
 nmap <leader>+ <C-I><CR>
-map <leader>d  :bdelete
+" jump to start/end of current func
+nmap { :?^{<CR>
+nmap } :/^}<CR>
 " unnamed for '* register', unnamedplus for '+ register'
 set clipboard=unnamedplus,unnamed
 " copy to system clipboard
@@ -359,14 +361,14 @@ let NERDTreeIgnore=['\.d$[[dir]]', '\.o$[[file]]']
 " CONFIG NERDCOMMENTER
 """"""""""""""""""""""""""""""
 "quick comment/uncomment
-map <F4> <leader>ci<CR>
+nmap <F4> <leader>ci<CR>
 "add a space after comment flag
 let g:NERDSpaceDelims = 1
 
 """"""""""""""""""""""""""""""
 " CONFIG SUPERTAB
 """"""""""""""""""""""""""""""
-let g:SuperTabDefaultCompletionType = '<C-n>'
+let g:SuperTabDefaultCompletionType = '<C-N>'
 
 """"""""""""""""""""""""""""""
 " CONFIG AUTO-PAIRS
@@ -379,9 +381,9 @@ inoremap <buffer><silent> ) <C-R>=AutoPairsInsert(')')<CR>
 """"""""""""""""""""""""""""""
 "Trigger configuration. Do not use <tab>
 "if you use https://github.com/Valloric/YouCompleteMe.
-let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsJumpForwardTrigger = "<tab>"
-let g:UltiSnipsJumpBackwardTrigger = "<c-b>"
+let g:UltiSnipsExpandTrigger = "<Tab>"
+let g:UltiSnipsJumpForwardTrigger = "<Tab>"
+let g:UltiSnipsJumpBackwardTrigger = "<C-B>"
 " If you want :UltiSnipsEdit to split your window.
 let g:UltiSnipsEditSplit = "vertical"
 
@@ -389,18 +391,18 @@ let g:UltiSnipsEditSplit = "vertical"
 " CONFIG COMPLETEPARAMETER.VIM
 """"""""""""""""""""""""""""""
 inoremap <silent><expr> ( complete_parameter#pre_complete("()")
-nmap <c-j> <Plug>(complete_parameter#goto_next_parameter)
-imap <c-j> <Plug>(complete_parameter#goto_next_parameter)
-smap <c-j> <Plug>(complete_parameter#goto_next_parameter)
-nmap <c-k> <Plug>(complete_parameter#goto_previous_parameter)
-imap <c-k> <Plug>(complete_parameter#goto_previous_parameter)
-smap <c-k> <Plug>(complete_parameter#goto_previous_parameter)
-nmap <m-d> <Plug>(complete_parameter#overload_down)
-imap <m-d> <Plug>(complete_parameter#overload_down)
-smap <m-d> <Plug>(complete_parameter#overload_down)
-nmap <m-u> <Plug>(complete_parameter#overload_up)
-imap <m-u> <Plug>(complete_parameter#overload_up)
-smap <m-u> <Plug>(complete_parameter#overload_up)
+nmap <C-J> <Plug>(complete_parameter#goto_next_parameter)
+imap <C-J> <Plug>(complete_parameter#goto_next_parameter)
+smap <C-J> <Plug>(complete_parameter#goto_next_parameter)
+nmap <C-K> <Plug>(complete_parameter#goto_previous_parameter)
+imap <C-K> <Plug>(complete_parameter#goto_previous_parameter)
+smap <C-K> <Plug>(complete_parameter#goto_previous_parameter)
+nmap <M-D> <Plug>(complete_parameter#overload_down)
+imap <M-D> <Plug>(complete_parameter#overload_down)
+smap <M-D> <Plug>(complete_parameter#overload_down)
+nmap <M-U> <Plug>(complete_parameter#overload_up)
+imap <M-U> <Plug>(complete_parameter#overload_up)
+smap <M-U> <Plug>(complete_parameter#overload_up)
 " use ultisnips mapping to goto next or previous parameter if set
 let g:complete_parameter_use_ultisnips_mapping = 0
 
@@ -437,8 +439,8 @@ let g:ycm_complete_in_strings = 1
 let g:ycm_collect_identifiers_from_comments_and_strings = 0
 let g:ycm_cache_omnifunc = 0
 " make YCM compatible with UltiSnips (using supertab)
-let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
-let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
+let g:ycm_key_list_select_completion = ['<C-N>', '<Down>']
+let g:ycm_key_list_previous_completion = ['<C-P>', '<Up>']
 " Do not delete next line | specify python3 interpreter
 let g:ycm_server_python_interpreter = '/usr/local/bin/python3'
 let g:ycm_add_preview_to_completeopt = 0
@@ -446,3 +448,4 @@ let g:ycm_autoclose_preview_window_after_insertion = 0
 let g:ycm_autoclose_preview_window_after_completion = 0
 nnoremap <leader>j :YcmCompleter GoToDefinitionElseDeclaration<CR>
 nnoremap <leader>D :YcmDiags<CR>
+nnoremap <leader>I :YcmCompleter FixIt<CR>

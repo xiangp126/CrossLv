@@ -1,6 +1,6 @@
 #!/bin/bash
 # config
-# Should be placed at ~/.ssh/config, make it if not exist. 
+# Should be placed at ~/.ssh/config, make it if not exist.
 # or you should edit line at /etc/ssh/ssh_config
 # 49 #   ProxyCommand ssh -q -W %h:%p gateway.example.com
 # Host *
@@ -32,7 +32,7 @@ cat << _EOF
        |                                                  ^
        |                                                  |
        |-------------------- X --------------- X ----------
-                          
+
 [MANUAL]
     ssh -vv -o ProxyCommand="ssh -W %h:%p login@jump-server" login@dst-server
 _EOF
@@ -90,7 +90,7 @@ uninstall() {
         cd - &>/dev/null
         echo Move Done!
         echo Going back to main $(pwd)/ ...
-    else 
+    else
         echo "Already has no $cfgFilePath, Quiting Now ..."
         exit
     fi
@@ -113,7 +113,7 @@ install() {
     # pass parameter to the self-defined function.
     echo Writing Contents to config: $cfgFilePath ...
     writeCfg $cfgFilePath
-    
+
     echo "cat ~/.ssh/$cfgFile"
     echo "--------------------------------------------------"
     cat ~/.ssh/$cfgFile

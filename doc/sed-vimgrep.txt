@@ -1,7 +1,11 @@
----- in vim
+--------------- IN VIM
+----- del trailing whitespace
 :%s/\s\+$//gc
 
----- use sed
+----- del ^M from Windows
+%s/\r//gc
+
+---- USE SED
 -E, -r, --regexp-extended (did not need \ for special symbol)
 use extended regular expressions in the script (for portability use POSIX -E).
 
