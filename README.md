@@ -1,17 +1,15 @@
-## Crosslv
-- Goal to deploy working/programming environment by 'oneKey' stroke
+- To do a good job, an artisan needs the best tools (idiom)
 
-- Save time and enjoy more with help of wonderful Open-Source tools and plugins
+- Thanks for the development of wonderful open-source tools
+
+- Goal to persist my working/programming environment by 'oneKey' stroke
 
 - Two modes deploy selection
     - home | root
     - without root privilege, normally install packages into $HOME/.usr
     - with root privilege, normally install packages into /usr/local
 
-- Crossing Linux platforms, verified on
-    - Ubuntu | CentOS | MacOS
-    - On Ubuntu and MacOS whole installation takes little time
-    - On CentOS expecially 6 may compile GCC supporting C++11 first, taking disk space 5G+
+- Incremental install, safe to run consecutive times, verified on Ubuntu/CentOS/Mac
 
 ![](https://github.com/xiangp126/crosslv/blob/master/gif/crosslv.gif)
 
@@ -50,7 +48,7 @@ $ sh oneKey.sh [home | root]
 - oneKey.sh => main 'one key stroke' shell, will auto call
     - makeLink.sh   => additional shell to make link for that in tools/
     - autoHandle.sh => assistant for handling files tracked in confirm/
-- tools/    => written for better or understanding some logics
+- tools/    => written for better use or understanding some logics
 - compile-tools/  => some useful automatically compiling tools, as name indicated
 - doc/   => frequently used document
 - fonts/ => beautifully and recommended open source fonts
