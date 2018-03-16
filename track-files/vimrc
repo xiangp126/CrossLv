@@ -70,7 +70,7 @@ imap <C-L> <ESC>A
 " vim easy manipulator
 nmap <leader>R :source ~/.vimrc<CR>
 nmap <leader>W :write<CR>
-nmap <leader>Q :qall<CR>
+nmap <leader>Q :qall!<CR>
 " map leader NO. switch between buffers
 nmap <leader>1 :buffer1<CR>
 nmap <leader>2 :buffer2<CR>
@@ -87,7 +87,7 @@ nmap <leader>d :bdelete
 nmap <leader>- <C-O><CR>
 nmap <leader>+ <C-I><CR>
 " jump to start/end of current func
-nmap { :?^{<CR>
+nmap { ?^[^ ].*\s\+{<CR>
 nmap } :/^}<CR>
 " unnamed for '* register', unnamedplus for '+ register'
 set clipboard=unnamedplus,unnamed
