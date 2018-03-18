@@ -373,8 +373,8 @@ let g:SuperTabDefaultCompletionType = '<C-N>'
 """"""""""""""""""""""""""""""
 " CONFIG AUTO-PAIRS
 """"""""""""""""""""""""""""""
-let g:AutoPairs = {'[':']', '{':'}',"'":"'",'"':'"', '`':'`'}
-inoremap <buffer><silent> ) <C-R>=AutoPairsInsert(')')<CR>
+let g:AutoPairs = {'(':')', '[':']', '{':'}',"'":"'",'"':'"', '`':'`'}
+" inoremap <buffer><silent> ) <C-R>=AutoPairsInsert(')')<CR>
 
 """"""""""""""""""""""""""""""
 " CONFIG ULTISNIPS
