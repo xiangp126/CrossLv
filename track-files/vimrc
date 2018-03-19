@@ -61,12 +61,14 @@ set background=dark
 " <k0> - <k9> small keyboard 0 - 9
 cmap w!! w !sudo tee %
 set pastetoggle=<F12>
-noremap <F10> :set invnumber<CR>
-nmap  <leader>k :mark<Space>
+nmap <F10> :set invnumber<CR>
+nmap <leader>k :mark<Space>
 " insert mode jump to start of line
 " inoremap <C-H> <ESC>I
 " insert mode jump to end of line
 imap <C-L> <ESC>A
+" removing trailing white spaces
+nmap <C-G> :%s/\s\+$//gc<CR>
 " vim easy manipulator
 nmap <leader>R :source ~/.vimrc<CR>
 nmap <leader>W :write<CR>
@@ -355,7 +357,7 @@ let g:NERDTreeShowBookmarks = 0
 let g:NERDTreeWinSize = 20 " default 30
 let g:NERDTreeWinPos = 'left' " only left or right
 " all dirs ending in ".d" and all files ending in ".o" to be ignored
-let NERDTreeIgnore=['\.d$[[dir]]', '\.o$[[file]]']
+let NERDTreeIgnore=['\.d$[[dir]]', '\.dSYM[[dir]]', '\.o$[[file]]']
 
 """"""""""""""""""""""""""""""
 " CONFIG NERDCOMMENTER
