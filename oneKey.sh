@@ -980,6 +980,11 @@ _EOF
     fi
     # begin to build
     cd $clonedName
+    # get latest released tag
+    git pull
+    latestTag="git describe --tags `git rev-list --tags --max-count=1`"
+    git checkout $latestTag
+
     ./autogen.sh
     ./configure --prefix=$ackInstDir
     if [[ $? != 0 ]]; then
@@ -1830,8 +1835,7 @@ _EOF
         # use gnu-sed as compatible with that under Linux
         brew install python3 python2 cmake vim git fd \
             bash-completion fontconfig tmux ripgrep \
-            gnu-sed --with-default-names -y
-
+            gnu-sed the_silver_searcher --with-default-names -y
         cat << "_EOF"
 ------------------------------------------------------
 CREATING MORE TIMES RUNNING FLAG FILE
@@ -1955,6 +1959,7 @@ INSTALLATION THROUGH ONEKEY DONE - CONGRATULATION
 gcc   path = $CC
 cxx   path = $CXX
 rg    path = $rgPath
+ag    path = $agPath
 fd    path = $fdPath
 fzf   path = $fzfPath
 vim   path = $vimPath
@@ -2003,7 +2008,7 @@ install() {
         installRust
         installRipGrep
         installFd
-        # installSilverSearcher
+        installSilverSearcher
         installPython3
         installvim
         installCmake
