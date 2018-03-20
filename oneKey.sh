@@ -978,13 +978,15 @@ _EOF
             exit
         fi
     fi
-    # begin to build
-    cd $clonedName
-    # get latest released tag
-    git pull
-    latestTag="git describe --tags `git rev-list --tags --max-count=1`"
-    git checkout $latestTag
 
+    cd $clonedName
+    # checkout to latest released tag
+    git pull
+    latestTag=$(git describe --tags `git rev-list --tags --max-count=1`)
+    if [[ "$latestTag" != "" ]]; then
+        git checkout $latestTag
+    fi
+    # begin to build
     ./autogen.sh
     ./configure --prefix=$ackInstDir
     if [[ $? != 0 ]]; then
@@ -1249,9 +1251,14 @@ _EOF
     fi
 
     cd $clonedName
+    # checkout to latest released tag
     git checkout master
     git pull
-    # git checkout $checkoutVersion
+    latestTag=$(git describe --tags `git rev-list --tags --max-count=1`)
+    if [[ "$latestTag" != "" ]]; then
+        git checkout $latestTag
+    fi
+
     # clean before ./configure
     # make distclean
 
@@ -1958,8 +1965,8 @@ INSTALLATION THROUGH ONEKEY DONE - CONGRATULATION
 ------------------------------------------------------
 gcc   path = $CC
 cxx   path = $CXX
-rg    path = $rgPath
 ag    path = $agPath
+rg    path = $rgPath
 fd    path = $fdPath
 fzf   path = $fzfPath
 vim   path = $vimPath
