@@ -1974,7 +1974,7 @@ tmux  path = $tmuxPath
 cmake path = $cmakePath
 u-ctags path = $uCtagsPath
 python3 path = $python3Path
------------------------ ycm core path -----------------------------
+--------------------------------------------- YCM CORE PATH -------
 $ycmCorePath
 -------------------------------------------------------------------
 _EOF

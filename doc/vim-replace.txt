@@ -1,0 +1,5 @@
+----- Removing trailing whitespace
+:%s/\s\+$//gc
+
+----- Del ^M generated from Windows
+%s/\r//gc
