@@ -659,47 +659,7 @@ _EOF
     source $HOME/.bashrc 2> /dev/null
 
     # extra install actions for vim plugins
-    # doExtraForLeaderF
     doExtraForFzf
-}
-
-doExtraForLeaderF() {
-    cat << "_EOF"
-------------------------------------------------------
-COPYING DARK_LEADERF.VIM AS DEFAULT LEADERF COLORSCHEME
-------------------------------------------------------
-_EOF
-    myLeaderFColor=./template/dark_leaderf.vim
-    cpColorDst=$HOME/.vim/bundle/LeaderF/autoload/leaderf/colorscheme/
-    if [[ ! -d $cpColorDst ]]; then
-        echo "[Error]: no leaderf color dir found, please check it"
-        return 255
-    fi
-
-    cd $mainWd
-    cp $myLeaderFColor $cpColorDst
-    retVal=$?
-    if [[ $retVal != 0 ]]; then
-        echo "[Error]: copy private leaderf color return with value $retVal"
-        exit 255
-    fi
-
-    leaderfInstDir=$HOME/.vim/bundle/LeaderF
-    if [[ ! -d $leaderfInstDir ]]; then
-        echo "[Warning]: found no LeaderF, please check it"
-        return
-    fi
-    cat << "_EOF"
-------------------------------------------------------
-INSTALLING FUZZY MATCHING ALGORITHM FOR LEADERF
-------------------------------------------------------
-_EOF
-    cd $leaderfInstDir
-    sh -x ./install.sh
-    retVal=$?
-    if [[ $retVal != 0 ]]; then
-        echo "[Warning]: Install fuzzy for LeaderF return with value $retVal "
-    fi
 }
 
 installLibpcre() {
@@ -2006,7 +1966,6 @@ install() {
     installBone
       # | - installTmuxPlugins
       #   - installVimPlugins
-      #       | - doExtraForLeaderF
       #       | - doExtraForFzf
       #   - installBashCompletion
       #   - installFonts

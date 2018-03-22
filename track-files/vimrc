@@ -22,7 +22,7 @@ set nocompatible    " No vi compatible
 set showmatch       " Show matching brackets.
 set ignorecase      " Do case insensitive matching
 set smartcase       " Do smart case matching
-set hlsearch        " Highlight searched word
+set nohlsearch        " Highlight searched word
 set incsearch       " Incremental search
 set hidden          " Hide buffers when they are abandoned
 set mouse=a         " Enable mouse usage (all modes), or 'ni' for normal & insert
@@ -123,7 +123,6 @@ call plug#begin('~/.vim/bundle')
 " Plug 'davidhalter/jedi'
 " Plug 'tell-k/vim-autopep8'
 " Plug 'Chiel92/vim-autoformat'
-" Plug 'Yggdroot/LeaderF', { 'on': 'LeaderfFunction' }
 " Plug 'majutsushi/tagbar', { 'on': 'TagbarToggle' }
 "------ NEW PLUGINS -----
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
@@ -169,34 +168,6 @@ let g:airline#parts#ffenc#skip_expected_string='utf-8[unix]'
 let g:airline#extensions#tabline#formatter = 'unique_tail'
 let g:tmuxline_powerline_separators = 0
 let g:airline#extensions#tmuxline#enabled = 0
-
-""""""""""""""""""""""""""""""
-" CONFIG LEADERF
-""""""""""""""""""""""""""""""
-" " map <leader>F  :LeaderfFile<CR>
-" let g:Lf_ShortcutF = '<leader>F'
-" let g:Lf_StlColorscheme = 'dark_leaderf'
-" let g:Lf_WindowHeight = 0.50
-" let g:Lf_WildIgnore = {
-"    \ 'dir': ['.svn','.git','.hg', '.acme_project', '.ACMEROOT'],
-"    \ 'file': ['*.sw?','~$*','*.bak','*.exe','*.o','*.so','*.py[co]']
-"    \}
-" " press <F5> to refresh the cache.
-" let g:Lf_DelimiterChar = ';'
-" let g:Lf_MruFileExclude = ['*.so']
-" let g:Lf_CommandMap = {'<C-C>': ['<Esc>', '<C-C>']}
-" let g:Lf_HighlightIndividual = 0
-" let g:Lf_StlSeparator = { 'left': '', 'right': ''  }
-" map <leader><leader>f   :LeaderfFunction<CR>
-" map <leader><leader>fa  :LeaderfFunctionAll<CR>
-" map <leader><leader>fw  :LeaderfFunctionCword<CR>
-" " search line which has the word
-" map <leader><leader>l   :LeaderfLine<CR>
-" map <leader><leader>la  :LeaderfLineAll<CR>
-" map <leader><leader>lw  :LeaderfLineCword<CR>
-" " search line match word | end
-" map <leader><leader>m   :LeaderfMruCwd<CR>
-" map <leader><leader>ma  :LeaderfMru<CR>
 
 """"""""""""""""""""""""""""""
 " CONFIG FZF.VIM
@@ -283,8 +254,7 @@ command! -bang -nargs=* GGrep
 nnoremap <silent> <leader>c   :BCommits<CR>
 
 " lines
-" nnoremap <leader>l   :BLines<CR>
-" nnoremap <leader>la  :Lines<CR>
+" nnoremap <leader>l   :BLines<CR> " nnoremap <leader>la  :Lines<CR>
 nnoremap <leader>l   :call fzf#vim#buffer_lines({'options': '--no-reverse'})<CR>
 " <leader>lw will slow down heavily for <leader>l
 nnoremap <leader>L   :call fzf#vim#buffer_lines(expand('<cword>'),
@@ -292,8 +262,7 @@ nnoremap <leader>L   :call fzf#vim#buffer_lines(expand('<cword>'),
 " nnoremap <leader>la  :call fzf#vim#lines({'options': '--no-reverse'})<CR>
 
 " tags
-" nnoremap <leader>t   :BTags<CR>
-" nnoremap <leader>ta  :Tags<CR>
+" nnoremap <leader>t   :BTags<CR> " nnoremap <leader>ta  :Tags<CR>
 nnoremap <leader>t   :call fzf#vim#buffer_tags('', {'options': '--no-reverse'})<CR>
 nnoremap <leader>T   :call fzf#vim#buffer_tags(expand('<cword>'),
   \ {'options': '--no-reverse'})<CR>
@@ -315,7 +284,7 @@ command! -bang -nargs=* Rg
   \           : fzf#vim#with_preview('right:50%:hidden', '?'),
   \   <bang>0)
 
-" --------------------- ag --------------------------
+" ag => silver-searcher
 nnoremap <Leader>a   :Ag<CR>
 command! -bang -nargs=* Ag
   \ call fzf#vim#ag(<q-args>,
