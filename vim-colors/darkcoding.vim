@@ -143,7 +143,9 @@ hi normal ctermfg=247 ctermbg=NONE cterm=NONE
 hi Function ctermfg=137 guifg=#fad07a
 hi Identifier ctermfg=140 ctermbg=NONE cterm=NONE
 hi Operator ctermfg=144 ctermbg=None cterm=NONE
-hi Search ctermfg=130 ctermbg=None cterm=underline
+hi PreCondit ctermfg=110
+" hi Search ctermfg=130 ctermbg=None cterm=underline
+hi Search term=reverse cterm=underline ctermfg=16 ctermbg=245
 " -------------------- pop up menu ---------------------
 hi PMenu ctermfg=245 ctermbg=16
 hi PmenuSel ctermfg=0 ctermbg=242 term=Bold
