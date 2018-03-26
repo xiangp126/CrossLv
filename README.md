@@ -45,6 +45,7 @@ $ sh oneKey.sh [home | root]
 
 ## Modification Note
 V3.9.1
+* fix bug install cmake: check install status, then soft link it if failed
 * in practice, ag was better than rg on Vim search, so keep install ag
 
 V3.9

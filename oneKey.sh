@@ -1355,16 +1355,26 @@ _EOF
     make -j $cpuCoreNum
     # check if make returns successfully
     if [[ $? != 0 ]]; then
-        echo [Error]: make returns error, quitting now
-        exit
+        echo [Error]: make cmake failed, quitting now
+        exit 255
     fi
     $execPrefix make install
+    # check if make install returns successfully
+    if [[ $? != 0 ]]; then
+        echo [Error]: install cmake failed, try link it soft
+        cmakeRealPath=`pwd`/bin/cmake
+        $execPrefix ln -sf $cmakeRealPath $cmakeInstDir/bin
+        if [[ $? != 0 ]]; then
+            echo [FatalError]: soft link cmake also failed, quitting now
+        fi
+    fi
     cmakePath=$cmakeInstDir/bin/cmake
     cat << _EOF
 ------------------------------------------------------
 INSTALLING CMAKE 3 DONE
-`$cmakeInstDir/bin/cmake --version`
+$($cmakeInstDir/bin/cmake --version)
 cmake path = $cmakeInstDir/bin/
+$(ls -l $cmakePath)
 ------------------------------------------------------
 _EOF
 }
