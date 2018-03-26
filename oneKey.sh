@@ -1749,7 +1749,7 @@ _EOF
             sudo apt-get install \
                 pkg-config libevent-dev libncurses5 libncurses5-dev \
                 bash-completion python-optcomplete build-essential cmake \
-                automake asciidoc xmlto tmux curl cargo \
+                automake asciidoc xmlto tmux curl cargo realpath \
                 libpcre3-dev liblzma-dev libclang-5.0-dev clang-5.0 \
                 libmpc-dev libcurl4-openssl-dev perl libperl-dev \
                 libncursesw5 libncursesw5-dev libgnome2-dev libgnomeui-dev \
