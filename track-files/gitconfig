@@ -21,6 +21,7 @@
 	co = checkout
 	dt = difftool
 	mt = mergetool
+	cmm = commit -v -m
 [color]
 	ui = auto
 [push]

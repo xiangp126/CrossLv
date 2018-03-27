@@ -1,15 +1,13 @@
+- This project aims to persist my working/programming environment by 'oneKey' stroke
 - To do a good job, an artisan needs the best tools (idiom)
-
-- Thanks for the development of wonderful open-source tools
-
-- Goal to persist my working/programming environment by 'oneKey' stroke
-
+- Thanks for the development of such wonderful open-source tools
+    - fuzzy-find command-line tool and its vim plugin
+    - the C/C++ code-completion engine for vim
 - Two modes deploy selection
-    - home | root
-    - without root privilege, normally install packages into $HOME/.usr
-    - with root privilege, normally install packages into /usr/local
-
-- Incremental install, safe to run consecutive times, verified on Ubuntu/CentOS/Mac
+    - home mode: without root privilege, normally install packages into $HOME/.usr
+    - root mode: with root privilege, normally install packages into /usr/local
+- Incremental install supported, safe to run consecutive times
+- Has checked on Ubuntu | CentOS | Mac
 
 ![](https://github.com/xiangp126/crosslv/blob/master/gif/crosslv.gif)
 
@@ -138,8 +136,8 @@ $ sh autoHandle.sh
 ```
 
 ## Reference
-[Vundle Introduction Guide](http://www.jianshu.com/p/8d416ac4ad11)
+[VUNDLE INTRODUCTION GUIDE](http://www.jianshu.com/p/8d416ac4ad11)
 
-[How Does Cat Eof Work in Bash](https://stackoverflow.com/questions/2500436/how-does-cat-eof-work-in-bash)
+[HOW DOES CAT EOF WORK IN BASH](https://stackoverflow.com/questions/2500436/how-does-cat-eof-work-in-bash)
 
-[VIM-YouCompleteMe clang+llvm](https://www.jianshu.com/p/c24f919097b3)
+[VIM-YOUCOMPLETEME CLANG+LLVM](https://www.jianshu.com/p/c24f919097b3)
