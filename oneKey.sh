@@ -1271,7 +1271,7 @@ installTmux() {
         tmuxVersion=`tmux -V | cut -d ' ' -f 2`
         basicTmuxV=2.5
         cmpSoftVersion $tmuxVersion $basicTmuxV
-        if [[ $? == '1' ]]; then
+        if [[ $? == '1' || "$tmuxVersion" == "master" ]]; then
             return
         fi
     fi
@@ -1283,7 +1283,7 @@ _EOF
     tmuxInstDir=$commInstdir
     $execPrefix mkdir -p $tmuxInstDir
     # comm attribute to get source 'cc-tmux'
-    tmuxClonePath=https://github.com/xiangp126/cc-tmux
+    tmuxClonePath=https://github.com/xiangp126/let-tmux
     clonedName=cc-tmux
 
     # rename download package
