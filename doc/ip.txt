@@ -1,5 +1,5 @@
 --- Temporary modify
-sudo ip addr add 10.124.10.101/24 dev eth0
+sudo ip addr add 10.124.10.103/24 dev eth0
 sudo ip route add default via 10.124.10.1
 - or
 sudo ifconfig eth0 10.124.10.101/24
@@ -13,3 +13,4 @@ iface eth0 inet static
     netmask 255.255.255.0
     gateway 10.124.10.1
     dns-nameservers 8.8.8.8
+    # dns-nameservers 64.104.123.144

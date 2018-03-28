@@ -1282,9 +1282,9 @@ INSTALLING NEWLY TMUX VERSION 2.6
 _EOF
     tmuxInstDir=$commInstdir
     $execPrefix mkdir -p $tmuxInstDir
-    # comm attribute to get source 'cc-tmux'
+    # comm attribute to get source 'let-tmux'
     tmuxClonePath=https://github.com/xiangp126/let-tmux
-    clonedName=cc-tmux
+    clonedName=let-tmux
 
     # rename download package
     cd $downloadPath

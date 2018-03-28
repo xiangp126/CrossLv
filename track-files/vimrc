@@ -92,19 +92,22 @@ nmap <leader>d :bdelete
 " Jump to previous/next buffer
 nmap <leader>- <C-O><CR>
 nmap <leader>+ <C-I><CR>
-" Jump to begin/end of current func block
+" Jump to end of current func block
 nmap } :/^}<CR>
+" Jump to begin, need better solution
 nmap { }%
 " nmap { ?^[^ ].*\s\+{<CR>
 " unnamed for '* register', unnamedplus for '+ register'
 set clipboard=unnamedplus,unnamed
-" Copy to system clipboard
-noremap <silent> <leader>y "*y <CR>
-noremap <silent> <leader>Y "+y <CR>
-noremap <silent> <leader>p "*p <CR>
-noremap <silent> <leader>P "+p <CR>
-" vmap <leader>y :!xclip -f -sel clip<CR>
-" map <leader>p  :-1r !xclip -o -sel clip<CR>
+" Copy current visual selection to buffer file
+vnoremap <leader>Y :w! /tmp/pvim.txt<CR>
+" Copy current line to buffer file
+nnoremap <leader>y :.w! /tmp/pvim.txt<CR>
+nnoremap <leader>p :read /tmp/pvim.txt<CR>
+" noremap <silent> <leader>y "*y <CR>
+" noremap <silent> <leader>Y "+y <CR>
+" noremap <silent> <leader>p "*p <CR>
+" noremap <silent> <leader>P "+p <CR>
 
 """"""""""""""""""""""""""""""
 " SUMMARIZE PLUGIN MAPPING
