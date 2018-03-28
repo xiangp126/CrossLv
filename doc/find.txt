@@ -1,0 +1,2 @@
+-- find link file to delete
+find . -type l -exec rm -rf {} +

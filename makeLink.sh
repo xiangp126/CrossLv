@@ -43,18 +43,29 @@ makeLink() {
 ENTERING INTO $handleDir/
 ------------------------------------------------------
 _EOF
-
-    handleFiles=`find . -regex ".*.[sh|py]$" -type f -executable`
     # find on macos did not support -executable
     if [[ `uname -s` == "Darwin" ]]; then
-        handleFiles=`find . -regex ".*.[sh|py]$" -type f`
+        # use fd on mac if possible
+        fdPath=`which fd 2> /dev/null`
+        if [[ "$fdPath" != "" ]]; then
+            handleFiles=`fd -e sh -e py`
+        else
+            handleFiles=`find . -regex ".*.[sh|py]$" -type f`
+        fi
+    else
+        handleFiles=`find . -regex ".*.[sh|py]$" -type f -executable`
     fi
     for file in ${handleFiles[@]}
     # ./sshproxy.sh
     do
         realName=${file##*/}      # sshproxy.sh
         linkName=${realName%.*}   # sshproxy
-        echo Founding tool $realName to make link ...
+        if [[ -f "$installDir/$linkName" ]]; then
+            echo [Warning]: tool $realName already linked
+            continue
+        else
+            echo Founding tool $realName to make link ...
+        fi
         # show message
         cat << _EOF
 ln $para $handleDir/$realName
@@ -70,27 +81,36 @@ rmLink() {
         echo [Error]: Missing installation $installDir/ ...
         exit
     fi
-
     cd $handleDir
     cat << _EOF
 ------------------------------------------------------
 ENTERING INTO $handleDir/
 ------------------------------------------------------
 _EOF
-    handleFiles=`find . -regex ".*.[sh|py]" -type f -executable`
+    if [[ `uname -s` == "Darwin" ]]; then
+        # use fd on mac if possible
+        fdPath=`which fd 2> /dev/null`
+        if [[ "$fdPath" != "" ]]; then
+            handleFiles=`fd -e sh -e py`
+        else
+            handleFiles=`find . -regex ".*.[sh|py]$" -type f`
+        fi
+    else
+        handleFiles=`find . -regex ".*.[sh|py]$" -type f -executable`
+    fi
+
     for file in ${handleFiles[@]}
     # ./sshproxy.sh
     do
         realName=${file##*/}      # sshproxy.sh
         linkName=${realName%.*}   # sshproxy
 
-        echo "Found tool $realName to remove link ..."
         if [[ ! -f ${installDir}/${linkName} ]]; then
             echo [Warning]: No linked name $linkName found, omitting it ...
-            echo
             continue
         fi
-        echo "rm ${installDir}/${linkName}"
+        echo "Found tool $realName to remove link ..."
+        echo "        rm ${installDir}/${linkName}"
         rm ${installDir}/${linkName}
         echo
     done
@@ -100,16 +120,16 @@ case $1 in
     'install')
         makeLink
         exit 0
-    ;;
+        ;;
 
     'uninstall')
         rmLink
         exit 0
-    ;;
+        ;;
 
     *)
         usage
         logo
         exit 0
-    ;;
+        ;;
 esac
