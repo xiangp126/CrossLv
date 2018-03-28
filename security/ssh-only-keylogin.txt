@@ -2,9 +2,9 @@
 sudo vim /etc/ssh/sshd_config
 #search in vim for 'Password'
 
--- demon begin
+-- DEMON BEGIN
 Password Authentiaction no
--- demon end
+-- DEMON END
 
 sudo /etc/init.d/sshd restart
 and wait ...

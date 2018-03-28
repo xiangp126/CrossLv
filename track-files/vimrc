@@ -92,9 +92,10 @@ nmap <leader>d :bdelete
 " Jump to previous/next buffer
 nmap <leader>- <C-O><CR>
 nmap <leader>+ <C-I><CR>
-" Jump to begin/end of current func
-nmap { ?^[^ ].*\s\+{<CR>
+" Jump to begin/end of current func block
 nmap } :/^}<CR>
+nmap { }%
+" nmap { ?^[^ ].*\s\+{<CR>
 " unnamed for '* register', unnamedplus for '+ register'
 set clipboard=unnamedplus,unnamed
 " Copy to system clipboard

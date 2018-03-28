@@ -1,7 +1,7 @@
------- delete -------
+------ DELETE -------
 sudo useradd -m -s "/bin/bash" vbird
 sudo passwd vbird
 su - vbird
 
-------- add ---------
+------- ADD ---------
 sudo userdel -r vbird
