@@ -1,9 +1,8 @@
 - This project aims to persist my working/programming environment by 'oneKey' stroke
 - To do a good job, an artisan needs the best tools (idiom)
-- Thanks for the development of such wonderful open source tools
     - fuzzy-find command-line tool and its vim plugin
     - the C/C++ code-completion engine for vim
-- Also with some self-written handy scripts
+    - also with some self-written handy scripts
 - Two modes deploy selection
     - home mode: without root privilege, normally install packages into $HOME/.usr
     - root mode: with root privilege, normally install packages into /usr/local

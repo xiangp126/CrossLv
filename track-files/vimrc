@@ -100,7 +100,7 @@ nmap { }%
 " unnamed for '* register', unnamedplus for '+ register'
 set clipboard=unnamedplus,unnamed
 " Copy current visual selection to buffer file
-vnoremap <leader>Y :w! /tmp/pvim.txt<CR>
+vnoremap <leader>y :w! /tmp/pvim.txt<CR>
 " Copy current line to buffer file
 nnoremap <leader>y :.w! /tmp/pvim.txt<CR>
 nnoremap <leader>p :read /tmp/pvim.txt<CR>
