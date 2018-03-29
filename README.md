@@ -147,8 +147,8 @@ $ sh autoHandle.sh
 
 ```bash
 [NAME]
-    makeLink.sh -- make linke from ~/myGit/crosslv/tools/
-                           to   ~/.usr/bin/
+    makeLink.sh -- make link from ~/myGit/crosslv/tools/
+                             to   ~/.usr/bin/
 [USAGE]
     sh makeLink.sh [install | uninstall | help]
 

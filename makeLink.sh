@@ -24,8 +24,8 @@ usage() {
     exeName=${0##*/}
     cat << _EOF
 [NAME]
-    $exeName -- make linke from $handleDir/
-                           to   $installDir/
+    $exeName -- make link from $handleDir/
+                          to   $installDir/
 [USAGE]
     sh $exeName [install | uninstall | help]
 
