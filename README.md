@@ -1,8 +1,9 @@
-- This project aims to persist my working/programming environment by 'oneKey' stroke
+- This project aims to persist my working/programming env On Linux by 'oneKey' stroke
 - To do a good job, an artisan needs the best tools (idiom)
     - fuzzy-find command-line tool and its vim plugin
-    - the C/C++ code-completion engine for vim
-    - also with some self-written handy scripts
+    - the language code-completion engine for vim
+    - the awsome terminal multiplexer running on server
+    - also with some self-written handy scripts on [tools](https://github.com/xiangp126/pstlv/blob/master/tools) and somewhere else
 - Two modes deploy selection
     - home mode: without root privilege, normally install packages into $HOME/.usr
     - root mode: with root privilege, normally install packages into /usr/local
@@ -31,11 +32,13 @@ $ sh oneKey.sh
 [TROUBLESHOOTING]
     sudo ln -s /bin/bash /bin/sh, ensure /bin/sh was linked to /bin/bash.
     $ ll /bin/sh lrwxrwxrwx 1 root root 9 Dec  7 01:00 /bin/sh -> /bin/bash*
-                        _
-  ___ _ __ ___  ___ ___| |_   __
- / __| '__/ _ \/ __/ __| \ \ / /
-| (__| | | (_) \__ \__ \ |\ V /
- \___|_|  \___/|___/___/_| \_/
+                     _     _   _
+ _ __   ___ _ __ ___(_)___| |_| |_   __
+| '_ \ / _ \ '__/ __| / __| __| \ \ / /
+| |_) |  __/ |  \__ \ \__ \ |_| |\ V /
+| .__/ \___|_|  |___/_|___/\__|_| \_/
+|_|
+
 ```
 ```bash
 $ sh oneKey.sh [home | root]
@@ -43,6 +46,7 @@ $ sh oneKey.sh [home | root]
 
 ## Modification Note
 V3.9.1
+* revise makeLink.sh, skip already linked tool
 * fix bug install cmake: check install status, then soft link it if failed
 * in practice, ag was better than rg on Vim search, so keep install ag
 
@@ -92,8 +96,8 @@ V1.0
 - completion/ => bash completion for some extra use
 
 ## Tip of autoHandle.sh
+comment on/off one of them to add/remove from tracking
 ```bash
-# comment on/off one of them to add/remove from tracking
 trackFiles=(
     ".vimrc"
     ".tmux.conf"
