@@ -1,14 +1,25 @@
-- This project aims to persist my working/programming env On Linux by 'oneKey' stroke
-- To do a good job, an artisan needs the best tools (idiom)
+- This project aims to persist the same programming environment On Linux platform
+    - save more time and enjoy more life
+    - auto fit for different OS type
+    - doen everything for me with 'one-key' stroke
+- Project packaged with some awesome open source tools
     - fuzzy-find command-line tool and its vim plugin
     - the language code-completion engine for vim
     - the awsome terminal multiplexer running on server
-    - also with some self-written handy scripts on [tools](https://github.com/xiangp126/pstlv/blob/master/tools) and somewhere else
+- And with
+    - self-written handy scripts on [tools](https://github.com/xiangp126/crosslv/blob/master/tools) and somewhere else
+    - personal dotfiles on [track-files](https://github.com/xiangp126/crosslv/blob/master/track-files)
+    - extra bash completion for fzf/tmux/git on [completion](https://github.com/xiangp126/crosslv/blob/master/completion)
+    - favourite personal vim color scheme on [darkcoding.vim](https://github.com/xiangp126/crosslv/blob/master/vim-colors/darkcoding.vim)
+    - programming font on [monaco.ttf](https://github.com/xiangp126/crosslv/blob/master/fonts/monaco.ttf)
+    - etc...
 - Two modes deploy selection
     - home mode: without root privilege, normally install packages into $HOME/.usr
     - root mode: with root privilege, normally install packages into /usr/local
 - Incremental install supported, safe to run consecutive times
 - Has checked on Ubuntu | CentOS | Mac
+
+Catch a glimpse of the effect
 
 ![](https://github.com/xiangp126/crosslv/blob/master/gif/crosslv.gif)
 
@@ -80,23 +91,16 @@ V2.1
 V1.0
 * user-friendly manipulate for backup | restore | confirm | clean .
 
-## Project Outline
-- track-files/  => key files to track on the system, for backup and restore
-- oneKey.sh => main 'one key stroke' shell, will auto call
-    - makeLink.sh   => additional shell to make link for that in tools/
-    - autoHandle.sh => assistant for handling files tracked in confirm/
-- tools/    => written for better use or understanding some logics
-- compile-tools/  => some useful automatically compiling tools, as name indicated
-- doc/   => frequently used document
-- fonts/ => beautifully and recommended open source fonts
-- template/ => some templates generated or used by this project
-- testing/  => derived from compile-tools or tools, but deprecated by far
-- security/ => derived from doc, but has affairs with sccurity
-- vim-colors/ => color schemes for vim use
-- completion/ => bash completion for some extra use
+## Tips of key
 
-## Tip of autoHandle.sh
+autoHandle.sh and makeLink.sh was automatically called by oneKey.sh,
+
+however their function can be used outside this project, so separate them alone
+
+- Tips of autoHandle.sh
+
 comment on/off one of them to add/remove from tracking
+
 ```bash
 trackFiles=(
     ".vimrc"
@@ -139,9 +143,33 @@ $ sh autoHandle.sh
     clean   -> clean ${backupDir}.*/, but reserve main backup dir
 ```
 
+- Tips of makeLink.sh
+
+```bash
+[NAME]
+    makeLink.sh -- make linke from ~/myGit/crosslv/tools/
+                           to   ~/.usr/bin/
+[USAGE]
+    sh makeLink.sh [install | uninstall | help]
+
+[EXAMPLE]
+    sh makeLink.sh
+    sh makeLink.sh install
+
+[TROUBLESHOOTING]
+    ~/.usr/bin/ should be placed in PATH
+
+                 _          _ _       _
+ _ __ ___   __ _| | _____  | (_)_ __ | | __
+| '_ ` _ \ / _` | |/ / _ \ | | | '_ \| |/ /
+| | | | | | (_| |   <  __/ | | | | | |   <
+|_| |_| |_|\__,_|_|\_\___| |_|_|_| |_|_|\_\
+
+```
+```bash
+sh makeLink.sh install
+```
+
 ## Reference
-[VUNDLE INTRODUCTION GUIDE](http://www.jianshu.com/p/8d416ac4ad11)
-
-[HOW DOES CAT EOF WORK IN BASH](https://stackoverflow.com/questions/2500436/how-does-cat-eof-work-in-bash)
-
-[VIM-YOUCOMPLETEME CLANG+LLVM](https://www.jianshu.com/p/c24f919097b3)
+- [HOW DOES CAT EOF WORK IN BASH](https://stackoverflow.com/questions/2500436/how-does-cat-eof-work-in-bash)
+- [VIM-YOUCOMPLETEME CLANG+LLVM](https://www.jianshu.com/p/c24f919097b3)

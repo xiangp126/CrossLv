@@ -29,8 +29,12 @@ usage() {
 [USAGE]
     sh $exeName [install | uninstall | help]
 
-[DEPENDS]
-    you should make $installDir/ in PATH
+[EXAMPLE]
+    sh $exeName
+    sh $exeName install
+
+[TROUBLESHOOTING]
+    $installDir/ should be placed in PATH
 
 _EOF
 }
