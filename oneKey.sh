@@ -54,11 +54,12 @@ needPull=false
 
 logo() {
     cat << "_EOF"
-                        _
-  ___ _ __ ___  ___ ___| |_   __
- / __| '__/ _ \/ __/ __| \ \ / /
-| (__| | | (_) \__ \__ \ |\ V /
- \___|_|  \___/|___/___/_| \_/
+                     _     _   _
+ _ __   ___ _ __ ___(_)___| |_| |_   __
+| '_ \ / _ \ '__/ __| / __| __| \ \ / /
+| |_) |  __/ |  \__ \ \__ \ |_| |\ V /
+| .__/ \___|_|  |___/_|___/\__|_| \_/
+|_|
 
 _EOF
 }
@@ -258,6 +259,18 @@ _EOF
         echo [error]: copy bash-compile.pc failed, quitting now
         exit
     fi
+}
+
+installPrivateTools() {
+    cat << _EOF
+------------------------------------------------------
+INSTALLING SOMEM SELF-WRITTEN TOOLS
+------------------------------------------------------
+_EOF
+    cd $mainWd
+    mkLinkshellName=makeLink.sh
+    sh $mkLinkshellName install
+    # echo "sh makelink.sh install" >> $mRunFlagFile
 }
 
 installFonts() {
@@ -1775,7 +1788,7 @@ _EOF
 CREATING MORE TIMES RUNNING FLAG FILE
 ------------------------------------------------------
 _EOF
-        touch $mainWd/$mRunFlagFile
+        echo "preInstallForLinux" >> $mainWd/$mRunFlagFile
     else
         cat << _EOF
 ------------------------------------------------------
@@ -1818,7 +1831,7 @@ _EOF
 CREATING MORE TIMES RUNNING FLAG FILE
 ------------------------------------------------------
 _EOF
-        touch $mainWd/$mRunFlagFile
+        echo "preInstallForMacos" >> $mainWd/$mRunFlagFile
     else
         cat << _EOF
 ------------------------------------------------------
@@ -1979,6 +1992,7 @@ install() {
       #       | - doExtraForFzf
       #   - installBashCompletion
       #   - installFonts
+    installPrivateTools
     installuCtags
     if [[ $platOsType != 'macos' ]]; then
         installRust
