@@ -1,14 +1,16 @@
 - This project aims to persist the same programming environment On Linux platform
 - Done everything for me with just single command, save more time and enjoy more life
-    - provide different mode for installation, considering if has root privilege or not
-    - auto detect os type, already support Ubuntu | CentOS | Mac
-    - distribute packages mainly from source, so always the latest stable version
-    - pretty output, generate error log if occurs
-    - put all needed packages into one directory, easy to delete
+    - provide two modes for installation, considering if has root privilege or not
+    - put all packages from network into one directory, easy to delete
     - install all packages into one same directory, not to interfere with system old ones
+    - version compare, only trigger installation of certain package when requirements met
+    - auto fit for different os type, already support Ubuntu | CentOS | Mac
+    - distribute packages mainly from source, so always the latest stable version
     - skip already installed packages or downloaded tar ball
     - support incremental install, safe to run consecutive times
-    - any other method to speed up
+    - pretty print, generate error log if occurs
+    - robust for more possible situations
+    - any other methods to speed up
 
 Catch a glimpse of the effect
 

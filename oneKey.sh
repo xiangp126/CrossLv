@@ -832,15 +832,15 @@ _EOF
 }
 
 installRipGrep() {
-    rgPath=`which rg 2> /dev/null`
-    if [[ $rgPath != "" ]]; then
-        return
-    fi
     cat << "_EOF"
 ------------------------------------------------------
 INSTALLING RIPGREP -- REPLACEMENT of GREP
 ------------------------------------------------------
 _EOF
+    rgPath=`which rg 2> /dev/null`
+    if [[ $rgPath != "" ]]; then
+        return
+    fi
     gitClonePath=https://github.com/BurntSushi/ripgrep
     clonedName=ripgrep
 
@@ -933,7 +933,7 @@ _EOF
 installSilverSearcher() {
     cat << "_EOF"
 ------------------------------------------------------
-INSTALLING SILVER SEARCHER (SHORT FOR AG)
+INSTALLING SILVER SEARCHER (AKA AG)
 ------------------------------------------------------
 _EOF
     agPath=`which ag 2> /dev/null`
@@ -2039,7 +2039,6 @@ install() {
     # clear previous log info
     rm -rf $errLogFile
     mkdir -p $downloadPath
-    source $HOME/.bashrc
 
     # check platform & os type and set proper value
     preInstallCheck
