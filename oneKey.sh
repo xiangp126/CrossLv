@@ -1099,73 +1099,81 @@ installPython3() {
 INSTALLING PYTHON3
 ------------------------------------------------------
 _EOF
-    # install python3, no matter if installed python2
-    # method one -> locate  | sudo updatedb
+    # put below code here in case installYcm need python3Config
     python3Path=`which python3 2> /dev/null`
-    if [[ "$python3Path" != "" ]]; then
-        whereIsLocate=`which locate 2> /dev/null`
-        if [[ "$whereIsLocate" != "" ]]; then
-            # Python 3.5.2
-            python3Version=`python3 --version`
-            # 3.5.2
-            python3Ver=$(echo $python3Version | tr -s "" | cut -d " " -f 2)
-            # 3.5
-            python3V=$(echo $python3Ver | cut -d "." -f 1,2)
-            # libpython3.5m.so
-            libPython3Name=libpython${python3V}m.so
-            # may need run 'sudo updatedb'
+    python3Config=`python3-config --configdir 2> /dev/null`
+    if [[ "$python3Path" != "" && "$python3Config" == "" ]]; then
+        python3Config=`python3-dbg-config --configdir 2> /dev/null`
+    fi
+    # found libpython3 for already installed python3
+    if [[ "$python3Config" != "" ]]; then
+        # python3 Python - Python library
+        # sudo updatedb
+        whereIsLibPython3=`pkg-config --list-all | grep -i python3 2> /dev/null`
+        if [[ "$whereIsLibPython3" != "" ]]; then
+            # -L/usr/local/lib
+            python3LibL=`pkg-config --libs-only-L python3`
+            # -lpython3.6m
+            python3Libl=`pkg-config --libs-only-l python3`
+            libPython3Path="$(echo ${python3LibL#*L})/lib$(echo ${python3Libl#*-l}).so"
 
-            pathLoopLoc=(
-                "$HOME/.usr/lib"
-                "$HOME/.usr/lib64"
-                "/usr/local/lib"
-                "/usr/local/lib64"
-                "/usr/lib"
-                "/usr/lib64"
-            )
-            for pathLoc in ${pathLoopLoc[@]}
-            do
-                if [[ ! -d $pathLoc ]]; then
-                    continue
-                fi
-                libPython3Path=$(find $pathLoc -name $libPython3Name | head -n 1 2> /dev/null)
-                if [[ "$libPython3Path" != "" ]]; then
-                    break
-                fi
-            done
-
-            # libPython3Path=$(locate $libPython3Name | head -n 1 2> /dev/null)
             ls -l $libPython3Path
             # check if any error occurs
             if [[ $? != 0 ]]; then
-                echo "[Warning]: find checking python3 path/lib failed, re-install python3 "
+                echo "[Warning]: not enough python3 version installed, re-install from source"
             else
                 echo [Warning]: python3/lib already installed
                 return
             fi
         fi
-
-        # method two -> find
-        # python3 Python - Python library
-        # sudo updatedb
-        # whereIsLibPython3=`pkg-config --list-all | grep -i python3 2> /dev/null`
-        # if [[ "$python3Path" != "" && "$whereIsLibPython3" != "" ]]; then
-        #     # -L/usr/local/lib
-        #     python3LibL=`pkg-config --libs-only-L python3`
-        #     # -lpython3.6m
-        #     python3Libl=`pkg-config --libs-only-l python3`
-        #     libPython3Path="$(echo ${python3LibL#*L})/lib$(echo ${python3Libl#*-l}).so"
-        #     ls -l $libPython3Path
-
-        #     # check if any error occurs
-        #     if [[ $? != 0 ]]; then
-        #         echo "[Warning]: find checking python3 path/lib failed, re-install python3 "
-        #     else
-        #         echo [Warning]: python3/lib already installed
-        #         return
-        #     fi
-        # fi
     fi
+
+    # install python3, no matter if installed python2
+    # method one -> locate  | sudo updatedb
+    # python3Path=`which python3 2> /dev/null`
+    # if [[ "$python3Path" != "" ]]; then
+    #     whereIsLocate=`which locate 2> /dev/null`
+    #     if [[ "$whereIsLocate" != "" ]]; then
+    #         # Python 3.5.2
+    #         python3Version=`python3 --version`
+    #         # 3.5.2
+    #         python3Ver=$(echo $python3Version | tr -s "" | cut -d " " -f 2)
+    #         # 3.5
+    #         python3V=$(echo $python3Ver | cut -d "." -f 1,2)
+    #         # libpython3.5m.so
+    #         libPython3Name=libpython${python3V}m.so
+
+    #         # may need run 'sudo updatedb'
+    #         pathLoopLoc=(
+    #             "$HOME/.usr/lib"
+    #             "$HOME/.usr/lib64"
+    #             "/usr/local/lib"
+    #             "/usr/local/lib64"
+    #             "/usr/lib"
+    #             "/usr/lib64"
+    #         )
+    #         for pathLoc in ${pathLoopLoc[@]}
+    #         do
+    #             if [[ ! -d $pathLoc ]]; then
+    #                 continue
+    #             fi
+    #             libPython3Path=$(find $pathLoc -name $libPython3Name | head -n 1 2> /dev/null)
+    #             if [[ "$libPython3Path" != "" ]]; then
+    #                 break
+    #             fi
+    #         done
+
+    #         # libPython3Path=$(locate $libPython3Name | head -n 1 2> /dev/null)
+    #         ls -l $libPython3Path
+    #         # check if any error occurs
+    #         if [[ $? != 0 ]]; then
+    #             echo "[Warning]: find checking python3 path/lib failed, re-install python3 "
+    #         else
+    #             echo [Warning]: python3/lib already installed
+    #             return
+    #         fi
+    #     fi
+    # fi
 
     python3InstDir=$commInstdir
     $execPrefix mkdir -p $commInstdir
@@ -1238,13 +1246,11 @@ INSTALLING NEWLY VIM VERSION 8
 _EOF
     # put below code here in case installYcm need python3Config
     # find python2 & python3 config dir
-    python2Config=`python2-config --configdir 2> /dev/null`
     python3Config=`python3-config --configdir 2> /dev/null`
-    if [[ "$python2Config" == "" && "$python3Config" == "" ]]; then
-        python2Config=`python2-dbg-config --configdir 2> /dev/null`
+    if [[ "$python3Config" == "" ]]; then
         python3Config=`python3-dbg-config --configdir 2> /dev/null`
-        if [[ "$python2Config" == "" && "$python3Config" == "" ]]; then
-            echo [Error]: Not found python2-config or python3-config, pls check them
+        if [[ "$python3Config" == "" ]]; then
+            echo [Error]: Not found python3-config or python3-dbg-config, pls check them
             exit
         fi
     fi
@@ -1740,7 +1746,7 @@ _EOF
     # -DUSE_PYTHON2=OFF, do not use python2 library
     # -- Found PythonLibs: ~/.usr/lib/libpython3.6m.so
     # (found suitable version "3.6.4", minimum required is "3.3")
-               # -DPYTHON_INCLUDE_DIR=$python3Config \
+    # -DPYTHON_INCLUDE_DIR=$python3Config \
     $cmakePath -G "Unix Makefiles" \
                -DCMAKE_C_COMPILER=$CC \
                -DCMAKE_CXX_COMPILER=$CXX \
@@ -2015,11 +2021,10 @@ _EOF
     # output for error message
     if [[ -f $errLogFile ]]; then
     cat << _EOF
-------------------------------------------------------
-ONCE ERROR MESSAGE FIXED RUN COMMAND AGAIN
+        $(cat $errLogFile)
 ------------------------------------------------------
 _EOF
-        cat $errLogFile
+        echo
     fi
 }
 

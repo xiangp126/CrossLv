@@ -2,12 +2,18 @@
 - Done everything for me with just single command, save more time and enjoy more life
     - provide different mode for installation, considering if has root privilege or not
     - auto detect os type, already support Ubuntu | CentOS | Mac
+    - distribute packages mainly from source, so always the latest stable version
     - pretty output, generate error log if occurs
     - put all needed packages into one directory, easy to delete
     - install all packages into one same directory, not to interfere with system old ones
     - skip already installed packages or downloaded tar ball
     - support incremental install, safe to run consecutive times
     - any other method to speed up
+
+Catch a glimpse of the effect
+
+![](https://github.com/xiangp126/crosslv/blob/master/gif/crosslv.gif)
+
 - Project packaged with some awesome open source tools
     - fuzzy-find command-line tool and its vim plugin
     - the language code-completion engine for vim
@@ -24,9 +30,7 @@
     - home mode: without root privilege, normally install packages into $HOME/.usr
     - root mode: with root privilege, normally install packages into /usr/local
 
-Catch a glimpse of the effect
-
-![](https://github.com/xiangp126/crosslv/blob/master/gif/crosslv.gif)
+Latest released version: 3.9.9
 
 ## Quick Start
 on Ubuntu, /bin/sh was linked to /bin/dash by default
