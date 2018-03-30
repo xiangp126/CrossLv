@@ -190,6 +190,5 @@ $ sh autoHandle.sh
 sh makeLink.sh install
 ```
 
-## Reference
-- [HOW DOES CAT EOF WORK IN BASH](https://stackoverflow.com/questions/2500436/how-does-cat-eof-work-in-bash)
-- [VIM-YOUCOMPLETEME CLANG+LLVM](https://www.jianshu.com/p/c24f919097b3)
+## License
+The [MIT](https://github.com/xiangp126/crosslv/blob/master/LICENSE.txt) License (MIT)

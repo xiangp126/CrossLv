@@ -1,3 +1,6 @@
+- refer
+compile [vim-youcompleteme clang+llvm](https://www.jianshu.com/p/c24f919097b3)
+
 --- build step
 build gcc/c++ supporting c++11
 build python3 support python3-config
