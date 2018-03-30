@@ -2,10 +2,12 @@
 # cd /etc/sudoers.d
 # sudo vim You-Name
 
--- begin of example
+-- BEGIN OF EXAMPLE
 You-Name ALL=(root) NOPASSWD:ALL
 Defaults:You-Name secure_path=/sbin:/usr/sbin:/usr/bin:/bin:/usr/local/sbin:/usr/local/bin
--- end of example
+-- END OF EXAMPLE
+
+:%s/You-Name/xxx/gc
 
 ---------------------------------- CentOS
 # sudo vim /etc/sudoers

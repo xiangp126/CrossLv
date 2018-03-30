@@ -8,9 +8,16 @@ sudo route add default gw 10.124.10.1
 --- Permanent modify
 - for Ubuntu
 sudo vim /etc/network/interfaces
+------- BEGIN DEMO
+auto eth0
 iface eth0 inet static
     address 10.124.10.102
     netmask 255.255.255.0
     gateway 10.124.10.1
     dns-nameservers 8.8.8.8
     # dns-nameservers 64.104.123.144
+------- END DEMO
+
+- MANUAL NIC
+sudo ifup eth0
+sudo ifdown eth0 && sudo ifup eth0

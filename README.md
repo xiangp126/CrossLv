@@ -1,11 +1,12 @@
 - This project aims to persist the same programming environment On Linux platform
     - save more time and enjoy more life
     - auto fit for different OS type
-    - doen everything for me with 'one-key' stroke
+    - doen everything for me with just single command
 - Project packaged with some awesome open source tools
     - fuzzy-find command-line tool and its vim plugin
     - the language code-completion engine for vim
     - the awsome terminal multiplexer running on server
+    - needless to say vim itself
 - And with
     - self-written handy scripts on [tools](https://github.com/xiangp126/crosslv/blob/master/tools) and somewhere else
     - personal dotfiles on [track-files](https://github.com/xiangp126/crosslv/blob/master/track-files)
@@ -27,22 +28,22 @@ Catch a glimpse of the effect
 ```bash
 $ sh oneKey.sh
 [NAME]
-    oneKey.sh -- onekey to setup my working environment
-             | - vim | - plugins -- youcompleteme -- supertab -- vim-snippets
-                       -- ultisnips -- nerdtree -- auto-pairs -- fzf
-                     | - python3 | - etc
-             | - tmux | - plugins | - etc
+    oneKey.sh -- setup my working environment with just single command
 
 [SYNOPSIS]
     sh oneKey.sh [home | root | help]
 
+[EXAMPLE]
+    sh oneKey.sh
+    sh oneKey.sh root
+
 [DESCRIPTION]
-    home -- build required packages to ~/.usr/
-    root -- build required packages to /usr/local/
+    home -- install needed packages into ~/.usr/
+    root -- install needed packages into /usr/local/
 
 [TROUBLESHOOTING]
-    sudo ln -s /bin/bash /bin/sh, ensure /bin/sh was linked to /bin/bash.
-    $ ll /bin/sh lrwxrwxrwx 1 root root 9 Dec  7 01:00 /bin/sh -> /bin/bash*
+    sudo ln -s /bin/bash /bin/sh, ensuring /bin/sh linked to /bin/bash.
+    ll /bin/sh lrwxrwxrwx 1 root root 9 Dec  7 01:00 /bin/sh -> /bin/bash*
                      _     _   _
  _ __   ___ _ __ ___(_)___| |_| |_   __
 | '_ \ / _ \ '__/ __| / __| __| \ \ / /

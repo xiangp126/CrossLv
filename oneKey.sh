@@ -100,22 +100,22 @@ usage() {
     exeName=${0##*/}
     cat << _EOF
 [NAME]
-    $exeName -- onekey to setup my working environment
-             | - vim | - plugins -- youcompleteme -- supertab -- vim-snippets
-                       -- ultisnips -- nerdtree -- auto-pairs -- fzf
-                     | - python3 | - etc
-             | - tmux | - plugins | - etc
+    $exeName -- setup my working environment with just single command
 
 [SYNOPSIS]
     sh $exeName [home | root | help]
 
+[EXAMPLE]
+    sh $exeName
+    sh $exeName root
+
 [DESCRIPTION]
-    home -- build required packages to $homeInstDir/
-    root -- build required packages to $rootInstDir/
+    home -- install needed packages into $homeInstDir/
+    root -- install needed packages into $rootInstDir/
 
 [TROUBLESHOOTING]
-    sudo ln -s /bin/bash /bin/sh, ensure /bin/sh was linked to /bin/bash.
-    $ ll /bin/sh lrwxrwxrwx 1 root root 9 Dec  7 01:00 /bin/sh -> /bin/bash*
+    sudo ln -s /bin/bash /bin/sh, ensuring /bin/sh linked to /bin/bash.
+    ll /bin/sh lrwxrwxrwx 1 root root 9 Dec  7 01:00 /bin/sh -> /bin/bash*
 _EOF
     logo
 }
