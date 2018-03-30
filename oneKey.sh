@@ -18,9 +18,6 @@ instMode=home
 commInstdir=$homeInstDir
 # execute prefix: "" or sudo
 execPrefix=""
-# if first run this script, it'll generate mRunFlagFile
-# if checked has this file, will skip many install
-mRunFlagFile=.MORETIME.txt
 # ubuntu | centos | macos
 platOsType=ubuntu
 # required packages install info
@@ -47,6 +44,12 @@ clangInstDir=$commInstdir/$clangSubDir
 cpuCoreNum=1
 # store all downloaded packages here
 downloadPath=$mainWd/downloads
+# store packages that was slow to download
+pkgPath=$mainWd/packages
+# if first run this script, it'll generate mRunFlagFile
+mRunFlagFile=$mainWd/.MORETIME.txt
+# error message log file
+errLogFile=$mainWd/err.log
 # dir storing tracked files
 trackDir=./track-files
 # git repo need update
@@ -274,16 +277,16 @@ _EOF
 }
 
 installFonts() {
-    # only platform used for Desktop will install extra fonts
-    if [[ $platOsType == 'redhat' ]]; then
-        return
-    fi
-
     cat << _EOF
 ------------------------------------------------------
 INSTALLING WONDERFUL PROGRAMMING FONTS
 ------------------------------------------------------
 _EOF
+    # only platform used for Desktop will install extra fonts
+    if [[ $platOsType == 'redhat' ]]; then
+        return
+    fi
+
     # check if trylly need do fc-cache
     needUpdateCnt=0
 
@@ -430,17 +433,18 @@ checkGccVersion() {
 }
 
 installGcc() {
+    cat << "_EOF"
+------------------------------------------------------
+INSTALLING GCC VERSION 5
+------------------------------------------------------
+_EOF
     # if gcc version meets requirement, return 0
     checkGccVersion
     retVal=$?
     if [[ $retVal == '1' ]]; then
         return
     fi
-    cat << "_EOF"
-------------------------------------------------------
-INSTALLING GCC 5
-------------------------------------------------------
-_EOF
+
     gccInstDir=$commInstdir
     $execPrefix mkdir -p $commInstdir
     # comm attribute to get source 'gcc'
@@ -560,7 +564,6 @@ _EOF
     if [[ -f $vmInstPath ]]; then
         echo [Warning]: target $vmInstPath already exists
     else
-        curlPath=`which curl 2> /dev/null`
         if [[ $curlPath == "" ]]; then
             # did not has curl, use wget instead
             mkdir -p $vmInstDir
@@ -676,43 +679,44 @@ _EOF
 }
 
 installLibpcre() {
-    whereIsLibpcre=`pkg-config --libs libpcre 2> /dev/null`
-    if [[ $whereIsLibpcre != "" ]]; then
-        return
-    fi
     cat << "_EOF"
 ------------------------------------------------------
 INSTALLING LIBPCRE
 ------------------------------------------------------
 _EOF
+    whereIsLibpcre=`pkg-config --libs libpcre 2> /dev/null`
+    if [[ $whereIsLibpcre != "" ]]; then
+        return
+    fi
+
     libpcreInstDir=$commInstdir
     $execPrefix mkdir -p $commInstdir
-    wgetLink=ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre
+    # wgetLink=ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre
     tarName=pcre-8.41.tar.gz
     untarName=pcre-8.41
 
-    # rename download package if needed
     cd $downloadPath
     # check if already has this tar ball.
-    if [[ -f $tarName ]]; then
-        echo [Warning]: Tar Ball $tarName already exists
-    else
-        wget --no-cookies \
-             --no-check-certificate \
-             --header "Cookie: oraclelicense=accept-securebackup-cookie" \
-             "${wgetLink}/${tarName}" \
-             -O $tarName
-        # check if wget returns successfully
-        if [[ $? != 0 ]]; then
-            echo [Error]: wget returns error, quitting now
-            exit
-        fi
-    fi
+    # if [[ -f $tarName ]]; then
+    #     echo [Warning]: Tar Ball $tarName already exists
+    # else
+    #     wget --no-cookies \
+    #          --no-check-certificate \
+    #          --header "Cookie: oraclelicense=accept-securebackup-cookie" \
+    #          "${wgetLink}/${tarName}" \
+    #          -O $tarName
+    #     # check if wget returns successfully
+    #     if [[ $? != 0 ]]; then
+    #         echo [Error]: wget returns error, quitting now
+    #         exit
+    #     fi
+    # fi
+
     # check if already untared
     if [[ -d $untarName ]]; then
         echo [Warning]: untarname $untarName already exists
     else
-        tar -zxv -f $tarName
+        tar -zxv -f $pkgPath/$tarName
     fi
     cd $untarName
     ./configure --prefix=$python3InstDir \
@@ -733,43 +737,44 @@ _EOF
 }
 
 installLiblzma() {
-    whereIsLiblzma=`pkg-config --libs liblzma 2> /dev/null`
-    if [[ $whereIsLiblzma != "" ]]; then
-        return
-    fi
     cat << "_EOF"
 ------------------------------------------------------
 INSTALLING XZ-UTILS (LIBLZMAI)
 ------------------------------------------------------
 _EOF
+    whereIsLiblzma=`pkg-config --libs liblzma 2> /dev/null`
+    if [[ $whereIsLiblzma != "" ]]; then
+        return
+    fi
+
     liblzmaInstDir=$commInstdir
     $execPrefix mkdir -p $commInstdir
     wgetLink=http://cdn-fastly.deb.debian.org/debian/pool/main/x/xz-utils
     tarName=xz-utils_5.2.2.orig.tar.xz
     untarName=xz-5.2.2
 
-    # rename download package if needed
     cd $downloadPath
     # check if already has this tar ball.
-    if [[ -f $tarName ]]; then
-        echo [Warning]: Tar Ball $tarName already exists
-    else
-        wget --no-cookies \
-             --no-check-certificate \
-             --header "Cookie: oraclelicense=accept-securebackup-cookie" \
-             "${wgetLink}/${tarName}" \
-             -O $tarName
-        # check if wget returns successfully
-        if [[ $? != 0 ]]; then
-            echo [Error]: wget returns error, quitting now
-            exit
-        fi
-    fi
+    # if [[ -f $tarName ]]; then
+    #     echo [Warning]: Tar Ball $tarName already exists
+    # else
+    #     wget --no-cookies \
+    #          --no-check-certificate \
+    #          --header "Cookie: oraclelicense=accept-securebackup-cookie" \
+    #          "${wgetLink}/${tarName}" \
+    #          -O $tarName
+    #     # check if wget returns successfully
+    #     if [[ $? != 0 ]]; then
+    #         echo [Error]: wget returns error, quitting now
+    #         exit
+    #     fi
+    # fi
+
     # check if already untared
     if [[ -d $untarName ]]; then
         echo [Warning]: untarName $untarName already exists
     else
-        tar -xv -f $tarName
+        tar -xv -f $pkgPath/$tarName
     fi
     cd $untarName
     ./configure --prefix=$python3InstDir \
@@ -790,15 +795,16 @@ _EOF
 }
 
 installRust() {
-    cargoPath=`which cargo 2> /dev/null`
-    if [[ $cargoPath != "" ]]; then
-        return
-    fi
     cat << "_EOF"
 ------------------------------------------------------
 INSTALLING RUST (CARGO)
 ------------------------------------------------------
 _EOF
+    cargoPath=`which cargo 2> /dev/null`
+    if [[ $cargoPath != "" ]]; then
+        return
+    fi
+
     rustUpShell=sh.rustup.rs
     cd $downloadPath
     if [[ ! -x $rustUpShell ]]; then
@@ -811,6 +817,7 @@ _EOF
         # ensure only sed 'add' once
         sed -i "2a set -x" $rustUpShell
     fi
+
     ./$rustUpShell -y
     if [[ $? != 0 ]]; then
         echo [Error]: rust setup failed, please check it
@@ -874,15 +881,16 @@ _EOF
 
 # replacement of gnu find
 installFd() {
-    fdPath=`which fd 2> /dev/null`
-    if [[ $fdPath != "" ]]; then
-        return
-    fi
     cat << "_EOF"
 ------------------------------------------------------
 INSTALLING FD -- REPLACEMENT of FIND
 ------------------------------------------------------
 _EOF
+    fdPath=`which fd 2> /dev/null`
+    if [[ $fdPath != "" ]]; then
+        return
+    fi
+
     gitClonePath=https://github.com/sharkdp/fd
     clonedName=fd-find
 
@@ -923,21 +931,22 @@ _EOF
 
 # install silver searcher
 installSilverSearcher() {
+    cat << "_EOF"
+------------------------------------------------------
+INSTALLING SILVER SEARCHER (SHORT FOR AG)
+------------------------------------------------------
+_EOF
     agPath=`which ag 2> /dev/null`
     if [[ $agPath != "" ]]; then
         return
     fi
-    cat << "_EOF"
-------------------------------------------------------
-INSTALLING SILVER SEARCHER (ALIAS TO ACK)
-------------------------------------------------------
-_EOF
+
+    # if has no root privilege need manual compile them
     if [[ $execPrefix != 'sudo' ]]; then
-        # if has no root privilege need manual compile them
         installLibpcre
         installLiblzma
     fi
-    ackInstDir=$commInstdir
+    agInstDir=$commInstdir
     gitClonePath=https://github.com/ggreer/the_silver_searcher
     clonedName=the_silver_searcher
     cd $downloadPath
@@ -961,7 +970,7 @@ _EOF
     fi
     # begin to build
     ./autogen.sh
-    ./configure --prefix=$ackInstDir
+    ./configure --prefix=$agInstDir
     if [[ $? != 0 ]]; then
         echo [Error]: ./configure returns error, quitting now ...
         exit
@@ -979,20 +988,21 @@ _EOF
         echo [Error]: make install returns error, quitting now ...
         exit 255
     fi
-    agPath=$ackInstDir/bin/ag
+    agPath=$agInstDir/bin/ag
 }
 
 # command-line fuzzy finder
 doExtraForFzf() {
-    fzfPath=`which fzf 2> /dev/null`
-    if [[ $fzfPath != "" ]]; then
-        return
-    fi
     cat << "_EOF"
 ------------------------------------------------------
 INSTALLING COMMAND-LINE FUZZY FINDER FZF
 ------------------------------------------------------
 _EOF
+    fzfPath=`which fzf 2> /dev/null`
+    if [[ $fzfPath != "" ]]; then
+        return
+    fi
+
     # Exp: /usr/local/fzf
     fzfInstDir=$HOME/.vim/bundle/fzf
     if [[ ! -d $fzfInstDir ]]; then
@@ -1013,6 +1023,7 @@ MAKING SOFT LINK OF FZF INTO $commInstdir/
 ------------------------------------------------------
 _EOF
     linkFromDir=bin
+    $execPrefix mkdir -p $commInstdir/bin
     for file in `find $linkFromDir -type f`; do
         $execPrefix ln -sf $fzfInstDir/$file $commInstdir/bin/
     done
@@ -1030,17 +1041,21 @@ _EOF
 }
 
 installuCtags() {
-    # check if already installed
-    checkCmd=`ctags --version | grep -i universal 2> /dev/null`
-    if [[ $checkCmd != "" ]]; then
-        uCtagsPath=`which ctags`
-        return
-    fi
     cat << "_EOF"
 ------------------------------------------------------
 INSTALLING UNIVERSAL CTAGS
 ------------------------------------------------------
 _EOF
+    # check if already installed
+    ctagsPath=`which ctags 2> /dev/null`
+    if [[ "$ctagsPath" != "" ]]; then
+        checkCmd=`ctags --version | grep -i universal 2> /dev/null`
+        if [[ $checkCmd != "" ]]; then
+            uCtagsPath=`which ctags`
+            return
+        fi
+    fi
+
     uCtagsInstDir=$commInstdir
     cd $downloadPath
     clonedName=ctags
@@ -1055,6 +1070,12 @@ _EOF
         fi
     fi
     cd $clonedName
+    autoreconfPath=`which autoreconf 2> /dev/null`
+    if [[ "$autoreconfPath" == "" ]]; then
+        touch $errLogFile
+        echo [Error]: pls install autoconf for universal ctags | tee >> $errLogFile
+        return
+    fi
     ./autogen.sh
     ./configure --prefix=$uCtagsInstDir
     make -j $cpuCoreNum
@@ -1073,6 +1094,11 @@ _EOF
 }
 
 installPython3() {
+    cat << "_EOF"
+------------------------------------------------------
+INSTALLING PYTHON3
+------------------------------------------------------
+_EOF
     # install python3, no matter if installed python2
     # method one -> locate  | sudo updatedb
     python3Path=`which python3 2> /dev/null`
@@ -1088,11 +1114,31 @@ installPython3() {
             # libpython3.5m.so
             libPython3Name=libpython${python3V}m.so
             # may need run 'sudo updatedb'
-            libPython3Path=$(locate $libPython3Name | head -n 1 2> /dev/null)
 
+            pathLoopLoc=(
+                "$HOME/.usr/lib"
+                "$HOME/.usr/lib64"
+                "/usr/local/lib"
+                "/usr/local/lib64"
+                "/usr/lib"
+                "/usr/lib64"
+            )
+            for pathLoc in ${pathLoopLoc[@]}
+            do
+                if [[ ! -d $pathLoc ]]; then
+                    continue
+                fi
+                libPython3Path=$(find $pathLoc -name $libPython3Name | head -n 1 2> /dev/null)
+                if [[ "$libPython3Path" != "" ]]; then
+                    break
+                fi
+            done
+
+            # libPython3Path=$(locate $libPython3Name | head -n 1 2> /dev/null)
+            ls -l $libPython3Path
             # check if any error occurs
-            if [[ "$libPython3Path" == "" || "$?" != 0  ]]; then
-                echo "[Warning]: locate checking python3 path/lib failed, start find checking "
+            if [[ $? != 0 ]]; then
+                echo "[Warning]: find checking python3 path/lib failed, re-install python3 "
             else
                 echo [Warning]: python3/lib already installed
                 return
@@ -1102,30 +1148,25 @@ installPython3() {
         # method two -> find
         # python3 Python - Python library
         # sudo updatedb
-        whereIsLibPython3=`pkg-config --list-all | grep -i python3 2> /dev/null`
-        if [[ "$python3Path" != "" && "$whereIsLibPython3" != "" ]]; then
-            # -L/usr/local/lib
-            python3LibL=`pkg-config --libs-only-L python3`
-            # -lpython3.6m
-            python3Libl=`pkg-config --libs-only-l python3`
-            libPython3Path="$(echo ${python3LibL#*L})/lib$(echo ${python3Libl#*-l}).so"
-            ls -l $libPython3Path
+        # whereIsLibPython3=`pkg-config --list-all | grep -i python3 2> /dev/null`
+        # if [[ "$python3Path" != "" && "$whereIsLibPython3" != "" ]]; then
+        #     # -L/usr/local/lib
+        #     python3LibL=`pkg-config --libs-only-L python3`
+        #     # -lpython3.6m
+        #     python3Libl=`pkg-config --libs-only-l python3`
+        #     libPython3Path="$(echo ${python3LibL#*L})/lib$(echo ${python3Libl#*-l}).so"
+        #     ls -l $libPython3Path
 
-            # check if any error occurs
-            if [[ $? != 0 ]]; then
-                echo "[Warning]: find checking python3 path/lib failed, re-install python3 "
-            else
-                echo [Warning]: python3/lib already installed
-                return
-            fi
-        fi
+        #     # check if any error occurs
+        #     if [[ $? != 0 ]]; then
+        #         echo "[Warning]: find checking python3 path/lib failed, re-install python3 "
+        #     else
+        #         echo [Warning]: python3/lib already installed
+        #         return
+        #     fi
+        # fi
     fi
 
-    cat << "_EOF"
-------------------------------------------------------
-INSTALLING PYTHON3
-------------------------------------------------------
-_EOF
     python3InstDir=$commInstdir
     $execPrefix mkdir -p $commInstdir
     # comm attribute to get source 'python3'
@@ -1190,6 +1231,24 @@ _EOF
 }
 
 installvim() {
+    cat << "_EOF"
+------------------------------------------------------
+INSTALLING NEWLY VIM VERSION 8
+------------------------------------------------------
+_EOF
+    # put below code here in case installYcm need python3Config
+    # find python2 & python3 config dir
+    python2Config=`python2-config --configdir 2> /dev/null`
+    python3Config=`python3-config --configdir 2> /dev/null`
+    if [[ "$python2Config" == "" && "$python3Config" == "" ]]; then
+        python2Config=`python2-dbg-config --configdir 2> /dev/null`
+        python3Config=`python3-dbg-config --configdir 2> /dev/null`
+        if [[ "$python2Config" == "" && "$python3Config" == "" ]]; then
+            echo [Error]: Not found python2-config or python3-config, pls check them
+            exit
+        fi
+    fi
+
     # check if vim 8 was installed
     checkCmd=`vim --version | head -n 1 | grep -i "Vi IMproved 8" 2> /dev/null`
     if [[ "$checkCmd" != "" ]]; then
@@ -1197,11 +1256,7 @@ installvim() {
         vimPath=`which vim`
         return
     fi
-    cat << "_EOF"
-------------------------------------------------------
-INSTALLING NEWLY VIM VERSION 8
-------------------------------------------------------
-_EOF
+
     vimInstDir=$commInstdir
     $execPrefix mkdir -p $commInstdir
     # comm attribute to get source 'vim'
@@ -1235,20 +1290,14 @@ _EOF
     # clean before ./configure
     # make distclean
 
-    # find python2 & python3 config dir
-    python2Config=`python2-config --configdir 2> /dev/null`
-    python3Config=`python3-config --configdir 2> /dev/null`
-    if [[ "$python2Config" == "" && "$python3Config" == "" ]]; then
-        echo [Error]: Not found python2 or python3, please install either of them
-        exit
-    fi
-
     # https://stackoverflow.com/questions/10101488/cut-to-the-system-clipboard-from-vim-on-ubuntu
     # fix issue for ubuntu/vim no X11 support after trully has installed associage packages
     find . -name config.cache -delete 2> /dev/null
 
     # --with-python-config-dir=$python2Config
-    ./configure --prefix=$vimInstDir \
+    ldFlags=$(pkg-config --libs-only-L ncurses)
+    LDFLAGS=$ldFlags \
+        ./configure --prefix=$vimInstDir \
                 --with-features=huge \
                 --enable-multibyte \
                 --enable-rubyinterp=yes \
@@ -1258,7 +1307,8 @@ _EOF
                 --enable-perlinterp=yes \
                 --enable-luainterp=yes \
                 --enable-gui=gtk2 \
-                --enable-cscope
+                --enable-cscope \
+                --with-tlib=ncurses
     make -j $cpuCoreNum
     # check if make returns successfully
     if [[ $? != 0 ]]; then
@@ -1278,6 +1328,11 @@ _EOF
 }
 
 installTmux() {
+    cat << "_EOF"
+------------------------------------------------------
+INSTALLING NEWLY TMUX VERSION 2.6
+------------------------------------------------------
+_EOF
     # check tmux version, if >= 2.5
     tmuxPath=`which tmux 2> /dev/null`
     if [[ "$tmuxPath" != "" ]]; then
@@ -1288,11 +1343,7 @@ installTmux() {
             return
         fi
     fi
-    cat << "_EOF"
-------------------------------------------------------
-INSTALLING NEWLY TMUX VERSION 2.6
-------------------------------------------------------
-_EOF
+
     tmuxInstDir=$commInstdir
     $execPrefix mkdir -p $tmuxInstDir
     # comm attribute to get source 'let-tmux'
@@ -1319,6 +1370,11 @@ _EOF
 
 # install newly cmake if needed
 installCmake() {
+    cat << "_EOF"
+------------------------------------------------------
+INSTALLING CMAKE 3.10
+------------------------------------------------------
+_EOF
     # check cmake version, if >= 3.0
     cmakePath=`which cmake 2> /dev/null`
     if [[ "$cmakePath" != "" ]]; then
@@ -1332,11 +1388,7 @@ installCmake() {
             return
         fi
     fi
-    cat << "_EOF"
-------------------------------------------------------
-INSTALLING CMAKE 3.10
-------------------------------------------------------
-_EOF
+
     cmakeInstDir=$commInstdir
     $execPrefix mkdir -p $commInstdir
     # comm attribute to get source 'cmake'
@@ -1393,6 +1445,11 @@ _EOF
 }
 
 installClang() {
+    cat << "_EOF"
+------------------------------------------------------
+INSTALLING CLANG 5
+------------------------------------------------------
+_EOF
     libClangName="libclang.so"
     # loop to find system installed libclang.so
     pathLoopLoc=(
@@ -1419,11 +1476,6 @@ installClang() {
         fi
     done
 
-    cat << "_EOF"
-------------------------------------------------------
-PREPARE TO INSTALL CLANG 5
-------------------------------------------------------
-_EOF
     # clang version, change it if you need other version
     # clangVersion=5.0.1
     clangInstDir=$commInstdir/clang-$clangVersion
@@ -1638,17 +1690,18 @@ _EOF
 
 # compile YouCompleteMe
 installYcm() {
+    cat << "_EOF"
+------------------------------------------------------
+INSTALLING YOU COMPLETE ME
+------------------------------------------------------
+_EOF
     ycmCoreDir="$HOME/.vim/bundle/YouCompleteMe/third_party/ycmd"
     ycmCorePath="$ycmCoreDir/ycm_core.so"
     if [[ -f $ycmCorePath ]]; then
         echo 'Warning: already has YouCompleteMe installed'
         return 0
     fi
-    cat << "_EOF"
-------------------------------------------------------
-COMPILING YOUCOMPLETEME
-------------------------------------------------------
-_EOF
+
     # comm attribute for getting source ycm
     repoLink=https://github.com/Valloric
     repoName=YouCompleteMe
@@ -1666,7 +1719,8 @@ _EOF
 
     cd $ycmInstDir
     git submodule update --init --recursive
-    if [[ $platOsType == 'macos' || $platOsType == 'ubuntu' ]]; then
+    # if [[ $platOsType == 'macos' || $platOsType == 'ubuntu' ]]; then
+    if [[ $platOsType == 'macos' ]]; then
         python3 ./install.py --clang-completer --system-libclang
         if [[ $? != 0 ]]; then
             echo "install YCM returns error, quitting now "
@@ -1686,6 +1740,7 @@ _EOF
     # -DUSE_PYTHON2=OFF, do not use python2 library
     # -- Found PythonLibs: ~/.usr/lib/libpython3.6m.so
     # (found suitable version "3.6.4", minimum required is "3.3")
+               # -DPYTHON_INCLUDE_DIR=$python3Config \
     $cmakePath -G "Unix Makefiles" \
                -DCMAKE_C_COMPILER=$CC \
                -DCMAKE_CXX_COMPILER=$CXX \
@@ -1762,7 +1817,7 @@ _EOF
             sudo apt-get install \
                 pkg-config libevent-dev libncurses5 libncurses5-dev \
                 bash-completion python-optcomplete build-essential cmake \
-                automake asciidoc xmlto tmux curl cargo \
+                automake asciidoc xmlto tmux curl cargo autoconf \
                 libpcre3-dev liblzma-dev libclang-5.0-dev clang-5.0 \
                 libmpc-dev libcurl4-openssl-dev perl libperl-dev \
                 libncursesw5 libncursesw5-dev libgnome2-dev libgnomeui-dev \
@@ -1775,7 +1830,7 @@ _EOF
                 xz-devel libX11-devel libXpm-devel libXt-devel libevent-devel \
                 pcre-devel mlocate bash-completion python-optcomplete \
                 cmake ncurses* gmp-devel gcc gcc-c++ automake asciidoc \
-                xmlto perl-devel tmux git \
+                xmlto perl-devel tmux git autoconf \
                 ruby ruby-devel lua lua-devel luajit \
                 luajit-devel python python-devel \
                 python3 python3-devel python34 python34-devel tcl-devel \
@@ -1783,12 +1838,6 @@ _EOF
                 perl-ExtUtils-XSpp perl-ExtUtils-CBuilder \
                 perl-ExtUtils-Embed -y
         fi
-        cat << "_EOF"
-------------------------------------------------------
-CREATING MORE TIMES RUNNING FLAG FILE
-------------------------------------------------------
-_EOF
-        echo "preInstallForLinux" >> $mainWd/$mRunFlagFile
     else
         cat << _EOF
 ------------------------------------------------------
@@ -1826,12 +1875,6 @@ _EOF
         brew install python3 python2 cmake vim git fd \
             bash-completion fontconfig tmux ripgrep \
             gnu-sed the_silver_searcher --with-default-names -y
-        cat << "_EOF"
-------------------------------------------------------
-CREATING MORE TIMES RUNNING FLAG FILE
-------------------------------------------------------
-_EOF
-        echo "preInstallForMacos" >> $mainWd/$mRunFlagFile
     else
         cat << _EOF
 ------------------------------------------------------
@@ -1969,15 +2012,34 @@ $libClangPath
 _EOF
         echo ------------------------------------------------------
     fi
+    # output for error message
+    if [[ -f $errLogFile ]]; then
+    cat << _EOF
+------------------------------------------------------
+ONCE ERROR MESSAGE FIXED RUN COMMAND AGAIN
+------------------------------------------------------
+_EOF
+        cat $errLogFile
+    fi
 }
 
 preInstallCheck() {
+    curlPath=`which curl 2> /dev/null`
+    aclocalPath=`which aclocal 2> /dev/null`
     checkPlatOsType
     checkCpuCoreNum
 }
 
 install() {
+    # clear previous log info
+    rm -rf $errLogFile
     mkdir -p $downloadPath
+    source $HOME/.bashrc
+
+    # check platform & os type and set proper value
+    preInstallCheck
+        # | - checkPlatOsType
+        #   - checkCpuCoreNum
     if [[ $platOsType == 'macos' ]]; then
         preInstallForMacos
     else
@@ -1995,14 +2057,24 @@ install() {
     installPrivateTools
     installuCtags
     if [[ $platOsType != 'macos' ]]; then
-        installRust
-        installRipGrep
-        installFd
-        installSilverSearcher
+        # check existence of curl
+        if [[ "$curlPath" == "" ]]; then
+            echo [Error]: pls install curl for rust/ripgrep/fd | tee >> $errLogFile
+        else
+            installRust
+            installRipGrep
+            installFd
+        fi
         installPython3
-        installvim
         installCmake
-        installTmux
+        if [[ "$aclocalPath" == "" ]]; then
+            echo [FatalError]: pls install automake for tmux/ag/vim | tee >> $errLogFile
+            exit 255
+        else
+            installTmux
+            installSilverSearcher
+            installvim
+        fi
         installClang
     fi
     installYcm
@@ -2041,10 +2113,6 @@ _EOF
     esac
 }
 
-# check platform & os type and set proper value
-preInstallCheck
-    # | - checkPlatOsType
-    #   - checkCpuCoreNum
 case $1 in
     'home')
         set -x
@@ -2056,6 +2124,8 @@ case $1 in
 
     'root')
         set -x
+        # create flag for had run more than one time
+        touch $mRunFlagFile
         commInstdir=$rootInstDir
         execPrefix=sudo
         instMode=root

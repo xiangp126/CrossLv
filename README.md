@@ -1,7 +1,13 @@
 - This project aims to persist the same programming environment On Linux platform
-    - save more time and enjoy more life
-    - auto fit for different OS type
-    - doen everything for me with just single command
+- Done everything for me with just single command, save more time and enjoy more life
+    - provide different mode for installation, considering if has root privilege or not
+    - auto detect os type, already support Ubuntu | CentOS | Mac
+    - pretty output, generate error log if occurs
+    - put all needed packages into one directory, easy to delete
+    - install all packages into one same directory, not to interfere with system old ones
+    - skip already installed packages or downloaded tar ball
+    - support incremental install, safe to run consecutive times
+    - any other method to speed up
 - Project packaged with some awesome open source tools
     - fuzzy-find command-line tool and its vim plugin
     - the language code-completion engine for vim
@@ -17,14 +23,22 @@
 - Two modes deploy selection
     - home mode: without root privilege, normally install packages into $HOME/.usr
     - root mode: with root privilege, normally install packages into /usr/local
-- Incremental install supported, safe to run consecutive times
-- Has checked on Ubuntu | CentOS | Mac
 
 Catch a glimpse of the effect
 
 ![](https://github.com/xiangp126/crosslv/blob/master/gif/crosslv.gif)
 
 ## Quick Start
+on Ubuntu, /bin/sh was linked to /bin/dash by default
+
+so firstly you should link it to /bin/bash
+
+```bash
+sudo ln -s /bin/bash /bin/sh
+> ll /bin/sh
+lrwxrwxrwx 1 root root 9 Mar 29 17:04 /bin/sh -> /bin/bash*
+```
+
 ```bash
 $ sh oneKey.sh
 [NAME]
