@@ -9,8 +9,7 @@
     - skip already installed packages or downloaded tar ball
     - support incremental install, safe to run consecutive times
     - pretty print, generate error log if occurs
-    - robust for more possible situations
-    - any other methods to speed up
+    - robust for more possible situations and any other methods to speed up
 
 Catch a glimpse of the effect
 
