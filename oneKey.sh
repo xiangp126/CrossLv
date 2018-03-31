@@ -50,6 +50,8 @@ pkgPath=$mainWd/packages
 mRunFlagFile=$mainWd/.MORETIME.txt
 # error message log file
 errLogFile=$mainWd/err.log
+# store install summary into log
+summaryLog=$mainWd/crosslv.log
 # dir storing tracked files
 trackDir=./track-files
 # git repo need update
@@ -106,15 +108,18 @@ usage() {
     $exeName -- setup my working environment with just single command
 
 [SYNOPSIS]
-    sh $exeName [home | root | help]
+    sh $exeName [home | root | summary | help]
 
 [EXAMPLE]
     sh $exeName
     sh $exeName root
+    sh $exeName summary
 
 [DESCRIPTION]
-    home -- install needed packages into $homeInstDir/
-    root -- install needed packages into $rootInstDir/
+    home -- install packages into $homeInstDir/
+    root -- install packages into $rootInstDir/
+    help -- print the help messages
+    summary -- show installation summary
 
 [TROUBLESHOOTING]
     sudo ln -s /bin/bash /bin/sh, ensuring /bin/sh linked to /bin/bash.
@@ -1100,80 +1105,78 @@ INSTALLING PYTHON3
 ------------------------------------------------------
 _EOF
     # put below code here in case installYcm need python3Config
-    python3Path=`which python3 2> /dev/null`
-    python3Config=`python3-config --configdir 2> /dev/null`
-    if [[ "$python3Path" != "" && "$python3Config" == "" ]]; then
-        python3Config=`python3-dbg-config --configdir 2> /dev/null`
-    fi
-    # found libpython3 for already installed python3
-    if [[ "$python3Config" != "" ]]; then
-        # python3 Python - Python library
-        # sudo updatedb
-        whereIsLibPython3=`pkg-config --list-all | grep -i python3 2> /dev/null`
-        if [[ "$whereIsLibPython3" != "" ]]; then
-            # -L/usr/local/lib
-            python3LibL=`pkg-config --libs-only-L python3`
-            # -lpython3.6m
-            python3Libl=`pkg-config --libs-only-l python3`
-            libPython3Path="$(echo ${python3LibL#*L})/lib$(echo ${python3Libl#*-l}).so"
-
-            ls -l $libPython3Path
-            # check if any error occurs
-            if [[ $? != 0 ]]; then
-                echo "[Warning]: not enough python3 version installed, re-install from source"
-            else
-                echo [Warning]: python3/lib already installed
-                return
-            fi
-        fi
-    fi
-
-    # install python3, no matter if installed python2
-    # method one -> locate  | sudo updatedb
     # python3Path=`which python3 2> /dev/null`
-    # if [[ "$python3Path" != "" ]]; then
-    #     whereIsLocate=`which locate 2> /dev/null`
-    #     if [[ "$whereIsLocate" != "" ]]; then
-    #         # Python 3.5.2
-    #         python3Version=`python3 --version`
-    #         # 3.5.2
-    #         python3Ver=$(echo $python3Version | tr -s "" | cut -d " " -f 2)
-    #         # 3.5
-    #         python3V=$(echo $python3Ver | cut -d "." -f 1,2)
-    #         # libpython3.5m.so
-    #         libPython3Name=libpython${python3V}m.so
+    # python3Config=`python3-config --configdir 2> /dev/null`
+    # if [[ "$python3Path" != "" && "$python3Config" == "" ]]; then
+    #     python3Config=`python3-dbg-config --configdir 2> /dev/null`
+    # fi
+    # # found libpython3 for already installed python3
+    # if [[ "$python3Config" != "" ]]; then
+    #     # python3 Python - Python library
+    #     # sudo updatedb
+    #     whereIsLibPython3=`pkg-config --list-all | grep -i python3 2> /dev/null`
+    #     if [[ "$whereIsLibPython3" != "" ]]; then
+    #         # -L/usr/local/lib
+    #         python3LibL=`pkg-config --libs-only-L python3`
+    #         # -lpython3.6m
+    #         python3Libl=`pkg-config --libs-only-l python3`
+    #         libPython3Path="$(echo ${python3LibL#*L})/lib$(echo ${python3Libl#*-l}).so"
 
-    #         # may need run 'sudo updatedb'
-    #         pathLoopLoc=(
-    #             "$HOME/.usr/lib"
-    #             "$HOME/.usr/lib64"
-    #             "/usr/local/lib"
-    #             "/usr/local/lib64"
-    #             "/usr/lib"
-    #             "/usr/lib64"
-    #         )
-    #         for pathLoc in ${pathLoopLoc[@]}
-    #         do
-    #             if [[ ! -d $pathLoc ]]; then
-    #                 continue
-    #             fi
-    #             libPython3Path=$(find $pathLoc -name $libPython3Name | head -n 1 2> /dev/null)
-    #             if [[ "$libPython3Path" != "" ]]; then
-    #                 break
-    #             fi
-    #         done
-
-    #         # libPython3Path=$(locate $libPython3Name | head -n 1 2> /dev/null)
     #         ls -l $libPython3Path
     #         # check if any error occurs
     #         if [[ $? != 0 ]]; then
-    #             echo "[Warning]: find checking python3 path/lib failed, re-install python3 "
+    #             echo "[Warning]: not enough python3 version installed, re-install from source"
     #         else
     #             echo [Warning]: python3/lib already installed
     #             return
     #         fi
     #     fi
     # fi
+
+    python3Path=`which python3 2> /dev/null`
+    if [[ "$python3Path" != "" ]]; then
+        whereIsLocate=`which locate 2> /dev/null`
+        if [[ "$whereIsLocate" != "" ]]; then
+            # Python 3.5.2
+            python3Version=`python3 --version`
+            # 3.5.2
+            python3Ver=$(echo $python3Version | tr -s "" | cut -d " " -f 2)
+            # 3.5
+            python3V=$(echo $python3Ver | cut -d "." -f 1,2)
+            # libpython3.5m.so
+            libPython3Name=libpython${python3V}m.so
+
+            # may need run 'sudo updatedb'
+            pathLoopLoc=(
+                "$HOME/.usr/lib"
+                "$HOME/.usr/lib64"
+                "/usr/local/lib"
+                "/usr/local/lib64"
+                "/usr/lib"
+                "/usr/lib64"
+            )
+            for pathLoc in ${pathLoopLoc[@]}
+            do
+                if [[ ! -d $pathLoc ]]; then
+                    continue
+                fi
+                libPython3Path=$(find $pathLoc -name $libPython3Name | head -n 1 2> /dev/null)
+                if [[ "$libPython3Path" != "" ]]; then
+                    break
+                fi
+            done
+
+            # libPython3Path=$(locate $libPython3Name | head -n 1 2> /dev/null)
+            ls -l $libPython3Path
+            # check if any error occurs
+            if [[ $? != 0 ]]; then
+                echo "[Warning]: find checking python3 path/lib failed, re-install python3 "
+            else
+                echo [Warning]: python3/lib already installed
+                return
+            fi
+        fi
+    fi
 
     python3InstDir=$commInstdir
     $execPrefix mkdir -p $commInstdir
@@ -1889,7 +1892,7 @@ _EOF
 ------------------------------------------------------
 _EOF
     fi
-    # set path vars for use in installSummary
+    # set path vars for use in writeInstallSummary
     CC=`which clang 2> /dev/null`
     CXX=`which clang++ 2> /dev/null`
     agPath=`which ag 2> /dev/null`
@@ -1990,9 +1993,9 @@ INSTALLING YOUCOMPLETEME SUCCESSFULLY DONE
 _EOF
 }
 
-installSummary() {
+writeInstallSummary() {
     set +x
-    cat << _EOF
+    cat << _EOF > $summaryLog
 ------------------------------------------------------
 INSTALLATION THROUGH ONEKEY DONE - CONGRATULATION
 ------------------------------------------------------
@@ -2012,13 +2015,25 @@ $ycmCorePath
 -------------------------------------------------------------------
 _EOF
     if [[ $platOsType != "macos" ]]; then
-        cat << _EOF
+        cat << _EOF >> $summaryLog
 -- > ✄
 $libPython3Path
 $libClangPath
+------------------------------------------------------
 _EOF
-        echo ------------------------------------------------------
     fi
+}
+
+showSummary() {
+    if [[ -f "$summaryLog" ]]; then
+        cat $summaryLog
+    fi
+}
+
+installSummary() {
+    writeInstallSummary
+    showSummary
+
     # output for error message
     if [[ -f $errLogFile ]]; then
     cat << _EOF
@@ -2135,6 +2150,10 @@ case $1 in
         execPrefix=sudo
         instMode=root
         install
+        ;;
+
+    'summary')
+        showSummary
         ;;
 
     *)

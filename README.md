@@ -50,15 +50,18 @@ $ sh oneKey.sh
     oneKey.sh -- setup my working environment with just single command
 
 [SYNOPSIS]
-    sh oneKey.sh [home | root | help]
+    sh oneKey.sh [home | root | summary | help]
 
 [EXAMPLE]
     sh oneKey.sh
     sh oneKey.sh root
+    sh oneKey.sh summary
 
 [DESCRIPTION]
-    home -- install needed packages into ~/.usr/
-    root -- install needed packages into /usr/local/
+    home -- install packages into ~/.usr/
+    root -- install packages into /usr/local/
+    help -- print the help messages
+    summary -- show installation summary
 
 [TROUBLESHOOTING]
     sudo ln -s /bin/bash /bin/sh, ensuring /bin/sh linked to /bin/bash.
@@ -76,12 +79,11 @@ $ sh oneKey.sh [home | root]
 ```
 
 ## Modification Note
-V3.9.1
+V3.9
+* add support for install summary, more easy to update certain package
 * revise makeLink.sh, skip already linked tool
 * fix bug install cmake: check install status, then soft link it if failed
 * in practice, ag was better than rg on Vim search, so keep install ag
-
-V3.9
 * auto detect OS platform | skipping already installed packages
 * correct key parameter of config file adjusting to current system
 * add support for MAC system
