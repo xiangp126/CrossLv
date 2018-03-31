@@ -124,6 +124,13 @@ _fzf_compgen_dir() {
   fd --type d --hidden --follow --exclude ".git" . "$1"
 }
 
+# MAPPING CAPSLOCK TO ESC
+pathOfsetxkbmap=`which setxkbmap 2> /dev/null`
+if [[ "$pathOfsetxkbmap" != "" ]]; then
+    setxkbmap -option caps:escape
+    # setxkbmap -option
+fi
+
 # TEST IF COMMAND 'TMUX' EXIST.
 if [[ "`which tmux 2> /dev/null`" != "" ]]; then
     # already under tmux env

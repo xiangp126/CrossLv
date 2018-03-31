@@ -1829,7 +1829,8 @@ _EOF
                 libncursesw5 libncursesw5-dev libgnome2-dev libgnomeui-dev \
                 libgtk2.0-dev libatk1.0-dev libbonoboui2-dev \
                 libcairo2-dev libx11-dev libxpm-dev libxt-dev \
-                python-dev python3-dev ruby-dev lua5.1 lua5.1-dev -y
+                python-dev python3-dev ruby-dev lua5.1 lua5.1-dev \
+                x11-xkb-utils -y
 
         elif [[ $platOsType = 'centos' && $execPrefix == 'sudo' ]]; then
             sudo yum install \
@@ -1842,7 +1843,7 @@ _EOF
                 python3 python3-devel python34 python34-devel tcl-devel \
                 curl libcurl-devel perl perl-devel perl-ExtUtils-ParseXS \
                 perl-ExtUtils-XSpp perl-ExtUtils-CBuilder \
-                perl-ExtUtils-Embed -y
+                perl-ExtUtils-Embed xorg-x11-xkb-utils -y
         fi
     else
         cat << _EOF
