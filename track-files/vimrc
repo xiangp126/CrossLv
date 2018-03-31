@@ -69,8 +69,10 @@ nnoremap <C-H> :call InvHlSearch()<CR>
 function! InvHlSearch()
     set invhlsearch
 endfunc
-" Jump to end of line in Insert Mode
+" Jump to end of line in all Mode
+nmap <C-L>      A
 imap <C-L> <ESC>A
+vmap <C-L> <ESC>A
 " Removing trailing white spaces
 nmap <C-G> :%s/\s\+$//gc<CR>
 " Easy vim manipulator
@@ -352,8 +354,8 @@ let g:SuperTabDefaultCompletionType = '<C-N>'
 """"""""""""""""""""""""""""""
 " CONFIG AUTO-PAIRS
 """"""""""""""""""""""""""""""
-let g:AutoPairs = {'(':')', '[':']', '{':'}',"'":"'",'"':'"', '`':'`'}
-" inoremap <buffer><silent> ) <C-R>=AutoPairsInsert(')')<CR>
+let g:AutoPairs = {'[':']', '{':'}',"'":"'",'"':'"', '`':'`'}
+inoremap <buffer><silent> ) <C-R>=AutoPairsInsert(')')<CR>
 
 """"""""""""""""""""""""""""""
 " CONFIG ULTISNIPS

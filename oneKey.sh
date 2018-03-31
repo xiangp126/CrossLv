@@ -1818,7 +1818,7 @@ PRE INSTALL FOR LINUX PLATFORM - WITH SUDO
 ------------------------------------------------------
 _EOF
     # only run this for the first time
-    if [[ ! -f $mainWd/$mRunFlagFile ]]; then
+    if [[ ! -f $mRunFlagFile ]]; then
         if [[ $platOsType == "ubuntu" && $execPrefix == "sudo" ]]; then
             sudo apt-get install \
                 pkg-config libevent-dev libncurses5 libncurses5-dev \
@@ -1875,7 +1875,7 @@ _EOF
 PRE INSTALL FOR MACOS PLATFORM - WITH BREW
 ------------------------------------------------------
 _EOF
-    if [[ ! -f $mainWd/$mRunFlagFile ]]; then
+    if [[ ! -f $mRunFlagFile ]]; then
         # as ordinary user run brew
         # use gnu-sed as compatible with that under Linux
         brew install python3 python2 cmake vim git fd \

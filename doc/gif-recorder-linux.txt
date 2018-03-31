@@ -1,6 +1,7 @@
 https://itsfoss.com/best-gif-recorder-linux/
 
 Peek GitHub Repo
+https://github.com/phw/peek
 
 Installation on Ubuntu
 Peek has its own official PPA. For installing, use the following commands:
