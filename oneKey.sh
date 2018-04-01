@@ -1135,46 +1135,43 @@ _EOF
 
     python3Path=`which python3 2> /dev/null`
     if [[ "$python3Path" != "" ]]; then
-        whereIsLocate=`which locate 2> /dev/null`
-        if [[ "$whereIsLocate" != "" ]]; then
-            # Python 3.5.2
-            python3Version=`python3 --version`
-            # 3.5.2
-            python3Ver=$(echo $python3Version | tr -s "" | cut -d " " -f 2)
-            # 3.5
-            python3V=$(echo $python3Ver | cut -d "." -f 1,2)
-            # libpython3.5m.so
-            libPython3Name=libpython${python3V}m.so
+        # Python 3.5.2
+        python3Version=`python3 --version`
+        # 3.5.2
+        python3Ver=$(echo $python3Version | tr -s "" | cut -d " " -f 2)
+        # 3.5
+        python3V=$(echo $python3Ver | cut -d "." -f 1,2)
+        # libpython3.5m.so
+        libPython3Name=libpython${python3V}m.so
 
-            # may need run 'sudo updatedb'
-            pathLoopLoc=(
-                "$HOME/.usr/lib"
-                "$HOME/.usr/lib64"
-                "/usr/local/lib"
-                "/usr/local/lib64"
-                "/usr/lib"
-                "/usr/lib64"
-            )
-            for pathLoc in ${pathLoopLoc[@]}
-            do
-                if [[ ! -d $pathLoc ]]; then
-                    continue
-                fi
-                libPython3Path=$(find $pathLoc -name $libPython3Name | head -n 1 2> /dev/null)
-                if [[ "$libPython3Path" != "" ]]; then
-                    break
-                fi
-            done
+        # may need run 'sudo updatedb'
+        pathLoopLoc=(
+        "$HOME/.usr/lib"
+        "$HOME/.usr/lib64"
+        "/usr/local/lib"
+        "/usr/local/lib64"
+        "/usr/lib"
+        "/usr/lib64"
+        )
 
-            # libPython3Path=$(locate $libPython3Name | head -n 1 2> /dev/null)
-            ls -l $libPython3Path
-            # check if any error occurs
-            if [[ $? != 0 ]]; then
-                echo "[Warning]: find checking python3 path/lib failed, re-install python3 "
-            else
-                echo [Warning]: python3/lib already installed
-                return
+        for pathLoc in ${pathLoopLoc[@]}
+        do
+            if [[ ! -d $pathLoc ]]; then
+                continue
             fi
+            libPython3Path=$(find $pathLoc -name $libPython3Name | head -n 1 2> /dev/null)
+            if [[ "$libPython3Path" != "" ]]; then
+                break
+            fi
+        done
+
+        ls -l $libPython3Path
+        # check if any error occurs
+        if [[ $? != 0 ]]; then
+            echo "[Warning]: find checking python3 path/lib failed, re-install python3 "
+        else
+            echo [Warning]: python3/lib already installed
+            return
         fi
     fi
 
