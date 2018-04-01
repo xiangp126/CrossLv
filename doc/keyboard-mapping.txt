@@ -1,9 +1,12 @@
---- use set setxkbmap
+----------------- For MAC
+System Preferences -> Keyboard -> Modifier Keys
 
+----------------- For Linux
 dpkg -S /usr/bin/setxkbmap
 x11-xkb-utils: /usr/bin/setxkbmap
 
-yum install xorg-x11-xkb-utils
+sudo apt-get install x11-xkb-utils
+sudo yum install xorg-x11-xkb-utils
 
 > setxkbmap -print
 xkb_keymap {
