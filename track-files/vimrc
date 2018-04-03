@@ -77,7 +77,9 @@ vmap <C-L> <ESC>A
 nmap <C-G> :%s/\s\+$//gc<CR>
 " Easy vim manipulator
 nmap <leader>R :source ~/.vimrc<CR>
-nmap <leader>W :write<CR>
+nnoremap <C-\>      :write<CR>
+inoremap <C-\> <ESC>:write<CR>
+vnoremap <C-\> <ESC>:write<CR>
 nmap <leader>Q :qall!<CR>
 " Jump between buffers
 nmap <leader>1 :buffer1<CR>
@@ -90,7 +92,6 @@ nmap <leader>7 :buffer7<CR>
 nmap <leader>8 :buffer8<CR>
 nmap <leader>9 :buffer9<CR>
 nmap <leader>d :bdelete
-" nmap <leader>g :buffer
 " Jump to previous/next buffer
 nmap <leader>- <C-O><CR>
 nmap <leader>+ <C-I><CR>
@@ -99,13 +100,12 @@ nmap } :/^}<CR>
 " Jump to begin, need better solution
 nmap { }%
 " nmap { ?^[^ ].*\s\+{<CR>
+" Copy current visual-selection/line to buffer file
+vnoremap <leader>y :w!   /tmp/pvim.txt<CR>
+nnoremap <leader>y :.w!  /tmp/pvim.txt<CR>
+nnoremap <leader>p :read /tmp/pvim.txt<CR>
 " unnamed for '* register', unnamedplus for '+ register'
 set clipboard=unnamedplus,unnamed
-" Copy current visual selection to buffer file
-vnoremap <leader>y :w! /tmp/pvim.txt<CR>
-" Copy current line to buffer file
-nnoremap <leader>y :.w! /tmp/pvim.txt<CR>
-nnoremap <leader>p :read /tmp/pvim.txt<CR>
 " noremap <silent> <leader>y "*y <CR>
 " noremap <silent> <leader>Y "+y <CR>
 " noremap <silent> <leader>p "*p <CR>
