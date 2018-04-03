@@ -126,7 +126,7 @@ _fzf_compgen_dir() {
 
 # MAPPING CAPSLOCK TO ESC
 pathOfsetxkbmap=`which setxkbmap 2> /dev/null`
-if [[ "$pathOfsetxkbmap" != "" ]]; then
+if [[ "$pathOfsetxkbmap" != "" && "$DISPLAY" != "" ]]; then
     setxkbmap -option caps:escape
     # setxkbmap -option
 fi

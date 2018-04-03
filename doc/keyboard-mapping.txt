@@ -1,3 +1,5 @@
+Ctrl + [   <===>   Esc
+
 ----------------- For MAC
 System Preferences -> Keyboard -> Modifier Keys
 
