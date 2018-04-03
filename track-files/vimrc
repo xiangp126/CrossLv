@@ -80,7 +80,7 @@ nmap <leader>R :source ~/.vimrc<CR>
 nnoremap <C-\>      :write<CR>
 inoremap <C-\> <ESC>:write<CR>
 vnoremap <C-\> <ESC>:write<CR>
-nmap <leader>Q :qall!<CR>
+nmap <leader>q :qall!<CR>
 " Jump between buffers
 nmap <leader>1 :buffer1<CR>
 nmap <leader>2 :buffer2<CR>
