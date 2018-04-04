@@ -35,6 +35,8 @@ if has("autocmd")
     au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$")
                 \ | exe "normal! g'\"" | endif
 endif
+" Let .php use html snippets
+autocmd filetype php set filetype=php.html
 "------ :help ins-completion-menu -----
 set pumheight=12      " maximum height of popup menu
 set shell=/bin/bash   " set vim default shell
@@ -77,10 +79,18 @@ vmap <C-L> <ESC>A
 nmap <C-G> :%s/\s\+$//gc<CR>
 " Easy vim manipulator
 nmap <leader>R :source ~/.vimrc<CR>
-nnoremap <C-\>      :write<CR>
-inoremap <C-\> <ESC>:write<CR>
-vnoremap <C-\> <ESC>:write<CR>
-nmap <leader>q :qall!<CR>
+nmap <silent> <leader>q       :qall!<CR>
+nnoremap <silent> <C-Q>       :qall!<CR>
+inoremap <silent> <C-Q>  <ESC>:qall!<CR>
+vnoremap <silent> <C-Q>  <ESC>:qall!<CR>
+" stty -ixon on ~/.bashrc
+nnoremap <leader>W       :write!<CR>
+nnoremap <C-S>            :write<CR>
+inoremap <C-S>       <ESC>:write<CR>
+vnoremap <C-S>       <ESC>:write<CR>
+nmap <C-\>            <leader>ci<CR>
+imap <C-\>       <ESC><leader>ci<CR>
+vmap <C-\>            <leader>ci<CR>
 " Jump between buffers
 nmap <leader>1 :buffer1<CR>
 nmap <leader>2 :buffer2<CR>
