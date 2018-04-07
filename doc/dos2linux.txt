@@ -1,0 +1,10 @@
+# refer to https://www.cyberciti.biz/faq/sed-remove-m-and-line-feeds-under-unix-linux-bsd-appleosx/
+# spell mistake for caret
+
+# to show ^M
+# 注意：这里的“^M”要使用“CTRL-V CTRL-M”生成，而不是直接键入“^M”。
+# sed ’s/^M//g’ $1
+first
+# :e ++ff=unix %
+second
+# :%s/^M$//g
