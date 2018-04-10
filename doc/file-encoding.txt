@@ -1,0 +1,17 @@
+--- dos2linux
+# refer to https://www.cyberciti.biz/faq/sed-remove-m-and-line-feeds-under-unix-linux-bsd-appleosx/
+# spell mistake for caret
+
+!! Notice: ^M should be typed by 'Ctrl-V folled by Ctrl-M' !!
+-- In vim
+- to show show ^M
+:e ++ff=unix %
+- replace with ''
+:%s/^M$//g
+-- Use sed
+> sed ’s/^M//g’ $1
+
+--- change file encoding type
+- Just use 'utf-8' encoding when you create the file
+:set fileencoding
+:set fileencoding=utf-8

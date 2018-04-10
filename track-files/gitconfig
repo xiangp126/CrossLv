@@ -22,6 +22,8 @@
 	dt = difftool
 	mt = mergetool
 	cmm = commit -v -m
+	dft = diff --stat
+	dfc = diff --cached
 [color]
 	ui = auto
 [push]

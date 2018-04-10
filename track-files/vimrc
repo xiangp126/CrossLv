@@ -13,8 +13,8 @@ set shiftwidth=4
 set expandtab
 set cinoptions={0,1s,t0,n-2,p2s,(03s,=.5s,>1s,=1s,:1s
 set encoding=utf-8
-set fileencoding=utf-8
 set fileencodings=utf-8,gb2312,gb18030,gbk,ucs-bom,cp936,latin1
+set fileencoding=utf-8
 set termencoding=utf-8
 set backspace=indent,eol,start
 " Reference from /etc/vim/vimrc on Ubuntu
@@ -36,7 +36,7 @@ if has("autocmd")
                 \ | exe "normal! g'\"" | endif
 endif
 " Let .php use html snippets
-autocmd filetype php set filetype=php.html
+autocmd filetype php set filetype=php.html.js
 "------ :help ins-completion-menu -----
 set pumheight=12      " maximum height of popup menu
 set shell=/bin/bash   " set vim default shell
@@ -75,15 +75,18 @@ endfunc
 nmap <C-L>      A
 imap <C-L> <ESC>A
 vmap <C-L> <ESC>A
+imap <C-I> <ESC>I
 " Removing trailing white spaces
 nmap <C-G> :%s/\s\+$//gc<CR>
 " Easy vim manipulator
 nmap <leader>R :source ~/.vimrc<CR>
 nmap <silent> <leader>q       :qall!<CR>
+nmap <silent> <leader>w       :wq!<CR>
 nnoremap <silent> <C-Q>       :qall!<CR>
 inoremap <silent> <C-Q>  <ESC>:qall!<CR>
+imap <C-D> <ESC>dd
 vnoremap <silent> <C-Q>  <ESC>:qall!<CR>
-" stty -ixon on ~/.bashrc
+" Set stty -ixon on ~/.bashrc
 nnoremap <leader>W       :write!<CR>
 nnoremap <C-S>            :write<CR>
 inoremap <C-S>       <ESC>:write<CR>
