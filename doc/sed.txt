@@ -1,3 +1,8 @@
+---- Ordinary use
+git commit before use sed
+
+sed -i 's/Old/New/g' *.txt
+
 ---- Removing trailing whitespace
 -E, -r, --regexp-extended (did not need \ for special symbol)
 use extended regular expressions in the script (for portability use POSIX -E).

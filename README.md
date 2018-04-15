@@ -10,11 +10,8 @@
     - support incremental install, safe to run consecutive times
     - pretty print, generate error log if occurs
     - robust for more possible situations and any other methods to speed up
-
-Catch a glimpse of the effect
-
+- Catch a glimpse of the effect
 ![](https://github.com/xiangp126/crosslv/blob/master/gif/crosslv.gif)
-
 - Project packaged with some awesome open source tools
     - fuzzy-find command-line tool and its vim plugin
     - the language code-completion engine for vim
