@@ -1,0 +1,14 @@
+---- Remove all commits
+git checkout --orphan tick
+git add -A
+git commit -am "Init commit"
+git branch -D master
+# rename current branch to master
+git branch -m master
+git push origin master --force
+
+--- git untrace
+https://gist.github.com/nasirkhan/5919173
+
+git update-index --assume-unchanged FILE_NAME
+git update-index --no-assume-unchanged FILE_NAME

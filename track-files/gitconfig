@@ -24,6 +24,7 @@
 	cmm = commit -v -m
 	dft = diff --stat
 	dfc = diff --cached
+	dfs = diff --stat
 [color]
 	ui = auto
 [push]

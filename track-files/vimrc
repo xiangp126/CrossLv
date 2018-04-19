@@ -305,6 +305,7 @@ command! -bang -nargs=* Rg
 
 " ag => silver-searcher
 nnoremap <Leader>a   :Ag<CR>
+" command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>, {'options': '--delimiter : --nth 4..'}, <bang>0)
 command! -bang -nargs=* Ag
   \ call fzf#vim#ag(<q-args>,
   \   '--color-path="01;30" --color-line-number="00" --color-match="00;35"',
