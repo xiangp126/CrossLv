@@ -1,3 +1,7 @@
+--- term color
+foreground #b2b2b2
+background #000000
+
 -- iterm2 font install them first
 font -> monaco 17pt
 Non-ASCII font source code pro for powerline 14pt
