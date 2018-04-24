@@ -1820,6 +1820,7 @@ _EOF
     # only run this for the first time
     if [[ ! -f $mRunFlagFile ]]; then
         if [[ $platOsType == "ubuntu" && $execPrefix == "sudo" ]]; then
+            touch $mRunFlagFile
             sudo apt-get install \
                 pkg-config libevent-dev libncurses5 libncurses5-dev \
                 bash-completion python-optcomplete build-essential cmake \
@@ -1830,14 +1831,15 @@ _EOF
                 libgtk2.0-dev libatk1.0-dev libbonoboui2-dev \
                 libcairo2-dev libx11-dev libxpm-dev libxt-dev \
                 python-dev python3-dev ruby-dev lua5.1 lua5.1-dev \
-                x11-xkb-utils -y
+                x11-xkb-utils vim -y
 
         elif [[ $platOsType = 'centos' && $execPrefix == 'sudo' ]]; then
+            touch $mRunFlagFile
             sudo yum install \
                 xz-devel libX11-devel libXpm-devel libXt-devel libevent-devel \
                 pcre-devel mlocate bash-completion python-optcomplete \
                 cmake ncurses* gmp-devel gcc gcc-c++ automake asciidoc \
-                xmlto perl-devel tmux git autoconf \
+                xmlto perl-devel tmux git autoconf vim \
                 ruby ruby-devel lua lua-devel luajit \
                 luajit-devel python python-devel \
                 python3 python3-devel python34 python34-devel tcl-devel \
@@ -1848,7 +1850,7 @@ _EOF
     else
         cat << _EOF
 ------------------------------------------------------
-[WARNING]: YOU MAY NEED DELETE ./$mRunFlagFile
+[WARNING]: YOU MAY NEED DELETE $mRunFlagFile
 ------------------------------------------------------
 _EOF
         return
@@ -1877,15 +1879,16 @@ PRE INSTALL FOR MACOS PLATFORM - WITH BREW
 ------------------------------------------------------
 _EOF
     if [[ ! -f $mRunFlagFile ]]; then
-        # as ordinary user run brew
-        # use gnu-sed as compatible with that under Linux
+        # Run brew as ordinary user
+        # Use gnu-sed as compatible with that under Linux
+        touch $mRunFlagFile
         brew install python3 python2 cmake vim git fd \
             bash-completion fontconfig tmux ripgrep \
             gnu-sed the_silver_searcher --with-default-names -y
     else
         cat << _EOF
 ------------------------------------------------------
-[WARNING]: YOU MAY NEED DELETE ./$mRunFlagFile
+[WARNING]: YOU MAY NEED DELETE $mRunFlagFile
 ------------------------------------------------------
 _EOF
     fi
@@ -2042,6 +2045,7 @@ _EOF
 }
 
 preInstallCheck() {
+    source $HOME/.bashrc 2> /dev/null
     curlPath=`which curl 2> /dev/null`
     aclocalPath=`which aclocal 2> /dev/null`
     checkPlatOsType
@@ -2142,7 +2146,6 @@ case $1 in
     'root')
         set -x
         # create flag for had run more than one time
-        touch $mRunFlagFile
         commInstdir=$rootInstDir
         execPrefix=sudo
         instMode=root
