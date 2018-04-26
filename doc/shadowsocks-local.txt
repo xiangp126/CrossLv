@@ -1,14 +1,18 @@
---- Local ShadowSocks (Preferred)
+-------------- Local ShadowSocks (Preferred)
 sudo apt-get update
 sudo apt-get install shadowsocks
 cp template/shadowsocks-local.json /etc/shadowsocks.json
+
 - Edit certain fields and then
 sslocal -c /etc/shadowsocks.json
+
+-- Then from SwichyOmega import
+OmegaProfile_ShadowSocks.pac
 
 --- Add to Chrome Plugin
 socks5 127.0.0.1 1080
 
--- Or install using pip (Second choice)
+-------------- Or install using pip (Second choice)
 sudo apt-get update
 sudo apt-get install python-gevent python-pip
 

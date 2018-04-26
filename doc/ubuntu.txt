@@ -1,0 +1,47 @@
+-------- Manual install SouGou input
+get deb from web
+dpkg -i *.deb
+sudo apt-get instlal -f
+
+add sougou pinyin from config
+Ctrl + Space to switch
+
+--- Refer
+http://blog.csdn.net/ljheee/article/details/52966456
+
+-------- Manual install Chrome
+# 1. Add Key:
+wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+
+# 2. Set Repository:
+echo 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main' | sudo tee /etc/apt/sources.list.d/google-chrome.list
+
+# 3. Install Package:
+sudo apt-get update
+sudo apt-get install google-chrome-stable
+
+--- chrome plugins ----
+- stylish
+--- preferred
+Global dark style - changes everything to DARK
+--- second choice
+Midnight Surfing - Global Dark Style
+
+
+-------- Terminal Config
+Terminal-> Preferences -> default(rename to Ubuntu)
+
+--- General -> Cursor Shape => Block
+            -> Custom Font => Monaco Regular 16pt
+--- Colors -> Text Color => #909090
+           -> Bold Color => #969696
+           -> Background Color => #000000
+
+Bold Color used for git diff/man git/fzf
+
+-------- Fix issue with enterprise wifi connection
+deleting the saved network connection and then using the "Connect to Hidden Network"
+menu to setup the connection.
+This menu can be accessed by clicking the wifi icon on the top bar.
+
+https://askubuntu.com/questions/885785/failed-to-connect-to-wpa2-peap-mschapv2-enterprise-wifi-network
