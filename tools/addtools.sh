@@ -2,16 +2,12 @@
 # only works for Ubuntu by 15 Dec, 2017.
 
 mytools=(
-    "figlet"
-#    "tldr"
-    "xclip"
     "shellcheck"
     "mosh"      # mobile ssh tool
     "htop"
     "iftop"
     "netcat"    # as known as nc
     "bridge-utils"
-    "tmux"      # terminal multiplexer
 )
 
 mysource=(
@@ -113,22 +109,21 @@ parseInput() {
     case "$1" in
         'install')
             doJobInstall install
-        ;;
+            ;;
 
         'uninstall')
             doJobInstall remove
-        ;;
+            ;;
 
         'source')
             doJobSrc "source"
-        ;;
+            ;;
 
         *)
             usage
-        ;;
+            ;;
     esac
 }
 
 # begin to parse input.
 parseInput $1
-

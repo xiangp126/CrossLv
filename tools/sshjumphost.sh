@@ -16,11 +16,11 @@ logo() {
              |__/                |_|
 
 _EOF
-}
+         }
 
-usage() {
-    exeName=${0##*/}
-cat << _EOF
+         usage() {
+             exeName=${0##*/}
+             cat << _EOF
 [NAME]
     $exeName -- setup config file for ssh from client directly to dst-server
 
@@ -37,7 +37,7 @@ cat << _EOF
     ssh -vv -o ProxyCommand="ssh -W %h:%p login@jump-server" login@dst-server
 _EOF
 
-    logo
+logo
 }
 
 # config file name.
@@ -47,13 +47,13 @@ cfgFilePath=~/.ssh/$cfgFile
 jumpHost="sha-srg-edit7"
 # below names can be DNS lookup on jumpHostt
 dstServer=(
-    "sjc-marsbu-010"
-    "sjc-marsbu-011"
-    "sjc-marsbu-012"
-    "sjc-marsbu-013"
-    "sjc-marsbu-014"
-    "sjc-marsbu-019"
-    "sjc-marsbu-020"
+"sjc-marsbu-010"
+"sjc-marsbu-011"
+"sjc-marsbu-012"
+"sjc-marsbu-013"
+"sjc-marsbu-014"
+"sjc-marsbu-019"
+"sjc-marsbu-020"
 )
 # ssh port of jumpHost
 jHostPort=22
@@ -66,12 +66,12 @@ writeCfg() {
 #     Hostname server.example.org
 #     ProxyCommand ssh jumphost.example.org -W %h:%p
 _EOF
-    # loop to write config for each server
-    for server in ${dstServer[@]}
-    do
-        # abbreviate name for dstServer
-        abbreName=$server
-        cat << _EOF >> $1
+# loop to write config for each server
+for server in ${dstServer[@]}
+do
+    # abbreviate name for dstServer
+    abbreName=$server
+    cat << _EOF >> $1
 Host $abbreName
     Hostname $server
     ProxyCommand ssh -p $jHostPort $jumpHost -W %h:%p
@@ -122,14 +122,13 @@ install() {
 case $1 in
     'install')
         install
-    ;;
+        ;;
 
     'uninstall')
         uninstall
-    ;;
+        ;;
 
     *)
         usage
-    ;;
-
+        ;;
 esac

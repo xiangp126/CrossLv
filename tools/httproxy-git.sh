@@ -13,7 +13,7 @@ usage() {
 
 [DESCRIPTION]
     git clone using proxy through SSH reverse tunnel.
-    proxy => socks5://127.0.0.1:8080 
+    proxy => socks5://127.0.0.1:8080
 
 [PREREQUISITE]
    pls ensure first: ssh -vv -ND 8080 -l [loginName] [midmanServer]
@@ -38,14 +38,14 @@ case $1 in
         git config --global http.proxy ${proxyAddr}
         echo "start enabling https.proxy ..."
         git config --global https.proxy ${proxyAddr}
-    ;;
+        ;;
 
     'uninstall')
         echo "start disabling http.proxy ..."
         git config --global --unset http.proxy
         echo "start disabling https.proxy ..."
         git config --global --unset https.proxy
-    ;;
+        ;;
 esac;
 
 echo "> git config --global --list | grep -i proxy"

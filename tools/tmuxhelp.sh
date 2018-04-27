@@ -12,11 +12,11 @@ bind-key    -T prefix       }                 swap-pane -D
 ------------------------------------------------------------
 :swap-window [-s src-client] -t dst-window  # swap window src with dst
 :swap-window -t dst-window                  # swap current window with dst
-:move-window [-s src-window] -t dst-window  # move current window to No.1 
+:move-window [-s src-window] -t dst-window  # move current window to No.1
 :move-window -t [dst-client]                # move current window to dst-client
 
 :attach-session -c /usr/local/     # set new pane default path
-:attach-session -c "#{pane_current_path}"  
+:attach-session -c "#{pane_current_path}"
 
 ------------------------------------------------------------
 -          JOIN-PANE AND BREAK PANE TO WINDOW              -
