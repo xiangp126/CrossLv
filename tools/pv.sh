@@ -1,5 +1,6 @@
 #!/bin/bash
 # set -x
+vimBufferFile=/tmp/pvim.txt
 
 usage() {
     exeName=${0##*/}
@@ -11,13 +12,12 @@ cat << _EOF
     sh $exeName
 
 [DESCRIPTION]
-    vim buffer file is /tmp/pvim.txt now
+    vim buffer file is $vimBufferFile now
 
 _EOF
 }
 
 pVimBufferFile() {
-    vimBufferFile=/tmp/pvim.txt
     if [[ -f $vimBufferFile ]]; then
         cat $vimBufferFile 2> /dev/null
     else

@@ -1831,7 +1831,7 @@ _EOF
                 libgtk2.0-dev libatk1.0-dev libbonoboui2-dev \
                 libcairo2-dev libx11-dev libxpm-dev libxt-dev \
                 python-dev python3-dev ruby-dev lua5.1 lua5.1-dev \
-                x11-xkb-utils vim -y
+                x11-xkb-utils vim openssh-server -y
 
         elif [[ $platOsType = 'centos' && $execPrefix == 'sudo' ]]; then
             touch $mRunFlagFile

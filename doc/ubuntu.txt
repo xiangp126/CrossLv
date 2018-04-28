@@ -27,14 +27,13 @@ Global dark style - changes everything to DARK
 --- second choice
 Midnight Surfing - Global Dark Style
 
-
 -------- Terminal Config
 Terminal-> Preferences -> default(rename to Ubuntu)
 
 --- General -> Cursor Shape => Block
             -> Custom Font => Monaco Regular 16pt
---- Colors -> Text Color => #909090
-           -> Bold Color => #969696
+--- Colors -> Text Color => #999999
+           -> Bold Color => #A79797
            -> Background Color => #000000
 
 Bold Color used for git diff/man git/fzf
