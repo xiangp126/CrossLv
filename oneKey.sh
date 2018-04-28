@@ -387,6 +387,11 @@ _EOF
 
 # gcc must support C++11 to compile YCM
 checkGccVersion() {
+    cat << "_EOF"
+------------------------------------------------------
+BEGIN TO CHECK GCC VERSION
+------------------------------------------------------
+_EOF
     # loop to find if there exists gcc and version meets requirement
     pathLoopLoc=(
         "$HOME/.usr/bin"
@@ -438,11 +443,6 @@ checkGccVersion() {
 }
 
 installGcc() {
-    cat << "_EOF"
-------------------------------------------------------
-INSTALLING GCC VERSION 5
-------------------------------------------------------
-_EOF
     # if gcc version meets requirement, return 0
     checkGccVersion
     retVal=$?
@@ -450,6 +450,11 @@ _EOF
         return
     fi
 
+    cat << "_EOF"
+------------------------------------------------------
+INSTALLING GCC VERSION 5 IF CHECK FAILED
+------------------------------------------------------
+_EOF
     gccInstDir=$commInstdir
     $execPrefix mkdir -p $commInstdir
     # comm attribute to get source 'gcc'
@@ -1374,6 +1379,47 @@ _EOF
     tmuxPath=$tmuxInstDir/bin/tmux
 }
 
+installGit() {
+    cat << "_EOF"
+------------------------------------------------------
+INSTALLING NEWLY Git VERSION
+------------------------------------------------------
+_EOF
+    # check git version, if >= 2.5
+    gitPath=`which git 2> /dev/null`
+    if [[ "$gitPath" != "" ]]; then
+        gitVersion=`git --version | cut -d ' ' -f 3`
+        basicgitV=2.10
+        cmpSoftVersion $gitVersion $basicgitV
+        if [[ $? == '1' || "$gitVersion" == "master" ]]; then
+            return
+        fi
+    fi
+
+    gitInstDir=$commInstdir
+    $execPrefix mkdir -p $gitInstDir
+    # comm attribute to get source 'let-git'
+    gitClonePath=https://github.com/xiangp126/let-git
+    clonedName=let-git
+
+    # rename download package
+    cd $downloadPath
+    # check if already has this repository.
+    if [[ -d $clonedName ]]; then
+        echo [Warning]: target $clonedName/ already exists
+    else
+        git clone $gitClonePath $clonedName
+        # check if git clone returns successfully
+        if [[ $? != 0 ]]; then
+            echo [Error]: git clone returns error, quitting now
+            exit
+        fi
+    fi
+    cd $clonedName
+    sh oneKey.sh $instMode
+    gitPath=$gitInstDir/bin/git
+}
+
 # install newly cmake if needed
 installCmake() {
     cat << "_EOF"
@@ -1828,24 +1874,30 @@ _EOF
                 libpcre3-dev liblzma-dev libclang-5.0-dev clang-5.0 \
                 libmpc-dev libcurl4-openssl-dev perl libperl-dev \
                 libncursesw5 libncursesw5-dev libgnome2-dev libgnomeui-dev \
-                libgtk2.0-dev libatk1.0-dev libbonoboui2-dev \
+                libgtk2.0-dev libatk1.0-dev libbonoboui2-dev expat \
                 libcairo2-dev libx11-dev libxpm-dev libxt-dev \
                 python-dev python3-dev ruby-dev lua5.1 lua5.1-dev \
                 x11-xkb-utils vim openssh-server -y
 
         elif [[ $platOsType = 'centos' && $execPrefix == 'sudo' ]]; then
             touch $mRunFlagFile
+            sudo yum groupinstall "Development tools" -y
             sudo yum install \
                 xz-devel libX11-devel libXpm-devel libXt-devel libevent-devel \
                 pcre-devel mlocate bash-completion python-optcomplete \
                 cmake ncurses* gmp-devel gcc gcc-c++ automake asciidoc \
-                xmlto perl-devel tmux git autoconf vim \
-                ruby ruby-devel lua lua-devel luajit \
-                luajit-devel python python-devel \
-                python3 python3-devel python34 python34-devel tcl-devel \
+                xmlto tmux git autoconf vim openssl \
+                ruby ruby-devel lua lua-devel luajit clang clang-devel \
+                luajit-devel python python-devel openssl-devel \
+                python34 python34-devel python36 python36-devel tcl-devel \
                 curl libcurl-devel perl perl-devel perl-ExtUtils-ParseXS \
-                perl-ExtUtils-XSpp perl-ExtUtils-CBuilder \
-                perl-ExtUtils-Embed xorg-x11-xkb-utils -y
+                perl-ExtUtils-XSpp perl-ExtUtils-CBuilder expat expat-devel \
+                perl-ExtUtils-Embed xorg-x11-xkb-utils --skip-broken -y
+                # perl-ExtUtils-Embed xorg-x11-xkb-utils -y
+        fi
+        # Check root install return status
+        if [[ $? != 0 ]]; then
+            echo "[WARNING]: ROOT install return failed, please manual check it"
         fi
     else
         cat << _EOF
@@ -2099,6 +2151,8 @@ install() {
         installClang
     fi
     installYcm
+    # install git can be disabled for its low privilege
+    installGit
     finalAdjustParams
     installSummary
 }
@@ -2112,15 +2166,18 @@ checkPlatOsType() {
             ;;
         Linux)
             linuxType=`sed -n '1p' /etc/issue | tr -s " " | cut -d " " -f 1`
-            if [[ $linuxType == "Ubuntu" ]]; then
+            if [[ "$linuxType" == "Ubuntu" ]]; then
                 # echo "Platform is Ubuntu"
                 platOsType=ubuntu
-            elif [[ $linuxType == "CentOS" ]]; then
-                # echo "Platform is CentOS"
+            elif [[ "$linuxType" == "CentOS" || "$linuxType" == "\S" ]]; then
+                # echo "Platform is CentOS" \S => CentOS 7
                 platOsType=centos
             elif [[ $linuxType == "Red" ]]; then
                 # echo "Platform is Red Hat"
                 platOsType=redhat
+            else
+                echo "Sorry, We did not support your platform, pls check it first"
+                exit
             fi
             ;;
         *)
@@ -2129,7 +2186,7 @@ checkPlatOsType() {
 WE ONLY SUPPORT LINUX AND MACOS SO FAR
 ------------------------------------------------------
 _EOF
-            exit 255
+            exit
             ;;
     esac
 }

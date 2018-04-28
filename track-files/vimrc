@@ -36,7 +36,7 @@ if has("autocmd")
                 \ | exe "normal! g'\"" | endif
 endif
 " Let .php use html snippets
-autocmd filetype php set filetype=php.html.js
+" autocmd filetype php set filetype=php.html.js
 "------ :help ins-completion-menu -----
 set pumheight=12      " maximum height of popup menu
 set shell=/bin/bash   " set vim default shell

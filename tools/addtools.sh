@@ -2,6 +2,7 @@
 # only works for Ubuntu by 15 Dec, 2017.
 
 mytools=(
+    "figlet"
     "shellcheck"
     "mosh"      # mobile ssh tool
     "htop"
