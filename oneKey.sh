@@ -1936,7 +1936,7 @@ _EOF
         # If unavailable:cannot import name _remove_dead_weakref
         brew uninstall python@2
         brew install python3 cmake vim git fd wget autoconf automake \
-            bash-completion fontconfig tmux ripgrep pkg-config \
+            bash-completion fontconfig tmux ripgrep pkg-config htop \
             gnu-sed the_silver_searcher --with-default-names -y
     else
         cat << _EOF
@@ -1956,6 +1956,16 @@ _EOF
     vimPath=`which vim 2> /dev/null`
     cmakePath=`which cmake 2> /dev/null`
     fzfPath=`which fzf 2> /dev/null`
+    cat << "_EOF"
+------------------------------------------------------
+FIX .BASHRC ISSUE WITH ITERM2
+------------------------------------------------------
+_EOF
+    bashProfile=$HOME/.bash_profile
+    if [[ ! -f $bashProfile ]]; then
+        echo "source $HOME/.bashrc" > $bashProfile
+        chmod +x $bashProfile
+    fi
 }
 
 # auto correct path of key packages according to the system
@@ -2098,7 +2108,7 @@ _EOF
 }
 
 preInstallCheck() {
-#    source $HOME/.bashrc 2> /dev/null
+    # source $HOME/.bashrc 2> /dev/null
     curlPath=`which curl 2> /dev/null`
     aclocalPath=`which aclocal 2> /dev/null`
     checkPlatOsType
