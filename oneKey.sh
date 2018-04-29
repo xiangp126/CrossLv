@@ -1773,7 +1773,7 @@ _EOF
     git submodule update --init --recursive
     # if [[ $platOsType == 'macos' || $platOsType == 'ubuntu' ]]; then
     if [[ $platOsType == 'macos' ]]; then
-        python3 ./install.py --clang-completer --system-libclang
+        $python3Path ./install.py --clang-completer --system-libclang
         if [[ $? != 0 ]]; then
             echo "install YCM returns error, quitting now "
             exit 1
@@ -1931,11 +1931,12 @@ PRE INSTALL FOR MACOS PLATFORM - WITH BREW
 ------------------------------------------------------
 _EOF
     if [[ ! -f $mRunFlagFile ]]; then
-        # Run brew as ordinary user
-        # Use gnu-sed as compatible with that under Linux
+        # Ordinary user run brew, use gnu-sed as compatible with that of Linux
         touch $mRunFlagFile
-        brew install python3 python2 cmake vim git fd \
-            bash-completion fontconfig tmux ripgrep \
+        # If unavailable:cannot import name _remove_dead_weakref
+        brew uninstall python@2
+        brew install python3 cmake vim git fd wget autoconf automake \
+            bash-completion fontconfig tmux ripgrep pkg-config \
             gnu-sed the_silver_searcher --with-default-names -y
     else
         cat << _EOF
@@ -2097,7 +2098,7 @@ _EOF
 }
 
 preInstallCheck() {
-    source $HOME/.bashrc 2> /dev/null
+#    source $HOME/.bashrc 2> /dev/null
     curlPath=`which curl 2> /dev/null`
     aclocalPath=`which aclocal 2> /dev/null`
     checkPlatOsType

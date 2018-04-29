@@ -32,3 +32,7 @@ python3 -c "import ycm_core; print(ycm_core.HasClangSupport())"
 -------------
 #you should compile python3 with your self-compiled gcc/c++ first
 let g:ycm_server_python_interpreter = '/usr/bin/python3'
+
+-- Only for MAC
+unavailable:cannot import name _remove_dead_weakref
+brew uninstall python@2
