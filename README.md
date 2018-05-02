@@ -23,6 +23,8 @@
     - extra bash completion for fzf/tmux/git on [completion](https://github.com/xiangp126/crosslv/blob/master/completion)
     - favourite personal vim color scheme on [darkcoding.vim](https://github.com/xiangp126/crosslv/blob/master/vim-colors/darkcoding.vim)
     - programming font on [monaco.ttf](https://github.com/xiangp126/crosslv/blob/master/fonts/monaco.ttf)
+    - my personel [let-tmux](https://github.com/xiangp126/Let-Tmux) if needed
+    - my personel [let-git](https://github.com/xiangp126/let-git) if needed
     - etc...
 - Two modes deploy selection
     - home mode: without root privilege, normally install packages into $HOME/.usr
