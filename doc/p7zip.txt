@@ -1,0 +1,8 @@
+------ Encrypt
+# haha is the password
+7z a -mhe=on -phaha me.7z Directory
+-- or input password from command-line
+7z a -mhe=on -p me.7z Directory
+
+------ Decrypt
+7z x me.7z
