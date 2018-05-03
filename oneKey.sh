@@ -2032,7 +2032,9 @@ _EOF
         echo "[Warning]: replace c++ header directory returns $retVal "
     fi
 
-    # only macos needed, for macos not support --color=auto
+    # Detect platform type on .bashrc now
+    return
+    # Only macos needed, for macos not support --color=auto
     if [[ $platOsType != "macos" ]]; then
         return
     fi
@@ -2051,7 +2053,7 @@ _EOF
         echo "[Warning]: deleting --color=auto returns $retVal "
     fi
 
-cat << "_EOF"
+    cat << "_EOF"
 ------------------------------------------------------
 INSTALLING YOUCOMPLETEME SUCCESSFULLY DONE
 ------------------------------------------------------

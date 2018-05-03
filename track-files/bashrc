@@ -36,21 +36,31 @@ stty -ixon
 # export LS_COLORS=$LS_COLORS:'di=0;35:':'ex=0;0'
 export LS_COLORS=$LS_COLORS:'ex=0;0'
 # MY USEFUL HANDY ALIAS
-alias ls='ls --color=auto'
+if [[ "`uname -s`" == 'Darwin' ]]; then
+    # Compatible with Mac
+    alias ls='ls -G'
+    alias netstat='netstat -an -p tcp'
+else
+    # Linux
+    alias ls='ls --color=auto'
+    alias dir='dir --color=auto'
+    alias vdir='vdir --color=auto'
+    alias netstat='netstat -tuanp'
+fi
 alias ll='ls -lF'
 alias ll.='ls -alF'
 alias rm='rm -i'
 alias mv='mv -i'
 alias cp='cp -i'
-alias dir='dir --color=auto'
-alias vdir='vdir --color=auto'
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias gdb='gdb -q'
 alias cgdb='cgdb -q'
-alias netstat='netstat -tuanp'
 alias ag="ag --color-path='1;34' --color-line-number='0;8' --color-match='0;35'"
+alias 7zP='7z a -mhe=on -p'
+alias 7zA='7z a'
+alias 7zX='7z x'
 # fix tmux utf8 issue
 alias tmux='tmux -u'
 # quick change directory
