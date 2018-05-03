@@ -1,3 +1,7 @@
+--- Load myself color preset - darkcoding-iterm2
+iterm2 -> profiles -> colors -> Color Presets -> import
+    -- choose ./template/darkcoding-iterm2.itermcolors
+
 --- term color
 foreground #b2b2b2
 background #000000
