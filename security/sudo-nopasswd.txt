@@ -9,7 +9,7 @@ Defaults:You-Name secure_path=/sbin:/usr/sbin:/usr/bin:/bin:/usr/local/sbin:/usr
 
 :%s/You-Name/xxx/gc
 
----------------------------------- CentOS
+---------------------------------- CentOS & Mac
 # sudo vim /etc/sudoers
 -- begin of sample
 

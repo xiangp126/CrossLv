@@ -1877,7 +1877,7 @@ _EOF
                 libgtk2.0-dev libatk1.0-dev libbonoboui2-dev expat \
                 libcairo2-dev libx11-dev libxpm-dev libxt-dev \
                 python-dev python3-dev ruby-dev lua5.1 lua5.1-dev \
-                x11-xkb-utils vim openssh-server -y
+                x11-xkb-utils vim openssh-server p7zip* htop iftop -y
 
         elif [[ $platOsType = 'centos' && $execPrefix == 'sudo' ]]; then
             touch $mRunFlagFile
@@ -1892,7 +1892,8 @@ _EOF
                 python34 python34-devel python36 python36-devel tcl-devel \
                 curl libcurl-devel perl perl-devel perl-ExtUtils-ParseXS \
                 perl-ExtUtils-XSpp perl-ExtUtils-CBuilder expat expat-devel \
-                perl-ExtUtils-Embed xorg-x11-xkb-utils --skip-broken -y
+                perl-ExtUtils-Embed xorg-x11-xkb-utils \
+                p7zip htop iftop --skip-broken -y
                 # perl-ExtUtils-Embed xorg-x11-xkb-utils -y
         fi
         # Check root install return status
@@ -1936,7 +1937,8 @@ _EOF
         # If unavailable:cannot import name _remove_dead_weakref
         brew uninstall python@2
         brew install python3 cmake vim git fd wget autoconf automake \
-            bash-completion fontconfig tmux ripgrep pkg-config htop \
+            bash-completion fontconfig tmux ripgrep pkg-config \
+            p7zip htop iftop \
             gnu-sed the_silver_searcher --with-default-names -y
     else
         cat << _EOF
