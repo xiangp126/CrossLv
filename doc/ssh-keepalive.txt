@@ -1,0 +1,6 @@
+SSH Keep Alive from server side
+
+sudo vim /etc/ssh/sshd_config
+
+ClientAliveInterval 60
+ClientAliveCountMax 5
