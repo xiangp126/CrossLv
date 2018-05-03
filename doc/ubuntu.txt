@@ -24,6 +24,7 @@ sudo apt-get install google-chrome-stable
 - stylish
 --- preferred
 Global dark style - changes everything to DARK
+Github Dark
 --- second choice
 Midnight Surfing - Global Dark Style
 
