@@ -14,7 +14,7 @@ trackFiles=(
     ".gitconfig"
     ".gitignore"
     ".bashrc"
-    ".ycm_extra_conf.py"
+    # ".ycm_extra_conf.py"
 )
 # private colors needed to track
 privateColorDir=$HOME/.vim/colors

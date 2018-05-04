@@ -1,4 +1,4 @@
----- Remove all commits
+---- Remove all commits | git empty
 git checkout --orphan tick
 git add -A
 git commit -am "Init commit"
