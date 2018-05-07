@@ -1,0 +1,13 @@
+https://unix.stackexchange.com/questions/7004/uploading-directories-with-sftp
+---------- sftp guide
+sftp root@ip
+-- Remote
+ls -l
+cd
+mkdir source
+
+-- Local
+lls -l
+lcd
+# Note that source/ must exists on remote server
+put -r source/

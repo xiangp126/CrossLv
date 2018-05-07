@@ -1,0 +1,40 @@
+----- Make Verbose
+make V=?
+V=99: This option controls the degree and type of verbosity that you will be exposed to during the make process. This is not specific to make itself but rather to the OpenWrt makefile. In the source see the file include/verbose.mk where the following links are made:
+- Verbose = V
+- Verbosity level 1 = w (warnings/errors only)
+- Verbosity level 99 = s (This gives stdout+stderr)
+makelevel
+https://unix.stackexchange.com/questions/139459/what-does-makenumber-mean-in-make-v-s
+https://askubuntu.com/questions/833770/what-does-make-j-n-v-m-mean
+
+> make V=1
+
+make -j [N]
+make -j
+-j [N], --jobs[=N]          Allow N jobs at once; infinite jobs with no arg.
+
+[Example]
+make -j 8
+
+------ Template
+MAKE	= make
+CC 		= gcc
+LD 		= ld
+
+SUBDIRS = src tools
+
+INSDIR  = $(PWD)/bin
+export INSDIR
+
+export KERNEL   = $(shell /bin/uname -r)
+
+all:
+	for i in $(SUBDIRS); do $(MAKE) -C $$i || exit 1; done
+
+clean:
+	for i in $(SUBDIRS); do $(MAKE) -C $$i clean || exit 1; done
+
+install:all
+	-mkdir -p $(INSDIR)
+	for i in $(SUBDIRS); do $(MAKE) -C $$i install || exit 1; done

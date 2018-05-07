@@ -1,3 +1,6 @@
+--- git patch | apply
+TODO
+
 ---- Remove all commits | git empty
 git checkout --orphan tick
 git add -A

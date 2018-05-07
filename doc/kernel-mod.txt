@@ -1,0 +1,5 @@
+-- insmod
+insmod build/kmod/igb_uio.ko
+
+-- rmmod
+rmmod build/kmod/igb_uio.ko
