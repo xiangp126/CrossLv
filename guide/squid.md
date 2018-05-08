@@ -49,6 +49,7 @@ udp6       0      0 :::17176                :::*                                
 ## Use Proxy on Client
 Assume 10.124.10.102 is the IP of Server
 ```bash
-export http_proxy=http://10.124.10.102:3128/
-export https_proxy=http://10.124.10.102:3128/
+proxyIP=10.124.10.102
+export http_proxy=http://$proxyIP:3128/
+export https_proxy=http://$proxyIP:3128/
 ```

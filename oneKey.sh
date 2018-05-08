@@ -1867,7 +1867,7 @@ PRE INSTALL FOR LINUX PLATFORM - WITH SUDO
 _EOF
     # only run this for the first time
     if [[ ! -f $mRunFlagFile ]]; then
-        if [[ $platOsType == "ubuntu" && $execPrefix == "sudo" ]]; then
+        if [[ $platOsType == "ubuntu" && ($execPrefix == "sudo" || $execPrefix == "mixed") ]]; then
             touch $mRunFlagFile
             sudo apt-get install \
                 pkg-config libevent-dev libncurses5 libncurses5-dev \
@@ -1881,7 +1881,7 @@ _EOF
                 python-dev python3-dev ruby-dev lua5.1 lua5.1-dev \
                 x11-xkb-utils vim openssh-server p7zip* htop iftop -y
 
-        elif [[ $platOsType = 'centos' && $execPrefix == 'sudo' ]]; then
+        elif [[ $platOsType = 'centos' && ($execPrefix == "sudo" || $execPrefix == "mixed") ]]; then
             touch $mRunFlagFile
             sudo yum groupinstall "Development tools" -y
             sudo yum install \
