@@ -33,19 +33,15 @@
 Latest released version: 3.9.9
 
 ## Prerequisite
-You should have full Internet access, if not refer [squid.md](https://github.com/xiangp126/Giggle/blob/master/guide/squid.md) or [ssh-proxy.md](https://github.com/xiangp126/Giggle/blob/master/guide/ssh-proxy.md) to establish connection
-
-## Quick Start
-on Ubuntu, /bin/sh was linked to /bin/dash by default
-
-so firstly you should link it to /bin/bash
-
+- You should have full Internet access, if not refer [squid.md](https://github.com/xiangp126/Giggle/blob/master/guide/squid.md) or [ssh-proxy.md](https://github.com/xiangp126/Giggle/blob/master/guide/ssh-proxy.md) to establish connection
+ - On Ubuntu, /bin/sh was linked to /bin/dash by default, correct it to /bin/bash
 ```bash
-sudo ln -s /bin/bash /bin/sh
-> ll /bin/sh
+sudo ln -sf /bin/bash /bin/sh
+ls -l /bin/sh
 lrwxrwxrwx 1 root root 9 Mar 29 17:04 /bin/sh -> /bin/bash*
 ```
 
+## Quick Start
 ```bash
 $ sh oneKey.sh
 [NAME]
