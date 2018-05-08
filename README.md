@@ -11,18 +11,18 @@
     - pretty print, generate error log if occurs
     - robust for more possible situations and any other methods to speed up
 - Catch a glimpse of the effect
-![](https://github.com/xiangp126/crosslv/blob/master/gif/crosslv.gif)
+![](https://github.com/xiangp126/giggle/blob/master/gif/crosslv.gif)
 - Project packaged with some awesome open source tools
     - fuzzy-find command-line tool and its vim plugin
     - the language code-completion engine for vim
     - the awsome terminal multiplexer running on server
     - needless to say vim itself
 - And with
-    - self-written handy scripts on [tools](https://github.com/xiangp126/crosslv/blob/master/tools) and somewhere else
-    - personal dotfiles on [track-files](https://github.com/xiangp126/crosslv/blob/master/track-files)
-    - extra bash completion for fzf/tmux/git on [completion](https://github.com/xiangp126/crosslv/blob/master/completion)
-    - favourite personal vim color scheme on [darkcoding.vim](https://github.com/xiangp126/crosslv/blob/master/vim-colors/darkcoding.vim)
-    - programming font on [monaco.ttf](https://github.com/xiangp126/crosslv/blob/master/fonts/monaco.ttf)
+    - self-written handy scripts on [tools](https://github.com/xiangp126/giggle/blob/master/tools) and somewhere else
+    - personal dotfiles on [track-files](https://github.com/xiangp126/giggle/blob/master/track-files)
+    - extra bash completion for fzf/tmux/git on [completion](https://github.com/xiangp126/giggle/blob/master/completion)
+    - favourite personal vim color scheme on [darkcoding.vim](https://github.com/xiangp126/giggle/blob/master/vim-colors/darkcoding.vim)
+    - programming font on [monaco.ttf](https://github.com/xiangp126/giggle/blob/master/fonts/monaco.ttf)
     - my personel [let-tmux](https://github.com/xiangp126/Let-Tmux) if needed
     - my personel [let-git](https://github.com/xiangp126/let-git) if needed
     - etc...
@@ -31,6 +31,9 @@
     - root mode: with root privilege, normally install packages into /usr/local
 
 Latest released version: 3.9.9
+
+## Prerequisite
+You should have full Internet access, if not refer [squid.md](https://github.com/xiangp126/Giggle/blob/master/guide/squid.md) or [ssh-proxy.md](https://github.com/xiangp126/Giggle/blob/master/guide/ssh-proxy.md) to establish connection
 
 ## Quick Start
 on Ubuntu, /bin/sh was linked to /bin/dash by default
@@ -168,7 +171,7 @@ $ sh autoHandle.sh
 
 ```bash
 [NAME]
-    makeLink.sh -- make link from ~/myGit/crosslv/tools/
+    makeLink.sh -- make link from ~/myGit/giggle/tools/
                              to   ~/.usr/bin/
 [USAGE]
     sh makeLink.sh [install | uninstall | help]
@@ -192,4 +195,4 @@ sh makeLink.sh install
 ```
 
 ## License
-The [MIT](https://github.com/xiangp126/crosslv/blob/master/LICENSE.txt) License (MIT)
+The [MIT](https://github.com/xiangp126/giggle/blob/master/LICENSE.txt) License (MIT)

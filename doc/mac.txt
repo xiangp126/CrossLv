@@ -1,0 +1,3 @@
+--- Maximum Chrome still with Dock
+command＋option＋D hide 'Dock' and then stretch Chrome
+then reveal 'Dock'
