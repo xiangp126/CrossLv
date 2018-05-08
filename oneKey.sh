@@ -15,6 +15,8 @@ homeInstDir=$HOME/.usr
 rootInstDir=/usr/local
 # installation mode, default is home
 instMode=home
+# install flag used for 'mixed' mode
+instFlag=""
 commInstdir=$homeInstDir
 # execute prefix: "" or sudo
 execPrefix=""
@@ -1867,7 +1869,8 @@ PRE INSTALL FOR LINUX PLATFORM - WITH SUDO
 _EOF
     # only run this for the first time
     if [[ ! -f $mRunFlagFile ]]; then
-        if [[ $platOsType == "ubuntu" && ($execPrefix == "sudo" || $execPrefix == "mixed") ]]; then
+        if [[ $platOsType == "ubuntu" &&
+                ($execPrefix == "sudo" || $instFlag == "mixed") ]]; then
             touch $mRunFlagFile
             sudo apt-get install \
                 pkg-config libevent-dev libncurses5 libncurses5-dev \
@@ -1881,7 +1884,8 @@ _EOF
                 python-dev python3-dev ruby-dev lua5.1 lua5.1-dev \
                 x11-xkb-utils vim openssh-server p7zip* htop iftop -y
 
-        elif [[ $platOsType = 'centos' && ($execPrefix == "sudo" || $execPrefix == "mixed") ]]; then
+        elif [[ $platOsType = 'centos' &&
+                ($execPrefix == "sudo" || $instFlag == "mixed") ]]; then
             touch $mRunFlagFile
             sudo yum groupinstall "Development tools" -y
             sudo yum install \
@@ -2229,8 +2233,9 @@ case $1 in
     'mixed')
         set -x
         commInstdir=$homeInstDir
-        execPrefix=sudo
+        execPrefix=""
         instMode=home
+        instFlag=mixed
         install
         ;;
 
