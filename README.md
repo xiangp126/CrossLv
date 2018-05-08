@@ -1,6 +1,6 @@
 - This project aims to persist the same programming environment On Linux platform
 - Done everything for me with just single command, save more time and enjoy more life
-    - provide two modes for installation, considering if has root privilege or not
+    - provide three modes for installation, considering if has root privilege or not
     - put all packages from network into one directory, easy to delete
     - install all packages into one same directory, not to interfere with system old ones
     - version compare, only trigger installation of certain package when requirements met
@@ -48,7 +48,7 @@ $ sh oneKey.sh
     oneKey.sh -- setup my working environment with just single command
 
 [SYNOPSIS]
-    sh oneKey.sh [home | root | summary | help]
+    sh oneKey.sh [home | root | mixed | summary | help]
 
 [EXAMPLE]
     sh oneKey.sh
@@ -58,6 +58,7 @@ $ sh oneKey.sh
 [DESCRIPTION]
     home -- install packages into ~/.usr/
     root -- install packages into /usr/local/
+    mix  -- install packages into ~/.usr/ but with sudo privilege
     help -- print the help messages
     summary -- show installation summary
 

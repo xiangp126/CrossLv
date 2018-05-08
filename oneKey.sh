@@ -108,16 +108,18 @@ usage() {
     $exeName -- setup my working environment with just single command
 
 [SYNOPSIS]
-    sh $exeName [home | root | summary | help]
+    sh $exeName [home | root | mixed | summary | help]
 
 [EXAMPLE]
     sh $exeName
+    sh $exeName home
     sh $exeName root
     sh $exeName summary
 
 [DESCRIPTION]
     home -- install packages into $homeInstDir/
     root -- install packages into $rootInstDir/
+    mix  -- install packages into $homeInstDir/ but with sudo privilege
     help -- print the help messages
     summary -- show installation summary
 
@@ -2221,6 +2223,14 @@ case $1 in
         commInstdir=$rootInstDir
         execPrefix=sudo
         instMode=root
+        install
+        ;;
+
+    'mixed')
+        set -x
+        commInstdir=$homeInstDir
+        execPrefix=sudo
+        instMode=home
         install
         ;;
 
