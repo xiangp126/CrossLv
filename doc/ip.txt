@@ -1,4 +1,5 @@
 --- Temporary modify (add them to /etc/rc.local for permanent)
+# sudo ip addr del 10.124.10.103/24 dev eth0
 sudo ip addr add 10.124.10.103/24 dev eth0
 sudo ip route add default via 10.124.10.1
 - or

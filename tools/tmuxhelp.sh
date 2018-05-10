@@ -44,5 +44,9 @@ bind-key    -T prefix       |                 split-window -h
 bind-key    -T prefix       S       run-shell ~/.tmux/plugins/tmux-resurrect/scripts/save.sh
 bind-key    -T prefix       R       run-shell ~/.tmux/plugins/tmux-resurrect/scripts/restore.sh
 bind-key    -T prefix       U       run-shell ~/.tmux/plugins/tpm/bindings/update_plugins
+# Brief help
+#     send-prefix + I        # install
+#     send-prefix + U        # update
+#     send-prefix + Alt-u    # uninstall plugins not on the plugin list
 ------------------------------------------------------------
 _EOF

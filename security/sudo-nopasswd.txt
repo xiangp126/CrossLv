@@ -1,15 +1,15 @@
 ---------------------------------- Ubuntu
 # cd /etc/sudoers.d
-# sudo vim You-Name
+# sudo vim vbird
 
 -- BEGIN OF EXAMPLE
-You-Name ALL=(root) NOPASSWD:ALL
-Defaults:You-Name secure_path=/sbin:/usr/sbin:/usr/bin:/bin:/usr/local/sbin:/usr/local/bin
+vbird ALL=(root) NOPASSWD:ALL
+Defaults:vbird secure_path=/sbin:/usr/sbin:/usr/bin:/bin:/usr/local/sbin:/usr/local/bin
 -- END OF EXAMPLE
 
-:%s/You-Name/xxx/gc
+:%s/vbird/xxx/gc
 
----------------------------------- CentOS & Mac
+---------------------------------- CentOS & MAC
 # sudo vim /etc/sudoers
 -- begin of sample
 
@@ -17,7 +17,17 @@ Defaults:You-Name secure_path=/sbin:/usr/sbin:/usr/bin:/bin:/usr/local/sbin:/usr
 ##
 ## Allow root to run any commands anywhere
 root     ALL=(ALL)       ALL
-You-Name ALL=(ALL)     NOPASSWD: ALL
+vbird ALL=(ALL)     NOPASSWD: ALL
 
 ## Allows members of the 'sys' group to run networking, software,
 -- end of sample
+
+-- SCRIPT Refer (run with root privilege)
+# For Ubuntu
+user=vbird
+cd /etc/sudoers.d
+cat > $user << _EOF
+$user ALL=(root) NOPASSWD:ALL
+Defaults:$user secure_path=/sbin:/usr/sbin:/usr/bin:/bin:/usr/local/sbin:/usr/local/bin
+_EOF
+

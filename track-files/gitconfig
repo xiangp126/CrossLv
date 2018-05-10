@@ -22,15 +22,15 @@
 	dt = difftool
 	mt = mergetool
 	cmm = commit -v -m
-	dft = diff --stat
 	dfc = diff --cached
 	dfs = diff --stat
+	dtd = difftool --dir-diff
 [color]
 	ui = auto
 [push]
 	followTags = true
 	default = current
 [diff]
-	tool = kdiff3
+	tool = meld
 [merge]
-	tool = kdiff3
+	tool = meld

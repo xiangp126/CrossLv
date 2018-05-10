@@ -119,10 +119,10 @@ usage() {
     sh $exeName summary
 
 [DESCRIPTION]
+    help -- print the help messages
     home -- install packages into $homeInstDir/
     root -- install packages into $rootInstDir/
-    mix  -- install packages into $homeInstDir/ but with sudo privilege
-    help -- print the help messages
+    mixed -- install packages into $homeInstDir/ but with sudo privilege
     summary -- show installation summary
 
 [TROUBLESHOOTING]
@@ -1942,6 +1942,7 @@ _EOF
         touch $mRunFlagFile
         # If unavailable:cannot import name _remove_dead_weakref
         brew uninstall python@2
+        brew cask install meld
         brew install python3 cmake vim git fd wget autoconf automake \
             bash-completion fontconfig tmux ripgrep pkg-config \
             p7zip htop iftop \

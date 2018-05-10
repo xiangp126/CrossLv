@@ -1,6 +1,6 @@
 - This project aims to persist the same programming environment On Linux platform
 - Done everything for me with just single command, save more time and enjoy more life
-    - provide three modes for installation, considering if has root privilege or not
+    - provide different modes for installation, considering if has root privilege or not
     - put all packages from network into one directory, easy to delete
     - install all packages into one same directory, not to interfere with system old ones
     - version compare, only trigger installation of certain package when requirements met
@@ -26,9 +26,10 @@
     - my personel [let-tmux](https://github.com/xiangp126/Let-Tmux) if needed
     - my personel [let-git](https://github.com/xiangp126/let-git) if needed
     - etc...
-- Two modes deploy selection
+- Three modes deploy selection
     - home mode: without root privilege, normally install packages into $HOME/.usr
     - root mode: with root privilege, normally install packages into /usr/local
+    - mixed mode
 
 Latest released version: 3.9.9
 
@@ -56,10 +57,10 @@ $ sh oneKey.sh
     sh oneKey.sh summary
 
 [DESCRIPTION]
+    help -- print the help messages
     home -- install packages into ~/.usr/
     root -- install packages into /usr/local/
-    mix  -- install packages into ~/.usr/ but with sudo privilege
-    help -- print the help messages
+    mixed -- install packages into ~/.usr/ but with sudo privilege
     summary -- show installation summary
 
 [TROUBLESHOOTING]
@@ -112,7 +113,7 @@ V2.1
 V1.0
 * user-friendly manipulate for backup | restore | confirm | clean .
 
-## Tips of key
+## Tips of key Script
 
 autoHandle.sh and makeLink.sh was automatically called by oneKey.sh,
 
