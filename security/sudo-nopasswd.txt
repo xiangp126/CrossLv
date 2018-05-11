@@ -30,4 +30,3 @@ cat > $user << _EOF
 $user ALL=(root) NOPASSWD:ALL
 Defaults:$user secure_path=/sbin:/usr/sbin:/usr/bin:/bin:/usr/local/sbin:/usr/local/bin
 _EOF
-
