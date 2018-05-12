@@ -18,4 +18,4 @@ gccenv.txt
 .nfs*
 .ycm_extra_conf.py
 err.log
-crosslv.log
+*.log

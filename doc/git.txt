@@ -1,0 +1,15 @@
+-- On Remote Machinde | team server
+# git bare local private repository
+-
+useradd -m -s "$(which git-shell)" git
+cd /home/git/
+-
+git init --bare sample
+sudo chown -R git:git sample
+
+-- On Local Machinde | access repository somewhere else
+git remote add origin2 git@<team server ip>:/home/git/sample
+git clone git@<remote server ip>:/home/git/sample
+
+$ git pull origin2 master
+$ git push origin2 master

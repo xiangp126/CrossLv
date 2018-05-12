@@ -1,6 +1,10 @@
+-- Load iterm preference from template
+iterm2 -> general | check 'Load preferences from a custom folder ...'
+    choose ./iterm2/darkcoding-iterm2.itermcolors
+
 --- Load myself color preset - darkcoding-iterm2
 iterm2 -> profiles -> colors -> Color Presets -> import
-    -- choose ./template/darkcoding-iterm2.itermcolors
+    choose ./iterm2/darkcoding-iterm2.itermcolors
 
 --- term color
 foreground #b2b2b2
