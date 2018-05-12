@@ -1,15 +1,26 @@
 -- On Remote Machinde | team server
 # git bare local private repository
--
+- use git-shell | not bash
 useradd -m -s "$(which git-shell)" git
-cd /home/git/
+cd /usr/local/src/
 -
 git init --bare sample
 sudo chown -R git:git sample
 
 -- On Local Machinde | access repository somewhere else
-git remote add origin2 git@<team server ip>:/home/git/sample
-git clone git@<remote server ip>:/home/git/sample
+- Create authorized_keys for user: git | Important
+su -
+cd /home/git
+mkdir .ssh
+touch .ssh/authorized_keys
+chmod 600 .ssh/authorized_keys
+chown -R git:git .ssh
 
-$ git pull origin2 master
-$ git push origin2 master
+# Put pub key of access user into /home/git/.ssh/authorized_keys
+# One line for each user
+
+git remote add origin git@<team server ip>:/usr/local/src/sample
+git clone git@<remote server ip>:/usr/local/src/sample
+
+git pull origin master
+git push origin master
