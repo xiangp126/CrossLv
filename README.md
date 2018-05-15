@@ -16,14 +16,14 @@
     - fuzzy-find command-line tool and its vim plugin
     - the language code-completion engine for vim
     - the awsome terminal multiplexer running on server
-    - needless to say vim itself
+    - and vim itself
 - And with
-    - self-written handy scripts on [tools](./tools) and somewhere else
-    - handy notes on [doc](./doc) which was searched quickly by rg or ag with wim
     - personal dotfiles on [track-files](./track-files)
-    - extra bash completion for fzf/tmux/git on [completion](./completion)
+    - handy notes on [doc](./doc) which was searched quickly by rg or ag with wim
+    - some self-written scripts on [tools](./tools)
+    - extra bash completion on [completion](./completion)
     - favourite personal vim color scheme on [darkcoding.vim](./vim-colors/darkcoding.vim)
-    - programming font on [monaco.ttf](./fonts/monaco.ttf)
+    - ever best programming font on [monaco.ttf](./fonts/monaco.ttf)
     - my personel [let-tmux](https://github.com/xiangp126/Let-Tmux) if needed
     - my personel [let-git](https://github.com/xiangp126/let-git) if needed
     - etc...
