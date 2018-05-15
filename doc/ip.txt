@@ -28,3 +28,6 @@ iface eth0 inet static
 - MANUAL NIC
 sudo ifup eth0
 sudo ifdown eth0 && sudo ifup eth0
+
+- IP show neighbour | neighbor
+ip neighbor

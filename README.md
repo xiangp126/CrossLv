@@ -1,5 +1,5 @@
 - This project aims to persist the same programming environment On Linux platform
-- Done everything for me with just single command, save more time and enjoy more life
+- Done everything for me with just single command, save more time for life
     - provide different modes for installation, considering if has root privilege or not
     - put all packages from network into one directory, easy to delete
     - install all packages into one same directory, not to interfere with system old ones
@@ -19,6 +19,7 @@
     - needless to say vim itself
 - And with
     - self-written handy scripts on [tools](./tools) and somewhere else
+    - handy notes on [doc](./doc) which was searched quickly by rg or ag with wim
     - personal dotfiles on [track-files](./track-files)
     - extra bash completion for fzf/tmux/git on [completion](./completion)
     - favourite personal vim color scheme on [darkcoding.vim](./vim-colors/darkcoding.vim)
