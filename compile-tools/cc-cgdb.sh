@@ -1,13 +1,59 @@
 #!/bin/bash
-installDir=/usr/local
-wgetDir=wget https://github.com/cgdb/cgdb/archive/v0.7.0.tar.gz
-srcDir=/usr/local/src
-untarName=cgdb-0.7.0
+downloadPath=../downloads
+homeInstDir=$HOME/.usr/
+rootInstDir=/usr/local
+commInstdir=$homeInstDir
+execPrefix=""
 
-cd $srcDir
-wget $wgetDir -O $untarName
-cd $untarName
-/bin/bash autogen.sh
-./configure --prefix=$installDir
-make -j
-make install
+usage() {
+    echo "usage: $0 [home | root]"
+}
+
+install() {
+    clonedName=cgdb
+    clonedPath=https://github.com/cgdb/cgdb
+    cgdbInstDir=$commInstdir
+
+    cd $downloadPath
+    if [[ ! -d "$downloadPath" ]]; then
+        mkdir -p $downloadPath
+    fi
+    if [[ ! -d $clonedName ]]; then
+        git clone $clonedPath $clonedName
+    fi
+
+    cd $clonedName
+    # checkout to latest released tag
+    git pull
+    latestTag=$(git describe --tags `git rev-list --tags --max-count=1`)
+    if [[ "$latestTag" != "" ]]; then
+        git checkout $latestTag
+    fi
+
+    sh autogen.sh
+    ./configure --prefix=$cgdbInstDir
+    make -j
+    $execPrefix make install
+}
+
+case $1 in
+    'home')
+        set -x
+        commInstdir=$homeInstDir
+        execPrefix=""
+        install
+        ;;
+
+    'root')
+        set -x
+        # create flag for had run more than one time
+        commInstdir=$rootInstDir
+        execPrefix=sudo
+        install
+        ;;
+
+    *)
+        usage
+        exit
+        ;;
+esac

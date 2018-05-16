@@ -1,0 +1,8 @@
+- curl download
+curl http://some.url --output some.file
+
+- be silent
+curl http://example.com --output my.file --silent
+
+- refer
+http://www.compciv.org/recipes/cli/downloading-with-curl/
