@@ -1,0 +1,18 @@
+--- cgdb debug | gdb
+Warning: Do Not Type layout src
+
+- logging
+set logging file ~/dpvs.log
+set logging on
+set trace-commands on
+
+- break
+break main
+break 334
+
+- until | can be used to jump out of function
+until + 3
+until <Line_Number>
+
+Execute until the program reaches a source line greater than the current
+or a specified location (same args as break command) within the current frame))
