@@ -26,6 +26,7 @@ install() {
     # checkout to latest released tag
     git pull
     latestTag=$(git describe --tags `git rev-list --tags --max-count=1`)
+    latestTag=v0.6.8
     if [[ "$latestTag" != "" ]]; then
         git checkout $latestTag
     fi
