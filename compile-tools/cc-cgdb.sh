@@ -1,5 +1,9 @@
 #!/bin/bash
-downloadPath=../downloads
+# From which path it was executed
+startDir=`pwd`
+# Absolute path of this shell, no impact by start dir
+mainWd=$(cd $(dirname $0)/../; pwd)
+downloadPath=$mainWd/downloads
 homeInstDir=$HOME/.usr/
 rootInstDir=/usr/local
 commInstdir=$homeInstDir
@@ -9,7 +13,12 @@ usage() {
     echo "usage: $0 [home | root]"
 }
 
-install() {
+installCgdb() {
+    cat << _EOF
+------------------------------------------------------
+INSTALLING CGDB INTO $commInstdir
+------------------------------------------------------
+_EOF
     clonedName=cgdb
     clonedPath=https://github.com/cgdb/cgdb
     cgdbInstDir=$commInstdir
@@ -34,7 +43,54 @@ install() {
     sh autogen.sh
     ./configure --prefix=$cgdbInstDir
     make -j
+    if [[ $? != 0 ]]; then
+        echo [Error]: make error, pls check
+        exit
+    fi
     $execPrefix make install
+    if [[ $? != 0 ]]; then
+        echo [Error]: make install error, pls check
+        exit
+    fi
+    cgdbPath=$cgdbInstDir/bin/cgdb
+}
+
+installRc() {
+    cat << "_EOF"
+------------------------------------------------------
+INSTALLING CGDB RC FILE
+------------------------------------------------------
+_EOF
+    rcFromPath=$mainWd/template/cgdbrc
+    rcToPath=$HOME/.cgdb
+    cgdbRcPath=$rcToPath/cgdbrc
+    if [[ -f $cgdbRcPath ]]; then
+        echo [Warning]: already has cgdbrc, cover it anyway
+    fi
+    $execPrefix cp $rcFromPath $rcToPath
+
+    if [[ $? != 0 ]]; then
+        echo [Error]: copy cgdbrc error, please check
+        exit
+    fi
+}
+
+installSummary() {
+    cat << _EOF
+------------------------------------------------------
+INSTALLATION SUMMARY FOR CGDB
+------------------------------------------------------
+cgdbPath=$cgdbPath
+cgdbRcPath=$cgdbRcPath
+------------------------------------------------------
+_EOF
+
+}
+
+install() {
+    installCgdb
+    installRc
+    installSummary
 }
 
 case $1 in
@@ -47,7 +103,6 @@ case $1 in
 
     'root')
         set -x
-        # create flag for had run more than one time
         commInstdir=$rootInstDir
         execPrefix=sudo
         install

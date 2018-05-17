@@ -10,7 +10,7 @@ set showmarks
 set cgdbmodekey=<ESC>
 set winsplitorientation=vertical
 set executinglinedisplay=longarrow
-set selectedlinedisplay=longarrow
+set selectedlinedisplay=shortarrow
 
 " map <F5>  :run<CR>
 " map <F8>  :continue<CR>
