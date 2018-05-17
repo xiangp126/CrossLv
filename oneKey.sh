@@ -1,7 +1,8 @@
 #!/bin/bash
-# COPYRIGHT BY PENG, 2018. XIANGP126@SJTU.EDU.CN.
+# Copyright by PENG, 2018. hi.pxiang@gmail.com.
+# From which path it was executed
 startDir=`pwd`
-# main work directory, not influenced by start dir
+# Absolute path of this shell, no impact by start dir
 mainWd=$(cd $(dirname $0); pwd)
 # .vim/.tmux config files location
 baseDir=$HOME
