@@ -1,7 +1,39 @@
-# cgdb | gdb debugging
-Warning: Do Not Type layout src
+# cgdb | gdb debugging | Warning: Do Not Type layout src
+- compile source file for debugging
+g++ -Wall -g3
+-g3 must be assigned
 
-- Logging Output | logging
+- reverse-next | gdb | cgdb
+Step program backward, proceeding through subroutine calls
+https://sourceware.org/gdb/wiki/ProcessRecord
+https://stackoverflow.com/questions/7517236/how-do-i-enable-reverse-debugging-on-a-multi-threaded-program
+
+For multi-thread reverse debugging
+You need to active the instruction-recording target, by executing the command record
+> Example
+record
+next
+reverse-next
+
+- finish
+Upon return, the value returned is printed and put in the value history.
+
+- break
+break main
+break 334
+
+- until | can be used to jump out of function
+until + 3
+until <Line_Number>
+
+Execute until the program reaches a source line greater than the current
+or a specified location (same args as break command) within the current frame))
+
+- info
+info line
+info line -- Core addresses of the code for a source line
+
+- logging | Logging Output
 You may want to save the output of GDB commands to a file. There are several commands to control GDB’s logging.
 
 > Example
@@ -28,16 +60,6 @@ By default, GDB output will go to both the terminal and the logfile. Set redirec
 show logging
 Show the current values of the logging settings.
 
-- break
-break main
-break 334
-
-- until | can be used to jump out of function
-until + 3
-until <Line_Number>
-
-Execute until the program reaches a source line greater than the current
-or a specified location (same args as break command) within the current frame))
 
 --- shortcut key | only support >= v0.7.0
 - refer http://cgdb.github.io/docs/cgdb.html

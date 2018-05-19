@@ -14,13 +14,14 @@
 ![](./gif/crosslv.gif)
 - Project packaged with some awesome open source tools
     - fuzzy-find command-line tool and its vim plugin
-    - the language code-completion engine for vim
+    - the programming language code-completion engine for vim
     - the awsome terminal multiplexer running on server
     - and vim itself
 - And with
     - personal dotfiles on [track-files](./track-files)
-    - handy notes on [doc](./doc) which was searched quickly by rg or ag with wim
-    - some self-written scripts on [tools](./tools)
+    - quick install scripts on [compile-tools](./compile-tools)
+    - handy notes on [doc](./doc) which was searched quickly by rg or ag with vim
+    - some self-written short commands on [tools](./tools)
     - extra bash completion on [completion](./completion)
     - favourite personal vim color scheme on [darkcoding.vim](./vim-colors/darkcoding.vim)
     - ever best programming font on [monaco.ttf](./fonts/monaco.ttf)
