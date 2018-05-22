@@ -216,8 +216,9 @@ _EOF
     $execPrefix mkdir -p $commInstdir
     # comm attribute to get source
     wgetLink=http://archive.ubuntu.com/ubuntu/pool/main/b/bash-completion
-    tarName=bash-completion_2.1.orig.tar.bz2
-    untarName=bash-completion-2.1
+    wgetVersion=2.8
+    tarName=bash-completion_$wgetVersion.orig.tar.gz
+    untarName=bash-completion-$wgetVersion
 
     # rename download package if needed
     cd $downloadPath
@@ -237,9 +238,10 @@ _EOF
         fi
     fi
     if [[ ! -d $untarName ]]; then
-        tar -jxv -f $tarName
+        tar -zxv -f $tarName
     fi
     cd $untarName
+    autoreconf -i
     ./configure --prefix=$bashCompInstDir
     make -j $cpuCoreNum
     # check if make returns successfully
@@ -1940,13 +1942,14 @@ PRE INSTALL FOR MACOS PLATFORM - WITH BREW
 _EOF
     if [[ ! -f $mRunFlagFile ]]; then
         # Ordinary user run brew, use gnu-sed as compatible with that of Linux
+        # update bash version
         touch $mRunFlagFile
         # If unavailable:cannot import name _remove_dead_weakref
         brew uninstall python@2
         brew cask install meld
         brew install python3 cmake vim git fd wget autoconf automake \
             bash-completion fontconfig tmux ripgrep pkg-config \
-            p7zip htop iftop \
+            p7zip htop iftop bash \
             gnu-sed the_silver_searcher --with-default-names -y
     else
         cat << _EOF
