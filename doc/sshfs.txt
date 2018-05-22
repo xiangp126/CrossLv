@@ -1,0 +1,22 @@
+---- sshfs  | ssh file system
+https://www.digitalocean.com/community/tutorials/how-to-use-sshfs-to-mount-remote-file-systems-over-ssh
+https://lutao.me/ssh/sshfs/fuse/2017/04/19/sshfs.html
+
+-- MAC
+brew cask install osxfuse
+brew install sshfs
+
+cd
+mkdir rdisk
+sshfs root@10.123.16.46: rdisk/
+
+df -h
+root@10.123.16.46:       1.1T  264G  849G  24% /root/rdisk
+
+- unmount | umount
+diskutil unmount ~/rdisk
+umount ~/rdisk
+
+-- Ubuntu | CentOS
+yum install sshfs
+apt-get install sshfs

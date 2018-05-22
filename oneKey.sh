@@ -1883,7 +1883,7 @@ _EOF
                 libmpc-dev libcurl4-openssl-dev perl libperl-dev \
                 libncursesw5 libncursesw5-dev libgnome2-dev libgnomeui-dev \
                 libgtk2.0-dev libatk1.0-dev libbonoboui2-dev expat \
-                libcairo2-dev libx11-dev libxpm-dev libxt-dev \
+                libcairo2-dev libx11-dev libxpm-dev libxt-dev sshfs \
                 python-dev python3-dev ruby-dev lua5.1 lua5.1-dev \
                 x11-xkb-utils vim openssh-server p7zip* htop iftop -y
 
@@ -1895,7 +1895,7 @@ _EOF
                 xz-devel libX11-devel libXpm-devel libXt-devel libevent-devel \
                 pcre-devel mlocate bash-completion python-optcomplete \
                 cmake ncurses* gmp-devel gcc gcc-c++ automake asciidoc \
-                xmlto tmux git autoconf vim openssl \
+                xmlto tmux git autoconf vim openssl sshfs \
                 ruby ruby-devel lua lua-devel luajit clang clang-devel \
                 luajit-devel python python-devel openssl-devel \
                 python34 python34-devel python36 python36-devel tcl-devel \
@@ -1944,15 +1944,16 @@ _EOF
         # Ordinary user run brew, use gnu-sed as compatible with that of Linux
         # Update bash version from 3.X to 4.X to support new feature
         # then ln -s /bin/bash /usr/local/bin/bash
-        # Need restart and 'csrutil disable' to allow /bin write permission
-        # for root
+        # Need restart, press Win + R till Apple logo appear,
+        # launch terminal type 'csrutil disable' to allow /bin write permission
+        # for root, and back to 'csrutil enable' after everything done.
         touch $mRunFlagFile
         # If unavailable:cannot import name _remove_dead_weakref
         brew uninstall python@2
-        brew cask install meld
+        brew cask install meld osxfuse
         brew install python3 cmake vim git fd wget autoconf automake \
             bash-completion fontconfig tmux ripgrep pkg-config \
-            p7zip htop iftop bash \
+            p7zip htop iftop bash sshfs \
             gnu-sed the_silver_searcher --with-default-names -y
     else
         cat << _EOF

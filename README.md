@@ -33,8 +33,7 @@
     - root mode: with root privilege, normally install packages into /usr/local
     - mixed mode
 
-Latest released version: 3.9.9
-
+Latest released version: v4.0
 ## Prerequisite
 - You should have full Internet access, if not refer [squid.md](./guide/squid.md) or [ssh-proxy.md](./guide/ssh-proxy.md) to establish connection
  - On Ubuntu, /bin/sh was linked to /bin/dash by default, correct it to /bin/bash
@@ -82,6 +81,7 @@ $ sh oneKey.sh [home | root]
 
 ## Modification Note
 V3.9
+* add sshfs support for root mode
 * add support for install summary, more easy to update certain package
 * revise makeLink.sh, skip already linked tool
 * fix bug install cmake: check install status, then soft link it if failed
