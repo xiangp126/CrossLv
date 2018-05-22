@@ -1942,7 +1942,10 @@ PRE INSTALL FOR MACOS PLATFORM - WITH BREW
 _EOF
     if [[ ! -f $mRunFlagFile ]]; then
         # Ordinary user run brew, use gnu-sed as compatible with that of Linux
-        # update bash version
+        # Update bash version from 3.X to 4.X to support new feature
+        # then ln -s /bin/bash /usr/local/bin/bash
+        # Need restart and 'csrutil disable' to allow /bin write permission
+        # for root
         touch $mRunFlagFile
         # If unavailable:cannot import name _remove_dead_weakref
         brew uninstall python@2
