@@ -1,4 +1,4 @@
----- sshfs  | ssh file system
+---- sshfs  | ssh file system | Temporary Add
 https://www.digitalocean.com/community/tutorials/how-to-use-sshfs-to-mount-remote-file-systems-over-ssh
 https://lutao.me/ssh/sshfs/fuse/2017/04/19/sshfs.html
 
@@ -20,3 +20,10 @@ umount ~/rdisk
 -- Ubuntu | CentOS
 yum install sshfs
 apt-get install sshfs
+
+---- Permanently Mounting the Remote File System
+sudo vim /etc/fstab
+
+...
+/dev/vdb /data          ext4    defaults  1      2
+sshfs#root@xxx.xxx.xxx.xxx:~ /mnt/droplet
