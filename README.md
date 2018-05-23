@@ -23,7 +23,7 @@
     - handy notes on [doc](./doc) which was searched quickly by rg or ag with vim
     - some self-written short commands on [tools](./tools)
     - extra bash completion on [completion](./completion)
-    - favourite personal vim color scheme on [darkcoding.vim](./vim-colors/darkcoding.vim)
+    - favourite personal vim color scheme on [vim-colors](./vim-colors)
     - ever best programming font on [monaco.ttf](./fonts/monaco.ttf)
     - my personel [let-tmux](https://github.com/xiangp126/Let-Tmux) if needed
     - my personel [let-git](https://github.com/xiangp126/let-git) if needed
