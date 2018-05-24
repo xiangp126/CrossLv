@@ -3,3 +3,11 @@
 
 -- Del ^M generated from Windows
 %s/\r//gc
+
+-- Shortcut Key
+- Refer  ../pic/iterm2-Alt.png
+mapping Alt to Esc+
+so typing 'Alt + O' equals typing 'Esc + O'
+
+Alt + o   next line in 'Insert Mode'
+Alt + Shift + i  goto current head of line
