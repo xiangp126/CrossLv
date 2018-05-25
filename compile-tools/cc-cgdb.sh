@@ -29,6 +29,9 @@ _EOF
     fi
     if [[ ! -d $clonedName ]]; then
         git clone $clonedPath $clonedName
+        if [[ $? != 0 ]]; then
+            exit
+        fi
     fi
 
     cd $clonedName
@@ -44,12 +47,10 @@ _EOF
     ./configure --prefix=$cgdbInstDir
     make -j
     if [[ $? != 0 ]]; then
-        echo [Error]: make error, pls check
         exit
     fi
     $execPrefix make install
     if [[ $? != 0 ]]; then
-        echo [Error]: make install error, pls check
         exit
     fi
     cgdbPath=$cgdbInstDir/bin/cgdb
