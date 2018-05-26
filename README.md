@@ -61,7 +61,7 @@ $ sh oneKey.sh
     help -- print the help messages
     home -- install packages into ~/.usr/
     root -- install packages into /usr/local/
-    mixed -- install packages into ~/.usr/ but with sudo privilege
+    mixed - install packages into ~/.usr/ but with sudo privilege
     summary -- show installation summary
 
 [TROUBLESHOOTING]

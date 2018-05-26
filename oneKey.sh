@@ -123,7 +123,7 @@ usage() {
     help -- print the help messages
     home -- install packages into $homeInstDir/
     root -- install packages into $rootInstDir/
-    mixed -- install packages into $homeInstDir/ but with sudo privilege
+    mixed - install packages into $homeInstDir/ but with sudo privilege
     summary -- show installation summary
 
 [TROUBLESHOOTING]
@@ -1057,6 +1057,43 @@ _EOF
     fzfPath=$commInstdir/bin/fzf
 }
 
+# Till now, only MAC configure this
+doExtraForAria2() {
+    cat << "_EOF"
+------------------------------------------------------
+INSTALLING 'DOWNLOAD' TOOL ARIA2
+------------------------------------------------------
+_EOF
+    aria2Path=`which aria2c 2> /dev/null`
+    aria2LocalConfigDir=$HOME/.aria2
+    aria2LocalConfigPath=$aria2LocalConfigDir/aria2.conf
+    aria2ConfPath=$mainWd/template/aria2.conf
+    if [[ "$aria2Path" == "" ]]; then
+        return
+    else
+        if [[ ! -f "$aria2LocalConfigPath" ]]; then
+            mkdir -p $aria2LocalConfigDir
+            cp $aria2ConfPath $aria2LocalConfigPath
+            if [[ $? != 0 ]]; then
+                exit 1
+            fi
+        fi
+    fi
+
+    # Install webui for aria2
+    webuiClonePath=https://github.com/ziahamza/webui-aria2
+    clonedName=webui-aria2
+    webuiAria2Path=$downloadPath/webui-aria2/index.html
+    cd $downloadPath
+    if [[ -d $clonedName ]]; then
+        return
+    fi
+    git clone $webuiClonePath
+    if [[ $? != 0 ]]; then
+        exit 1
+    fi
+}
+
 installuCtags() {
     cat << "_EOF"
 ------------------------------------------------------
@@ -1952,9 +1989,9 @@ _EOF
         brew uninstall python@2
         brew cask install meld osxfuse
         brew install python3 cmake vim git fd wget autoconf automake \
-            bash-completion fontconfig tmux ripgrep pkg-config \
-            p7zip htop iftop bash sshfs \
-            gnu-sed the_silver_searcher --with-default-names -y
+            fontconfig tmux ripgrep pkg-config \
+            p7zip htop iftop bash sshfs aria2 --with-libssh2 \
+            the_silver_searcher gnu-sed --with-default-names -y
     else
         cat << _EOF
 ------------------------------------------------------
@@ -2092,6 +2129,12 @@ tmux  path = $tmuxPath
 cmake path = $cmakePath
 u-ctags path = $uCtagsPath
 python3 path = $python3Path
+_EOF
+    if [[ $webuiAria2Path != "" ]]; then
+        echo "aria2 webui  = $webuiAria2Path" >> $summaryLog
+    fi
+    # print ycm path info
+    cat << _EOF >> $summaryLog
 --------------------------------------------- YCM CORE PATH -------
 $ycmCorePath
 -------------------------------------------------------------------
@@ -2145,18 +2188,19 @@ install() {
         #   - checkCpuCoreNum
     if [[ $platOsType == 'macos' ]]; then
         preInstallForMacos
+        doExtraForAria2
     else
         # if had root privilege, sudo install needed packages
+        # and check and/or install gcc first of all
         preInstallForLinux
-        # check and/or install gcc first of all
         installGcc
     fi
     installBone
-      # | - installTmuxPlugins
-      #   - installVimPlugins
-      #       | - doExtraForFzf
-      #   - installBashCompletion
-      #   - installFonts
+        # | - installTmuxPlugins
+        #   - installVimPlugins
+        #       | - doExtraForFzf
+        #   - installBashCompletion
+        #   - installFonts
     installPrivateTools
     installuCtags
     if [[ $platOsType != 'macos' ]]; then
