@@ -1,5 +1,20 @@
-- This project aims to persist the same programming environment On Linux platform
-- Done everything for me with just single command, save more time for life
+- This project aims to persist the same working environment crossing different working machine
+- Done everything for me with just 'onekey' command, save more time for life -- life ease
+- Packages many awesome open source tools and its well-going configuration, And with
+    - personal dotfiles on [track-files](./track-files)
+    - extra configuration on [template](./template)
+    - quick install scripts on [compile-tools](./compile-tools)
+    - handy notes on [doc](./doc) which was searched quickly by rg or ag with vim
+    - some self-written short commands on [tools](./tools)
+    - extra bash completion on [completion](./completion)
+    - favourite personal vim color scheme on [vim-colors](./vim-colors)
+    - ever best programming font on [fonts](./fonts)
+    - my personal [let-tmux](https://github.com/xiangp126/Let-Tmux) if needed
+    - my personal [let-git](https://github.com/xiangp126/let-git) if needed
+    - etc...
+- Catch a glimpse of the working effect
+![](./gif/crosslv.gif)
+- Featured with
     - provide different modes for installation, considering if has root privilege or not
     - put all packages from network into one directory, easy to delete
     - install all packages into one same directory, not to interfere with system old ones
@@ -10,30 +25,15 @@
     - support incremental install, safe to run consecutive times
     - pretty print, generate error log if occurs
     - robust for more possible situations and any other methods to speed up
-- Catch a glimpse of the effect
-![](./gif/crosslv.gif)
-- Project packaged with some awesome open source tools
-    - fuzzy-find command-line tool and its vim plugin
-    - the programming language code-completion engine for vim
-    - the awsome terminal multiplexer running on server
-    - and vim itself
-- And with
-    - personal dotfiles on [track-files](./track-files)
-    - quick install scripts on [compile-tools](./compile-tools)
-    - handy notes on [doc](./doc) which was searched quickly by rg or ag with vim
-    - some self-written short commands on [tools](./tools)
-    - extra bash completion on [completion](./completion)
-    - favourite personal vim color scheme on [vim-colors](./vim-colors)
-    - ever best programming font on [monaco.ttf](./fonts/monaco.ttf)
-    - my personel [let-tmux](https://github.com/xiangp126/Let-Tmux) if needed
-    - my personel [let-git](https://github.com/xiangp126/let-git) if needed
-    - etc...
 - Three modes deploy selection
     - home mode: without root privilege, normally install packages into $HOME/.usr
     - root mode: with root privilege, normally install packages into /usr/local
     - mixed mode
 
+It's great if this project may be helpful for you though it aimed to my personal use at the beginning
+
 Latest released version: v4.0
+
 ## Prerequisite
 - You should have full Internet access, if not refer [squid.md](./guide/squid.md) or [ssh-proxy.md](./guide/ssh-proxy.md) to establish connection
  - On Ubuntu, /bin/sh was linked to /bin/dash by default, correct it to /bin/bash
