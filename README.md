@@ -12,8 +12,8 @@
     - my personal [let-tmux](https://github.com/xiangp126/Let-Tmux) if needed
     - my personal [let-git](https://github.com/xiangp126/let-git) if needed
     - etc...
-- Catch a glimpse of the working effect
-![](./gif/crosslv.gif)
+- Catch a glimpse of the 'recursive' one key procedure
+![](./gif/persistlv.gif)
 - Featured with
     - provide different modes for installation, considering if has root privilege or not
     - put all packages from network into one directory, easy to delete
