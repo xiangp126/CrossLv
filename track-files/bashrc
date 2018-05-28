@@ -114,8 +114,8 @@ fi
 # SETTINGS FOR FZF -- FUZZY FINDER
 if [[ "`which fd 2> /dev/null`" != '' ]]; then
     # export FZF_DEFAULT_COMMAND='fd --type f'
-    export FZF_DEFAULT_COMMAND="fd --type f --hidden --follow --no-ignore --exclude .git \
-        --exclude '*.sw[p|o]'"
+    export FZF_DEFAULT_COMMAND="fd --type f --hidden --follow --no-ignore --exclude '.git'\
+        --exclude '*.sw[p|o]' --exclude '*.[a|o]' --exclude '*.so'"
     # To apply the command to CTRL-T as well
     export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 fi
