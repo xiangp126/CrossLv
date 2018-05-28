@@ -1,7 +1,10 @@
 # cgdb | gdb debugging | Warning: Do Not Type layout src
-- compile source file for debugging
+
+############# Notice Importnant ########################
+- Compile source file for debugging
 g++ -Wall -g3
--g3 must be assigned
+    > -g3 must be assigned
+    > -O must be all removed (Shift + o, optimized for short)
 
 - reverse-next | gdb | cgdb
 Step program backward, proceeding through subroutine calls
