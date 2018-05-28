@@ -26,8 +26,6 @@ platOsType=ubuntu
 # required packages install info
 # gcc install
 gccInstDir=$commInstdir
-# silver searcher install
-ackInstDir=$commInstdir
 # universal ctags install
 uCtagsInstDir=$commInstdir
 # python3 install
@@ -1991,7 +1989,7 @@ _EOF
         brew install python3 cmake vim git fd wget autoconf automake \
             fontconfig tmux ripgrep pkg-config \
             p7zip htop iftop bash sshfs aria2 --with-libssh2 \
-            the_silver_searcher gnu-sed --with-default-names -y
+            gnu-sed --with-default-names -y
     else
         cat << _EOF
 ------------------------------------------------------
@@ -2120,7 +2118,6 @@ INSTALLATION THROUGH ONEKEY DONE - CONGRATULATION
 ------------------------------------------------------
 gcc   path = $CC
 cxx   path = $CXX
-ag    path = $agPath
 rg    path = $rgPath
 fd    path = $fdPath
 fzf   path = $fzfPath
@@ -2131,7 +2128,7 @@ u-ctags path = $uCtagsPath
 python3 path = $python3Path
 _EOF
     if [[ $webuiAria2Path != "" ]]; then
-        echo "aria2 webui  = $webuiAria2Path" >> $summaryLog
+        echo "webui: $webuiAria2Path" >> $summaryLog
     fi
     # print ycm path info
     cat << _EOF >> $summaryLog
@@ -2216,10 +2213,10 @@ install() {
         installCmake
         if [[ "$aclocalPath" == "" ]]; then
             echo [FatalError]: pls install automake for tmux/ag/vim | tee >> $errLogFile
-            exit 255
+            exit 1
         else
             installTmux
-            installSilverSearcher
+            # installSilverSearcher
             installvim
         fi
         installClang
