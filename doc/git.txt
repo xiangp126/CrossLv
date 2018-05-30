@@ -1,3 +1,9 @@
+-- diff
+git diff --since=1.hour.ago --until=1.minute.ago
+
+-- log
+git log -p --author='Peng'
+
 -- On Remote Machinde | team server
 # git bare local private repository
 - use git-shell | not bash

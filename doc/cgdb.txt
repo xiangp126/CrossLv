@@ -6,7 +6,7 @@ g++ -Wall -g3
     > -g3 must be assigned
     > -O must be all removed (Shift + o, optimized for short)
 
-- reverse-next | gdb | cgdb
+- reverse-next | gdb | cgdb | record
 Step program backward, proceeding through subroutine calls
 https://sourceware.org/gdb/wiki/ProcessRecord
 https://stackoverflow.com/questions/7517236/how-do-i-enable-reverse-debugging-on-a-multi-threaded-program
@@ -18,7 +18,9 @@ record
 next
 reverse-next
 
-- finish
+record stop
+
+- finish | continue until hit a return
 Upon return, the value returned is printed and put in the value history.
 
 - break
@@ -32,6 +34,16 @@ until <Line_Number>
 Execute until the program reaches a source line greater than the current
 or a specified location (same args as break command) within the current frame))
 
+- condition
+(gdb) help condition
+Specify breakpoint number N to break only if COND is true.
+Usage is `condition N COND', where N is an integer and COND is an
+expression to be evaluated whenever breakpoint N is reached.
+
+break <Function>
+info breakpoints
+condition 3 i == 3
+`
 - info
 info line
 info line -- Core addresses of the code for a source line
@@ -76,3 +88,8 @@ Puts the user into scroll mode in the GDB mode.
 
 Ctrl-T
 Opens a new tty for the debugged program.
+
+---- cgdb usage
+Jump to cgdb source window, like VIM, type command below to switch to horizontal split
+set winsplitorientation=vertical
+set winsplitorientation=horizontal

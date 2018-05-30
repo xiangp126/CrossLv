@@ -58,7 +58,8 @@ alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias gdb='gdb -q'
 alias cgdb='cgdb -q'
-alias ag="ag --color-path='1;34' --color-line-number='0;8' --color-match='0;35'"
+# alias ag="ag --color-path='1;34' --color-line-number='0;8' --color-match='0;35'"
+alias rg='rg -S'
 alias 7zP='7z a -mhe=on -p'
 alias 7zA='7z a'
 alias 7zX='7z x'
