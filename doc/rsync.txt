@@ -12,6 +12,9 @@ rsync -azP /var/www/example.com/ root@108.175.12.239:/var/www/example.com/ -n
          Pull: rsync [OPTION...] [USER@]HOST:SRC... [DEST]
          Push: rsync [OPTION...] SRC... [USER@]HOST:DEST
 
+- rsync not at port 22
+rsync -azP "-e ssh -p 23" user@server-ip:/opt/o-source/ /opt/o-source -n
+
 -- Before sync
 must do this before actually sync. with -n -v flag, in case of data lose.
 > rsync -anv dir1/ dir2
