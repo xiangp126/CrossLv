@@ -45,24 +45,31 @@ lrwxrwxrwx 1 root root 9 Mar 29 17:04 /bin/sh -> /bin/bash*
 
 ## Quick Start
 ```bash
-$ sh oneKey.sh
+git clone https://github.com/xiangp126/giggle
+```
+```bash
+sh oneKey.sh
 [NAME]
     oneKey.sh -- setup my working environment with just single command
 
 [SYNOPSIS]
-    sh oneKey.sh [home | root | mixed | summary | help]
+    sh oneKey.sh < home | root | mixed > [simple | full]
+    sh oneKey.sh [summary | help]
 
 [EXAMPLE]
     sh oneKey.sh
+    sh oneKey.sh home
     sh oneKey.sh root
     sh oneKey.sh summary
+    sh oneKey.sh root simple
 
 [DESCRIPTION]
     help -- print the help messages
-    home -- install packages into ~/.usr/
+    home -- install packages into /home/pi/.usr/
     root -- install packages into /usr/local/
-    mixed - install packages into ~/.usr/ but with sudo privilege
+    mixed - install packages into /home/pi/.usr/ but with sudo privilege
     summary -- show installation summary
+    simple  -- simple install level, only key vim/tmux plugins
 
 [TROUBLESHOOTING]
     sudo ln -s /bin/bash /bin/sh, ensuring /bin/sh linked to /bin/bash.
@@ -73,10 +80,9 @@ $ sh oneKey.sh
 | |_) |  __/ |  \__ \ \__ \ |_| |\ V /
 | .__/ \___|_|  |___/_|___/\__|_| \_/
 |_|
-
 ```
 ```bash
-$ sh oneKey.sh [home | root]
+sh oneKey.sh root
 ```
 
 ## Modification Note

@@ -18,6 +18,8 @@ rootInstDir=/usr/local
 instMode=home
 # install flag used for 'mixed' mode
 instFlag=""
+# install level: simple | full
+instLevel=full
 commInstdir=$homeInstDir
 # execute prefix: "" or sudo
 execPrefix=""
@@ -109,13 +111,15 @@ usage() {
     $exeName -- setup my working environment with just single command
 
 [SYNOPSIS]
-    sh $exeName [home | root | mixed | summary | help]
+    sh $exeName < home | root | mixed > [simple | full]
+    sh $exeName [summary | help]
 
 [EXAMPLE]
     sh $exeName
     sh $exeName home
     sh $exeName root
     sh $exeName summary
+    sh $exeName root simple
 
 [DESCRIPTION]
     help -- print the help messages
@@ -123,6 +127,7 @@ usage() {
     root -- install packages into $rootInstDir/
     mixed - install packages into $homeInstDir/ but with sudo privilege
     summary -- show installation summary
+    simple  -- simple install level, only key vim/tmux plugins
 
 [TROUBLESHOOTING]
     sudo ln -s /bin/bash /bin/sh, ensuring /bin/sh linked to /bin/bash.
@@ -2198,6 +2203,12 @@ install() {
         #       | - doExtraForFzf
         #   - installBashCompletion
         #   - installFonts
+    
+    # if install level is 'simple', just return after
+    if [[ $instLevel == 'simple' ]]; then
+        return
+    fi
+
     installPrivateTools
     installuCtags
     if [[ $platOsType != 'macos' ]]; then
@@ -2265,6 +2276,10 @@ _EOF
     esac
 }
 
+# sh oneKey.sh root [simple]
+if [[ $2 == "simple" ]]; then
+    instLevel='simple'
+fi
 case $1 in
     'home')
         set -x
@@ -2276,7 +2291,6 @@ case $1 in
 
     'root')
         set -x
-        # create flag for had run more than one time
         commInstdir=$rootInstDir
         execPrefix=sudo
         instMode=root
