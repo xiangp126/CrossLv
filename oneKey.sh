@@ -2245,7 +2245,10 @@ checkPlatOsType() {
                 platOsType=centos
             elif [[ $linuxType == "Red" ]]; then
                 # echo "Platform is Red Hat"
-                platOsType=redhat
+                platOsType=centos
+            elif [[ $linuxType == "Raspbian" ]]; then
+                # echo "Platform is Raspbian"
+                platOsType=ubuntu
             else
                 echo "Sorry, We did not support your platform, pls check it first"
                 exit
