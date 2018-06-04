@@ -1,3 +1,8 @@
+- YCM
+nnoremap <leader>j :YcmCompleter GoToDefinitionElseDeclaration<CR>
+nnoremap <leader>D :YcmDiags<CR>
+nnoremap <leader>I :YcmCompleter FixIt<CR>
+
 - refer
 compile [vim-youcompleteme clang+llvm](https://www.jianshu.com/p/c24f919097b3)
 

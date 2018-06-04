@@ -1,2 +1,2 @@
--- MAC use
+-- MAC use | ldd | ldconfig
 otool -L
