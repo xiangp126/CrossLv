@@ -147,7 +147,6 @@ call plug#begin('~/.vim/bundle')
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 Plug 'scrooloose/nerdcommenter'
 Plug 'jiangmiao/auto-pairs'
-" Plug 'majutsushi/tagbar'
 Plug 'majutsushi/tagbar'
 Plug 'Yggdroot/indentLine'
 "------ FUZZY FINDER -----
