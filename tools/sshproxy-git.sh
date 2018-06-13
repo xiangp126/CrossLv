@@ -4,7 +4,7 @@
 # or you should edit line at /etc/ssh/ssh_config
 # 49 #   ProxyCommand ssh -q -W %h:%p gateway.example.com
 # Host *
-#   ProxyCommand netcat -x 127.0.0.1:8080 %h %p
+#   ProxyCommand nc -x 127.0.0.1:8080 %h %p
 
 logo() {
     cat << "_EOF"
@@ -31,19 +31,14 @@ usage() {
     proxy => socks5://127.0.0.1:8080
 
 [PREREQUISITE]
-   pls ensure first: ssh -vv -ND 8080 -l [loginName] [midmanServer]
+   pls ensure first: ssh -vv -ND 8080 -l [login-name] [midman-server]
 _EOF
 
 logo
 }
 
 # proxycommand use by ssh command.
-pxyCmd='netcat -x 127.0.0.1:8080 %h %p'
-
-if [ $# -le 0 ]; then
-    usage
-    exit
-fi
+pxyCmd='nc -x 127.0.0.1:8080 %h %p'
 
 # config file name.
 cfgFile=config
@@ -58,7 +53,7 @@ writeCfg() {
 # 49 #   ProxyCommand ssh -q -W %h:%p gateway.example.com
 Host github.com
     Hostname github.com
-    ProxyCommand netcat -x 127.0.0.1:8080 %h %p
+    ProxyCommand nc -x 127.0.0.1:8080 %h %p
 EOF
 }
 
@@ -102,4 +97,8 @@ case $1 in
     'uninstall')
         uninstall
         ;;
-esac;
+
+    *)
+        usage
+        ;;
+esac

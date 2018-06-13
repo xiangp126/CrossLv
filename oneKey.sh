@@ -2203,7 +2203,7 @@ install() {
         #       | - doExtraForFzf
         #   - installBashCompletion
         #   - installFonts
-    
+
     # if install level is 'simple', just return after
     if [[ $instLevel == 'simple' ]]; then
         return
