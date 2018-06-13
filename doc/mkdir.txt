@@ -1,0 +1,12 @@
+---- mkdir
+create directory consecutively
+mkdir test
+mkdir test/{haha,hehe}
+# Do not leave any blank between haha & hehe
+
+ll test/
+16:03 haha/
+16:03 hehe/
+
+---- touch | same as mkdir
+touch test/{just,get}

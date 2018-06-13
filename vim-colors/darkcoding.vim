@@ -137,7 +137,7 @@ hi rubysymbol guifg=#7697d6 guibg=NONE guisp=NONE gui=NONE ctermfg=110 ctermbg=N
 hi rubycontrol guifg=#7597c6 guibg=NONE guisp=NONE gui=NONE ctermfg=110 ctermbg=NONE cterm=NONE
 hi rubyidentifier guifg=#c6b6fe guibg=NONE guisp=NONE gui=NONE ctermfg=147 ctermbg=NONE cterm=NONE
 
-" ---- Peng modify
+" ---- PENG modify
 hi LineNr term=underline ctermfg=59 ctermbg=NONE
 hi normal ctermfg=247 ctermbg=NONE cterm=NONE
 hi Function ctermfg=137 guifg=#fad07a
@@ -146,6 +146,7 @@ hi Operator ctermfg=144 ctermbg=None cterm=NONE
 hi PreCondit ctermfg=110
 " hi Search ctermfg=130 ctermbg=None cterm=underline
 hi Search term=reverse cterm=underline ctermfg=16 ctermbg=245
+hi Exception ctermfg=98 ctermbg=NONE
 " -------------------- pop up menu ---------------------
 hi PMenu ctermfg=245 ctermbg=16
 hi PmenuSel ctermfg=0 ctermbg=242 term=Bold
