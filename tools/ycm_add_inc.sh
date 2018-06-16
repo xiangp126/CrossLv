@@ -8,6 +8,8 @@ fi
 
 set -x
 
+# nginx exclude dir
+ngxExDir=win32
 mkdir -p $incDir
 cd $incDir
-find .. -name '*.h' -exec ln -sf {} \;
+find .. -regex '.*.h$' ! -path '*inc*' ! -path '*win32*' -exec ln -s {} \;
