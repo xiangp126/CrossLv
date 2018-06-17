@@ -6,6 +6,7 @@ tags
 core
 core-*
 core.*
+inc/
 backup/
 downloads/
 backup.*/
