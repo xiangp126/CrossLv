@@ -6,13 +6,13 @@ incDir=inc
 
 doJob() {
     if [[ -d "$incDir" ]]; then
-        mv $incDir $incDir.bak
+        # rm -rf ${incDir}.bak
+        # mv $incDir ${incDir}.bak
         rm -rf $incDir
-        mkdir -p $incDir
     fi
 
+    mkdir -p $incDir
     cd $incDir
-
     fdPath=`which fd 2> /dev/null`
     if [[ $fdPath != '' ]]; then
         if [[ "$1" == 'nginx' ]]; then
@@ -38,7 +38,7 @@ doJob() {
     cd $startDir
     ycmConf=$HOME/.ycm_extra_conf.py
     if [[ -f "$ycmConf" ]]; then
-        if [[ ! -f "./ycm_extra_conf.py" ]]; then
+        if [[ ! -f ".ycm_extra_conf.py" ]]; then
             cp $ycmConf .
         fi
     fi
