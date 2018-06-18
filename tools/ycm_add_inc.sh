@@ -15,10 +15,6 @@ doJob() {
     cd $incDir
 
     fdPath=`which fd 2> /dev/null`
-
-        export FZF_DEFAULT_COMMAND="fd --type f --hidden --follow --no-ignore --exclude '.git'\
-                    --exclude '*.sw[p|o]' --exclude '*.[a|o]' --exclude '*.so'"
-
     if [[ $fdPath != '' ]]; then
         if [[ "$1" == 'nginx' ]]; then
             cmd='fd --type f --no-ignore --exclude inc --exclude win32 '.*\.h\$' '$startDir
