@@ -6,27 +6,26 @@ incDir=inc
 
 doJob() {
     if [[ -d "$incDir" ]]; then
-        echo "Already has directory inc, please check it"
+        mv $incDir $incDir.bak
         rm -rf $incDir
-        # exit
+        mkdir -p $incDir
     fi
 
-    mkdir -p $incDir
     cd $incDir
 
     fdPath=`which fd 2> /dev/null`
     if [[ $fdPath != '' ]]; then
         if [[ "$1" == 'nginx' ]]; then
-            cmd='fd --type f --no-ignore --exclude inc --exclude win32 '.*\.h\$' '$startDir
+            cmd='fd --type f --no-ignore --exclude inc --exclude win32 '.*\\.h\$' '$startDir
         else
-            cmd='fd --type f --no-ignore --exclude inc '.*\.h\$' '$startDir
+            cmd='fd --type f --no-ignore --exclude inc '.*\\.h\$' '$startDir
         fi
     else
         # use legacy find
         if [[ "$1" == 'nginx' ]]; then
-            cmd='find $startDir -regex '.*.h$' ! -path '*inc*' ! -path '*win32*''
+            cmd="find $startDir "'-regex '.*\\.h\$' ! -path '*inc*' ! -path '*win32*''
         else
-            cmd='find $startDir -regex '.*.h$' ! -path '*inc*''
+            cmd="find $startDir "'-regex '.*\\.h\$' ! -path '*inc*''
         fi
     fi
 
@@ -38,8 +37,10 @@ doJob() {
     # copy default ycm config
     cd $startDir
     ycmConf=$HOME/.ycm_extra_conf.py
-    if [[ ! -f "$ycmConf" ]]; then
-        cp $ycmConf .
+    if [[ -f "$ycmConf" ]]; then
+        if [[ ! -f "./ycm_extra_conf.py" ]]; then
+            cp $ycmConf .
+        fi
     fi
 }
 
