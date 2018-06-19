@@ -6,6 +6,8 @@ incDir=inc
 
 doJob() {
     if [[ -d "$incDir" ]]; then
+        exit
+
         # rm -rf ${incDir}.bak
         # mv $incDir ${incDir}.bak
         rm -rf $incDir
