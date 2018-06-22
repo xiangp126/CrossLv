@@ -164,5 +164,11 @@ $ sh autoHandle.sh
 sh makeLink.sh install
 ```
 
+### Other Goodies
+
+- [Let-OpenGrok](https://github.com/xiangp126/tmux-copycat)
+- [Let-Tmux](https://github.com/xiangp126/let-tmux)
+- [Let-Git](https://github.com/xiangp126/let-git)
+
 ## License
 The [MIT](./LICENSE.txt) License (MIT)

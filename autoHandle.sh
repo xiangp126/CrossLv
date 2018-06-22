@@ -58,7 +58,7 @@ usage() {
 
 [DESCRIPTION]
     backup  -> backup tracked files under environment to ${backupDir}/
-    track   -> deploy tracked files from 'backup-ed' to ${trackDir}/
+    track   -> deploy tracked files from ${backupDir}/ to ${trackDir}/
     restore -> restore tracked files to environment from ${trackDir}/
     regret  -> regret previous 'restore' action as medicine
     auto    -> run 'backup' & 'track' as pack
