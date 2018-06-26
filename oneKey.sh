@@ -51,10 +51,12 @@ downloadPath=$mainWd/downloads
 pkgPath=$mainWd/packages
 # if first run this script, it'll generate mRunFlagFile
 mRunFlagFile=$mainWd/.MORETIME.txt
+# store all log files here
+logPath=$mainWd/log
 # error message log file
-errLogFile=$mainWd/err.log
+errLog=$logPath/err.log
 # store install summary into log
-summaryLog=$mainWd/crosslv.log
+summaryLog=$logPath/crosslv.log
 # dir storing tracked files
 trackDir=./track-files
 # git repo need update
@@ -1129,8 +1131,8 @@ _EOF
     cd $clonedName
     autoreconfPath=`which autoreconf 2> /dev/null`
     if [[ "$autoreconfPath" == "" ]]; then
-        touch $errLogFile
-        echo [Error]: pls install autoconf for universal ctags | tee >> $errLogFile
+        touch $errLog
+        echo [Error]: pls install autoconf for universal ctags | tee >> $errLog
         return
     fi
     ./autogen.sh
@@ -2116,6 +2118,7 @@ _EOF
 }
 
 writeInstallSummary() {
+    mkdir -p
     set +x
     cat << _EOF > $summaryLog
 ------------------------------------------------------
@@ -2162,9 +2165,9 @@ installSummary() {
     showSummary
 
     # output for error message
-    if [[ -f $errLogFile ]]; then
+    if [[ -f $errLog ]]; then
     cat << _EOF
-        $(cat $errLogFile)
+        $(cat $errLog)
 ------------------------------------------------------
 _EOF
         echo
@@ -2181,7 +2184,7 @@ preInstallCheck() {
 
 install() {
     # clear previous log info
-    rm -rf $errLogFile
+    mkdir -p $logPath
     mkdir -p $downloadPath
 
     # check platform & os type and set proper value
@@ -2214,7 +2217,7 @@ install() {
     if [[ $platOsType != 'macos' ]]; then
         # check existence of curl
         if [[ "$curlPath" == "" ]]; then
-            echo [Error]: pls install curl for rust/ripgrep/fd | tee >> $errLogFile
+            echo [Error]: pls install curl for rust/ripgrep/fd | tee >> $errLog
         else
             installRust
             installRipGrep
@@ -2223,7 +2226,7 @@ install() {
         installPython3
         installCmake
         if [[ "$aclocalPath" == "" ]]; then
-            echo [FatalError]: pls install automake for tmux/ag/vim | tee >> $errLogFile
+            echo [FatalError]: pls install automake for tmux/ag/vim | tee >> $errLog
             exit 1
         else
             installTmux

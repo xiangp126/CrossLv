@@ -8,6 +8,7 @@ core-*
 core.*
 inc/
 backup/
+log/
 downloads/
 backup.*/
 dry_install/

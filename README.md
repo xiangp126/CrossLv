@@ -166,7 +166,7 @@ sh makeLink.sh install
 
 ### Other Goodies
 
-- [Let-OpenGrok](https://github.com/xiangp126/tmux-copycat)
+- [Let-OpenGrok](https://github.com/xiangp126/let-opengrok)
 - [Let-Tmux](https://github.com/xiangp126/let-tmux)
 - [Let-Git](https://github.com/xiangp126/let-git)
 
