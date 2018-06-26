@@ -132,8 +132,8 @@ usage() {
     simple  -- simple install level, only key vim/tmux plugins
 
 [TROUBLESHOOTING]
-    sudo ln -s /bin/bash /bin/sh, ensuring /bin/sh linked to /bin/bash.
-    ll /bin/sh lrwxrwxrwx 1 root root 9 Dec  7 01:00 /bin/sh -> /bin/bash*
+    if 'sh $execName' can not be excuted, ensure /bin/sh linked to /bin/bash
+    ln -s /bin/bash /bin/sh
 _EOF
     logo
 }

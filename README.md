@@ -72,8 +72,8 @@ sh oneKey.sh
     simple  -- simple install level, only key vim/tmux plugins
 
 [TROUBLESHOOTING]
-    sudo ln -s /bin/bash /bin/sh, ensuring /bin/sh linked to /bin/bash.
-    ll /bin/sh lrwxrwxrwx 1 root root 9 Dec  7 01:00 /bin/sh -> /bin/bash*
+    if 'sh $execName' can not be excuted, ensure /bin/sh linked to /bin/bash
+    ln -s /bin/bash /bin/sh
                      _     _   _
  _ __   ___ _ __ ___(_)___| |_| |_   __
 | '_ \ / _ \ '__/ __| / __| __| \ \ / /
@@ -121,12 +121,8 @@ $ sh autoHandle.sh
     sh $execName auto
 
 [TROUBLESHOOTING]
-    if 'sh $execName' can not be excuted.
-    $ ll `which sh`
-    lrwxrwxrwx 1 root root 9 Dec  7 01:00 /bin/sh -> /bin/bash*
-    # on some distribution, sh was linked to dash, not bash.
-    # you have to excute following command mannually. -f if needed.
-    $ ln -s /bin/bash /bin/sh
+    if 'sh $execName' can not be excuted, ensure /bin/sh linked to /bin/bash
+    ln -s /bin/bash /bin/sh
 
 [DESCRIPTION]
     backup  -> backup tracked files under environment to ${backupDir}/
@@ -152,7 +148,6 @@ $ sh autoHandle.sh
 
 [TROUBLESHOOTING]
     ~/.usr/bin/ should be placed in PATH
-
                  _          _ _       _
  _ __ ___   __ _| | _____  | (_)_ __ | | __
 | '_ ` _ \ / _` | |/ / _ \ | | | '_ \| |/ /
@@ -166,9 +161,9 @@ sh makeLink.sh install
 
 ### Other Goodies
 
-- [Let-OpenGrok](https://github.com/xiangp126/let-opengrok)
-- [Let-Tmux](https://github.com/xiangp126/let-tmux)
-- [Let-Git](https://github.com/xiangp126/let-git)
+- [Let-OpenGrok](https://github.com/xiangp126/let-opengrok) - tool to deploy OpenGrok
+- [Let-Tmux](https://github.com/xiangp126/let-tmux) - quick deploy tmux and resolving dependency
+- [Let-Git](https://github.com/xiangp126/let-git) - update old version of Git
 
 ## License
 The [MIT](./LICENSE.txt) License (MIT)

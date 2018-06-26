@@ -35,7 +35,6 @@ usage() {
 
 [TROUBLESHOOTING]
     $installDir/ should be placed in PATH
-
 _EOF
 }
 
