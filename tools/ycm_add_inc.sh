@@ -1,16 +1,13 @@
 #!/bin/bash
-set -x
 mainWd=$(cd $(dirname $0); pwd)
 startDir=`pwd`
 incDir=inc
 
 doJob() {
     if [[ -d "$incDir" ]]; then
-        exit
-
-        # rm -rf ${incDir}.bak
-        # mv $incDir ${incDir}.bak
-        rm -rf $incDir
+        set +x
+        echo "Already has inc/, please check it"
+        exit 1
     fi
 
     mkdir -p $incDir
@@ -50,28 +47,38 @@ usage() {
     exeName=${0##*/}
     cat << _EOF
 [NAME]
-    $exeName -- make soft link all headers of current directory to ./inc/
-
+    $exeName -- make soft link all headers of current directory
+                                       to ./inc/
+                -- One Key Done
 [USAGE]
-    sh $exeName [nginx | help]
+    sh $exeName [go | nginx | help]
 
 [EXAMPLE]
-    sh $exeName
-    sh $exeName nginx --> only for generating Nginx source code
+    sh $exeName [help]
+    sh $exeName go
+    sh $exeName nginx
+
+[DESCRIPTION]
+    go     start to generate links
+    nginx  same as 'go' mode, but special for Nginx source
+    help   print help page
 
 _EOF
 }
 
 case $1 in
     'nginx')
+        set -x
         doJob nginx
         ;;
 
-    'help')
-        usage
+    'go')
+        set -x
+        doJob
         ;;
 
     *)
-        doJob
+        set +x
+        usage
         ;;
 esac

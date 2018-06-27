@@ -43,8 +43,6 @@ flags = [
 'c',
 '-isystem',
 '/usr/include',
-'-isystem',
-'/usr/include',
 '-I.',
 '-I./include',
 '-I./inc'
