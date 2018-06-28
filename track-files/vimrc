@@ -42,6 +42,9 @@ set pumheight=12      " maximum height of popup menu
 set shell=/bin/bash   " set vim default shell
 let mapleader=';'     " leader key, default is '\'
 set t_Co=256          " number of colors
+" Tip: below two lines handle characters over 80c
+" highlight OverLength ctermbg=33 ctermfg=Grey
+" match OverLength /\%81v.\+/
 set background=dark
 "------ private under ~/.vim/colors -----
 :colorscheme darkcoding
