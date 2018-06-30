@@ -1926,7 +1926,7 @@ _EOF
                 libncursesw5 libncursesw5-dev libgnome2-dev libgnomeui-dev \
                 libgtk2.0-dev libatk1.0-dev libbonoboui2-dev expat \
                 libcairo2-dev libx11-dev libxpm-dev libxt-dev sshfs \
-                python-dev python3-dev ruby-dev lua5.1 lua5.1-dev \
+                python-dev python3-dev ruby-dev lua5.1 lua5.1-dev net-tools \
                 x11-xkb-utils vim openssh-server p7zip* htop iftop -y
 
         elif [[ $platOsType = 'centos' &&
@@ -1944,7 +1944,7 @@ _EOF
                 curl libcurl-devel perl perl-devel perl-ExtUtils-ParseXS \
                 perl-ExtUtils-XSpp perl-ExtUtils-CBuilder expat expat-devel \
                 perl-ExtUtils-Embed xorg-x11-xkb-utils readline-devel \
-                p7zip htop iftop --skip-broken -y
+                p7zip htop iftop net-tools --skip-broken -y
                 # perl-ExtUtils-Embed xorg-x11-xkb-utils -y
         fi
         # Check root install return status
