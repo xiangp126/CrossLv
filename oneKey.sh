@@ -2118,7 +2118,7 @@ _EOF
 }
 
 writeInstallSummary() {
-    mkdir -p
+    mkdir -p $logPath
     set +x
     cat << _EOF > $summaryLog
 ------------------------------------------------------
