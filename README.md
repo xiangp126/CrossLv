@@ -164,6 +164,7 @@ sh makeLink.sh install
 - [Let-OpenGrok](https://github.com/xiangp126/let-opengrok) - tool to deploy OpenGrok
 - [Let-Tmux](https://github.com/xiangp126/let-tmux) - quick deploy tmux and resolving dependency
 - [Let-Git](https://github.com/xiangp126/let-git) - update old version of Git
+- [Let-Unlatch](https://github.com/xiangp126/let-unlatch) - quick deploy unlatch on VPS
 
 ## License
 The [MIT](./LICENSE.txt) License (MIT)
