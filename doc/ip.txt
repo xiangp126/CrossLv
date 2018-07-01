@@ -18,12 +18,25 @@ sudo vim /etc/network/interfaces
 ------- BEGIN DEMO
 auto eth0
 iface eth0 inet static
-    address 10.124.10.102
+    address 1.1.1.1
     netmask 255.255.255.0
-    gateway 10.124.10.1
+    gateway 1.1.1.254
     dns-nameservers 8.8.8.8
     # dns-nameservers 64.104.123.144
 ------- END DEMO
+
+- for CentOS | static | Example
+cd /etc/sysconfig/network-scripts
+
+DEVICE='eth0'
+TYPE=Ethernet
+BOOTPROTO=static
+ONBOOT='yes'
+IPADDR=1.1.1.1
+NETMASK=255.255.255.0
+GATEWAY=1.1.1.254
+NM_CONTROLLED='no'
+DNS1=8.8.8.8
 
 - MANUAL NIC
 sudo ifup eth0
