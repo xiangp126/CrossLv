@@ -1,5 +1,5 @@
 - This project aims to persist the same working environment crossing different working machine
-- Done everything for me with just 'onekey' command, save more time for life -- life ease
+- Done everything even from fresh install of OS with just 'onekey' command -- life ease
 - Packages many awesome open source tools and its well-going configuration, And with
     - personal dotfiles on [track-files](./track-files)
     - extra configuration on [template](./template)
