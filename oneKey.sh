@@ -1938,9 +1938,9 @@ _EOF
                 pcre-devel mlocate bash-completion python-optcomplete \
                 cmake ncurses* gmp-devel gcc gcc-c++ automake asciidoc \
                 xmlto tmux git autoconf vim openssl sshfs texinfo \
-                ruby ruby-devel lua lua-devel luajit clang clang-devel \
+                ruby ruby-devel lua lua-devel luajit \
                 luajit-devel python python-devel openssl-devel \
-                python34 python34-devel python36 python36-devel tcl-devel \
+                python34 python34-devel tcl-devel \
                 curl libcurl-devel perl perl-devel perl-ExtUtils-ParseXS \
                 perl-ExtUtils-XSpp perl-ExtUtils-CBuilder expat expat-devel \
                 perl-ExtUtils-Embed xorg-x11-xkb-utils readline-devel \
