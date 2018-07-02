@@ -1789,6 +1789,44 @@ ln -s $libClangPath libclang.so.5
 _EOF
 }
 
+checkDynLibForYcm() {
+    cat << _EOF
+------------------------------------------------------
+CHECK IF ANY DYNAMIC LIBRARY LINK ISSUE
+------------------------------------------------------
+_EOF
+    # ycmCoreDir="$HOME/.vim/bundle/YouCompleteMe/third_party/ycmd"
+    # ycmCorePath="$ycmCoreDir/ycm_core.so"
+    lddPath=`which ldd 2> /dev/null`
+    if [[ $lddPath != "" ]]; then
+        # loop to check and fix issue
+        loopCnt=2
+        for (( i = 0; i < $loopCnt; i++ )); do
+            isSomeNotFound=`$lddPath $ycmCorePath | grep -i 'not found'`
+            if [[ "$isSomeNotFound" != "" ]]; then
+                cat << _EOF
+------------------------------------------------------ LINK BAD
+_EOF
+                $lddPath $ycmCorePath
+                # try to fix issue libclang.so.5 not found
+                cat << _EOF
+------------------------------------------------------ TRY FIX
+_EOF
+                cd $ycmCoreDir
+                linkedName=libclang.so.5
+                ln -sf $libClangPath $linkedName
+                ls -l $linkedName
+            else
+                cat << _EOF
+------------------------------------------------------ LINK WELL
+_EOF
+                $lddPath $ycmCorePath
+                break
+            fi
+        done
+    fi
+}
+
 # compile YouCompleteMe
 installYcm() {
     cat << "_EOF"
@@ -1800,6 +1838,7 @@ _EOF
     ycmCorePath="$ycmCoreDir/ycm_core.so"
     if [[ -f $ycmCorePath ]]; then
         echo 'Warning: already has YouCompleteMe installed'
+        checkDynLibForYcm
         return 0
     fi
 
@@ -1869,41 +1908,7 @@ _EOF
         exit
     fi
 
-    cat << _EOF
-------------------------------------------------------
-CHECK IF ANY DYNAMIC LIBRARY LINK ISSUE
-------------------------------------------------------
-_EOF
-    # ycmCoreDir="$HOME/.vim/bundle/YouCompleteMe/third_party/ycmd"
-    # ycmCorePath="$ycmCoreDir/ycm_core.so"
-    lddPath=`which ldd 2> /dev/null`
-    if [[ $lddPath != "" ]]; then
-        # loop to check and fix issue
-        loopCnt=2
-        for (( i = 0; i < $loopCnt; i++ )); do
-            isSomeNotFound=`$lddPath $ycmCorePath | grep -i 'not found'`
-            if [[ "$isSomeNotFound" != "" ]]; then
-                cat << _EOF
------------------------------------------------------- LINK BAD
-_EOF
-                $lddPath $ycmCorePath
-                # try to fix issue libclang.so.5 not found
-                cat << _EOF
------------------------------------------------------- TRY FIX
-_EOF
-                cd $ycmCoreDir
-                linkedName=libclang.so.5
-                ln -sf $libClangPath $linkedName
-                ls -l $linkedName
-            else
-                cat << _EOF
------------------------------------------------------- LINK WELL
-_EOF
-                $lddPath $ycmCorePath
-                break
-            fi
-        done
-    fi
+    checkDynLibForYcm
 }
 
 preInstallForLinux() {
