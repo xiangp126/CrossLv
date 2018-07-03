@@ -32,8 +32,6 @@
 
 It's great if this project may be helpful for you though it aimed to my personal use at the beginning
 
-Latest released version: v4.0
-
 ## Prerequisite
 - You should have full Internet access, if not refer [squid.md](./guide/squid.md) or [ssh-proxy.md](./guide/ssh-proxy.md) to establish connection
  - On Ubuntu, /bin/sh was linked to /bin/dash by default, correct it to /bin/bash
@@ -161,8 +159,8 @@ sh makeLink.sh install
 
 ### Other Goodies
 
-- [Let-OpenGrok](https://github.com/xiangp126/let-opengrok) - tool to deploy OpenGrok
-- [Let-Tmux](https://github.com/xiangp126/let-tmux) - quick deploy tmux and resolving dependency
+- [Let-OpenGrok](https://github.com/xiangp126/let-opengrok) - one-click installation of OpenGrok
+- [Let-Tmux](https://github.com/xiangp126/let-tmux) - quick deploy tmux and resolving its dependency
 - [Let-Git](https://github.com/xiangp126/let-git) - update old version of Git
 - [Let-Unlatch](https://github.com/xiangp126/let-unlatch) - quick deploy unlatch on VPS
 
