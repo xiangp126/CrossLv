@@ -3,7 +3,7 @@
 - Packages many awesome open source tools and its well-going configuration, And with
     - personal dotfiles on [track-files](./track-files)
     - extra configuration on [template](./template)
-    - quick install scripts on [compile-tools](./compile-tools)
+    - plain compile scripts on [compile-tools](./compile-tools)
     - handy notes on [doc](./doc) which was searched quickly by rg or ag with vim
     - some self-written short commands on [tools](./tools)
     - extra bash completion on [completion](./completion)

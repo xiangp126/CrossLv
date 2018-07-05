@@ -10,6 +10,11 @@ git branch -D master
 git branch -m master
 git push origin master --force
 
+--- Delete remove branch
+git push origin :[branch_name]
+Exp: delete branch 'feature'
+git push origin :feature
+
 --- git untrace
 https://gist.github.com/nasirkhan/5919173
 
