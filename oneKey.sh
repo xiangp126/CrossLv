@@ -700,122 +700,6 @@ _EOF
     doExtraForFzf
 }
 
-installLibpcre() {
-    cat << "_EOF"
-------------------------------------------------------
-INSTALLING LIBPCRE
-------------------------------------------------------
-_EOF
-    whereIsLibpcre=`pkg-config --libs libpcre 2> /dev/null`
-    if [[ $whereIsLibpcre != "" ]]; then
-        return
-    fi
-
-    libpcreInstDir=$commInstdir
-    $execPrefix mkdir -p $commInstdir
-    # wgetLink=ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre
-    tarName=pcre-8.41.tar.gz
-    untarName=pcre-8.41
-
-    cd $downloadPath
-    # check if already has this tar ball.
-    # if [[ -f $tarName ]]; then
-    #     echo [Warning]: Tar Ball $tarName already exists
-    # else
-    #     wget --no-cookies \
-    #          --no-check-certificate \
-    #          --header "Cookie: oraclelicense=accept-securebackup-cookie" \
-    #          "${wgetLink}/${tarName}" \
-    #          -O $tarName
-    #     # check if wget returns successfully
-    #     if [[ $? != 0 ]]; then
-    #         echo [Error]: wget returns error, quitting now
-    #         exit
-    #     fi
-    # fi
-
-    # check if already untared
-    if [[ -d $untarName ]]; then
-        echo [Warning]: untarname $untarName already exists
-    else
-        tar -zxv -f $pkgPath/$tarName
-    fi
-    cd $untarName
-    ./configure --prefix=$python3InstDir \
-                --enable-shared
-    make -j $cpuCoreNum
-    # check if make returns successfully
-    if [[ $? != 0 ]]; then
-        echo [Error]: make returns error, quitting now
-        exit
-    fi
-
-    $execPrefix make install
-    # check if make returns successfully
-    if [[ $? != 0 ]]; then
-        echo [Error]: make install returns error, quitting now
-        exit
-    fi
-}
-
-installLiblzma() {
-    cat << "_EOF"
-------------------------------------------------------
-INSTALLING XZ-UTILS (LIBLZMAI)
-------------------------------------------------------
-_EOF
-    whereIsLiblzma=`pkg-config --libs liblzma 2> /dev/null`
-    if [[ $whereIsLiblzma != "" ]]; then
-        return
-    fi
-
-    liblzmaInstDir=$commInstdir
-    $execPrefix mkdir -p $commInstdir
-    wgetLink=http://cdn-fastly.deb.debian.org/debian/pool/main/x/xz-utils
-    tarName=xz-utils_5.2.2.orig.tar.xz
-    untarName=xz-5.2.2
-
-    cd $downloadPath
-    # check if already has this tar ball.
-    # if [[ -f $tarName ]]; then
-    #     echo [Warning]: Tar Ball $tarName already exists
-    # else
-    #     wget --no-cookies \
-    #          --no-check-certificate \
-    #          --header "Cookie: oraclelicense=accept-securebackup-cookie" \
-    #          "${wgetLink}/${tarName}" \
-    #          -O $tarName
-    #     # check if wget returns successfully
-    #     if [[ $? != 0 ]]; then
-    #         echo [Error]: wget returns error, quitting now
-    #         exit
-    #     fi
-    # fi
-
-    # check if already untared
-    if [[ -d $untarName ]]; then
-        echo [Warning]: untarName $untarName already exists
-    else
-        tar -xv -f $pkgPath/$tarName
-    fi
-    cd $untarName
-    ./configure --prefix=$python3InstDir \
-                --enable-shared
-    make -j $cpuCoreNum
-    # check if make returns successfully
-    if [[ $? != 0 ]]; then
-        echo [Error]: make returns error, quitting now
-        exit
-    fi
-
-    $execPrefix make install
-    # check if make returns successfully
-    if [[ $? != 0 ]]; then
-        echo [Error]: make install returns error, quitting now
-        exit
-    fi
-}
-
 installRust() {
     cat << "_EOF"
 ------------------------------------------------------
@@ -949,68 +833,6 @@ _EOF
         echo [Error]: fd-find run error, quitting now
         exit
     fi
-}
-
-# install silver searcher
-installSilverSearcher() {
-    cat << "_EOF"
-------------------------------------------------------
-INSTALLING SILVER SEARCHER (AKA AG)
-------------------------------------------------------
-_EOF
-    agPath=`which ag 2> /dev/null`
-    if [[ $agPath != "" ]]; then
-        return
-    fi
-
-    # if has no root privilege need manual compile them
-    if [[ $execPrefix != 'sudo' ]]; then
-        installLibpcre
-        installLiblzma
-    fi
-    agInstDir=$commInstdir
-    gitClonePath=https://github.com/ggreer/the_silver_searcher
-    clonedName=the_silver_searcher
-    cd $downloadPath
-    if [[ -d "$clonedName" ]]; then
-        echo [Warning]: clonedName $clonedName/ already exists
-    else
-        git clone $gitClonePath
-        # check if git clone returns successfully
-        if [[ $? != 0 ]]; then
-            echo [Error]: git clone returns error, quiting now
-            exit
-        fi
-    fi
-
-    cd $clonedName
-    # checkout to latest released tag
-    git pull
-    latestTag=$(git describe --tags `git rev-list --tags --max-count=1`)
-    if [[ "$latestTag" != "" ]]; then
-        git checkout $latestTag
-    fi
-    # begin to build
-    ./autogen.sh
-    ./configure --prefix=$agInstDir
-    if [[ $? != 0 ]]; then
-        echo [Error]: ./configure returns error, quitting now ...
-        exit
-    fi
-    make -j $cpuCoreNum
-    # check if make returns successfully
-    if [[ $? != 0 ]]; then
-        echo [Error]: make returns error, quitting now ...
-        exit
-    fi
-
-    $execPrefix make install
-    # check if make install returns successfully
-    if [[ $? != 0 ]]; then
-        echo [Error]: make install returns error, quitting now ...
-        exit 255
-    fi
-    agPath=$agInstDir/bin/ag
 }
 
 # command-line fuzzy finder
@@ -2235,7 +2057,6 @@ install() {
             exit 1
         else
             installTmux
-            # installSilverSearcher
             installvim
         fi
         installClang
