@@ -45,6 +45,14 @@ _EOF
 
     sh autogen.sh
     ./configure --prefix=$cgdbInstDir
+    if [[ $? != 0 ]]; then
+        cat << _EOF
+  try install following packages for a try
+  sudo yum install texinfo help2man readline-devel -y
+_EOF
+        exit
+    fi
+
     make -j
     if [[ $? != 0 ]]; then
         exit
