@@ -4,7 +4,7 @@
     - personal dotfiles on [track-files](./track-files)
     - extra configurations on [template](./template)
     - standalone compile scripts on [compile-tools](./compile-tools), such as installing cgdb
-    - handy notes on [doc](./doc) which was searched quickly by rg or ag with vim
+    - handy notes on [doc](./doc) which be quickly searched by rg or vim/fzf
     - self-written short commands on [tools](./tools)
     - extra bash completion on [completion](./completion)
     - favourite personal vim color scheme on [vim-colors](./vim-colors)
