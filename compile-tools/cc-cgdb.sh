@@ -97,6 +97,7 @@ _EOF
 }
 
 install() {
+    mkdir -p $downloadPath
     installCgdb
     installRc
     installSummary
