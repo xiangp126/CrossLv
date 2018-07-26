@@ -1,5 +1,6 @@
 ## Install Squid
 wget did not support ssh socks5 proxy
+
 ```bash
 sudo yum install squid -y
 ```
@@ -47,7 +48,8 @@ udp6       0      0 :::17176                :::*                                
 ```
 
 ## Use Proxy on Client
-Assume 10.124.10.102 is the IP of Server
+Let's assume 10.124.10.102 is the IP of Server
+
 ```bash
 proxy_ip=10.124.10.102
 export http_proxy=http://$proxy_ip:3128/
