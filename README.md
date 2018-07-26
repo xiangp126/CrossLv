@@ -1,3 +1,4 @@
+## Illustrate
 - This project aims to persist the same working environment crossing different working machine
 - Done everything even from fresh install of OS with just 'onekey' command -- life ease
 - Package many awesome open source tools and its well-going configuration, And with
@@ -161,8 +162,8 @@ sh makeLink.sh install
 
 - [Let-OpenGrok](https://github.com/xiangp126/let-opengrok) - one-click installation of OpenGrok
 - [Let-Tmux](https://github.com/xiangp126/let-tmux) - quick deploy tmux and resolving its dependency
-- [Let-Git](https://github.com/xiangp126/let-git) - update old version of Git
-- [Let-Unlatch](https://github.com/xiangp126/let-unlatch) - quick deploy unlatch on VPS
+- [Let-Git](https://github.com/xiangp126/let-git) - update to latest stable version of Git
+- [Let-Unlatch](https://github.com/xiangp126/let-unlatch) - quick deploy 'you know' on VPS
 
 ## License
 The [MIT](./LICENSE.txt) License (MIT)

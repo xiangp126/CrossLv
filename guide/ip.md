@@ -1,4 +1,8 @@
---- Temporary modify (add them to /etc/rc.local for permanent)
+## ip
+### add
+add them to **/etc/rc.local** for permanent
+
+```
 # sudo ip addr del 10.124.10.103/24 dev eth0
 sudo ip addr add 10.124.10.103/24 dev eth0
 sudo ip route add default via 10.124.10.1
@@ -6,16 +10,14 @@ sudo ip route add default via 10.124.10.1
 sudo ifconfig eth0 10.123.18.129/20
 sudo route del default gw 10.123.31.254
 sudo route add default gw 10.123.31.1
+```
 
-- Del one route (Not recommended)
-route del -net 10.0.0.0 netmask 255.0.0.0
-- Add one route
-route add -net 10.0.0.0 netmask 255.0.0.0 gw 10.123.31.1
+### Ubuntu
+- Permanent modify
 
---- Permanent modify
-- for Ubuntu
+```
 sudo vim /etc/network/interfaces
-------- BEGIN DEMO
+
 auto eth0
 iface eth0 inet static
     address 1.1.1.1
@@ -23,9 +25,12 @@ iface eth0 inet static
     gateway 1.1.1.254
     dns-nameservers 8.8.8.8
     # dns-nameservers 64.104.123.144
-------- END DEMO
+```
 
-- for CentOS | static | Example
+### CentOS
+- static
+
+```
 cd /etc/sysconfig/network-scripts
 
 DEVICE='eth0'
@@ -37,10 +42,27 @@ NETMASK=255.255.255.0
 GATEWAY=1.1.1.254
 NM_CONTROLLED='no'
 DNS1=8.8.8.8
+```
 
-- MANUAL NIC
+### ifup / ifdown
+```
 sudo ifup eth0
 sudo ifdown eth0 && sudo ifup eth0
+```
 
-- IP show neighbour | neighbor
+### route
+- Del one route (Not recommended)
+
+```
+route del -net 10.0.0.0 netmask 255.0.0.0 gw 10.123.31.254
+```
+- Add one route
+
+```
+route add -net 10.0.0.0 netmask 255.0.0.0 gw 10.123.31.1
+```
+
+### neighbour | neighbor
+```
 ip neighbor
+```
