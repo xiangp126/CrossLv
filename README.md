@@ -44,7 +44,7 @@ lrwxrwxrwx 1 root root 9 Mar 29 17:04 /bin/sh -> /bin/bash*
 
 ## Quick Start
 ```bash
-git clone https://github.com/xiangp126/giggle
+git clone https://github.com/xiangp126/Giggle crosslv
 ```
 ```bash
 sh oneKey.sh
