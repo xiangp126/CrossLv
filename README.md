@@ -20,7 +20,7 @@
     - put all packages from network into one directory, easy to delete
     - install all packages into one same directory, not to interfere with system old ones
     - version compare, only trigger installation of certain package when requirements met
-    - auto fit for different os type, already support Ubuntu | CentOS | Mac
+    - auto fit for different os type, alredy support Ubuntu | CentOS | Mac
     - distribute packages mainly from source, so always the latest stable version
     - skip already installed packages or downloaded tar ball
     - support incremental install, safe to run consecutive times
@@ -161,9 +161,9 @@ sh makeLink.sh install
 ### Other Goodies
 
 - [Let-OpenGrok](https://github.com/xiangp126/let-opengrok) - one-click installation of OpenGrok
-- [Let-Tmux](https://github.com/xiangp126/let-tmux) - quick deploy tmux and resolving its dependency
+- [Let-Tmux](https://github.com/xiangp126/let-tmux) - lazy deploy tmux and enjoy
 - [Let-Git](https://github.com/xiangp126/let-git) - update to latest stable version of Git
-- [Let-Unlatch](https://github.com/xiangp126/let-unlatch) - quick deploy 'you know' on VPS
+- [Let-Unlatch](https://github.com/xiangp126/let-unlatch) - lazy deploy that 'you known' on VPS
 
 ## License
 The [MIT](./LICENSE.txt) License (MIT)
