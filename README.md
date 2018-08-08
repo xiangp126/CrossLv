@@ -1,11 +1,11 @@
 ## Illustrate
-- This project aims to persist the same working environment crossing different working machine
-- Done everything even from fresh install of OS with just 'onekey' command -- life ease
-- Package many awesome open source tools and its well-going configuration, And with
+- This project aims to persist the same working environment crossing different working machines
+- Done everything even from fresh install of OS with just 'one-click' command -- life ease
+- Package many awesome open source tools and their well-going configs, and with
     - personal dotfiles on [track-files](./track-files)
     - extra configurations on [template](./template)
     - standalone compile scripts on [compile-tools](./compile-tools), such as installing cgdb
-    - handy notes on [doc](./doc) which be quickly searched by rg or vim/fzf
+    - handy notes on [doc](./doc) and [guide](./guide) which can be quickly searched by rg/fzf
     - self-written short commands on [tools](./tools)
     - extra bash completion on [completion](./completion)
     - favourite personal vim color scheme on [vim-colors](./vim-colors)
@@ -31,11 +31,13 @@
     - root mode: with root privilege, normally install packages into /usr/local
     - mixed mode
 
-It's great if this project may be helpful for you though it aimed to my personal use at the beginning
+> It's great if this project may be helpful for you though it aimed to my personal use at the beginning<br>
+> Latest released version: v4.0
 
 ## Prerequisite
-- You should have full Internet access, if not refer [squid.md](./guide/squid.md) or [ssh-proxy.md](./guide/ssh-proxy.md) to establish connection
- - On Ubuntu, /bin/sh was linked to /bin/dash by default, correct it to /bin/bash
+> You should have full Internet access, if not refer [squid.md](./guide/squid.md) or [ssh-proxy.md](./guide/ssh-proxy.md) to establish connection<br>
+> On Ubuntu, /bin/sh was linked to /bin/dash by default, correct it to /bin/bash
+
 ```bash
 sudo ln -sf /bin/bash /bin/sh
 ls -l /bin/sh
@@ -48,6 +50,7 @@ git clone https://github.com/xiangp126/Giggle crosslv
 ```
 ```bash
 sh oneKey.sh
+
 [NAME]
     oneKey.sh -- setup my working environment with just single command
 
@@ -85,14 +88,10 @@ sh oneKey.sh root
 ```
 
 ## Tips of key Script
+> autoHandle.sh and makeLink.sh was automatically called by oneKey.sh, but their function can be used outside this project, so separate them alone.
 
-autoHandle.sh and makeLink.sh was automatically called by oneKey.sh,
-
-however their function can be used outside this project, so separate them alone
-
-- Tips of autoHandle.sh
-
-comment on/off one of them to add/remove from tracking
+### autoHandle.sh
+> comment on/off one of them to add/remove from tracking
 
 ```bash
 trackFiles=(
@@ -106,7 +105,8 @@ trackFiles=(
 ```
 
 ```bash
-$ sh autoHandle.sh
+sh autoHandle.sh
+
 [NAME]
     $execName -- auto backup/restore key files of current linux env.
 
@@ -132,11 +132,14 @@ $ sh autoHandle.sh
     clean   -> clean ${backupDir}.*/, but reserve main backup dir
 ```
 
-- Tips of makeLink.sh
+### makeLink.sh
+> generate soft link for [tools](./tools) into PATH
 
 ```bash
+sh makeLink.sh
+
 [NAME]
-    makeLink.sh -- make link from ~/myGit/giggle/tools/
+    makeLink.sh -- make link from ~/myGit/crosslv/tools/
                              to   ~/.usr/bin/
 [USAGE]
     sh makeLink.sh [install | uninstall | help]
@@ -159,7 +162,6 @@ sh makeLink.sh install
 ```
 
 ### Other Goodies
-
 - [Let-OpenGrok](https://github.com/xiangp126/let-opengrok) - one-click installation of OpenGrok
 - [Let-Tmux](https://github.com/xiangp126/let-tmux) - lazy deploy tmux and enjoy
 - [Let-Git](https://github.com/xiangp126/let-git) - update to latest stable version of Git
