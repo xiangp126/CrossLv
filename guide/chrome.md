@@ -1,18 +1,23 @@
--------- Manual Install Chrome | for Ubuntu
-# 1. Add Key:
+
+## Manual Install Chrome | Ubuntu
+### Add Key:
+```bash
 wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+```
 
-# 2. Set Repository:
+### Set Repository:
+```bash
 echo 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main' | sudo tee /etc/apt/sources.list.d/google-chrome.list
+```
 
-# 3. Install Package:
+### Install Package:
+```bash
 sudo apt-get update
 sudo apt-get install google-chrome-stable
+```
 
---- chrome plugins ----
+### chrome plugins
 - stylish
---- preferred
-Global dark style - changes everything to DARK
-Github Dark
---- second choice
-Midnight Surfing - Global Dark Style
+	- Global dark style - changes everything to DARK
+	- Midnight Surfing - Global Dark Style
+- uBlock Origin
