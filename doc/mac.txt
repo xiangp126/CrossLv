@@ -1,7 +1,0 @@
---- Maximize Chrome still with Dock
-command＋option＋D hide 'Dock' and then stretch Chrome
-then reveal 'Dock'
-
---- Install Java8
-brew update
-brew cask install caskroom/versions/java8
