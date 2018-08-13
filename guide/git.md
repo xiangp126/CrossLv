@@ -1,20 +1,29 @@
--- diff
+## git
+
+### diff
+```git
 git diff --since=1.hour.ago --until=1.minute.ago
+```
 
--- log
+### log
+```git
 git log -p --author='Peng'
+```
 
--- On Remote Machinde | team server
+### bare repository
+```bash
 # git bare local private repository
-- use git-shell | not bash
+# use git-shell | not bash
 useradd -m -s "$(which git-shell)" git
 cd /usr/local/src/
--
+
 git init --bare sample
 sudo chown -R git:git sample
+```
 
--- On Local Machinde | access repository somewhere else
-- Create authorized_keys for user: git | Important
+```bash
+# On Local Machinde | access repository somewhere else
+#  Create authorized_keys for user: git | Important
 su -
 cd /home/git
 mkdir .ssh
@@ -30,3 +39,4 @@ git clone git@<remote server ip>:/usr/local/src/sample
 
 git pull origin master
 git push origin master
+```
