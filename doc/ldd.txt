@@ -1,2 +1,0 @@
--- MAC use | ldd | ldconfig
-otool -L

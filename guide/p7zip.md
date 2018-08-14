@@ -26,6 +26,3 @@
     -- or input password 'cipher' from command-line
     7z a -mhe=on -p me.7z me/
 ```
-
-
-
