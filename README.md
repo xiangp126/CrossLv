@@ -35,7 +35,7 @@
 > Latest released version: v4.0
 
 ## Prerequisite
-> You should have full Internet access, if not refer [squid.md](./guide/squid.md) or [ssh-proxy.md](./guide/ssh-proxy.md) to establish connection<br>
+> You should have full Internet access. if not, refer [squid.md](./guide/squid.md) or [ssh-proxy.md](./guide/ssh-proxy.md) to establish connection<br>
 > On Ubuntu, /bin/sh was linked to /bin/dash by default, correct it to /bin/bash
 
 ```bash
@@ -163,9 +163,9 @@ sh makeLink.sh install
 
 ### Other Goodies
 - [Let-OpenGrok](https://github.com/xiangp126/let-opengrok) - one-click installation of OpenGrok
-- [Let-Tmux](https://github.com/xiangp126/let-tmux) - lazy deploy tmux and enjoy
+- [Let-Tmux](https://github.com/xiangp126/let-tmux) - lazy deploy of tmux and enjoy it
 - [Let-Git](https://github.com/xiangp126/let-git) - update to latest stable version of Git
-- [Let-Unlatch](https://github.com/xiangp126/let-unlatch) - lazy deploy that 'you known' on VPS
+- [Let-Unlatch](https://github.com/xiangp126/let-unlatch) - lazy deploy that 'you knows' on VPS
 
 ## License
 The [MIT](./LICENSE.txt) License (MIT)
