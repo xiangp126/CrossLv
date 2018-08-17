@@ -1,4 +1,37 @@
------ Make Verbose
+## makefile
+
+### Notice GCC Variables
+```
+  CC          C compiler command
+  CFLAGS      C compiler flags
+  LDFLAGS     linker flags, e.g. -L<lib dir> if you have libraries in a
+              nonstandard directory <lib dir>
+  LIBS        libraries to pass to the linker, e.g. -l<library>
+  CPPFLAGS    (Objective) C/C++ preprocessor flags, e.g. -I<include dir> if
+              you have headers in a nonstandard directory <include dir>
+  CPP         C preprocessor
+  CXX         C++ compiler command
+  CXXFLAGS    C++ compiler flags
+```
+
+### make
+
+WE CAN MANUAL SPECIFY GCC/C++ USING ENV VARIABLES
+
+```bash
+export CC=/usr/local/bin/gcc
+export CXX=/usr/local/bin/c++
+make -j
+```
+or
+
+```makefile
+make CC=/usr/local/bin/gcc CXX=/usr/local/bin/c++ -j
+```
+
+> make V=s
+
+```
 make V=?
 V=99: This option controls the degree and type of verbosity that you will be exposed to during the make process. This is not specific to make itself but rather to the OpenWrt makefile. In the source see the file include/verbose.mk where the following links are made:
 - Verbose = V
@@ -7,22 +40,30 @@ V=99: This option controls the degree and type of verbosity that you will be exp
 makelevel
 https://unix.stackexchange.com/questions/139459/what-does-makenumber-mean-in-make-v-s
 https://askubuntu.com/questions/833770/what-does-make-j-n-v-m-mean
+```
 
-> make V=1
+> make -j
 
+```
 make -j [N]
 make -j
 -j [N], --jobs[=N]          Allow N jobs at once; infinite jobs with no arg.
 
 [Example]
 make -j 8
+```
 
------- Special Symbols
+### Special Symbols
+
+```makefile
 $@  target
 $<  the first depends
 $^  all depends
+```
 
------- Template
+### Makefile Template
+
+```makefile
 MAKE	= make
 CC 		= gcc
 LD 		= ld
@@ -43,3 +84,4 @@ clean:
 install:all
 	-mkdir -p $(INSDIR)
 	for i in $(SUBDIRS); do $(MAKE) -C $$i install || exit 1; done
+```
