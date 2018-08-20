@@ -1,4 +1,6 @@
--------- Terminal Config
+## ubuntu
+### Terminal Config
+```vim
 Terminal-> Preferences -> default(rename to Ubuntu)
 
 --- General -> Cursor Shape => Block
@@ -7,11 +9,13 @@ Terminal-> Preferences -> default(rename to Ubuntu)
            -> Bold Color => #A79797
            -> Background Color => #000000
 
-Bold Color used for git diff/man git/fzf
+# Bold Color used for git diff/man git/fzf
+```
 
--------- Fix issue with enterprise wifi connection
-deleting the saved network connection and then using the "Connect to Hidden Network"
+### Fix issue with enterprise wifi connection
+<https://askubuntu.com/questions/885785/failed-to-connect-to-wpa2-peap-mschapv2-enterprise-wifi-network>
+> deleting the saved network connection and then using the "Connect to Hidden Network"
 menu to setup the connection.
 This menu can be accessed by clicking the wifi icon on the top bar.
 
-https://askubuntu.com/questions/885785/failed-to-connect-to-wpa2-peap-mschapv2-enterprise-wifi-network
+
