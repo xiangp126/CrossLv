@@ -1,7 +1,0 @@
---- regex
-? 0 or 1 time
-+ 1+ time
-* 0 or more times
-{n} n times
-{n,} n+ times
-{n, m} n to m times
