@@ -1,7 +1,0 @@
--- Change ro user, not change environment | such as Directory
-su haha
-su root
-
--- Normal change, will chage env too
-su - haha
-sudo -i
