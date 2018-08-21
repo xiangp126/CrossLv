@@ -1,17 +1,23 @@
----------------------------------- Ubuntu
+## passwd
+### Ubuntu
+```bash
 # cd /etc/sudoers.d
 # sudo vim vbird
 
--- BEGIN OF EXAMPLE
+# BEGIN OF EXAMPLE
 vbird ALL=(root) NOPASSWD:ALL
 Defaults:vbird secure_path=/sbin:/usr/sbin:/usr/bin:/bin:/usr/local/sbin:/usr/local/bin
--- END OF EXAMPLE
-
+# END OF EXAMPLE
+```
+```vim
 :%s/vbird/xxx/gc
+```
 
----------------------------------- CentOS & MAC
+### CentOS & MAC
+```bash
 # sudo vim /etc/sudoers
--- begin of sample
+
+# begin of sample
 
 ## The COMMANDS section may have other options added to it.
 ##
@@ -20,13 +26,20 @@ root     ALL=(ALL)       ALL
 vbird ALL=(ALL)     NOPASSWD: ALL
 
 ## Allows members of the 'sys' group to run networking, software,
--- end of sample
 
--- SCRIPT Refer (run with root privilege)
-# For Ubuntu
+# end of sample
+```
+
+### SCRIPT Refer (run with root privilege)
+> For Ubuntu
+
+run it
+
+```bash
 user=vbird
 cd /etc/sudoers.d
 cat > $user << _EOF
 $user ALL=(root) NOPASSWD:ALL
 Defaults:$user secure_path=/sbin:/usr/sbin:/usr/bin:/bin:/usr/local/sbin:/usr/local/bin
 _EOF
+```
