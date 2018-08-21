@@ -1,3 +1,7 @@
+## swap
+> add swap for VPS
+
+```bash
 # change to main directory
 cd ~
 
@@ -12,3 +16,4 @@ sudo swapon .swap
 
 # take effect immediately, reboot will disappear
 free -m
+```
