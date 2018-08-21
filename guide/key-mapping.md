@@ -1,16 +1,21 @@
-Ctrl + [   <===>   Esc
+## key-mapping
 
------------------ For MAC
+`Ctrl + [   <===>   Esc`
+
+### For MAC
+```
 System Preferences -> Keyboard -> Modifier Keys
-
------------------ For Linux
+```
+### For Linux
+```bash
 dpkg -S /usr/bin/setxkbmap
 x11-xkb-utils: /usr/bin/setxkbmap
 
 sudo apt-get install x11-xkb-utils
 sudo yum install xorg-x11-xkb-utils
 
-> setxkbmap -print
+setxkbmap -print
+
 xkb_keymap {
         xkb_keycodes  { include "evdev+aliases(qwerty)" };
         xkb_types     { include "complete"      };
@@ -18,8 +23,9 @@ xkb_keymap {
         xkb_symbols   { include "pc+us+inet(evdev)"     };
         xkb_geometry  { include "pc(pc105)"     };
 };
-
-# remapping CapsLock to Esc
+```
+### remapping CapsLock to Esc
+```
 setxkbmap -option caps:escape
 
 > setxkbmap -print
@@ -30,8 +36,10 @@ xkb_keymap {
         xkb_symbols   { include "pc+us+inet(evdev)+capslock(escape)"    };
         xkb_geometry  { include "pc(pc105)"     };
 };
+```
 
-# delete originally mapping
+### delete originally mapping
+```
 > setxkbmap -option
 
 > setxkbmap -print
@@ -42,10 +50,7 @@ xkb_keymap {
         xkb_symbols   { include "pc+us+inet(evdev)"     };
         xkb_geometry  { include "pc(pc105)"     };
 };
-
---- use xmodmap
-https://my.oschina.net/zhangqingcai/blog/55016
-
-> xev
+```
+> use xmodmap
 
 ~/.Xmodmap
