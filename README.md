@@ -1,11 +1,11 @@
 ## Illustrate
 - This project aims to persist the same working environment crossing different working machines
-- Done everything even from fresh install of OS with just 'one-click' command -- life ease
-- Package many awesome open source tools and their well-going configs, and with
+- Done everything even from fresh install of OS with just 'one-click' -- life ease
+- Package awesome open source tools and their well-going configs, and with
     - personal dotfiles on [track-files](./track-files)
     - extra configurations on [template](./template)
     - standalone compile scripts on [compile-tools](./compile-tools), such as installing cgdb
-    - handy notes on [doc](./doc) and [guide](./guide) which can be quickly searched by rg/fzf
+    - handy notes on [doc](./doc) which were of md format and can be quickly searched by rg/fzf
     - self-written short commands on [tools](./tools)
     - extra bash completion on [completion](./completion)
     - favourite personal vim color scheme on [vim-colors](./vim-colors)
@@ -17,7 +17,7 @@
 ![](./gif/persistlv.gif)
 - Featured with
     - provide different modes for installation, considering if has root privilege or not
-    - put all packages from network into one directory, easy to delete
+    - put all packages from Internet into one directory, easy to delete
     - install all packages into one same directory, not to interfere with system old ones
     - version compare, only trigger installation of certain package when requirements met
     - auto fit for different os type, alredy support Ubuntu | CentOS | Mac
@@ -35,7 +35,7 @@
 > Latest released version: v4.0
 
 ## Prerequisite
-> You should have full Internet access. if not, refer [squid.md](./guide/squid.md) or [ssh-proxy.md](./guide/ssh-proxy.md) to establish connection<br>
+> You should have full Internet access. if not, refer [squid.md](./doc/squid.md) or [ssh-proxy.md](./doc/ssh-proxy.md) to establish connection<br>
 > On Ubuntu, /bin/sh was linked to /bin/dash by default, correct it to /bin/bash
 
 ```bash
