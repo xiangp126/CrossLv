@@ -1,6 +1,11 @@
 ## mac
 ### hotkey with Dock
-*command＋option＋D* hide/reveal 'Dock'
+
+ key | Explain
+:---: | :---:
+**Ctrl + Command + Q** | Lock screen
+**command＋option＋D** | hide/reveal 'Dock'
+
 
 ### Install Java8
 ```bash
