@@ -162,7 +162,7 @@ sh makeLink.sh install
 ```
 
 ### Other Goodies
-- [Let-OpenGrok](https://github.com/xiangp126/let-opengrok) - one-click installation of OpenGrok
+- [Leaf](https://github.com/xiangp126/leaf) - one-click lazy of OpenGrok
 - [Let-Tmux](https://github.com/xiangp126/let-tmux) - lazy deploy of tmux and enjoy it
 - [Let-Git](https://github.com/xiangp126/let-git) - update to latest stable version of Git
 - [Let-Unlatch](https://github.com/xiangp126/let-unlatch) - lazy deploy that 'you knows' on VPS
