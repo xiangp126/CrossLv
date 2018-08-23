@@ -855,10 +855,20 @@ _EOF
     fi
 
     cd $fzfInstDir
-    sh install --bin
+    # loop to install fzf
+    for (( i = 0; i < 2; i++ )); do
+        sh install --bin
+        if [[ $? != 0 ]]; then
+            echo [Error]: install fzf returns error, try again ...
+            continue
+        else
+            # successfully install
+            break
+        fi
+    done
     if [[ $? != 0 ]]; then
         echo [Error]: install fzf returns error, quitting now ...
-        exit
+        exit 1
     fi
 
     cat << "_EOF"
