@@ -25,6 +25,7 @@
 	dfc = diff --cached
 	dfs = diff --stat
 	dtd = difftool --dir-diff
+	dfcs = diff --cached --stat
 [color]
 	ui = auto
 [push]

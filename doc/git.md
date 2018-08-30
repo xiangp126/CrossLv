@@ -1,5 +1,11 @@
 ## git
 
+### alias
+```git
+git config alias.co checkout
+git config --global alias.dfcs 'diff --cached --stat'
+```
+
 ### diff
 ```git
 git diff --since=1.hour.ago --until=1.minute.ago
