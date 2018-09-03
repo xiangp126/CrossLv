@@ -4,7 +4,7 @@
  key | Explain
 :---: | :---:
 **Ctrl + Command + Q** | Lock screen
-**command＋option＋D** | hide/reveal 'Dock'
+**command＋option＋D** | hide or reveal *`Dock`*
 
 
 ### Install Java8
