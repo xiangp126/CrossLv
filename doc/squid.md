@@ -48,7 +48,7 @@ udp6       0      0 :::17176                :::*                                
 ```
 
 ## Use Proxy on Client
-Let's assume 10.124.10.102 is the IP of Server
+> let's assume `10.124.10.102` is the ip of `server`
 
 ```bash
 proxy_ip=10.124.10.102
