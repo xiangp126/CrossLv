@@ -1,21 +1,42 @@
 ## git
 
+- [pull](#pull)
+- [alias](#alias)
+- [diff](#diff)
+- [log](#log)
+- [bare repo](#bare)
+
+<a id = pull></a>
+### pull
+<http://hungyuhei.github.io/2012/08/07/better-git-commit-graph-using-pull---rebase-and-merge---no-ff.html>
+
+为了使提交更加整洁一些, 使用 `git pull --rebase`
+
+---
+```git
+git pull origin master --rebase
+```
+
+<a id = alias></a>
 ### alias
 ```git
 git config alias.co checkout
 git config --global alias.dfcs 'diff --cached --stat'
 ```
 
+<a id = diff></a>
 ### diff
 ```git
 git diff --since=1.hour.ago --until=1.minute.ago
 ```
 
+<a id = log></a>
 ### log
 ```git
 git log -p --author='Peng'
 ```
 
+<a id = bare></a>
 ### bare repository
 ```bash
 # git bare local private repository
