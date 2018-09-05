@@ -1,0 +1,129 @@
+# TMUX 2.6 CONFIG COPYRIGHT BY PENG
+# """"""""""""""""""""""""""""""
+# " BASIC CONFIG
+# """"""""""""""""""""""""""""""
+# use ctrl + x for key-prefix
+unbind C-b
+set -g prefix C-x
+bind C-x send-prefix
+set -g default-terminal "screen-256color"
+set -g history-limit 10000
+set -g base-index 1
+set -g pane-base-index 1
+# automatically renumber window numbers on closing a pane (tmux >= 1.7)
+# set -g renumber-windows on
+set -g display-time 3000
+set -s escape-time 0
+# 'repeat-time' Allow the arrow key to be used immediately after changing windows
+# set -g repeat-time 500
+set -g repeat-time 0
+setw -g mouse-resize-pane on
+setw -g mouse-select-pane on
+setw -g mouse-select-window on
+setw -g mode-mouse on
+set-option -g default-shell /bin/bash
+# fixed session name once set
+set-option -g allow-rename off
+set-window-option -g mode-keys vi
+
+# """"""""""""""""""""""""""""""
+# " BASIC KEY BIND
+# """"""""""""""""""""""""""""""
+# use key-prefix + r to read config file
+bind r source-file ~/.tmux.conf \; display "source ~/.tmux.conf done!"
+# use key-prefix + C to set default path for new-created pane
+# bind C attach-session -c "#{pane_current_path}" \; display "attach-session done!"
+# use vi mode for copy/paste
+# bind-key -T copy-mode-vi v send-keys -X begin-selection
+# bind-key -T copy-mode-vi y send-keys -X copy-selection-and-cancel
+# bind-key -T prefix       p                 paste-buffer
+# bind prefix-key X (shitf + x) for toggle maximum pane.
+unbind z
+# bind-key -T prefix X resize-pane -Z
+# bind prefix-key 0 to jump to last window.
+# bind-key    -T prefix       0                 last-window
+# re-bind prefix-key l to jump to last session.
+# bind-key    -T prefix       l                switch-client -l
+# bind-key for horizontal & vertical panes
+unbind %
+unbind |
+bind | split-window -h      # use | for vertical split pane
+unbind '"'
+bind - split-window -v      # use - for horizontal split pane
+# resize size of pane, M stands for Alt, C for Ctrl.
+# -U [step]
+bind-key -r    M-Up resize-pane -U 1
+bind-key -r  M-Down resize-pane -D 1
+bind-key -r  M-Left resize-pane -L 1
+bind-key -r M-Right resize-pane -R 1
+# ctrl + Arrow, conflicts with MAC as switch between windows.
+# so unbind all of them 4
+unbind C-Up
+unbind C-Down
+unbind C-Left
+unbind C-Right
+# bind-key -r    C-Up resize-pane -U
+# bind-key -r  C-Down resize-pane -D
+# bind-key -r  C-Left resize-pane -L
+# bind-key -r C-Right resize-pane -R
+
+# may conflict with 'C-Z'
+# bind-key    -T prefix       C-z               suspend-client
+unbind C-Z
+
+# """"""""""""""""""""""""""""""
+# " STATUS BAR CONFIG
+# """"""""""""""""""""""""""""""
+# you can refer http://www.atool.org/colorpicker.php for online color choose.
+# set -g renumber-windows on
+# set flush intarval of Time update, such as every 5 seconds.
+set -g status-interval 60
+# set -g status-position bottom
+# set background color of status bar.
+set -g status-bg '#333333'
+# set foreground color of status bar.
+set -g status-fg '#c49c9c'
+# set left length of status bar. [basic] 1:SSH => [basic]         1:SSH
+set -g status-left-length 15
+# set attributes of status-left
+# set -g status-left '[#S] #[default]'
+# set -g status-left "#[fg=colour0,bg=colour243] #S #[fg=colour242,bg=colour234,nobold,nounderscore,noitalics] "
+set -g status-left "#[fg=colour0,bg=colour244] #S #[fg=colour242,bg=colour234,nobold,nounderscore,noitalics] "
+
+set -g status-right-length 50
+# set clock of status bar on the right bottom.
+# set -g status-right '[#h] %Y-%m-%d %H:%M:%S '
+# set -g status-right "#[fg=colour0,bg=colour234,nobold,nounderscore,noitalics]#[fg=colour242,bg=colour0] %Y-%m-%d | %H:%M #[fg=colour242,bg=colour0,nobold,nounderscore,noitalics]#[fg=colour0,bg=colour242] #h "
+set -g status-right "#[fg=colour244,bg=colour0,nobold,nounderscore,noitalics]#[fg=colour0,bg=colour244] #h #[fg=colour0,bg=colour244,nobold,nounderscore,noitalics]#[fg=colour0,bg=colour245] %Y-%m-%d | %H:%M "
+# --- ACTIVE PANE COLOR CONFIG --- #
+# set color for the active pane, 0 is black. 0 - 255
+set-option -g pane-active-border-bg default
+set -g pane-active-border-fg colour24
+# set -g pane-active-border-bg colour0
+# --- MESSAGE BAR COLOR CONFIG --- #
+# that is command bar color, when you typed 'prefix-key :'
+set -g message-attr bold
+# set -g message-fg '#a08580'
+set -g message-fg "colour242"
+set -g message-bg "colour0"
+# --- MODE COLOR CONFIG --- #
+# when you select block using mouse the color it shows.
+# set -g clock-mode-colour colour223
+set -g mode-attr bold
+set -g mode-fg '#c49c9c'
+# set -g mode-fg '#c49c9c'
+set -g mode-bg '#333333'
+# --- WINDOW STATUS CONFIG --- #
+# setw -g window-status-separator ''
+# setw -g window-status-format "#[fg=colour247,bg=colour234] #I|#[fg=colour247,bg=colour234] #W #F"
+# setw -g window-status-format "#I| #W#F"
+setw -g window-status-format "#[fg=colour246,bg=colour234] #I #[fg=colour247,bg=colour234]#W #F"
+
+# current active window, the last #F the maximum Z indicator as such
+# setw -g window-status-current-format "#[fg=colour234,bg=colour0,nobold,nounderscore,noitalics]#[fg=colour242,bg=colour0] #I|#[fg=colour242,bg=colour0] #W#[fg=colour242,bg=colour0,nobold,nounderscore,noitalics] #F"
+# setw -g window-status-current-format "#I| #W#F"
+setw -g window-status-current-format "#[fg=colour30,bg=colour0,nobold,nounderscore,noitalics]#[fg=colour30,bg=colour0] #I➢ #[fg=colour30,bg=colour0]#W#[fg=colour30,bg=colour0,nobold,nounderscore,noitalics] #F"
+
+# INITIALIZE TMUX PLUGIN MANAGER
+# (keep this line at the very bottom of tmux.conf)
+run '~/.tmux/plugins/tpm/tpm'
