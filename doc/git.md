@@ -14,6 +14,7 @@
 
 ---
 ```git
+# git pull origin master
 git pull origin master --rebase
 ```
 
@@ -33,7 +34,7 @@ git diff --since=1.hour.ago --until=1.minute.ago
 <a id = log></a>
 ### log
 ```git
-git log -p --author='Peng'
+git log -p --author='PENG'
 ```
 
 <a id = bare></a>

@@ -1,13 +1,9 @@
 ## Github
 
-* [Syncing a fork](#sync)
 * [Make repo empty](#empty)
 * [Delete remote branch](#delete)
 * [Untrace certain files](#untrace)
-
-### git patch | apply
-ToDo
----
+* [Syncing a fork](#sync)
 
 <a id = 'empty'></a>
 ### Make repo empty
