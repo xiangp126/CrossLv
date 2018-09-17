@@ -1,4 +1,20 @@
 ## mac
+
+### Disable SIP Mode
+System Integrity Protection
+
+```
+sudo reboot
+```
+> Press `Win + R` until Apple Logo appears<br>
+At the top menu, launch Terminal
+
+```
+csrutil status
+csrutil disable
+# csrutil enable
+```
+
 ### hotkey with Dock
 
  key | Explain
