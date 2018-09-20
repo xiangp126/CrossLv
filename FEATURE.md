@@ -1,0 +1,11 @@
+- Featured with
+    - provide different modes for installation, considering if has root privilege or not
+    - put all packages from Internet into one directory, easy to delete
+    - install all packages into one same directory, not to interfere with system old ones
+    - version compare, only trigger installation of certain package when requirements met
+    - auto fit for different os type, alredy support Ubuntu | CentOS | Mac
+    - distribute packages mainly from source, so always the latest stable version
+    - skip already installed packages or downloaded tar ball
+    - support incremental install, safe to run consecutive times
+    - pretty print, generate error log if occurs
+    - robust for more possible situations and any other methods to speed up

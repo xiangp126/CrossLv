@@ -1,35 +1,56 @@
 ## Illustrate
-- This project aims to persist the same working environment crossing different working machines
-- Done everything even from fresh install of OS with just 'one-click' -- life ease
-- Package awesome open source tools and their well-going configs, and with
-    - personal dotfiles on [track-files](./track-files)
-    - extra configurations on [template](./template)
-    - standalone compile scripts on [compile-tools](./compile-tools), such as installing cgdb
-    - handy notes on [doc](./doc) which were of md format and can be quickly searched by rg/fzf
-    - self-written short commands on [tools](./tools)
-    - extra bash completion on [completion](./completion)
-    - favourite personal vim color scheme on [vim-colors](./vim-colors)
-    - ever best programming font on [fonts](./fonts)
-    - my personal [let-tmux](https://github.com/xiangp126/Let-Tmux) if needed
-    - my personal [let-git](https://github.com/xiangp126/let-git) if needed
-    - etc...
-- Catch a glimpse of the 'recursive' one key procedure
+- This project aims to persist same **Good Working Environment** quick and ease
+- Done everything even from fresh install of OS with just one click
+- Several install mode for selection
+
+<table>
+    <tr>
+        <th colspan=2> Mode </th>
+        <th>Need Root Privilege</th>
+        <th> Package Location</th>
+        <th>Used For</th>
+    </tr>
+    <tr>
+        <td colspan=2 align=center>Home Mode</td>
+        <td align=center>&Chi;</td>
+        <td align=center><b>$HOME/.usr</b></td>
+        <td align=center>Public Machine</td>
+    </tr>
+    <tr>
+        <td rowspan=2>Root Mode</td>
+        <td>Default</td>
+        <td align=center>&radic;</td>
+        <td rowspan=2 align=center><b>/usr/local</b></td>
+        <td align=center>Private Machine</td>
+    </tr>
+        <tr>
+        <td>Simple</td>
+        <td align=center>&radic;</td>
+        <td>Temporary Used Machine</td>
+    </tr>
+    <tr>
+        <td colspan=2 align=center>Mixed Mode</td>
+        <td align=center>&radic;</td>
+        <td align=center><b>$HOME/.usr</td>
+        <td align=center>Private Machine</td>
+    </tr>
+</table>
+
+- Catch a glimpse of the *recursive* one click procedure
 ![](./gif/persistlv.gif)
-- Featured with
-    - provide different modes for installation, considering if has root privilege or not
-    - put all packages from Internet into one directory, easy to delete
-    - install all packages into one same directory, not to interfere with system old ones
-    - version compare, only trigger installation of certain package when requirements met
-    - auto fit for different os type, alredy support Ubuntu | CentOS | Mac
-    - distribute packages mainly from source, so always the latest stable version
-    - skip already installed packages or downloaded tar ball
-    - support incremental install, safe to run consecutive times
-    - pretty print, generate error log if occurs
-    - robust for more possible situations and any other methods to speed up
-- Three modes deploy selection
-    - home mode: without root privilege, normally install packages into $HOME/.usr
-    - root mode: with root privilege, normally install packages into /usr/local
-    - mixed mode
+- Package awesome open source tools and their well-going configs, and with
+
+Package | Note | Type | Comment
+:---: | --- | :---: | :---:
+[track-files](./track-files) | Personal Dotfiles | Script | Personal Favour
+[template](./template) | Extra Configurations | Config
+[compile-tools](./compile-tools) | Standalone Compile Scripts | Shell
+[doc](./doc) | Handy Notes | Markdown | May be Searched by fzf/rg
+[tools](./tools) | Some Short Commands | Python | Assist
+[completion](./completion) | Extra Bash Completion | Bash |
+[vim-colors](./vim-colors) | Ever Best Programming Font | Vim | Personal Favour
+[let-tmux](https://github.com/xiangp126/Let-Tmux) | Lazy Enjoy of `tmux` | Tool | Other Goodies
+[let-git](https://github.com/xiangp126/let-git) | One Key to Upgrade `git` | Tool | Other Goodies
 
 > It's great if this project may be helpful for you though it aimed to my personal use at the beginning<br>
 > Latest released version: v4.0
@@ -67,9 +88,9 @@ sh oneKey.sh
 
 [DESCRIPTION]
     help -- print the help messages
-    home -- install packages into /home/pi/.usr/
+    home -- install packages into $HOME/.usr/
     root -- install packages into /usr/local/
-    mixed - install packages into /home/pi/.usr/ but with sudo privilege
+    mixed - install packages into $HOME.usr/ but with sudo privilege
     summary -- show installation summary
     simple  -- simple install level, only key vim/tmux plugins
 
@@ -162,7 +183,7 @@ sh makeLink.sh install
 ```
 
 ### Other Goodies
-- [Leaf](https://github.com/xiangp126/leaf) - one-click lazy of OpenGrok
+- [Latch](https://github.com/xiangp126/latch) - one-click lazy of OpenGrok
 - [Let-Tmux](https://github.com/xiangp126/let-tmux) - lazy deploy of tmux and enjoy it
 - [Let-Git](https://github.com/xiangp126/let-git) - update to latest stable version of Git
 - [Let-Unlatch](https://github.com/xiangp126/let-unlatch) - lazy deploy that 'you knows' on VPS
