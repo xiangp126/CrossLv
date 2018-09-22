@@ -1,7 +1,9 @@
 ## Illustrate
 - This project aims to persist same **Good Working Environment** quick and ease
 - Done everything even from fresh install of OS with just one click
-- Several install mode for selection
+- Catch a glimpse of the *recursive* one click procedure
+![](./gif/persistlv.gif)
+- Install mode for selection
 
 <table>
     <tr>
@@ -35,22 +37,6 @@
         <td align=center>Private Machine</td>
     </tr>
 </table>
-
-- Catch a glimpse of the *recursive* one click procedure
-![](./gif/persistlv.gif)
-- Package awesome open source tools and their well-going configs, and with
-
-Package | Note | Type | Comment
-:---: | --- | :---: | :---:
-[track-files](./track-files) | Personal Dotfiles | Script | Personal Favour
-[template](./template) | Extra Configurations | Config
-[compile-tools](./compile-tools) | Standalone Compile Scripts | Shell
-[doc](./doc) | Handy Notes | Markdown | May be Searched by fzf/rg
-[tools](./tools) | Some Short Commands | Python | Assist
-[completion](./completion) | Extra Bash Completion | Bash |
-[vim-colors](./vim-colors) | Ever Best Programming Font | Vim | Personal Favour
-[let-tmux](https://github.com/xiangp126/Let-Tmux) | Lazy Enjoy of `tmux` | Tool | Other Goodies
-[let-git](https://github.com/xiangp126/let-git) | One Key to Upgrade `git` | Tool | Other Goodies
 
 > It's great if this project may be helpful for you though it aimed to my personal use at the beginning<br>
 > Latest released version: v4.0
