@@ -1,10 +1,7 @@
 ## Illustrate
-- This project aims to persist same **Good Working Environment** quick and ease
-- Done everything even from fresh install of OS with just one click
-- Catch a glimpse of the *recursive* one click procedure
-![](./gif/persistlv.gif)
+- This project aims to persist same **Good Working Environment** quickly and easily
+- Done everything even from fresh install of OS with just `one click`
 - Install mode for selection
-
 <table>
     <tr>
         <th colspan=2> Mode </th>
@@ -37,6 +34,53 @@
         <td align=center>Private Machine</td>
     </tr>
 </table>
+
+- Catch a glimpse of the *recursive* procedure
+
+![](./gif/persistlv.gif)
+
+## Directory structure
+```
++-- Giggle
+|   +-- track-files
+|   |   +-- bashrc
+|   |   +-- gitconfig
+|   |   +-- gitignore
+|   |   +-- tmux.conf
+|   |   +-- vimrc
+|   |   +-- ycm_extra_conf.py
+|   +-- oneKey.sh
+|   +-- autoHandle.sh
+|   +-- makeLink.sh
+|   +-- vim-colors
+|   |   +-- darkcoding.vim
+|   |   +-- jellybeans.vim
+|   +-- doc
+|   |   +-- cgdb.md
+|   |   +-- crontab.md
+|   +-- template
+|   |   +-- aria2.conf
+|   |   +-- cgdbrc
+|   |   +-- tmux.conf_v1.6
+|   |   +-- shadowsocks-local.json
+|   +-- fonts
+|   |   +-- powerline-symbols
+|   |   +-- monaco.ttf
+|   +-- tools
+|   |   +-- addtools.sh
+|   |   +-- fkgit.py
+|   |   +-- ycm_add_inc.sh
+|   |   +-- mkfonts.sh
+|   |   +-- httproxy-git.sh
+|   +-- completion
+|   |   +-- fzf_completion.bash
+|   |   +-- fzf_keybindings.bash
+|   |   +-- tmux_completion.bash
+|   |   +-- git_completion.bash
+|   +-- pic
+|   |   +-- High Sierra.jpg
+|   |   +-- iterm2-save.png
+```
 
 > It's great if this project may be helpful for you though it aimed to my personal use at the beginning<br>
 > Latest released version: v4.0
