@@ -63,9 +63,9 @@
 |   |   +-- cgdbrc
 |   |   +-- tmux.conf_v1.6
 |   |   +-- shadowsocks-local.json
-|   +-- fonts
-|   |   +-- powerline-symbols
-|   |   +-- monaco.ttf
+|   +-- expect
+|   |   +-- ssh routine
+|   |   +-- rsync routine
 |   +-- tools
 |   |   +-- addtools.sh
 |   |   +-- fkgit.py
@@ -77,6 +77,9 @@
 |   |   +-- fzf_keybindings.bash
 |   |   +-- tmux_completion.bash
 |   |   +-- git_completion.bash
+|   +-- fonts
+|   |   +-- powerline-symbols
+|   |   +-- monaco.ttf
 |   +-- pic
 |   |   +-- High Sierra.jpg
 |   |   +-- iterm2-save.png
