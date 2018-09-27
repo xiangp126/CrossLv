@@ -14,8 +14,8 @@ tackleFile=(
 bksuffix=sys
 
 usage() {
-	exeName=${0##*/}
-	cat << _EOF
+    exeName=${0##*/}
+    cat << _EOF
 [NAME]
     $exeName -- link/unlink of self-compiled gcc to system gcc location
 
