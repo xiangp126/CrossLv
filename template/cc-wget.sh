@@ -18,11 +18,12 @@ downloadPath=$mainWd/downloads
 
 logo() {
     cat << "_EOF"
-                      _
-  ___ _ __ ___   __ _| | _____
- / __| '_ ` _ \ / _` | |/ / _ \
-| (__| | | | | | (_| |   <  __/
- \___|_| |_| |_|\__,_|_|\_\___|
+ _____                    _       _
+|_   _|__ _ __ ___  _ __ | | __ _| |_ ___
+  | |/ _ \ '_ ` _ \| '_ \| |/ _` | __/ _ \
+  | |  __/ | | | | | |_) | | (_| | ||  __/
+  |_|\___|_| |_| |_| .__/|_|\__,_|\__\___|
+                   |_|
 
 _EOF
 }
@@ -31,7 +32,7 @@ usage() {
     exeName=${0##*/}
     cat << _EOF
 [NAME]
-    $exeName -- compile and install newly cmake version
+    $exeName -- Template to compile and install certain package
 
 [SYNOPSIS]
     sh $exeName [home | root | help]
@@ -106,13 +107,6 @@ _EOF
 
     tclLib=$tclInstDir/lib
     tclIncDir=$tclInstDir/include
-
-    cat << _EOF
-------------------------------------------------------
-INSTALLING tcl DONE ...
-tcl path = $tclInstDir/bin/
-------------------------------------------------------
-_EOF
 }
 
 installExpect() {
@@ -159,13 +153,6 @@ _EOF
         exit
     fi
     $execPrefix make install
-
-    cat << _EOF
-------------------------------------------------------
-INSTALLING expect 3 DONE ...
-expect path = $expectInstDir/bin/
-------------------------------------------------------
-_EOF
 }
 
 install() {
