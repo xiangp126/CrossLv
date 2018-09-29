@@ -1,5 +1,5 @@
 #!/usr/bin/expect -f
-# ./jungle.sh [ssh_ip] [ssh_port] [ssh_user] [ssh_home] [ssh_prompt] [ssh_passwd]
+# ./fstack.sh [ssh_ip] [ssh_port] [ssh_user] [ssh_home] [ssh_prompt] [ssh_passwd]
 set ssh_ip        [lindex $argv 0]
 set ssh_port      [lindex $argv 1]
 set ssh_user      [lindex $argv 2]

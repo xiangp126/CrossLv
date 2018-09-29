@@ -1,5 +1,5 @@
 #!/usr/bin/expect -f
-# ./jungle.sh [ssh_ip] [ssh_port] [ssh_user] [ssh_home] [ssh_prompt] [ssh_passwd]
+# ./login.sh [ssh_ip] [ssh_port] [ssh_user] [ssh_home] [ssh_prompt] [ssh_passwd]
 set ssh_ip        [lindex $argv 0]
 set ssh_port      [lindex $argv 1]
 set ssh_user      [lindex $argv 2]
@@ -22,7 +22,7 @@ expect {
 expect $ssh_prompt
 send "yum install nmap -y\r"
 
-# 'interact' will give the handle operation to console
+# 'interact' will give the handle operation to user himself
 # interact
 
 expect $ssh_prompt
