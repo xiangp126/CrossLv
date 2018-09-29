@@ -14,9 +14,9 @@ server_ip=(
 i=0
 for ((i = 0; i < ${#server_ip[@]}; ++i)); do
     # ./jungle.sh [ssh_ip] [ssh_port] [ssh_user] [ssh_home] [ssh_prompt] [ssh_passwd]
-    ./jungle.exp ${server_ip[$i]} $ssh_port $ssh_user $ssh_home $ssh_prompt $ssh_passwd
+    ./ssh.exp ${server_ip[$i]} $ssh_port $ssh_user $ssh_home $ssh_prompt $ssh_passwd
     # Parallel executing, with &/wait
-    # ./jungle.exp ${server_ip[$i]} $ssh_port $ssh_user $ssh_home $ssh_prompt $ssh_passwd &
+    # ./ssh.exp ${server_ip[$i]} $ssh_port $ssh_user $ssh_home $ssh_prompt $ssh_passwd &
 done
 
 wait
