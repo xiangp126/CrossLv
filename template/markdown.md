@@ -34,7 +34,10 @@ Use the `printf()` function.
 **粗体强调**
 
 图片
-![Alt text](http://www.izhangbo.cn/wp-content/themes/minty/img/logo.png "Optional title")
+![Alt text](http://img0.sc115.com/dm/pc/pic/1502m4njrgravxh.jpg)
+图片 - 使用_**div**_
+<!-- width=500 or width=80% -->
+<div align=center><img src="http://pic.52112.com/180529/JPG-180529_196/iIBVXWaULd_small.jpg"/ width=100%></div>
 
 使用 icon 图标文字
 <i class="icon-cog"></i>
@@ -77,6 +80,14 @@ Pipe     | $1
 >- 块引用里使用列表，需要和上面的内容隔开一个空行
 >- 记得加空格哦。
 
-*注释*
+*注释* | comment on
 [//]: # (哈哈我是注释，不会在浏览器中显示。)
 [^_^]: # (哈哈我是注释，不会在浏览器中显示。)
+
+<!--哈哈我是注释，不会在浏览器中显示。-->
+
+<!--
+哈哈我是多段
+注释，
+不会在浏览器中显示。
+-->

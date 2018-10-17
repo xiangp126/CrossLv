@@ -1,6 +1,6 @@
 ## Illustrate
-- This project aims to persist same **Good Working Environment** quickly and easily
-- Done everything even from fresh install of OS with just `one click`
+- This project aims to persist same _**Good Working Environment**_ quickly and easily
+- Done everything even from fresh install of OS with `single click`
 - Install mode for selection
 <table>
     <tr>
@@ -37,7 +37,7 @@
 
 - Catch a glimpse of the *recursive* procedure
 
-![](./gif/persistlv.gif)
+![](./res/persistlv.gif)
 
 ## Directory structure
 ```

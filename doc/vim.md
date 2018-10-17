@@ -14,7 +14,7 @@ vim manipulation record
 ### Shortcut Key with Iterm2
 > As illustrated
 
-![](../pic/iterm2-Alt.png)
+![](../res/iterm2-Alt.png)
 
 ```bvim
 # mapping Alt to Esc+
