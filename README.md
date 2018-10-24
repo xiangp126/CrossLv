@@ -1,9 +1,9 @@
 ## Illustrate
 - This project aims to persist same _**Good Working Environment**_ quickly and easily
-- Done everything even from fresh install of OS with `single click`
-- Install mode for selection
+- Done everything even from fresh install of `OS` all in one
+- Several deploy mode for selection
 <table>
-    <tr>
+    <tr align=center>
         <th colspan=2> Mode </th>
         <th>Need Root Privilege</th>
         <th> Package Location</th>
@@ -64,8 +64,6 @@
 |   |   +-- tmux.conf_v1.6
 |   |   +-- shadowsocks-local.json
 |   +-- expect
-|   |   +-- ssh routine
-|   |   +-- rsync routine
 |   +-- tools
 |   |   +-- addtools.sh
 |   |   +-- fkgit.py
