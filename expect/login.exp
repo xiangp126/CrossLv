@@ -13,9 +13,9 @@ set timeout 30
 spawn ssh -p $ssh_port $ssh_user@$ssh_ip
 expect {
     "(yes/no)?" {send "yes\r"; exp_continue}
-    # 'Password' or 'password'
-    "*assword:" {send "$ssh_passwd\r"}
-    # ssh key login, no need passwd
+    "Password:" {send "$ssh_passwd\r"}
+    "password:" {send "$ssh_passwd\r"}
+    # ssh key login, no passwd need
     "$ssh_prompt" {send "\r"}
 }
 

@@ -30,7 +30,6 @@ config_ini_path=$fstack_dst_dir/config.ini
 i=0
 for ((i = 0; i < ${#server_ip[@]}; ++i)); do
     sed -i "/addr=/c addr=${local_ip[$i]}" $config_ini_path
-    # ./fstack.sh [ssh_ip] [ssh_port] [ssh_user] [ssh_home] [ssh_prompt] [ssh_passwd] [nic_port_name]
     ./fstack.exp ${server_ip[$i]} $ssh_port $ssh_user $ssh_home $ssh_prompt $ssh_passwd ${nic_port_name[$i]}
     # Parallel executing, with &/wait
     # ./fstack.exp ${server_ip[$i]} $ssh_port $ssh_user $ssh_home $ssh_prompt $ssh_passwd ${nic_port_name[$i]} &
