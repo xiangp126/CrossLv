@@ -21,7 +21,7 @@ nic_port_name=(
 # server local ip
 local_ip=(
 # mark LIP of server here, one per line
-# "127.0.0.1"
+# "192.168.10.10"
 )
 
 fstack_dst_dir=/root/myGit/f-stack
@@ -36,4 +36,4 @@ for ((i = 0; i < ${#server_ip[@]}; ++i)); do
 done
 
 wait
-echo "All Done!"
+echo "keepalive_timeout in /usr/local/nginx_fstack/conf/nginx.conf"

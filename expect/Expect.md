@@ -1,4 +1,4 @@
-## expect
+## Expect
 
 [Linux expect 教程中文版](http://xstarcd.github.io/wiki/shell/expect_handbook.html)
 
