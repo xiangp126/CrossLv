@@ -1,9 +1,29 @@
 ## ip
-### add
+
+- [ipv6 commands](#ipv6)
+- [ipv4 commands](#ipv4)
+
+<a id=ipv6></a>
+### IPV6
+#### add
+```bash
+$ ip -6 addr del 2001::76 dev enp7s0f0
+ip -6 addr add 2001::76 dev enp7s0f0
+```
+
+#### show
+```bash
+ip -6 addr show
+```
+
+--
+<a id=ipv4></a>
+### IPV4
+#### add
 add them to **/etc/rc.local** for permanent
 
-```
-# sudo ip addr del 10.124.10.103/24 dev eth0
+```bash
+$ sudo ip addr del 10.124.10.103/24 dev eth0
 sudo ip addr add 10.124.10.103/24 dev eth0
 sudo ip route add default via 10.124.10.1
 - or
@@ -12,11 +32,11 @@ sudo route del default gw 10.123.31.254
 sudo route add default gw 10.123.31.1
 ```
 
-### Ubuntu
+#### Ubuntu
 - Permanent modify
 
 ```
-sudo vim /etc/network/interfaces
+$ sudo vim /etc/network/interfaces
 
 auto eth0
 iface eth0 inet static
@@ -27,11 +47,11 @@ iface eth0 inet static
     # dns-nameservers 64.104.123.144
 ```
 
-### CentOS
+#### CentOS
 - static
 
 ```
-cd /etc/sysconfig/network-scripts
+$ cd /etc/sysconfig/network-scripts
 
 DEVICE='eth0'
 TYPE=Ethernet
@@ -44,25 +64,25 @@ NM_CONTROLLED='no'
 DNS1=8.8.8.8
 ```
 
-### ifup / ifdown
+#### ifup / ifdown
 ```
-sudo ifup eth0
-sudo ifdown eth0 && sudo ifup eth0
+$ sudo ifup eth0
+$ sudo ifdown eth0 && sudo ifup eth0
 ```
 
-### route
+#### route
 - Del one route (Not recommended)
 
 ```
-route del -net 10.0.0.0 netmask 255.0.0.0 gw 10.123.31.254
+$ sudo route del -net 10.0.0.0 netmask 255.0.0.0 gw 10.123.31.254
 ```
 - Add one route
 
 ```
-route add -net 10.0.0.0 netmask 255.0.0.0 gw 10.123.31.1
+$ sudo route add -net 10.0.0.0 netmask 255.0.0.0 gw 10.123.31.1
 ```
 
-### neighbour | neighbor
-```
+#### neighbour | neighbor
+```bash
 ip neighbor
 ```
