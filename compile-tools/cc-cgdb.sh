@@ -73,6 +73,12 @@ _EOF
     rcFromPath=$mainWd/template/cgdbrc
     rcToPath=$HOME/.cgdb
     cgdbRcPath=$rcToPath/cgdbrc
+
+    if [[ ! -d $rcToPath ]]; then
+        rm -f $rcToPath
+        mkdir -p $rcToPath
+    fi
+
     if [[ -f $cgdbRcPath ]]; then
         echo [Warning]: already has cgdbrc, cover it anyway
     fi
