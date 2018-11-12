@@ -1,41 +1,55 @@
 ## cgdb
-> Warning: Do Not Type layout src
+~~warning: do not type **layout src**, there was bug for gdb~~
 
-### Compile source file for debugging
+### Contents
+- [compile for debug](#compile)
+- [run](#run)
+- [reverse-next](#reverse-next)
+- [finish](#finish)
+- [break](#break)
+- [unitl](#until)
+- [condition](#condition)
+- [info](#info)
+- [logging](#logging)
+- [shortcut](#shortcut)
+- [cgdbusage](#cgdbusage)
 
-```makefile
-g++ -Wall -g3
-    > -g3 must be assigned
-    > -O must be all removed (Shift + o, optimized for short)
+<a id=compile></a>
+### compile source file for debugging
+
+_compile source file for debugging_
+
+- `-g3` must be assigned
+- `-O` must all be removed (~~Shift + o, optimized for short~~)
+
+```bash
+$ g++ -Wall -g3 main.cpp -o main
+
 ```
 
-### reverse-next
-> Step program backward, proceeding through subroutine calls
-<https://sourceware.org/gdb/wiki/ProcessRecord>
-<https://stackoverflow.com/questions/7517236/how-do-i-enable-reverse-debugging-on-a-multi-threaded-program>
+<a id=run></a>
+### run
+run with arguments after launching gdb
 
-For multi-thread reverse debugging
-You need to active the instruction-recording target, by executing the command record
-
-#### reverse - Example
-
-```vim
-record
-next
-reverse-next
-
-record stop
+```bash
+$ cgdb maini
+(cgdb) run arg1 arg2 ...
 ```
+
+<a id=finish></a>
 ### finish
 > continue until hit a return
 
 Upon return, the value returned is printed and put in the value history.
 
+<a id=break></a>
 ### break
 ```
 break main
 break 334
 ```
+
+<a id=until></a>
 ### until
 > can be used to jump out of function
 
@@ -47,6 +61,7 @@ Execute until the program reaches a source line greater than the current
 or a specified location (same args as break command) within the current frame))
 ```
 
+<a id=condition></a>
 ### condition
 > (gdb) help condition
 Specify breakpoint number N to break only if COND is true.
@@ -59,12 +74,14 @@ info breakpoints
 condition 3 i == 3
 ```
 
+<a id=info></a>
 ### info
 ```vim
 info line
 info line -- Core addresses of the code for a source line
 ```
 
+<a id=logging></a>
 ### logging
 > You may want to save the output of GDB commands to a file. There are several commands to control GDB’s logging.
 
@@ -94,6 +111,7 @@ show logging
 Show the current values of the logging settings.
 ```
 
+<a id=shortcut></a>
 ### shortcut key
 > only support >= v0.7.0, refer <http://cgdb.github.io/docs/cgdb.html>
 
@@ -109,10 +127,30 @@ Ctrl-T
 Opens a new tty for the debugged program.
 ```
 
+<a id=cgdbusage></a>
 ### cgdb usage
 > Jump to cgdb source window, like VIM, type command below to switch to horizontal split
 
 ```
 set winsplitorientation=vertical
 set winsplitorientation=horizontal
+```
+
+<a id=reverse-next></a>
+### reverse-next
+> Step program backward, proceeding through subroutine calls
+<https://sourceware.org/gdb/wiki/ProcessRecord>
+<https://stackoverflow.com/questions/7517236/how-do-i-enable-reverse-debugging-on-a-multi-threaded-program>
+
+For multi-thread reverse debugging
+You need to active the instruction-recording target, by executing the command record
+
+#### reverse - Example
+
+```vim
+record
+next
+reverse-next
+
+record stop
 ```
