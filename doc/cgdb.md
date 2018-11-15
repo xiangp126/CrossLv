@@ -3,7 +3,7 @@
 
 ### Contents
 - [compile for debug](#compile)
-- [run](#run)
+- [run with arguments](#run)
 - [reverse-next](#reverse-next)
 - [finish](#finish)
 - [break](#break)
@@ -11,8 +11,8 @@
 - [condition](#condition)
 - [info](#info)
 - [logging](#logging)
-- [shortcut](#shortcut)
-- [cgdbusage](#cgdbusage)
+- [horizontal or vertical](#horizontal)
+- [shortcut manipulation](#shortcut)
 
 <a id=compile></a>
 ### compile source file for debugging
@@ -20,137 +20,146 @@
 _compile source file for debugging_
 
 - `-g3` must be assigned
-- `-O` must all be removed (~~Shift + o, optimized for short~~)
+- `-Onum` must all be removed (~~Shift + o, optimized for short~~)
+- or change all `-O1`, `-O2`, ... etc to `-O0`
 
 ```bash
-$ g++ -Wall -g3 main.cpp -o main
-
+g++ -Wall -g3 main.cpp -o main
 ```
 
 <a id=run></a>
 ### run
-run with arguments after launching gdb
+> run with arguments after launching `gdb`
 
 ```bash
-$ cgdb maini
+cgdb main
 (cgdb) run arg1 arg2 ...
 ```
 
 <a id=finish></a>
 ### finish
-> continue until hit a return
-
+> **continue until hit a return**<br>
 Upon return, the value returned is printed and put in the value history.
 
 <a id=break></a>
 ### break
-```
+```bash
 break main
-break 334
+break <Line_Number>
 ```
 
 <a id=until></a>
 ### until
-> can be used to jump out of function
+> Execute until the program reaches a source line **greater than** the current or a specified location (same args as break command) within the current frame
 
-```
+```bash
 until + 3
 until <Line_Number>
-
-Execute until the program reaches a source line greater than the current
-or a specified location (same args as break command) within the current frame))
 ```
 
 <a id=condition></a>
 ### condition
-> (gdb) help condition
-Specify breakpoint number N to break only if COND is true.
-Usage is `condition N COND', where N is an integer and COND is an
-expression to be evaluated whenever breakpoint N is reached.
+> Specify breakpoint number `N` to break only if `COND` is true<br>
+> `N` is an **integer**<br>
+> `COND` is an **expression** to be evaluated whenever breakpoint `N` is reached
 
-```vim
-break <Function>
-info breakpoints
-condition 3 i == 3
+```bash
+condition N COND
 ```
 
 <a id=info></a>
 ### info
-```vim
-info line
-info line -- Core addresses of the code for a source line
+
+`Arg` can be:
+
+> `LINENUM`, to list around that line in current file<br>
+`FILE:LINENUM`, to list around that line in that file<br>
+`FUNCTION`, to list around beginning of that function<br>
+`FILE:FUNCTION`, to distinguish among like-named static functions<br>
+Default is to describe the last source line that was listed<br>
+
+```bash
+# Core addresses of the code for a source line
+info linke <Arg>
 ```
 
 <a id=logging></a>
 ### logging
 > You may want to save the output of GDB commands to a file. There are several commands to control GDB’s logging.
 
-#### logging - Example
-```vim
-set logging file ~/dpvs.log
-set logging on
-set trace-commands on
-show logging
+_logging - Example_
 
-set logging on
+```vim
+(gdb) set logging file ~/dpvs.log
+(gdb) set logging on
+(gdb) set trace-commands on
+(gdb) show logging
+
+(gdb) set logging on
 Enable logging.
 
-set logging off
+(gdb) set logging off
 Disable logging.
 
-set logging file file
+(gdb) set logging file file
 Change the name of the current logfile. The default logfile is gdb.txt.
 
-set logging overwrite [on|off]
+(gdb) set logging overwrite [on|off]
 By default, GDB will append to the logfile. Set overwrite if you want set logging on to overwrite the logfile instead.
 
-set logging redirect [on|off]
+(gdb) set logging redirect [on|off]
 By default, GDB output will go to both the terminal and the logfile. Set redirect if you want output to go only to the log file.
 
-show logging
+(gdb) show logging
 Show the current values of the logging settings.
-```
-
-<a id=shortcut></a>
-### shortcut key
-> only support >= v0.7.0, refer <http://cgdb.github.io/docs/cgdb.html>
-
-```
-When you are in the source window, you are implicitly in CGDB mode. All of the below commands are available during this mode.
-i
-Puts the user into GDB mode.
-
-s
-Puts the user into scroll mode in the GDB mode.
-
-Ctrl-T
-Opens a new tty for the debugged program.
-```
-
-<a id=cgdbusage></a>
-### cgdb usage
-> Jump to cgdb source window, like VIM, type command below to switch to horizontal split
-
-```
-set winsplitorientation=vertical
-set winsplitorientation=horizontal
 ```
 
 <a id=reverse-next></a>
 ### reverse-next
-> Step program backward, proceeding through subroutine calls
+> step program backward, proceeding through subroutine calls
 <https://sourceware.org/gdb/wiki/ProcessRecord>
 <https://stackoverflow.com/questions/7517236/how-do-i-enable-reverse-debugging-on-a-multi-threaded-program>
 
-For multi-thread reverse debugging
-You need to active the instruction-recording target, by executing the command record
+> for **multi-thread reverse debugging**
+You need to active the **instruction-recording target**, by executing the command `record`
 
-#### reverse - Example
+_reverse - Example_
 
-```vim
-record
-next
-reverse-next
+```
+(gdb) record
+(gdb) next
+(gdb) reverse-next
 
-record stop
+...
+
+(gdb) record stop
+```
+
+<a id=horizontal></a>
+### horizontal or vertical
+> Jump to cgdb **source window**, like VIM, type command below to switch to horizontal split
+
+`Alt + <Up/Down>` to jump into and scroll `source window`
+
+```bash
+set winsplitorientation=vertical
+set winsplitorientation=horizontal
+```
+
+<a id=shortcut></a>
+### shortcut key
+> only support cgdb >= **v0.7.0**, refer <http://cgdb.github.io/docs/cgdb.html>
+
+```bash
+# When you are in the source window, you are implicitly in CGDB mode.
+# All of the below commands are available during this mode.
+
+# Puts the user into GDB mode.
+i
+
+# Puts the user into scroll mode in the GDB mode.
+s
+
+# Opens a new tty for the debugged program.
+Ctrl-T
 ```
