@@ -1,44 +1,60 @@
-## git
+## Git
+### Contents
+- [Git](#git)
+    - [pull](#pull)
+    - [alias](#alias)
+    - [diff](#diff)
+    - [log](#log)
+    - [bare repo](#bare)
+    - [branch](#branch)
+- [Github](#github)
+    * [make repo empty](#empty)
+    * [delete remote branch](#delete)
+    * [untrace certain files](#untrace)
+    * [syncing a fork](#sync)
 
-- [pull](#pull)
-- [alias](#alias)
-- [diff](#diff)
-- [log](#log)
-- [bare repo](#bare)
-
-<a id = pull></a>
-### pull
+<a id=git></a>
+### Git
+<a id=pull></a>
+#### pull
 <http://hungyuhei.github.io/2012/08/07/better-git-commit-graph-using-pull---rebase-and-merge---no-ff.html>
 
-为了使提交更加整洁一些, 使用 `git pull --rebase`
+_为了使提交更加整洁一些, 使用 `git pull --rebase`_
 
----
 ```git
 # git pull origin master
 git pull origin master --rebase
 ```
 
-<a id = alias></a>
-### alias
+<a id=alias></a>
+#### alias
 ```git
 git config alias.co checkout
 git config --global alias.dfcs 'diff --cached --stat'
 ```
 
-<a id = diff></a>
-### diff
+<a id=branch></a>
+#### branch
+```git
+git branch -a
+# delete branch 'devel'
+git branch -d <devel>
+```
+
+<a id=diff></a>
+#### diff
 ```git
 git diff --since=1.hour.ago --until=1.minute.ago
 ```
 
-<a id = log></a>
-### log
+<a id=log></a>
+#### log
 ```git
 git log -p --author='PENG'
 ```
 
-<a id = bare></a>
-### bare repository
+<a id=bare></a>
+#### bare repository
 ```bash
 # git bare local private repository
 # use git-shell | not bash
@@ -68,3 +84,50 @@ git clone git@<remote server ip>:/usr/local/src/sample
 git pull origin master
 git push origin master
 ```
+
+---
+<a id=github></a>
+### Github
+<a id=empty></a>
+#### make repo empty
+> make new branch
+
+```git
+git checkout --orphan orphan
+git add -A
+git commit -am "Init commit"
+git branch -D master
+```
+
+> Rename current branch to master and push
+
+```git
+git branch -m master
+git push origin master --force
+```
+
+<a id='delete'></a>
+#### delete remote branch
+```git
+git push origin :[branch_name]
+
+# Exp: delete branch 'feature'
+git push origin :feature
+```
+
+<a id='untrace'></a>
+#### untrace certain files
+> refer <https://gist.github.com/nasirkhan/5919173>
+
+```git
+git update-index --assume-unchanged FILE_NAME
+git update-index --no-assume-unchanged FILE_NAME
+```
+
+<a id='sync'></a>
+#### syncing a fork
+
+follow steps:
+
+1. [Configuring a remote for a fork](https://help.github.com/articles/configuring-a-remote-for-a-fork/)<br>
+2. [Syncing a fork](https://help.github.com/articles/syncing-a-fork/)
