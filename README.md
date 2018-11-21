@@ -1,8 +1,9 @@
-## Illustrate
-- This project aims to persist same _**Good Working Environment**_ quickly and easily
-- Done everything even from fresh install of `OS` all in one
-- Several deploy mode for selection
-<table>
+### Illustrate
+- This project aims to provide and persist **Cosy Working Environment** quickly and easily
+- Release more time on coding itself rather than installing tools time and time again boringly
+- Done everything even from fresh OS installation all in one
+- Different mode fit for different need
+<table width=100%>
     <tr align=center>
         <th colspan=2> Mode </th>
         <th>Need Root Privilege</th>
@@ -35,11 +36,13 @@
     </tr>
 </table>
 
-- Catch a glimpse of the *recursive* procedure
-
+- Catch a glimpse of the `recursive` procedure
 ![](./res/persistlv.gif)
 
-## Directory structure
+> It's great if this project may help you though it aimed to my personal use at the beginning<br>
+> Latest released version: v4.0
+
+### Directory structure
 ```
 +-- Giggle
 |   +-- track-files
@@ -83,10 +86,7 @@
 |   |   +-- iterm2-save.png
 ```
 
-> It's great if this project may be helpful for you though it aimed to my personal use at the beginning<br>
-> Latest released version: v4.0
-
-## Prerequisite
+### Prerequisite
 > You should have full Internet access. if not, refer [squid.md](./doc/squid.md) or [ssh-proxy.md](./doc/ssh-proxy.md) to establish connection<br>
 > On Ubuntu, /bin/sh was linked to /bin/dash by default, correct it to /bin/bash
 
@@ -96,11 +96,14 @@ ls -l /bin/sh
 lrwxrwxrwx 1 root root 9 Mar 29 17:04 /bin/sh -> /bin/bash*
 ```
 
-## Quick Start
-```bash
+### Lazy Deploy
+#### clone repo
+```git
 git clone https://github.com/xiangp126/Giggle crosslv
 ```
-```bash
+
+#### install routine
+```
 sh oneKey.sh
 
 [NAME]
@@ -139,10 +142,10 @@ sh oneKey.sh
 sh oneKey.sh root
 ```
 
-## Tips of key Script
+### Tips of Key Script
 > autoHandle.sh and makeLink.sh was automatically called by oneKey.sh, but their function can be used outside this project, so separate them alone.
 
-### autoHandle.sh
+#### autoHandle.sh
 > comment on/off one of them to add/remove from tracking
 
 ```bash
@@ -184,7 +187,7 @@ sh autoHandle.sh
     clean   -> clean ${backupDir}.*/, but reserve main backup dir
 ```
 
-### makeLink.sh
+#### makeLink.sh
 > generate soft link for [tools](./tools) into PATH
 
 ```bash
@@ -219,5 +222,5 @@ sh makeLink.sh install
 - [Let-Git](https://github.com/xiangp126/let-git) - update to latest stable version of Git
 - [Let-Unlatch](https://github.com/xiangp126/let-unlatch) - lazy deploy that 'you knows' on VPS
 
-## License
+### License
 The [MIT](./LICENSE.txt) License (MIT)

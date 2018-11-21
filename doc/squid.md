@@ -1,11 +1,11 @@
-## Install Squid
+## Squid
 wget did not support ssh socks5 proxy
 
 ```bash
 sudo yum install squid -y
 ```
 
-## Help Page
+### Help Page
 ```bash
 > which squid
 /usr/sbin/squid
@@ -35,7 +35,7 @@ Usage: squid [-cdhvzCFNRVYX] [-s | -l facility] [-f config-file] [-[au] port] [-
        -Y        Only return UDP_HIT or UDP_MISS_NOFETCH during fast reload.
 ```
 
-## Start Squid on Server
+### Start Squid on Server
 ```bash
 > squid -N -d 1
 # Default listen port is 3128
@@ -47,11 +47,11 @@ udp        0      0 0.0.0.0:21835           0.0.0.0:*                           
 udp6       0      0 :::17176                :::*                                12863/squid
 ```
 
-## Use Proxy on Client
-> let's assume `10.124.10.102` is the ip of `server`
+### Use Proxy on Client
+> let's assume `10.123.18.129` is the ip of `server`
 
 ```bash
-proxy_ip=10.124.10.102
+proxy_ip=10.123.18.129
 export http_proxy=http://$proxy_ip:3128/
 export https_proxy=http://$proxy_ip:3128/
 ```
