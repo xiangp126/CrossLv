@@ -1,5 +1,5 @@
 ### Illustrate
-- This project aims to provide and persist **Cosy Working Environment** quickly and easily
+- This project aims to provide and persist **Cosy Working Environment** on Linux and Mac
 - Release more time on coding itself rather than installing tools time and time again boringly
 - Done everything even from fresh OS installation all in one
 - Different mode fit for different need
@@ -36,55 +36,11 @@
     </tr>
 </table>
 
-- Catch a glimpse of the `recursive` procedure
+- Demo for the `recursive` procedure
 ![](./res/persistlv.gif)
 
 > It's great if this project may help you though it aimed to my personal use at the beginning<br>
 > Latest released version: v4.0
-
-### Directory structure
-```
-+-- Giggle
-|   +-- track-files
-|   |   +-- bashrc
-|   |   +-- gitconfig
-|   |   +-- gitignore
-|   |   +-- tmux.conf
-|   |   +-- vimrc
-|   |   +-- ycm_extra_conf.py
-|   +-- oneKey.sh
-|   +-- autoHandle.sh
-|   +-- makeLink.sh
-|   +-- vim-colors
-|   |   +-- darkcoding.vim
-|   |   +-- jellybeans.vim
-|   +-- doc
-|   |   +-- cgdb.md
-|   |   +-- crontab.md
-|   +-- template
-|   |   +-- aria2.conf
-|   |   +-- cgdbrc
-|   |   +-- tmux.conf_v1.6
-|   |   +-- shadowsocks-local.json
-|   +-- expect
-|   +-- tools
-|   |   +-- addtools.sh
-|   |   +-- fkgit.py
-|   |   +-- ycm_add_inc.sh
-|   |   +-- mkfonts.sh
-|   |   +-- httproxy-git.sh
-|   +-- completion
-|   |   +-- fzf_completion.bash
-|   |   +-- fzf_keybindings.bash
-|   |   +-- tmux_completion.bash
-|   |   +-- git_completion.bash
-|   +-- fonts
-|   |   +-- powerline-symbols
-|   |   +-- monaco.ttf
-|   +-- pic
-|   |   +-- High Sierra.jpg
-|   |   +-- iterm2-save.png
-```
 
 ### Prerequisite
 > You should have full Internet access. if not, refer [squid.md](./doc/squid.md) or [ssh-proxy.md](./doc/ssh-proxy.md) to establish connection<br>
@@ -138,8 +94,17 @@ sh oneKey.sh
 | .__/ \___|_|  |___/_|___/\__|_| \_/
 |_|
 ```
+
+deploy using `root` mode
+
 ```bash
 sh oneKey.sh root
+```
+
+or using 'home' mode
+
+```bash
+sh oneKey.sh home
 ```
 
 ### Tips of Key Script
