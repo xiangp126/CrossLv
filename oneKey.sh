@@ -127,9 +127,9 @@ usage() {
     help -- print the help messages
     home -- install packages into $homeInstDir/
     root -- install packages into $rootInstDir/
-    mixed - install packages into $homeInstDir/ but with sudo privilege
+    mixed - install packages into $homeInstDir/ with root privilege
+    simple  -- simple level, only install key vim/tmux plugins
     summary -- show installation summary
-    simple  -- simple install level, only key vim/tmux plugins
 
 [TROUBLESHOOTING]
     if 'sh $execName' can not be excuted, ensure /bin/sh linked to /bin/bash
@@ -1660,6 +1660,7 @@ _EOF
 }
 
 # compile YouCompleteMe
+# git co 39c06c42 for new YCM bug
 installYcm() {
     cat << "_EOF"
 ------------------------------------------------------

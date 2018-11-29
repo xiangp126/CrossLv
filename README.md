@@ -1,8 +1,9 @@
 ### Illustrate
-- This project aims to provide and persist **Cosy Working Environment** on Linux and Mac
+- This project aims to provide and persist **Cosy Programming Environment** on Linux and Mac
 - Release more time on coding itself rather than installing tools time and time again boringly
-- Done everything even from fresh OS installation all in one
-- Different mode fit for different need
+- Done everything even from fresh OS installation all in one-key
+- Different mode satisfies different needs
+
 <table width=100%>
     <tr align=center>
         <th colspan=2> Mode </th>
@@ -58,10 +59,12 @@ lrwxrwxrwx 1 root root 9 Mar 29 17:04 /bin/sh -> /bin/bash*
 git clone https://github.com/xiangp126/Giggle crosslv
 ```
 
-#### install routine
-```
+#### help message
+```bash
 sh oneKey.sh
+```
 
+```
 [NAME]
     oneKey.sh -- setup my working environment with just single command
 
@@ -81,8 +84,8 @@ sh oneKey.sh
     home -- install packages into $HOME/.usr/
     root -- install packages into /usr/local/
     mixed - install packages into $HOME.usr/ but with sudo privilege
-    summary -- show installation summary
     simple  -- simple install level, only key vim/tmux plugins
+    summary -- show installation summary
 
 [TROUBLESHOOTING]
     if 'sh $execName' can not be excuted, ensure /bin/sh linked to /bin/bash
@@ -95,13 +98,14 @@ sh oneKey.sh
 |_|
 ```
 
+#### install routine
 deploy using `root` mode
 
 ```bash
 sh oneKey.sh root
 ```
 
-or using 'home' mode
+or using `home` mode
 
 ```bash
 sh oneKey.sh home
