@@ -7,6 +7,7 @@
     - [log](#log)
     - [bare repo](#bare)
     - [branch](#branch)
+    - [tag](#tag)
 - [Github](#github)
     * [make repo empty](#empty)
     * [delete remote branch](#delete)
@@ -83,6 +84,21 @@ git clone git@<remote server ip>:/usr/local/src/sample
 
 git pull origin master
 git push origin master
+```
+
+<a id=tag></a>
+#### tag
+
+delete tag both on local and remote machine
+
+```bash
+#!/bin/bash
+set -x
+tags=`git tag`
+for tag in $tags; do
+    git tag --delete $tag
+    git push origin :refs/tags/$tag
+done
 ```
 
 ---
