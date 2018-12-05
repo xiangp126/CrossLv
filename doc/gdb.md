@@ -46,6 +46,9 @@ Upon return, the value returned is printed and put in the value history.
 ```bash
 break main
 break <Line_Number>
+
+# break at a line of certain file
+break /Full/path/to/service.cpp:45
 ```
 
 <a id=until></a>

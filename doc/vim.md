@@ -33,7 +33,8 @@ Alt + Shift + i  goto current head of line
 :31, 33 copy .
 ```
 <br>
+
 ---
+
 ### registers
 <https://vi.stackexchange.com/questions/84/how-can-i-copy-text-to-the-system-clipboard-from-vim>
-
