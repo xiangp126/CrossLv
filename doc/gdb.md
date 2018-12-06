@@ -13,6 +13,8 @@
 - [logging](#logging)
 - [horizontal or vertical](#horizontal)
 - [shortcut manipulation](#shortcut)
+- [multiple thread](#mthread)
+- [multiple process](#mprocess)
 
 <a id=compile></a>
 ### compile source file for debugging
@@ -165,4 +167,22 @@ s
 
 # Opens a new tty for the debugged program.
 Ctrl-T
+```
+
+<a id=mthread></a>
+### multiple thread
+```bash
+info threads
+thread ID
+break thread_test.c:123 thread all
+thread apply ID1 ID2 command
+thread apply all command
+set scheduler-locking off|on|step
+```
+
+<a id=mprocess></a>
+### multiple process
+```bash
+set follow-fork-mode [parent|child]
+set detach-on-fork [on|off]
 ```

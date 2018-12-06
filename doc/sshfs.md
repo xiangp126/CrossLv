@@ -5,7 +5,7 @@ _ssh file system_
 
 <https://lutao.me/ssh/sshfs/fuse/2017/04/19/sshfs.html>
 
-**Caution**: `cd` out of your **mount point** before `sshfs action`
+**Caution**: `cd` out of your **mount point** before sshfs **mount** action
 
 ### Install `sshfs`
 #### for `Mac`
@@ -22,7 +22,7 @@ yum install sshfs
 apt-get install sshfs
 ```
 
-#### Usage Illustrate
+### Usage Illustrate
 #### mount
 ```bash
 sshfs user@x.x.x.x:/remote/path /local/path/
@@ -36,8 +36,13 @@ user@x.x.x.x:       1.1T  264G  849G  24% /local/path
 
 #### umount
 ```bash
-diskutil unmount /local/path
 umount /local/path
+```
+
+for `mac` may need
+
+```bash
+diskutil unmount /local/path
 ```
 
 #### specify `IdentityFile`
