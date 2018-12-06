@@ -8,6 +8,7 @@
     - [bare repo](#bare)
     - [branch](#branch)
     - [tag](#tag)
+    - [reset](#reset)
 - [Github](#github)
     * [make repo empty](#empty)
     * [delete remote branch](#delete)
@@ -52,6 +53,31 @@ git diff --since=1.hour.ago --until=1.minute.ago
 #### log
 ```git
 git log -p --author='PENG'
+```
+
+<a id=reset></a>
+#### reset
+```git
+# help page
+--soft
+    Does not touch the index file nor the working tree at all (but resets
+    the head to <commit>, just like all modes do). This leaves all your
+    changed files "Changes to be committed", as git status would put it.
+
+--mixed
+    Resets the index but not the working tree (i.e., the changed files are
+    preserved but not marked for commit) and reports what has not been
+    updated. This is the default action.
+
+--hard
+    Resets the index and working tree. Any changes to tracked files in the
+    working tree since <commit> are discarded.
+```
+
+default was **--mixed**
+
+```git
+git reset HEAD -- filename
 ```
 
 <a id=bare></a>
