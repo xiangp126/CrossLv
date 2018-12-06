@@ -85,8 +85,9 @@ nmap <C-G> :%s/\s\+$//gc<CR>
 nmap <leader>R :source ~/.vimrc<CR>
 nmap <silent> <leader>q       :qall!<CR>
 nmap <silent> <leader>w       :wq!<CR>
-nnoremap <silent> <C-Q>       :qall!<CR>
-inoremap <silent> <C-Q>  <ESC>:qall!<CR>
+" may mishandle on VIM when Q near W
+" nnoremap <silent> <C-Q>       :qall!<CR>
+" inoremap <silent> <C-Q>  <ESC>:qall!<CR>
 imap <C-D> <ESC>dd
 vnoremap <silent> <C-Q>  <ESC>:qall!<CR>
 " Set stty -ixon on ~/.bashrc
