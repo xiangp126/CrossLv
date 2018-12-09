@@ -9,6 +9,7 @@
     - [branch](#branch)
     - [tag](#tag)
     - [reset](#reset)
+    - [remote](#remote)
 - [Github](#github)
     * [make repo empty](#empty)
     * [delete remote branch](#delete)
@@ -125,6 +126,26 @@ for tag in $tags; do
     git tag --delete $tag
     git push origin :refs/tags/$tag
 done
+```
+
+<a id=remote></a>
+#### remote
+
+> syntax: `git remote add`
+
+change your remote's URL
+
+```bash
+# check
+git remote -v
+origin  https://github.com/iqiyi/dpvs (fetch)
+origin  https://github.com/iqiyi/dpvs (push)
+
+git remote set-url origin https://github.com/xiangp126/dpvs
+# check
+git remote -v
+origin  https://github.com/xiangp126/dpvs (fetch)
+origin  https://github.com/xiangp126/dpvs (push)
 ```
 
 ---

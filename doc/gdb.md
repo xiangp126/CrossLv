@@ -3,6 +3,7 @@
 
 ### Contents
 - [compile for debug](#compile)
+- [debug with `core` file](#core)
 - [run with arguments](#run)
 - [reverse-next](#reverse-next)
 - [finish](#finish)
@@ -11,10 +12,11 @@
 - [condition](#condition)
 - [info](#info)
 - [logging](#logging)
-- [horizontal or vertical](#horizontal)
+- [horizontal or vertical?](#horizontal)
 - [shortcut manipulation](#shortcut)
-- [multiple thread](#mthread)
-- [multiple process](#mprocess)
+- [thread](#thread)
+- [scheduler-locking](#locking)
+- [fork](#fork)
 
 <a id=compile></a>
 ### compile source file for debugging
@@ -29,6 +31,21 @@ _compile source file for debugging_
 g++ -Wall -g3 main.cpp -o main
 ```
 
+<a id=core></a>
+
+### debug with `core` file
+let Linux generate core
+
+```bash
+ulimit -c unlimited
+```
+
+run with `core`
+
+```bash
+cgdb ./main -c core.63522
+```
+
 <a id=run></a>
 ### run
 > run with arguments after launching `gdb`
@@ -40,7 +57,8 @@ cgdb main
 
 <a id=finish></a>
 ### finish
-> **continue until hit a return**<br>
+**continue until hit a `return`**
+
 Upon return, the value returned is printed and put in the value history.
 
 <a id=break></a>
@@ -53,12 +71,24 @@ break <Line_Number>
 break /Full/path/to/service.cpp:45
 ```
 
+help message
+
+```
+break [PROBE_MODIFIER] [LOCATION] [thread THREADNUM] [if CONDITION]
+
+THREADNUM is the number from "info threads".
+CONDITION is a boolean expression.
+
+Multiple breakpoints at one place are permitted, and useful if their
+conditions are different.
+```
+
 <a id=until></a>
 ### until
 > Execute until the program reaches a source line **greater than** the current or a specified location (same args as break command) within the current frame
 
 ```bash
-until + 3
+until +3
 until <Line_Number>
 ```
 
@@ -141,7 +171,7 @@ _reverse - Example_
 ```
 
 <a id=horizontal></a>
-### horizontal or vertical
+### horizontal or vertical?
 > Jump to cgdb **source window**, like VIM, type command below to switch to horizontal split
 
 `Alt + <Up/Down>` to jump into and scroll `source window`
@@ -169,18 +199,31 @@ s
 Ctrl-T
 ```
 
-<a id=mthread></a>
-### multiple thread
+<a id=thread></a>
+### thread
 ```bash
 info threads
 thread ID
 break thread_test.c:123 thread all
 thread apply ID1 ID2 command
 thread apply all command
-set scheduler-locking off|on|step
 ```
 
-<a id=mprocess></a>
+<a id=locking></a>
+### scheduler-locking
+Set mode for locking scheduler during execution.
+
+set scheduler-locking **on**
+
+```ruby
+off  == no locking (threads may preempt at any time)
+on   == full locking (no thread except the current thread may run)
+step == scheduler locked during every single-step operation
+    In this mode, no other thread may run during a step command.
+    Other threads may run while stepping over a function call ('next')
+```
+
+<a id=fork></a>
 ### multiple process
 ```bash
 set follow-fork-mode [parent|child]
