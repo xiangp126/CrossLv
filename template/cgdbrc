@@ -1,8 +1,6 @@
-" Copy this file as ~/.cgdb/cgdbrc
 set tabstop=2
 set autosourcereload
 set ignorecase
-set winminheight=2
 set wrapscan
 set hlsearch
 set showmarks
@@ -12,12 +10,12 @@ set winsplitorientation=vertical
 set executinglinedisplay=longarrow
 set selectedlinedisplay=shortarrow
 
-" map <F5>  :run<CR>
-" map <F8>  :continue<CR>
-" map <F11> :step<CR>
-" map <F9>  :until<CR>
-" map <F10> :next<CR>
-" map <F12> :finish<CR>
+map <F5>  :run<CR>
+map <F8>  :continue<CR>
+map <F11> :step<CR>
+map <F9>  :until<CR>
+map <F10> :next<CR>
+map <F12> :finish<CR>
 
 hi SelectedLineArrow ctermfg=134
 hi SelectedLineNr ctermfg=134
