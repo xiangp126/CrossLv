@@ -1,6 +1,6 @@
 ## Git
 ### Contents
-- [Git](#git)
+- [Git Basic Commands ](#git)
     - [pull](#pull)
     - [alias](#alias)
     - [diff](#diff)
@@ -10,35 +10,35 @@
     - [tag](#tag)
     - [reset](#reset)
     - [remote](#remote)
-- [Github](#github)
+- [Github Useful Manipulation](#github)
     * [make repo empty](#empty)
     * [delete remote branch](#delete)
     * [untrace certain files](#untrace)
+    * [Configuring a remote for a fork](#forafork)
     * [syncing a fork](#sync)
 
 <a id=git></a>
 ### Git
 <a id=pull></a>
-#### pull
-<http://hungyuhei.github.io/2012/08/07/better-git-commit-graph-using-pull---rebase-and-merge---no-ff.html>
+#### [pull](http://hungyuhei.github.io/2012/08/07/better-git-commit-graph-using-pull---rebase-and-merge---no-ff.html)
 
-_为了使提交更加整洁一些, 使用 `git pull --rebase`_
+_To make commits looked more clean, use `git pull --rebase`_
 
-```git
+```bash
 # git pull origin master
 git pull origin master --rebase
 ```
 
 <a id=alias></a>
 #### alias
-```git
+```bash
 git config alias.co checkout
 git config --global alias.dfcs 'diff --cached --stat'
 ```
 
 <a id=branch></a>
 #### branch
-```git
+```bash
 git branch -a
 # delete branch 'devel'
 git branch -d <devel>
@@ -46,19 +46,19 @@ git branch -d <devel>
 
 <a id=diff></a>
 #### diff
-```git
+```bash
 git diff --since=1.hour.ago --until=1.minute.ago
 ```
 
 <a id=log></a>
 #### log
-```git
+```bash
 git log -p --author='PENG'
 ```
 
 <a id=reset></a>
 #### reset
-```git
+```bash
 # help page
 --soft
     Does not touch the index file nor the working tree at all (but resets
@@ -77,12 +77,15 @@ git log -p --author='PENG'
 
 default was **--mixed**
 
-```git
+```bash
 git reset HEAD -- filename
 ```
 
 <a id=bare></a>
 #### bare repository
+
+On remote machine run as server like `Github`
+
 ```bash
 # git bare local private repository
 # use git-shell | not bash
@@ -93,8 +96,9 @@ git init --bare sample
 sudo chown -R git:git sample
 ```
 
+On Local Machinde
+
 ```bash
-# On Local Machinde | access repository somewhere else
 #  Create authorized_keys for user: git | Important
 su -
 cd /home/git
@@ -155,7 +159,7 @@ origin  https://github.com/xiangp126/dpvs (push)
 #### make repo empty
 > make new branch
 
-```git
+```bash
 git checkout --orphan orphan
 git add -A
 git commit -am "Init commit"
@@ -164,14 +168,14 @@ git branch -D master
 
 > Rename current branch to master and push
 
-```git
+```bash
 git branch -m master
 git push origin master --force
 ```
 
 <a id='delete'></a>
 #### delete remote branch
-```git
+```bash
 git push origin :[branch_name]
 
 # Exp: delete branch 'feature'
@@ -182,15 +186,81 @@ git push origin :feature
 #### untrace certain files
 > refer <https://gist.github.com/nasirkhan/5919173>
 
-```git
+```bash
 git update-index --assume-unchanged FILE_NAME
 git update-index --no-assume-unchanged FILE_NAME
 ```
 
+<a id=forafork></a>
+#### [Configuring a remote for a fork](https://help.github.com/articles/configuring-a-remote-for-a-fork/)
+
+List the current configured remote repository for your fork
+
+```bash
+git remote -v
+origin  https://github.com/YOUR_USERNAME/YOUR_FORK.git (fetch)
+origin  https://github.com/YOUR_USERNAME/YOUR_FORK.git (push)
+```
+
+Specify a new remote `upstream` repository that will be synced with the fork
+
+```bash
+git remote add upstream https://github.com/ORIGINAL_OWNER/ORIGINAL_REPOSITORY.git
+```
+
+Verify the new upstream repository you've specified for your fork
+
+```bash
+git remote -v
+origin    https://github.com/YOUR_USERNAME/YOUR_FORK.git (fetch)
+origin    https://github.com/YOUR_USERNAME/YOUR_FORK.git (push)
+upstream  https://github.com/ORIGINAL_OWNER/ORIGINAL_REPOSITORY.git (fetch)
+upstream  https://github.com/ORIGINAL_OWNER/ORIGINAL_REPOSITORY.git (push)
+```
+
 <a id='sync'></a>
-#### syncing a fork
+#### [Syncing a fork](https://help.github.com/articles/syncing-a-fork/)
 
-follow steps:
+Fetch the branches and their respective commits from the `upstream` repository.<br>
+Commits to master will be stored in a **local** branch, `upstream/master`
 
-1. [Configuring a remote for a fork](https://help.github.com/articles/configuring-a-remote-for-a-fork/)<br>
-2. [Syncing a fork](https://help.github.com/articles/syncing-a-fork/)
+```bash
+git fetch upstream
+remote: Counting objects: 75, done.
+remote: Compressing objects: 100% (53/53), done.
+remote: Total 62 (delta 27), reused 44 (delta 9)
+Unpacking objects: 100% (62/62), done.
+From https://github.com/ORIGINAL_OWNER/ORIGINAL_REPOSITORY
+ * [new branch]      master     -> upstream/master
+```
+
+Check out your fork's local `master` branch
+
+```bash
+git checkout master
+Switched to branch 'master'
+```
+
+Merge the changes from **local** `upstream/master` into your **local** `master` branch.<br>
+This brings your **fork's** `master` branch _into sync with_ the **upstream** repository, without losing your local changes.
+
+```bash
+git merge upstream/master
+Updating a422352..5fdff0f
+Fast-forward
+ README                    |    9 -------
+ README.md                 |    7 ++++++
+ 2 files changed, 7 insertions(+), 9 deletions(-)
+ delete mode 100644 README
+ create mode 100644 README.md
+```
+
+If your local branch didn't have any unique commits, Git will instead perform a "fast-forward":
+
+```bash
+git merge upstream/master
+Updating 34e91da..16c56ad
+Fast-forward
+ README.md                 |    5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+```
