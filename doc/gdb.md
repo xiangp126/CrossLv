@@ -1,10 +1,10 @@
 ## cgdb
 ~~warning: do not type **layout src**, there was bug for gdb~~
 
-### Contents
-- [compile for debug](#compile)
-- [debug with `core` file](#core)
-- [run with arguments](#run)
+### Commonly Use
+- [thread](#thread)
+- [scheduler-locking](#locking)
+- [follow-fork-mode](#fork)
 - [reverse-next](#reverse-next)
 - [finish](#finish)
 - [break](#break)
@@ -12,11 +12,15 @@
 - [condition](#condition)
 - [info](#info)
 - [logging](#logging)
+
+### Not Commonly Used
+- [compile for debug](#compile)
+- [debug with `core` file](#core)
+- [run with arguments](#run)
+
+#### Basic `cgdb` Manipulation
 - [horizontal or vertical?](#horizontal)
 - [shortcut manipulation](#shortcut)
-- [thread](#thread)
-- [scheduler-locking](#locking)
-- [fork](#fork)
 
 <a id=compile></a>
 ### compile source file for debugging
@@ -32,7 +36,6 @@ g++ -Wall -g3 main.cpp -o main
 ```
 
 <a id=core></a>
-
 ### debug with `core` file
 let Linux generate core
 
@@ -164,39 +167,8 @@ _reverse - Example_
 (gdb) record
 (gdb) next
 (gdb) reverse-next
-
 ...
-
 (gdb) record stop
-```
-
-<a id=horizontal></a>
-### horizontal or vertical?
-> Jump to cgdb **source window**, like VIM, type command below to switch to horizontal split
-
-`Alt + <Up/Down>` to jump into and scroll `source window`
-
-```bash
-set winsplitorientation=vertical
-set winsplitorientation=horizontal
-```
-
-<a id=shortcut></a>
-### shortcut key
-> only support cgdb >= **v0.7.0**, refer <http://cgdb.github.io/docs/cgdb.html>
-
-```bash
-# When you are in the source window, you are implicitly in CGDB mode.
-# All of the below commands are available during this mode.
-
-# Puts the user into GDB mode.
-i
-
-# Puts the user into scroll mode in the GDB mode.
-s
-
-# Opens a new tty for the debugged program.
-Ctrl-T
 ```
 
 <a id=thread></a>
@@ -224,8 +196,58 @@ step == scheduler locked during every single-step operation
 ```
 
 <a id=fork></a>
-### multiple process
+### follow-fork-mode
+Set debugger response to a program call of `fork` or `vfork`.
+
+By default, the debugger will follow the **parent** process.
+
+set follow-fork-mode **parent**
+
 ```bash
-set follow-fork-mode [parent|child]
-set detach-on-fork [on|off]
+A fork or vfork creates a new process.  follow-fork-mode can be:
+  parent  - the original process is debugged after a fork
+  child   - the new process is debugged after a fork
+The unfollowed process will continue to run.
+```
+
+#### detach-on-fork
+default **on**
+
+set detach-on-fork **off**
+
+```bash
+Set whether gdb will detach the child of a fork.
+Tells gdb whether to detach the child of a fork.
+```
+
+---
+<a id=horizontal></a>
+### horizontal or vertical?
+> Jump to cgdb **source window**, like VIM, type command below to switch to horizontal split
+
+`Alt + <Up/Down>` or `ESC`, switch to `source window`
+
+then `:` into `configuration mode`
+
+```bash
+set winsplitorientation=vertical
+set winsplitorientation=horizontal
+```
+
+<a id=shortcut></a>
+### shortcut key
+> only support cgdb >= **v0.7.0**, refer <http://cgdb.github.io/docs/cgdb.html>
+
+```bash
+# When you are in the source window, you are implicitly in CGDB mode.
+# All of the below commands are available during this mode.
+
+# Puts the user into GDB mode.
+i
+
+# Puts the user into scroll mode in the GDB mode.
+s
+
+# Opens a new tty for the debugged program.
+Ctrl-T
 ```
