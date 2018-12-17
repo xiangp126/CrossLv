@@ -5,17 +5,17 @@
     - [alias](#alias)
     - [diff](#diff)
     - [log](#log)
-    - [bare repo](#bare)
     - [branch](#branch)
+    - [checkout](#checkout)
     - [tag](#tag)
     - [reset](#reset)
     - [remote](#remote)
-- [Github Useful Manipulation](#github)
-    * [make repo empty](#empty)
-    * [delete remote branch](#delete)
-    * [untrace certain files](#untrace)
+- [Github Associate Manipulation](#github)
+    * [Make a **bare** repository](#bare)
+    * [Make repo empty](#empty)
+    * [Untrace certain files](#untrace)
     * [Configuring a remote for a fork](#forafork)
-    * [syncing a fork](#sync)
+    * [Syncing a fork](#sync)
 
 <a id=git></a>
 ### Git
@@ -36,12 +36,51 @@ git config alias.co checkout
 git config --global alias.dfcs 'diff --cached --stat'
 ```
 
+<a id=checkout></a>
+#### checkout
+- remove already `indexed` file back to `workspace`
+
+```bash
+# from workspace to index
+git add <file_name>
+
+# then regret add
+git checkout <file_name>
+```
+
+- new branch from history commit
+
+```bash
+git checkout -b <branch_name> <sha1>
+``` 
+
 <a id=branch></a>
 #### branch
+- make a new branch, notice `-b`
+
+```bash
+git checkout -b <branch_name>
+```
+
+- list all branches
+
 ```bash
 git branch -a
-# delete branch 'devel'
-git branch -d <devel>
+```
+
+- delete **local** branch
+
+```bash
+git branch -d <branch_name>
+```
+
+- delete **remote** branch, notice `:` before `branch_name`
+
+```bash
+git push origin :<branch_name>
+
+# Example: delete branch 'feature'
+git push origin :feature
 ```
 
 <a id=diff></a>
@@ -79,42 +118,6 @@ default was **--mixed**
 
 ```bash
 git reset HEAD -- filename
-```
-
-<a id=bare></a>
-#### bare repository
-
-On remote machine run as server like `Github`
-
-```bash
-# git bare local private repository
-# use git-shell | not bash
-useradd -m -s "$(which git-shell)" git
-cd /usr/local/src/
-
-git init --bare sample
-sudo chown -R git:git sample
-```
-
-On Local Machinde
-
-```bash
-#  Create authorized_keys for user: git | Important
-su -
-cd /home/git
-mkdir .ssh
-touch .ssh/authorized_keys
-chmod 600 .ssh/authorized_keys
-chown -R git:git .ssh
-
-# Put pub key of access user into /home/git/.ssh/authorized_keys
-# One line for each user
-
-git remote add origin git@<team server ip>:/usr/local/src/sample
-git clone git@<remote server ip>:/usr/local/src/sample
-
-git pull origin master
-git push origin master
 ```
 
 <a id=tag></a>
@@ -155,9 +158,44 @@ origin  https://github.com/xiangp126/dpvs (push)
 ---
 <a id=github></a>
 ### Github
+<a id=bare></a>
+#### make a bare repository
+On remote machine run as server like `Github`
+
+```bash
+# git bare local private repository
+# use git-shell | not bash
+useradd -m -s "$(which git-shell)" git
+cd /usr/local/src/
+
+git init --bare sample
+sudo chown -R git:git sample
+```
+
+On Local Machinde
+
+```bash
+#  Create authorized_keys for user: git | Important
+su -
+cd /home/git
+mkdir .ssh
+touch .ssh/authorized_keys
+chmod 600 .ssh/authorized_keys
+chown -R git:git .ssh
+
+# Put pub key of access user into /home/git/.ssh/authorized_keys
+# One line for each user
+
+git remote add origin git@<team server ip>:/usr/local/src/sample
+git clone git@<remote server ip>:/usr/local/src/sample
+
+git pull origin master
+git push origin master
+```
+
 <a id=empty></a>
 #### make repo empty
-> make new branch
+make new branch
 
 ```bash
 git checkout --orphan orphan
@@ -166,20 +204,11 @@ git commit -am "Init commit"
 git branch -D master
 ```
 
-> Rename current branch to master and push
+Rename current branch to master and push
 
 ```bash
 git branch -m master
 git push origin master --force
-```
-
-<a id='delete'></a>
-#### delete remote branch
-```bash
-git push origin :[branch_name]
-
-# Exp: delete branch 'feature'
-git push origin :feature
 ```
 
 <a id='untrace'></a>
