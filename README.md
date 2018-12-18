@@ -1,7 +1,8 @@
 ### Illustrate
 - This project aims to provide and persist **Cosy Programming Environment** on Linux and Mac
-- Release more time on coding itself rather than installing tools time and time again boringly
+- Release time for coding itself rather than installing tools time and time again
 - Done everything even from fresh OS installation all in one-key
+- Mark down handy notes with `markdown` format in [doc](./doc)
 - Different mode satisfies different needs
 
 <table width=100%>

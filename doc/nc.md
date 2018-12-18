@@ -1,14 +1,42 @@
 ## nc
-> nc | netcat | tcpdmp | ncat | socat
+- ncat
+- netcat
+- ncat
+- socat
 
-```bash
-# dump bytes of 'tcpdump' to listening port of the remote machine
-# server_ip = 10.124.10.102
-tcpdump -i eth0 -s 0 -U -n -w - | nc -l server_ip 8080
+### connect
+`C-D` to quit
+
+- tcp
+
+```ruby
+ncat 192.168.10.1 80
+ncat 2001::221 80
 ```
 
-> get the bytes from remote server and open them with wireshark
+- udp
 
-```bash
-nc server_ip 8080 | wireshark -k -i -
+```ruby
+ncat -u 192.168.10.1 80
+ncat -u 2001::221 80
+```
+
+### listen
+
+listen on port `8088`
+
+- tcp
+
+```ruby
+nc -l 8088
+
+tcp6       0      0 :::8888        :::*     LISTEN  5378/nc
+```
+
+- udp
+
+```ruby
+nc -u -l 8088
+
+udp6       0      0 :::8888         :::*           4125/nc
 ```
