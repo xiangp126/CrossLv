@@ -1,9 +1,9 @@
 ### Illustrate
 - This project aims to provide and persist **Cosy Programming Environment** on Linux and Mac
-- Release time for coding itself rather than installing tools time and time again
+- Release time for coding itself, increase productivity
 - Done everything even from fresh OS installation all in one-key
 - Mark down handy notes with `markdown` format in [doc](./doc)
-- Different mode satisfies different needs
+- More install mode satisfies different needs
 
 <table width=100%>
     <tr align=center>
@@ -42,7 +42,7 @@
 ![](./res/persistlv.gif)
 
 > It's great if this project may help you though it aimed to my personal use at the beginning<br>
-> Latest released version: v4.0
+> Latest released version: v0.1
 
 ### Prerequisite
 > You should have full Internet access. if not, refer [squid.md](./doc/squid.md) or [ssh-proxy.md](./doc/ssh-proxy.md) to establish connection<br>
@@ -113,10 +113,12 @@ sh oneKey.sh home
 ```
 
 ### Tips of Key Script
-> autoHandle.sh and makeLink.sh was automatically called by oneKey.sh, but their function can be used outside this project, so separate them alone.
+`autoHandle.sh` and `makeLink.sh` were automatically called by `oneKey.sh`, whose function can be used outside this project, so separate them alone.
 
 #### autoHandle.sh
-> comment on/off one of them to add/remove from tracking
+comment on/off one of them to add/remove from tracking
+
+- tracked files
 
 ```bash
 trackFiles=(
@@ -128,6 +130,8 @@ trackFiles=(
     ".ycm_extra_conf.py"
 )
 ```
+
+- help info
 
 ```bash
 sh autoHandle.sh
@@ -158,7 +162,9 @@ sh autoHandle.sh
 ```
 
 #### makeLink.sh
-> generate soft link for [tools](./tools) into PATH
+Generate soft link for [tools](./tools) into PATH
+
+- help info
 
 ```bash
 sh makeLink.sh
@@ -182,6 +188,9 @@ sh makeLink.sh
 |_| |_| |_|\__,_|_|\_\___| |_|_|_| |_|_|\_\
 
 ```
+
+- make link
+
 ```bash
 sh makeLink.sh install
 ```
