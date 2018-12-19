@@ -1,5 +1,5 @@
 ## Squid
-wget did not support ssh socks5 proxy
+`wget` did not support `SSH socks5 proxy`, so choose `squid` for full proxy
 
 ```bash
 sudo yum install squid -y
@@ -47,8 +47,14 @@ udp        0      0 0.0.0.0:21835           0.0.0.0:*                           
 udp6       0      0 :::17176                :::*                                12863/squid
 ```
 
+### Access Log
+```bash
+cd /var/log/squid
+tail -f access.log
+```
+
 ### Use Proxy on Client
-> let's assume `10.123.18.129` is the ip of `server`
+let's assume `10.123.18.129` is the ip of server, add below to `.bashrc` of your client.
 
 ```bash
 proxy_ip=10.123.18.129

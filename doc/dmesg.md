@@ -5,9 +5,12 @@ The default action is to read all messages from `kernel ring buffer`.
 
 ### follow monitor
 ```bash
+# Wait for new messages. -w or --follow
 dmesg --follow
-# or dmesg -w
+# Enable human readable output
 dmesg --follow -H
+# Print human readable timestamps
+dmesg --follow -T
 ```
 
 ### file written
@@ -18,18 +21,24 @@ do not tempt to `vim` the file
 ### Explain Key Parameters
 > output of `pr_info` & `printk` can be seen using `dmesg`
 
+* -w, --follow
+
+```ruby
+Wait for new messages. This feature is supported on systems with readable `/dev/kmsg` only (since kernel 3.5.0).
+```
+
+* -T
+
+```ruby
+Print human readable timestamps.  The timestamp could be inaccurate!
+```
+ 
 * -H
 
 ```ruby
 -H, --human
 
 Enable human readable output.  See also --color, --reltime and --nopager.
-```
-
-* -w, --follow
-
-```ruby
-Wait for new messages. This feature is supported on systems with readable `/dev/kmsg` only (since kernel 3.5.0).
 ```
 
 * -n
