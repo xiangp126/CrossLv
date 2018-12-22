@@ -42,7 +42,9 @@ umount /local/path
 for `mac` may need
 
 ```bash
-diskutil unmount /local/path
+diskutil umount /local/path
+# Resource busy -- try 'diskutil unmount'
+diskutil umount force /local/path
 ```
 
 #### specify `IdentityFile`
