@@ -1,31 +1,46 @@
 ## tcpdump
-- wireshark
-- tshark
+tshark/wireshark/tcpdump
 
-### Remote Capture - Provide 3 Methods
-#### using ssh command- all in one
+### [Remote Capture](#rcapture)
+1. [using `ncat` - two commands, **nicest solution**](#ncat)
+2. [using `ssh` command - **all in one**](#ssh)
+3. [using `ssh` together with `fifo`](#fifo)
+
+### [Capture Filter](#filter)
+### [Explain Key Parameters](#explainkey)
+
+<a id=rcapture></a>
+<a id=ncat></a>
+#### using ncat - two commands, nicest solution
+> on server
+
+redirect raw bytes of `tcpdump` to `ncat`, listening on specified port on server
+
+```ruby
+tcpdump -s 0 -U -n -w - -i eth0 | nc -l 8888
+# with filter
+tcpdump -s 0 -U -n -w - -i any ip host 192.168.10.11 | nc -l 8888
+```
+
+> on client
+
+get the bytes from remote server and open them with `wireshark`
+
+```ruby
+nc 192.168.10.1 8888 | wireshark -k -i -
+```
+
+<a id=ssh></a>
+#### using ssh - all in one
 ```bash
-ssh -p 22 -l root 192.168.88.241 "sudo tcpdump -s 0 -U -n -w - -i eth0" | wireshark -k -i -
+ssh -p 22 -l root 192.168.10.1 "sudo tcpdump -s 0 -U -n -w - -i eth0" | wireshark -k -i -
 ```
 
-#### using ncat - two commands, nice solution
-on server
+<a id=fifo></a>
+#### using ssh together with fifo
+recommend only used when no `ncat` on remote server
 
-```ruby
-# dump raw bytes of `tcpdump` to `ncat`
-# which was listening on certain port on server
-tcpdump -s 0 -U -n -w - -i eth0 | nc -l 8080
-```
-
-on client
-
-```ruby
-# get the bytes from remote server and open them with wireshark
-nc server_ip 8080 | wireshark -k -i -
-```
-
-#### using `fifo` - two commands
-on Server
+> on Server
 
 ```ruby
 mkfifo /tmp/pcap
@@ -33,20 +48,30 @@ tcpdump -s 0 -U -n -w - -i eth0 > /tmp/pcap
 # tcpdump -s 0 -U -n -w - -i eth0 not port 22 > /tmp/pcap
 ```
 
-on client
+> on client
 
 ```ruby
-ssh -p 22 -l root 192.168.88.241 "cat /tmp/pcap" | wireshark -k -i -
+ssh -p 22 -l root 192.168.10.1 "cat /tmp/pcap" | wireshark -k -i -
 ```
 
----
-
+<a id=filter></a>
 ### Capture Filter
-```bash
+```ruby
+# only capture IP packets for host 192.168.88.241
 tcpdump -i any -nn ip host 192.168.88.241 -vv
+# only capture IPv6 packets for host 192.168.88.241
 tcpdump -i any -nn ip6 host 2001::220 -vv
+
+tcpdump ip host 192.168.88.241 and ! 192.168.88.242
+tcpdump -i eth0 src host 192.168.88.241
+tcpdump -i eth0 dst host 192.168.88.248
+
+# telnet: port 23
+tcpdump -i eth0 tcp port 23 and host 192.168.88.241
+tcpdump -i eth0 udp port 123
 ```
 
+<a id=explainkey></a>
 ### Explain Key Parameters
 * -s 0
 
