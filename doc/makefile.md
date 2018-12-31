@@ -1,6 +1,29 @@
 ## makefile
+### Template
+```makefile
+MAKE	= make
+CC 		= gcc
+LD 		= ld
 
-### Notice GCC Variables
+SUBDIRS = src tools
+
+INSDIR  = $(PWD)/bin
+export INSDIR
+
+export KERNEL   = $(shell /bin/uname -r)
+
+all:
+	for i in $(SUBDIRS); do $(MAKE) -C $$i || exit 1; done
+
+clean:
+	for i in $(SUBDIRS); do $(MAKE) -C $$i clean || exit 1; done
+
+install:all
+	-mkdir -p $(INSDIR)
+	for i in $(SUBDIRS); do $(MAKE) -C $$i install || exit 1; done
+```
+
+### Notable GCC Variables
 ```
   CC          C compiler command
   CFLAGS      C compiler flags
@@ -15,8 +38,7 @@
 ```
 
 ### make
-
-WE CAN MANUAL SPECIFY GCC/C++ USING ENV VARIABLES
+we can manual specify gcc/c++ using env variables
 
 ```bash
 export CC=/usr/local/bin/gcc
@@ -53,35 +75,36 @@ make -j
 make -j 8
 ```
 
+---
 ### Special Symbols
+- `$@`  target
+- `$<`  the first depends
+- `$^`  all depends
 
-```makefile
-$@  target
-$<  the first depends
-$^  all depends
+#### variable = value
+```ruby
+Lazy Set
+VARIABLE = value
+Normal setting of a variable - values within it are recursively expanded when the variable is used, not when it's declared
 ```
 
-### Makefile Template
+#### variable := value
+```ruby
+Immediate Set
+VARIABLE := value
+Setting of a variable with simple expansion of the values inside - values within it are expanded at declaration time.
+```
 
-```makefile
-MAKE	= make
-CC 		= gcc
-LD 		= ld
+#### variable ?= value
+```ruby
+Set If Absent
+VARIABLE ?= value
+Setting of a variable only if it doesn't have a value
+```
 
-SUBDIRS = src tools
-
-INSDIR  = $(PWD)/bin
-export INSDIR
-
-export KERNEL   = $(shell /bin/uname -r)
-
-all:
-	for i in $(SUBDIRS); do $(MAKE) -C $$i || exit 1; done
-
-clean:
-	for i in $(SUBDIRS); do $(MAKE) -C $$i clean || exit 1; done
-
-install:all
-	-mkdir -p $(INSDIR)
-	for i in $(SUBDIRS); do $(MAKE) -C $$i install || exit 1; done
+#### variable += value
+```ruby
+Append
+VARIABLE += value
+Appending the supplied value to the existing value (or setting to that value if the variable didn't exist)
 ```
