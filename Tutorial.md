@@ -1,41 +1,38 @@
 ## Tutorial
-### Key Markdowns
-- [Mount remote server to local disk](#sshfs)
-- [Config YCM auto-compeltion for DPDK](#ycm)
-- [Debug guide for `keepalived` - fork mode](#keepalived)
-- [Debug guide for multi-thread mode](#multithread)
+### Contents for Key Skills
+- [mount remote server to local disk](#sshfs)
+- [`YCM` auto-compeltion config how-to](#ycm)
+    - [config for calling DPDK functions](#dpdk)
+    - [config for calling Linux Kernel functions](#kernel)
+- [debug guide for `keepalived` - fork mode](#keepalived)
+- [debug guide for multi-thread mode](#multithread)
 
 <a id=ycm></a>
-### Config YCM auto-compeltion for DPDK
-
-More hot-key please refer to [.vimrc](./track-files/vimrc)
-#### commands for ycm
-```ruby
-:YcmRestartServer
-:YcmDebugInfo
-# <Leader> = ;
-<Leader> D
-<Leader> j
-```
-
+### YCM auto-compeltion config how-to
 #### .ycm\_extra\_conf.py
-Demo Config
-
 ```ruby
-# For a C project, you would set this to 'c' instead of 'c++'.
+# full path: ~/.ycm\_extra\_conf.py
+flags = [
+'-Wall',
+'-Wextra',
+# Turn warning into an error.
+# '-Werror',
+'-fexceptions',
+'-DNDEBUG',
+'-std=c++11',
 '-x',
 'c',
 '-isystem',
 '/usr/include',
-'-isystem',
-'/mnt/221/dpdk-1805/build/include',
 '-I.',
 '-I./include',
-'-I./include/ipvs'
+'-I./inc',
 ]
 ```
 
-> **-isystem** followed path that was included with `<>`, and **-I** was followed by path included with `""`
+- **-isystem**
+
+> **-isystem** followed by path that was included with `<>`, and **-I** was followed by path included with `""`
 
 - `<>` include
 
@@ -44,7 +41,7 @@ Demo Config
 #include <net/if.h>
 ```
 
-You should use **-isystem**
+auto-complete functions in these headers, you should use **-isystem**, like
 
 ```python
 '-isystem',
@@ -58,7 +55,74 @@ You should use **-isystem**
 #include "ipvs/acl.h"
 ```
 
-You should use **-I**
+auto-complete functions in these headers, you should use **-I**, like
+
+```python
+'-I./include',
+```
+
+<a id=dpdk></a>
+#### Config for calling DPDK functions
+- config
+
+add one `-isystem` entry like this:
+
+```python
+'-isystem',
+'/mnt/221/dpdk-1805/build/include',
+```
+
+and yields:
+
+```python
+# For a C project, you would set this to 'c' instead of 'c++'.
+'-x',
+'c',
+'-isystem',
+'/usr/include',
+'-isystem',
+'/mnt/221/dpdk-1805/build/include',
+'-I.',
+'-I./include',
+'-I./include/ipvs'
+```
+
+- commands for ycm
+
+more hot-key please refer to [.vimrc](./track-files/vimrc)
+
+```python
+:YcmRestartServer
+:YcmDebugInfo
+# <Leader> = ;
+<Leader> D
+<Leader> j
+```
+
+<a id=kernel></a>
+#### Config for calling Linux Kernel functions
+for example, when you try to write kernel modules, add one `-isystem` entry like this:
+
+```python
+'-isystem',
+'/usr/src/kernels/3.10.0-327.36.3.el7.x86_64/include/',
+```
+
+and yields:
+
+```python
+# For a C project, you would set this to 'c' instead of 'c++'.
+'-x',
+'c',
+'-isystem',
+'/usr/include',
+'-isystem',
+'/usr/src/kernels/3.10.0-327.36.3.el7.x86_64/include/',
+'-I.',
+'-I./include',
+'-I./inc',
+]
+```
 
 <a id=sshfs></a>
 ### Mouont remote server to local disk
