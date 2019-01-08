@@ -106,6 +106,8 @@ for example, when you try to write kernel modules, add one `-isystem` entry like
 ```python
 '-isystem',
 '/usr/src/kernels/3.10.0-327.36.3.el7.x86_64/include/',
+'-isystem',
+'/usr/src/kernels/3.10.0-327.36.3.el7.x86_64/include/linux',
 ```
 
 and yields:
@@ -118,6 +120,8 @@ and yields:
 '/usr/include',
 '-isystem',
 '/usr/src/kernels/3.10.0-327.36.3.el7.x86_64/include/',
+'-isystem',
+'/usr/src/kernels/3.10.0-327.36.3.el7.x86_64/include/linux',
 '-I.',
 '-I./include',
 '-I./inc',
