@@ -10,8 +10,9 @@ brew install ffmpeg
 - [look info](#info)
 - [video format converter](#videoformatconverter)
 - [compress video](#compress)
-- [extract video](#extractvideo)
-- [extract audio](#extractaudio)
+- [extract whole video](#extractvideo)
+- [extract whole audio](#extractaudio)
+- [blade duration of video](#bladeduration)
 
 <a id=info></a>
 #### look info
@@ -67,13 +68,13 @@ ffmpeg -i input.mp4 -c:v libx264 -preset veryslow -crf 20 -c:a copy output.mp4
 ```
 
 <a id=extractvideo></a>
-#### extract video
+#### extract whole video
 ```bash
 ffmpeg -i who.mp4 -vcodec copy -an whoNoAudio.mp4
 ```
 
 <a id=extractaudio></a>
-#### extract audio
+#### extract whole audio
 ```bash
 ffmpeg -i who.mp4 -acodec copy -vn whoAudio.aac
 ```
@@ -84,30 +85,42 @@ or
 ffmpeg -i who.mp4 -acodec copy -vn whoAudio.m4a
 ```
 
+<a id=bladeduration></a>
+#### blade duration of video
+start from #5 minutes, duration of 10 minutes
+
+```bash
+ffmpeg -ss 00:05:00 -t 00:10:00 -i input.mp4 -vcodec copy -acodec copy output.mp4
+```
+
 ### Parameters Explain
-- -vcodec
+- -vcodec codec
 
-```bash
--vcodec codec   force video codec ('copy' to copy stream)
-```
+> force video codec (`copy` to copy stream)
 
-- -acodec
+- -acodec codec
 
-```bash
--acodec codec   force audio codec ('copy' to copy stream)
-```
+> force audio codec (`copy` to copy stream)
 
 - -vn
 
-```bash
-disable video
-```
+> disable video
 
 - -an
 
-```bash
-disable audio
-```
+> disable audio
+
+- -ss time_off
+
+> set the start time offset
+
+- -t duration
+
+> record or transcode "duration" seconds of audio/video
+
+- -to time_stop
+
+> record or transcode stop time
 
 ### Codecs
 ```bash
