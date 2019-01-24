@@ -1,14 +1,11 @@
 ## sed
-```
-sed [-hnV][-e<script>][-f<script_file>] Text
-```
+[Sed - An Introduction and Tutorial by Bruce Barnett](http://www.grymoire.com/Unix/Sed.html#uh-59)
 
 recomment you **commit** before using sed with `-i`
 
-`sed` **handle one line each time**
-
 ### Content List
 - [Intro](#intro)
+- [delimiter](#delimiter)
 - [original example content](#oricontent)
 - [searching syntax](#searching)
 - [add](#add)
@@ -20,6 +17,16 @@ recomment you **commit** before using sed with `-i`
 
 <a id=intro></a>
 ### Intro
+- syntax
+
+```
+sed [-hnV][-e<script>][-f<script_file>] Text
+```
+
+- commands
+
+`sed` **handle one line each time**
+
 Command | Meaning
 --- | ---
 a | **add**, to next line of current line
@@ -29,9 +36,20 @@ s | **substitute**, with matched string
 d | **delete**
 p | print
 
-### Example
+<a id=delimiter></a>
+### delimiter
+`/` `@` `!` `^` `|`
+
+default is slash `/`, which is not always best
+
+```bash
+sed 's/old/new/g'
+sed 's@old@new@g'
+sed 's!old!new!g'
+```
+
 <a id=oricontent></a>
-#### cat
+### original example content
 ```bash
 cat test.txt
 ```
@@ -57,7 +75,7 @@ sed '/searched_word/command' test.txt
 of which, `command` can be `d`, `p`, etc
 
 <a id=add></a>
-#### add
+### add
 add new content after `4th` line
 
 ```ruby
@@ -74,7 +92,7 @@ This is new line.
 ```
 
 <a id=insert></a>
-#### insert - same as add
+### insert - same as add
 insert new content before `2th` line
 
 ```bash
@@ -93,7 +111,7 @@ This is new line.
 
 
 <a id=delete></a>
-#### delete
+### delete
 delete `2th` and `3th` line
 
 ```bash
@@ -120,7 +138,7 @@ output:
 ```
 
 <a id=substitutec></a>
-#### substitute with line
+### substitute with line
 ```bash
 nl test.txt | sed '2,3c This is new line.'
 ```
@@ -133,7 +151,7 @@ This is new line.
 ```
 
 <a id=print></a>
-#### print
+### print
 ```bash
 sed -n '/linux/p' test.txt
 ```
@@ -144,7 +162,7 @@ This is a linux testfile!
 ```
 
 <a id=substitutes></a>
-#### substitute with searched string
+### substitute with searched string
 only replace the **second one** matched in **one line** using `/2`<br>
 `s/x1/x2/` was same as `s/x1/x2/1`
 
