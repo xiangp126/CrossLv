@@ -57,7 +57,7 @@ lrwxrwxrwx 1 root root 9 Mar 29 17:04 /bin/sh -> /bin/bash*
 ### Lazy Deploy
 #### clone repo
 ```git
-git clone https://github.com/xiangp126/Giggle crosslv
+git clone https://github.com/xiangp126/CrossLv crosslv
 ```
 
 #### help message
