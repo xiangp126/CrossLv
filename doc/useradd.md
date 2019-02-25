@@ -1,14 +1,13 @@
 ## useradd
 
-### delete
-
+### add
 ```bash
 # sudo useradd -m -s "/bin/bash" vbird
 sudo passwd vbird
 su - vbird
 ```
 
-### add
+### delete
 ```bash
 sudo userdel -r vbird
 ```
