@@ -21,8 +21,8 @@ window-scale=0.5
 
 #### input.conf
 ```bash
-RIGHT seek 5
-LEFT seek -5
+RIGHT seek 1
+LEFT seek 1
 UP add volume 5
 DOWN add volume -5
 ```
