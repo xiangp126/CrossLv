@@ -13,6 +13,7 @@ brew install ffmpeg
 - [extract whole video](#extractvideo)
 - [extract whole audio](#extractaudio)
 - [blade duration of video](#bladeduration)
+- [compress with subtitle](#subtitle)
 
 <a id=info></a>
 #### look info
@@ -91,6 +92,12 @@ start from #5 minutes, duration of 10 minutes
 
 ```bash
 ffmpeg -ss 00:05:00 -t 00:10:00 -i input.mp4 -vcodec copy -acodec copy output.mp4
+```
+
+<a id=subtitle></a>
+#### compress with subtitle
+```bash
+ffmpeg -i Lantern.mp4 -vcodec libx264 -preset fast -crf 20 -vf "ass=Lantern.ass" out.mp4
 ```
 
 ### Parameters Explain
