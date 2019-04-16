@@ -16,6 +16,10 @@ cd ~/.config/mpv
 
 #### mpv.conf
 ```bash
+# Subtitles
+sub-auto=fuzzy
+sub-text-font-size=48
+sub-codepage=utf8:gb18030
 window-scale=0.5
 ```
 
