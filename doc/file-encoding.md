@@ -21,9 +21,11 @@ refer to <https://www.cyberciti.biz/faq/sed-remove-m-and-line-feeds-under-unix-l
 sed 's/^M//g' haha.txt
 ```
 
-### file encoding
+### File Encoding
 ```vim
 # Just use 'utf-8' encoding when you create the file
+# Tips: on Mac open SRT subtitles using TextEdit
+
 :set fileencoding
 :set fileencoding=utf-8
 ```
