@@ -96,8 +96,14 @@ ffmpeg -ss 00:05:00 -t 00:10:00 -i input.mp4 -vcodec copy -acodec copy output.mp
 
 <a id=subtitle></a>
 #### compress with subtitle
+
+**!! Change File Encoding of SRT to UTF-8 First, or FFMPEG WILL ERR !!**
+
 ```bash
-ffmpeg -i Lantern.mp4 -vcodec libx264 -preset fast -crf 20 -vf "ass=Lantern.ass" out.mp4
+#ffmpeg -i subtitle.srt subtitle.ass
+ffmpeg -i Inside.Man.2006.mp4 -vf subtitles=Inside.Man.2006.bd.chs.srt out.mp4
+
+#ffmpeg -i Lantern.mp4 -vcodec libx264 -preset fast -crf 20 -vf "ass=Lantern.ass" out.mp4
 ```
 
 ### Parameters Explain
