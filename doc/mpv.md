@@ -1,6 +1,8 @@
 ## mpv
-<https://github.com/mpv-player/mpv>
-### install
+[Github Link](https://github.com/mpv-player/mpv)
+
+[Manual](https://mpv.io/manual/master/)
+### how to install?
 - Mac
 
 ```bash
@@ -37,6 +39,26 @@ mpv [url]
 ```
 
 ### ShortCut Key
+### from Official
+Operation|Intent
+:---:|:---:
+LEFT and RIGHT|Seek backward/forward 5 seconds. Shift+arrow does a 1 second exact seek (see --hr-seek).
+UP and DOWN| Seek forward/backward 1 minute. Shift+arrow does a 5 second exact seek (see --hr-seek).
+Ctrl+LEFT and Ctrl+RIGHT|Seek to the previous/next subtitle. Subject to some restrictions and might not always work; see sub-seek command.
+Ctrl+Shift+Left and Ctrl+Shift+Right|Adjust subtitle delay so that the next or previous subtitle is displayed now. This is especially useful to sync subtitles to audio.
+**[ and ]**|**Decrease/increase current playback speed by 10%.**
+**{ and }**|**Halve/double current playback speed.**
+**BACKSPACE**|**Reset playback speed to normal.**
+Shift+BACKSPACE|Undo the last seek. This works only if the playlist entry was not changed. Hitting it a second time will go back to the original position. See revert-seek command for details.
+Shift+Ctrl+BACKSPACE|Mark the current position. This will then be used by Shift+BACKSPACE as revert position (once you seek back, the marker will be reset). You can use this to seek around in the file and then return to the exact position where you left off.
+< and >|Go backward/forward in the playlist.
+ENTER|Go forward in the playlist.
+q|Stop playing and quit.
+Q|Like q, but store the current playback position. Playing the same file later will resume at the old playback position if possible.
+m|Mute sound.
+s|Take a screenshot.
+S|Take a screenshot, without subtitles. (Whether this works depends on VO driver support.)
+
 #### 播放控制
 操作|反向操作|行为
 :---:|:---:|:---:
