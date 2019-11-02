@@ -14,6 +14,7 @@ brew install ffmpeg
 - [extract whole audio](#extractaudio)
 - [blade duration of video](#bladeduration)
 - [compress with subtitle](#subtitle)
+- [extract subtitle from video](#extractsub)
 
 <a id=info></a>
 #### look info
@@ -105,6 +106,19 @@ ffmpeg -i Inside.Man.2006.mp4 -vf subtitles=Inside.Man.2006.bd.chs.srt out.mp4
 
 #ffmpeg -i Lantern.mp4 -vcodec libx264 -preset fast -crf 20 -vf "ass=Lantern.ass" out.mp4
 ```
+
+<a id=extractsub></a>
+#### extract subtitle from video
+This would download the first subtitle track. If there are several, use 0:s:1 to download the second one, 0:s:2 to download the third one, and so on.
+
+```
+ffmpeg -i Movie.mkv -map 0:s:0 subs.srt
+```
+
+- -i: Input file URL/path.
+- -map: Designate one or more input streams as a source for the output file.
+- s:0: Select the subtitle stream.
+
 
 ### Parameters Explain
 - -vcodec codec
