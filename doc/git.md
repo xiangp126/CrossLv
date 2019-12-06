@@ -10,6 +10,7 @@
     - [tag](#tag)
     - [reset](#reset)
     - [remote](#remote)
+    - [revert](#revert)
 - [Github Associate Manipulation](#github)
     * [Make a **bare** repository](#bare)
     * [Make repo empty](#empty)
@@ -153,6 +154,22 @@ git remote set-url origin https://github.com/xiangp126/dpvs
 git remote -v
 origin  https://github.com/xiangp126/dpvs (fetch)
 origin  https://github.com/xiangp126/dpvs (push)
+```
+
+<a id=revert></a>
+#### revert
+
+[Git Revert Tutorials](https://www.atlassian.com/git/tutorials/undoing-changes/git-revert)
+
+```
+NAME
+       git-revert - Revert some existing commits
+
+SYNOPSIS
+       git revert [--[no-]edit] [-n] [-m parent-number] [-s] [-S[<keyid>]] <commit>...
+       git revert --continue
+       git revert --quit
+       git revert --abort
 ```
 
 ---
