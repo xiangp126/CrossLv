@@ -1,4 +1,4 @@
-## Squirrel- Input Method
+## Squirrel-Input Method
 
 ### Remove SougouInput from you system Completely
 use its official install/uninstall routine first, then
