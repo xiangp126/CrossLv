@@ -70,3 +70,7 @@ patch:
   menu:
     page_size: 10
 ```
+
+then re-deploy
+
+<div align=center><img src="../res/rime_redeploy.png" width=48%></div>
