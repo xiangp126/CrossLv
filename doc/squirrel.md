@@ -47,3 +47,26 @@ tar -zxvf template/rime_pro.tgz -C ~/Library/Rime --strip-components 1
 
 ### Key Notice
 按組合鍵 Ctrl+` 或 F4 鍵喚出輸入方案選單，由此調整 Rime 輸入法最常用的選項。
+
+You Could use `Gboard` on iphone
+
+### Minor Modification
+- 修改候选词个数
+
+```bash
+cd ~/Library/Rime
+vim default.custom.yaml
+
+# default.custom.yaml
+# encoding: utf-8
+
+patch:
+  switcher:
+    caption: 〔方案选单〕
+    hotkeys:
+    - Control+grave
+
+  # 候选词 5 个
+  menu:
+    page_size: 10
+```
