@@ -15,6 +15,12 @@ csrutil disable
 # csrutil enable
 ```
 
+### Create Encrypt Folder - dmg
+
+Open `Disk Utility`
+
+File - New from Directory
+
 ### hotkey with Dock
 
  key | Explain
