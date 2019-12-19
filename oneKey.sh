@@ -821,7 +821,7 @@ _EOF
         echo [Error]: fd-find build returns error, quitting now
         exit
     fi
-    $cargoPath install
+    $cargoPath install --path .
     if [[ $? != 0 ]]; then
         echo [Error]: fd-find install returns error, quitting now
         exit
