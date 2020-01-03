@@ -177,7 +177,7 @@ sed 's/ss.go/hh.jump/g' test.txt
 ```
 
 ### Key Parameters
-- -E, -r, --regexp-extended (did not need \ for special symbol)
+- -E, -r, --regexp-extended (did not need `\` for special symbol)
 
 ```bash
 use extended regular expressions in the script (for portability use POSIX -E).
