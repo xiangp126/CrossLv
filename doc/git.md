@@ -6,6 +6,8 @@
     - [diff](#diff)
     - [log](#log)
     - [branch](#branch)
+    - [commit](#commit)
+    - [amend](#amend)
     - [checkout](#checkout)
     - [tag](#tag)
     - [reset](#reset)
@@ -19,8 +21,10 @@
     * [Syncing a fork](#sync)
 
 <a id=git></a>
+
 ### Git
 <a id=pull></a>
+
 #### [pull](http://hungyuhei.github.io/2012/08/07/better-git-commit-graph-using-pull---rebase-and-merge---no-ff.html)
 
 _To make commits looked more clean, use `git pull --rebase`_
@@ -53,7 +57,7 @@ git checkout <file_name>
 
 ```bash
 git checkout -b <branch_name> <sha1>
-``` 
+```
 
 <a id=branch></a>
 #### branch
@@ -91,12 +95,64 @@ git diff --since=1.hour.ago --until=1.minute.ago
 ```
 
 <a id=log></a>
+
 #### log
 ```bash
 git log -p --author='PENG'
 ```
 
+<a id=commit></a>
+
+#### commit
+
+```bash
+git status
+git diff
+git add .
+git commit -m 'This is my first commit'
+git show 82fb783
+
+commit 82fb78377e99c98a902bc174e67d3913ed419ce7
+Author: Peng Xiang <hi.pxiang@gmail.com>
+Date:   Fri Dec 13 11:13:23 2019 +0800
+
+    add rime pro package
+
+diff --git a/template/rime_pro.zip b/template/rime_pro.zip
+new file mode 100644
+index 0000000..4a32888
+Binary files /dev/null and b/template/rime_pro.zip differ
+```
+
+<a id=amend></a>
+
+#### amend
+
+if you need to correct the commit message
+
+```bash
+git commit --amend
+
+# then use --force
+# push to GitHub
+git push origin master --force
+```
+
+if you need to modify some info of the submitter, such as `username` and `email` after pushing code to GitHub
+
+```bash
+git commit --amend --author='Peng Xiang <hi.pxiang@gmail.com>'
+```
+
+**Notice** `<>` was the essential sign for email address
+
+```bash
+# then use --force
+git push origin master --force
+```
+
 <a id=reset></a>
+
 #### reset
 ```bash
 # help page
@@ -137,6 +193,7 @@ done
 ```
 
 <a id=remote></a>
+
 #### remote
 
 > syntax: `git remote add`
