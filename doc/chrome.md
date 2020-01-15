@@ -29,7 +29,9 @@ sudo apt-get install google-chrome-stable
 ```
 
 ### recommended chrome plugins
-- stylish
-	- Global dark style - changes everything to DARK
-	- Midnight Surfing - Global Dark Style
 - uBlock Origin
+- SwitchyOmega - a proxy configuration tool
+- Absolute Enable Right Click & Copy(Firefox)
+- ~~stylish(Deprecated now)~~
+  - ~~Global dark style - changes everything to DARK~~
+  - ~~Midnight Surfing - Global Dark Style~~
