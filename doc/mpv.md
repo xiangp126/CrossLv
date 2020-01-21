@@ -57,7 +57,7 @@ q|Stop playing and quit.
 Q|Like q, but store the current playback position. Playing the same file later will resume at the old playback position if possible.
 m|Mute sound.
 s|Take a screenshot.
-S|Take a screenshot, without subtitles. (Whether this works depends on VO driver support.)
+**S**|Take a screenshot, without subtitles. (Whether this works depends on VO driver support.)
 
 #### 播放控制
 操作|反向操作|行为
@@ -74,7 +74,7 @@ l(小写L) ||设定/清除 A-B循环点
 L	 	||循环播放
 I (大写 i)	||显示当前文件名
 s	||截屏，有字幕
-S	||截屏，无字幕
+**S**	||截屏，无字幕
 o	||显示进度条与时间，2 秒后消失
 q	 	||停止播放并退出
 Q	 	||保存当前播放进度并退出，播放同样文件从上次保存进度继续播放
@@ -83,7 +83,7 @@ Q	 	||保存当前播放进度并退出，播放同样文件从上次保存进�
 操作|反向操作|行为
 :---:|:---:|:---:
 V	|| 	关闭/开启字幕
-j	|J|	循环切换可用字幕轨
+**j**	|J|	循环切换可用字幕轨
 x	|z|	字幕延迟 +/- 0.1秒
 r	|t|	上移/下移字幕位置
 
