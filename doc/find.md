@@ -1,5 +1,6 @@
 ## find
-> find link file to delete
+
+find the linked files and delete them
 
 ```bash
 find . -type l -exec rm -rf {} +
