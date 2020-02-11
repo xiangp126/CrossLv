@@ -1,12 +1,12 @@
 ## vim
-vim manipulation record
+VI Improved
 
 ### Removing trailing whitespace
 ```vim
 :%s/\s\+$//gc
 ```
 
-### Del ^M generated from Windows
+### Del `^M` generated from Windows
 ```vim
 :%s/\r//gc
 ```
@@ -20,7 +20,7 @@ vim manipulation record
 # mapping Alt to Esc+
 # so typing 'Alt + O' equals typing 'Esc + O'
 
-then
+# then
 
 Alt + o   next line in 'Insert Mode'
 Alt + Shift + i  goto current head of line
