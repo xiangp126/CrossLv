@@ -1,8 +1,8 @@
 ## swap
-> add swap for VPS
+add swap for VPS
 
 ```bash
-# change to main directory
+# change to home directory
 cd ~
 
 # of -> output file name, output swap file name is .swap
