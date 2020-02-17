@@ -1,4 +1,7 @@
+
+
 ## Git
+
 ### Contents
 - [Git Basic Commands ](#git)
     - [pull](#pull)
@@ -229,14 +232,14 @@ done
 
 Apply the changes introduced by some existing commits
 
-- cherry-pick from a different branch
+- cherry-pick specific commit from different branch
 
 ```bash
 git checkout <branch-to-cherry-pick>
-git cherry-pick <commit-id-to-cherry-pick-from>
+git cherry-pick <commit-id-to-cherry-pick-from>..<last_commit>
 ```
 
-- cherry-pick from a different repository
+- cherry-pick specific commit from a different repository
 
   You'll need to add the other repository as a remote, then  fetch its changes. From there you see the commit and you can cherry-pick it.
 
@@ -248,6 +251,37 @@ git fetch projectB
 
 # Then you can:
 git cherry-pick <first_commit>..<last_commit>
+```
+
+- cherry-pick specific merge from different branch
+
+```bash
+-m parent-number 
+
+--mainline parent-number 
+
+Usually you cannot cherry-pick a merge because you do not know which side of the merge should be considered the mainline.  This option specifies the parent number (starting from 1) of the mainline and allows cherry-pick to replay the change relative to the specified parent.
+```
+
+and you can try
+
+```bash
+git cherry-pick -m 1 <merge-hashid>
+```
+
+**how to explain**
+
+```bash
+
+For example, if your commit tree is like below:
+
+- A - D - E - F -   master
+   \     /
+    B - C           branch one
+
+then git cherry-pick E will produce the issue you faced.
+
+git cherry-pick E -m 1 means using D-E, while git cherry-pick E -m 2 means using B-C-E.
 ```
 
 <a id=revert></a>
