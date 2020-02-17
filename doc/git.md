@@ -12,6 +12,7 @@
     - [tag](#tag)
     - [reset](#reset)
     - [remote](#remote)
+    - [cherry-pick](#cherry)
     - [revert](#revert)
 - [Github Associate Manipulation](#github)
     * [Make a **bare** repository](#bare)
@@ -89,6 +90,7 @@ git push origin :feature
 ```
 
 <a id=diff></a>
+
 #### diff
 ```bash
 git diff --since=1.hour.ago --until=1.minute.ago
@@ -196,24 +198,60 @@ done
 
 #### remote
 
-> syntax: `git remote add`
+- directly update our local repo with any changes made in the central repo
 
-change your remote's URL
+  set **upstream** branch
+
+  ```bash
+  git remote add upstream <url-to-central-repo>
+  git pull upstream
+  ```
+
+- change your remote's URL
+
+  ```bash
+  # check
+  git remote -v
+  origin  https://github.com/iqiyi/dpvs (fetch)
+  origin  https://github.com/iqiyi/dpvs (push)
+  
+  git remote set-url origin https://github.com/xiangp126/dpvs
+  
+  # check
+  git remote -v
+  origin  https://github.com/xiangp126/dpvs (fetch)
+  origin  https://github.com/xiangp126/dpvs (push)
+  ```
+
+<a id=cherry></a>
+
+#### cherry-pick
+
+Apply the changes introduced by some existing commits
+
+- cherry-pick from a different branch
 
 ```bash
-# check
-git remote -v
-origin  https://github.com/iqiyi/dpvs (fetch)
-origin  https://github.com/iqiyi/dpvs (push)
+git checkout <branch-to-cherry-pick>
+git cherry-pick <commit-id-to-cherry-pick-from>
+```
 
-git remote set-url origin https://github.com/xiangp126/dpvs
-# check
-git remote -v
-origin  https://github.com/xiangp126/dpvs (fetch)
-origin  https://github.com/xiangp126/dpvs (push)
+- cherry-pick from a different repository
+
+  You'll need to add the other repository as a remote, then  fetch its changes. From there you see the commit and you can cherry-pick it.
+
+```bash
+# Here's an example of the remote-fetch-merge.
+cd /home/you/projectA
+git remote add projectB /home/you/projectB
+git fetch projectB
+
+# Then you can:
+git cherry-pick <first_commit>..<last_commit>
 ```
 
 <a id=revert></a>
+
 #### revert
 
 [Git Revert Tutorials](https://www.atlassian.com/git/tutorials/undoing-changes/git-revert)
