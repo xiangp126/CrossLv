@@ -27,8 +27,8 @@
 <a id=git></a>
 
 ### Git
-<a id=pull></a>
 
+<a id=pull></a>
 #### [pull](http://hungyuhei.github.io/2012/08/07/better-git-commit-graph-using-pull---rebase-and-merge---no-ff.html)
 
 _To make commits looked more clean, use `git pull --rebase`_
@@ -36,6 +36,23 @@ _To make commits looked more clean, use `git pull --rebase`_
 ```bash
 # git pull origin master
 git pull origin master --rebase
+```
+
+<a id=push></a>
+#### push
+use the -u flag (upstream) when you make your first push
+
+how to push newly created branch to upstream
+
+```bash
+-u, --set-upstream
+git push -u origin BRANCH
+```
+
+or directly `push`
+
+```bash
+git push origin BRANCH
 ```
 
 <a id=alias></a>
@@ -47,6 +64,20 @@ git config --global alias.dfcs 'diff --cached --stat'
 
 <a id=checkout></a>
 #### checkout
+- switch to another branch
+
+```bash
+git checkout <New-Branch>
+```
+
+or with force
+
+```
+-f, --force
+    When switching branches, proceed even if the index or the working tree differs from HEAD. This is used to throw away local changes.
+    When checking out paths from the index, do not fail upon unmerged entries; instead, unmerged entries are ignored.
+```
+
 - remove already `indexed` file back to `workspace`
 
 ```bash
@@ -57,7 +88,7 @@ git add <file_name>
 git checkout <file_name>
 ```
 
-- new branch from history commit
+- create new branch from history commit and switch to it meanwhile
 
 ```bash
 git checkout -b <branch_name> <sha1>
@@ -70,6 +101,8 @@ git checkout -b <branch_name> <sha1>
 ```bash
 git checkout -b <branch_name>
 ```
+
+
 
 - list all branches
 
@@ -90,6 +123,19 @@ git push origin :<branch_name>
 
 # Example: delete branch 'feature'
 git push origin :feature
+```
+
+- rename branch
+
+```bash
+-m, --move
+    Move/rename a branch and the corresponding reflog.
+
+# rename current branch to <NEW-BRANCH-NAME>
+git branch -m <NEW-BRANCH-NAME>
+
+# Alternative
+git branch --move <OLD-BRANCH-NAME> <NEW-BRANCH-NAME>
 ```
 
 <a id=diff></a>
@@ -251,6 +297,17 @@ git fetch projectB
 
 # Then you can:
 git cherry-pick <first_commit>..<last_commit>
+```
+
+- how to record the commit
+
+```bash
+-x
+    When recording the commit, append a line that says "(cherry picked from commit ...)" to the original commit message in order to indicate which commit this change was cherry-picked from.
+    This is done only for cherry picks without conflicts.
+    Do not use this option if you are cherry-picking from your private branch because the information is useless to the recipient. 
+    If on the other hand you are cherry-picking between two publicly visible branches
+    (e.g. backporting a fix to a maintenance branch for an older release from a development branch), adding this information can be useful.
 ```
 
 - cherry-pick specific merge from different branch
