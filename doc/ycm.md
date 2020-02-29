@@ -1,5 +1,5 @@
 ## YCM
-vim config
+config for vim
 
 ```vim
 nnoremap <leader>j :YcmCompleter GoToDefinitionElseDeclaration<CR>
