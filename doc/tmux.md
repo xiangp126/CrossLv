@@ -9,3 +9,10 @@ tmux new-session
 ```
 
 **! DO NOT USE tmux new-session -t XX**
+
+### attach existing session
+
+```bash
+# say session name is 0
+tmux attach-session -t 0
+```
