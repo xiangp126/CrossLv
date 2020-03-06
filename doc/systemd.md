@@ -1,8 +1,8 @@
 ## [systemd](http://www.ruanyifeng.com/blog/2016/03/systemd-tutorial-part-two.html)
 
-services that was supported has a configuration under **/usr/lib/systemd/system/**
+services that was supported has a configuration under `/usr/lib/systemd/system/`
 
-has a soft link under **/etc/systemd/system/** for that boots with system up
+has a soft link under `/etc/systemd/system/` for that boots with system up
 
 when system boots up, it executes configurations under `/etc/systemd/system`
 
