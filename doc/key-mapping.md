@@ -1,6 +1,6 @@
 ## key-mapping
 
-`Ctrl + [   <===>   Esc`
+Ctrl + [   <===>   Esc
 
 ### For MAC
 ```
