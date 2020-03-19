@@ -1,6 +1,6 @@
 ## tmux
 
-### new session
+### create new session
 ```bash
 tmux
 # or
