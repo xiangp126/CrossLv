@@ -169,5 +169,4 @@ Jan 08 10:17:10 816375385 Keepalived_vrrp[25104]: Registering DPVS gratuitous AR
 Jan 08 10:17:10 816375385 Keepalived_vrrp[25104]: Opening file '/etc/keepalived/keepalived.conf'.
 Jan 08 10:17:10 816375385 Keepalived_vrrp[25104]: Configuration is using : 58484 Bytes
 Jan 08 10:17:10 816375385 Keepalived_vrrp[25104]: Using LinkWatch kernel netlink reflector...
-
 ```
