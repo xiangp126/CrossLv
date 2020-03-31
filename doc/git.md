@@ -8,6 +8,8 @@
     - [alias](#alias)
     - [diff](#diff)
     - [log](#log)
+    - [apply](#apply)
+    - [show](#show)
     - [branch](#branch)
     - [commit](#commit)
     - [amend](#amend)
@@ -25,7 +27,6 @@
     * [Syncing a fork](#sync)
 
 <a id=git></a>
-
 ### Git
 
 <a id=pull></a>
@@ -139,21 +140,60 @@ git branch --move <OLD-BRANCH-NAME> <NEW-BRANCH-NAME>
 ```
 
 <a id=diff></a>
-
 #### diff
 ```bash
 git diff --since=1.hour.ago --until=1.minute.ago
 ```
 
 <a id=log></a>
-
 #### log
 ```bash
 git log -p --author='PENG'
 ```
 
-<a id=commit></a>
+<a id=apply></a>
+#### apply
 
+```bash
+NAME
+       git-apply - Apply a patch to files and/or to the index
+
+DESCRIPTION
+       Reads the supplied diff output (i.e. "a patch") and applies it to files. When running from a subdirectory in a
+       repository, patched paths outside the directory are ignored. With the --index option the patch is also applied to the
+       index, and with the --cached option the patch is only applied to the index. Without these options, the command applies
+       the patch only to files, and does not require them to be in a Git repository.
+
+       -R, --reverse
+           Apply the patch in reverse.
+
+```
+
+<a id=show></a>
+#### show
+```bash
+NAME
+       git-show - Show various types of objects
+
+SYNOPSIS
+       git show [options] [<object>...]
+
+DESCRIPTION
+       Shows one or more objects (blobs, trees, tags and commits).
+
+       For commits it shows the log message and textual diff. It also presents the merge commit in a special format as produced
+       by git diff-tree --cc.
+```
+
+Question: I want to revert changes made by a particular commit to a given file only.
+
+Tips:
+
+```bash
+git show some_commit_sha1 -- some_file.c | git apply -R
+```
+
+<a id=commit></a>
 #### commit
 
 ```bash
