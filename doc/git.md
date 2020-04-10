@@ -103,8 +103,6 @@ git checkout -b <branch_name> <sha1>
 git checkout -b <branch_name>
 ```
 
-
-
 - list all branches
 
 ```bash
