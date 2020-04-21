@@ -4,7 +4,7 @@
 - [ipv4 commands](#ipv4)
 
 <a id=ipv6></a>
-### IPV6
+### IPv6
 #### add
 ```bash
 $ ip -6 addr del 2001::76 dev enp7s0f0
@@ -18,7 +18,7 @@ ip -6 addr show
 
 --
 <a id=ipv4></a>
-### IPV4
+### IPv4
 #### add
 add them to **/etc/rc.local** for permanent
 
