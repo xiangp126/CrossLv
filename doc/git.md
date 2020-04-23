@@ -8,6 +8,7 @@
     - [alias](#alias)
     - [diff](#diff)
     - [log](#log)
+    - [blame](#blame)
     - [apply](#apply)
     - [show](#show)
     - [branch](#branch)
@@ -147,6 +148,17 @@ git diff --since=1.hour.ago --until=1.minute.ago
 #### log
 ```bash
 git log -p --author='PENG'
+```
+
+<a id=blame></a>
+#### blame
+Show what revision and author last modified each line of a file
+
+When you are interested in **finding the origin for lines** 40-60 for file foo, you can use the `-L` option like so (they mean the same thing, that is both ask for 21 lines starting at line 40):
+
+```bash
+git blame -L 40,60 foo
+git blame -L 40,+21 foo
 ```
 
 <a id=apply></a>
@@ -301,9 +313,9 @@ done
   git remote -v
   origin  https://github.com/iqiyi/dpvs (fetch)
   origin  https://github.com/iqiyi/dpvs (push)
-  
+
   git remote set-url origin https://github.com/xiangp126/dpvs
-  
+
   # check
   git remote -v
   origin  https://github.com/xiangp126/dpvs (fetch)
@@ -343,7 +355,7 @@ git cherry-pick <first_commit>..<last_commit>
 -x
     When recording the commit, append a line that says "(cherry picked from commit ...)" to the original commit message in order to indicate which commit this change was cherry-picked from.
     This is done only for cherry picks without conflicts.
-    Do not use this option if you are cherry-picking from your private branch because the information is useless to the recipient. 
+    Do not use this option if you are cherry-picking from your private branch because the information is useless to the recipient.
     If on the other hand you are cherry-picking between two publicly visible branches
     (e.g. backporting a fix to a maintenance branch for an older release from a development branch), adding this information can be useful.
 ```
@@ -351,9 +363,9 @@ git cherry-pick <first_commit>..<last_commit>
 - cherry-pick specific merge from different branch
 
 ```bash
--m parent-number 
+-m parent-number
 
---mainline parent-number 
+--mainline parent-number
 
 Usually you cannot cherry-pick a merge because you do not know which side of the merge should be considered the mainline.  This option specifies the parent number (starting from 1) of the mainline and allows cherry-pick to replay the change relative to the specified parent.
 ```
