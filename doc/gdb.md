@@ -1,5 +1,5 @@
 ## cgdb
-~~warning: do not type **layout src**, there was bug for gdb~~
+~~warning: do not type **layout src** in gdb, there was bug for gdb~~
 
 ### Commonly Use
 - [thread](#thread)
@@ -12,6 +12,8 @@
 - [condition](#condition)
 - [info](#info)
 - [logging](#logging)
+- [set](#set)
+    - [pagination](#pagination)
 
 ### Not Commonly Used
 - [compile for debug](#compile)
@@ -150,6 +152,16 @@ By default, GDB output will go to both the terminal and the logfile. Set redirec
 
 (gdb) show logging
 Show the current values of the logging settings.
+```
+---
+
+<a id=set></a>
+<a id=pagination></a>
+### pagination
+surpress pagination when print long messages, or it will keep asking you to type q or Enter
+
+```bash
+set pagination off
 ```
 
 <a id=reverse-next></a>
