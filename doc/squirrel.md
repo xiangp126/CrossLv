@@ -46,9 +46,10 @@ tar -zxvf template/rime_pro.tgz -C ~/Library/Rime --strip-components 1
 ```
 
 ### Key Notice
-按組合鍵 Ctrl+` 或 F4 鍵喚出輸入方案選單，由此調整 Rime 輸入法最常用的選項。
+按組合鍵 Ctrl+` 喚出輸入方案選單，由此調整 Rime 輸入法最常用的選項。
+选择0或者7，在明月拼音-台湾正体和简化字之间轻松切换
 
-You Could use `Gboard` on iphone
+You could choose `Gboard` instead when using iphone
 
 ### Minor Modification
 - 修改候选词个数
