@@ -7,7 +7,7 @@ SYNOPSIS
      link source_file target_file
 ```
 
-### make hard link
+### hard link
 ```bash
 ln ~/.bashrc .
 
@@ -15,7 +15,7 @@ ll .bashrc
 -rwxr-xr-x  2 corsair  staff  5336 Jun 14 11:41 .bashrc*
 ```
 
-### make soft link
+### soft link
 ```bash
 ln -s ~/.bashrc .
 
