@@ -18,6 +18,7 @@
     - [tag](#tag)
     - [reset](#reset)
     - [remote](#remote)
+    - [rebase](#rebase)
     - [cherry-pick](#cherry)
     - [revert](#revert)
 - [Github Associate Manipulation](#github)
@@ -102,6 +103,17 @@ git checkout -b <branch_name> <sha1>
 
 ```bash
 git checkout -b <branch_name>
+```
+
+- if you want to delete one branch
+
+```bash
+       -d, --delete
+           Delete a branch. The branch must be fully merged in its upstream branch, or in HEAD if no upstream was set with
+           --track or --set-upstream-to.
+
+       -D
+           Shortcut for --delete --force.
 ```
 
 - list all branches
@@ -322,8 +334,44 @@ done
   origin  https://github.com/xiangp126/dpvs (push)
   ```
 
-<a id=cherry></a>
+<a id=rebase></a>
+#### rebase
+use rebase to merge three recent commit into one
 
+take A/B/C for example, H denotes HEAD
+
+```bash
+# HEAD~3 was not included in the operation
+git rebase HEAD~3
+
+A -> B -> C  -> D
+
+H   H~1   H~2  H~3
+```
+
+then the commit C was list lowest and A was on the top
+
+```bash
+pick XXXX A
+pick XXXX B
+pick XXXX C
+
+... some words to guide you
+```
+
+change pick at the left of each commit id to s or squash
+
+```bash
+pick XXXX A
+s XXXX B
+s XXXX C
+
+... some words to guide you
+```
+
+then edit the merged commit message as you wish
+
+<a id=cherry></a>
 #### cherry-pick
 
 Apply the changes introduced by some existing commits
@@ -392,7 +440,6 @@ git cherry-pick E -m 1 means using D-E, while git cherry-pick E -m 2 means using
 ```
 
 <a id=revert></a>
-
 #### revert
 
 [Git Revert Tutorials](https://www.atlassian.com/git/tutorials/undoing-changes/git-revert)
