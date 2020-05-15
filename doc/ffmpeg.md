@@ -15,6 +15,7 @@ brew install ffmpeg
 - [blade duration of video](#bladeduration)
 - [compress with subtitle](#subtitle)
 - [extract subtitle from video](#extractsub)
+- [Download M3U8 and Combine](#downloadm3u8)
 
 <a id=info></a>
 #### look info
@@ -119,6 +120,14 @@ ffmpeg -i Movie.mkv -map 0:s:0 subs.srt
 - -map: Designate one or more input streams as a source for the output file.
 - s:0: Select the subtitle stream.
 
+<a id=downloadm3u8></a>
+#### download M3U8 and combine all slices to whole video
+for more detailed info, please refer [Teach You to Find M3U8 Manually
+](https://github.com/xiangp126/XGot/blob/master/Teach%20You%20to%20Find%20M3U8%20Manually.md)
+
+```bash
+ffmpeg -i https://vip.okokbo.com/20180219/YLHVBngO/index.m3u8 -c copy -bsf:a aac_adtstoasc output.mp4
+```
 
 ### Parameters Explain
 - -vcodec codec
