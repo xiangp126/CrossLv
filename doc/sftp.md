@@ -3,17 +3,16 @@
 <https://unix.stackexchange.com/questions/7004/uploading-directories-with-sftp>
 
 ### Local Side
-> start conversation
+- start conversation
 
 ```bash
 sftp root@ip
-```
-```bash
+
 lls -l
 lcd
 ```
 
-> Note that **`source/`** was on remote server
+- Note that **`source/`** was on remote server
 
 ```bash
 put -r source/
