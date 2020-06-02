@@ -1,6 +1,10 @@
 ## find
+#### Easiest way to use
+```bash
+find / -name for.txt
+```
 
-find the linked files and delete them
+### Find the linked files and delete them
 
 ```bash
 find . -type l -exec rm -rf {} +

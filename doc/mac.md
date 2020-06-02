@@ -16,18 +16,15 @@ csrutil disable
 ```
 
 ### Create Encrypt Folder - dmg
-
 Open `Disk Utility`
 
 File - New from Directory
 
 ### hotkey with Dock
-
  key | Explain
 :---: | :---:
 **Ctrl + Command + Q** | Lock screen
 **command＋option＋D** | hide or reveal *`Dock`*
-
 
 ### Install Java8
 ```bash
