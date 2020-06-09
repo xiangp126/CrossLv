@@ -158,8 +158,21 @@ git diff --since=1.hour.ago --until=1.minute.ago
 
 <a id=log></a>
 #### log
+- match specific author
+
+Limit the commits output to ones with author/committer header lines that match the specified pattern (regular expression)
+
 ```bash
 git log -p --author='PENG'
+```
+
+- match specific commit message
+
+Limit the commits output to ones with log message that matches the specified pattern (regular expression)
+
+```bash
+# --grep=<pattern>
+git log --grep="Revert"
 ```
 
 <a id=blame></a>
@@ -453,6 +466,16 @@ SYNOPSIS
        git revert --continue
        git revert --quit
        git revert --abort
+```
+
+if only want to revert some specific files within one commit, here is a workaround
+
+```bash
+git revert <SHA> --no-commit
+git reset --hard <the_file_you_won't_want_modify>
+# check
+git status
+git commit
 ```
 
 ---
