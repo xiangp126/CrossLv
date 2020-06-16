@@ -13,7 +13,7 @@ dmesg --follow -H
 dmesg --follow -T
 ```
 
-### file written
+### write to file
 this type of messages was originally writted to `/proc/kmsg`
 
 do not tempt to `vim` the file
