@@ -357,7 +357,7 @@ take A/B/C for example, H denotes HEAD
 # HEAD~3 was not included in the operation
 git rebase HEAD~3
 
-A -> B -> C  -> D
+A <- B <- C  <- D
 
 H   H~1   H~2  H~3
 ```
