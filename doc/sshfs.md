@@ -5,7 +5,7 @@ _ssh file system_
 
 <https://lutao.me/ssh/sshfs/fuse/2017/04/19/sshfs.html>
 
-**Caution**: `cd` out of your **mount point** before sshfs **mount** action
+**Caution**: `cd` out of your **mount point** before sshfs **mount** operation
 
 ### Install `sshfs`
 #### for `Mac`
