@@ -2072,7 +2072,7 @@ install() {
         fi
         installClang
     fi
-    installYcm
+    # installYcm
     # install git can be disabled for its low privilege
     installGit
     finalAdjustParams

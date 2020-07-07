@@ -164,8 +164,8 @@ Plug 'ervandew/supertab'
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 "------ CODE COMPLETION -----
-Plug 'Valloric/YouCompleteMe'
-Plug 'tenfyzhong/CompleteParameter.vim'
+" Plug 'Valloric/YouCompleteMe'
+" Plug 'tenfyzhong/CompleteParameter.vim'
 
 " Initialize plugin system
 call plug#end()
