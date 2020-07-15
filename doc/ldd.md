@@ -2,7 +2,7 @@
 
 - for MAC
 
-  use `otool` in place of `ldd`
+use `otool` in place of `ldd`
 
 ```bash
 otool -L
@@ -10,7 +10,7 @@ otool -L
 
 - for Linux
 
-  ```bash
+```bash
   DESCRIPTION         top
   
          ldd prints the shared objects (shared libraries) required by each
@@ -27,6 +27,4 @@ otool -L
                    /lib64/ld-linux-x86-64.so.2 (0x00005574bf12e000)
                    libattr.so.1 => /lib64/libattr.so.1 (0x00007f87e4817000)
                    libpthread.so.0 => /lib64/libpthread.so.0 (0x00007f87e45fa000)
-  ```
-
-  
+```
