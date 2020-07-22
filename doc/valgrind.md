@@ -1,6 +1,6 @@
 ## valgrind
 
-tool help to check memory leak
+a tool to help us to check if there exists memory leak
 
 ```bash
 # assume main is the executable program
