@@ -349,7 +349,7 @@ done
 
 <a id=rebase></a>
 #### rebase
-use rebase to merge three recent commit into one
+EXP: use rebase to merge three recent commit into one
 
 take A/B/C for example, H denotes HEAD
 
