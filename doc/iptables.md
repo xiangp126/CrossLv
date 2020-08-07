@@ -18,7 +18,7 @@ service iptables stop
 
 - CentOS 7
 
-[How can i use iptables on centos 7?](https://stackoverflow.com/questions/24756240/how-can-i-use-iptables-on-centos-7)
+[How Can I use iptables on CentOS 7?](https://stackoverflow.com/questions/24756240/how-can-i-use-iptables-on-centos-7)
 
 ```bash
 yum install iptables-services
