@@ -1,7 +1,7 @@
 ## mpv
-[Github Link](https://github.com/mpv-player/mpv)
+- [Github Link](https://github.com/mpv-player/mpv)
+- [Manual](https://mpv.io/manual/master/)
 
-[Manual](https://mpv.io/manual/master/)
 ### how to install?
 - Mac
 
