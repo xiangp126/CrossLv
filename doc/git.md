@@ -21,6 +21,7 @@
     - [rebase](#rebase)
     - [cherry-pick](#cherry)
     - [revert](#revert)
+    - [config](#config)
 - [Github Associate Manipulation](#github)
     * [Make a **bare** repository](#bare)
     * [Make repo empty](#empty)
@@ -476,6 +477,15 @@ git reset --hard <the_file_you_won't_want_modify>
 # check
 git status
 git commit
+```
+
+<a id=config></a>
+#### config
+
+refer [setting tabwidth to 4 in git show / git diff](https://stackoverflow.com/questions/10581093/setting-tabwidth-to-4-in-git-show-git-diff)
+
+```bash
+git config --global core.pager 'less -x1,5'
 ```
 
 ---
