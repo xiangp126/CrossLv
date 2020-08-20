@@ -1,0 +1,20 @@
+## inode
+
+[Detailed Understanding of Linux Inodes with Example](https://linoxide.com/linux-command/linux-inode/#:~:text=Inode%20number%20is%20also%20known,such%20as%20ext3%20or%20ext4.)
+
+### How to Del Files Using Its inode
+
+```bash
+find . -inum [inode number] -exec rm -i {} /;
+```
+
+#### Example
+
+refer to <https://www.cyberciti.biz/tips/delete-remove-files-with-inode-number.html>
+
+```bash
+cd /tmp
+touch "/+Xy /+/8"
+
+
+```
