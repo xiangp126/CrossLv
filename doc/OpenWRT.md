@@ -91,3 +91,29 @@ valid users = pi @users
 ```
 
 Note: using wrt1200 the time it takes with first backup >= 12 hours, it is very slow! The Throttle maybe CPU.
+
+#### Speed Up Time machines First back up
+[speed-up-time-machine-backups-by-10x](https://blog.shawjj.com/speed-up-time-machine-backups-by-10x-f6274330dc6f)
+
+- Speed up Time Machine Backups
+- close all apps BEST OPTION
+
+Then
+
+- clear cache (but not required)
+- go to Terminal
+
+```bash
+#$ sysctl debug.lowpri_throttle_enabled
+#debug.lowpri_throttle_enabled: 1
+sudo sysctl debug.lowpri_throttle_enabled=0
+```
+
+- While backing up - DO NOT use the computer
+- After finished go back in Terminal enter
+
+```bash
+sudo sysctl debug.lowpri_throttle_enabled=1
+```
+
+- Which resets the best normal performance to the computer
