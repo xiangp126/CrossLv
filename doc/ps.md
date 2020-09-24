@@ -1,5 +1,5 @@
 ## ps
-> Get the start time of certain process
+Get the start time of certain process
 
 ### find pid
 ```bash
