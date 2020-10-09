@@ -1,9 +1,9 @@
 ## VS-Code
 
 ### Plugin
-- Remote - SSH
+- remote - `SSH`
 
-Essential. same as sshfs on Linux
+Essential. same as `sshfs` on Linux
 
 Template for ssh config
 
