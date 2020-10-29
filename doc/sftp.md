@@ -7,7 +7,8 @@
 
 ```bash
 sftp root@ip
-
+# add a 'l' before the normal original command
+# ls -> lls, cd -> lcd
 lls -l
 lcd
 ```
