@@ -411,17 +411,19 @@ git fetch projectB
 git cherry-pick <commit-id-to-cherry-pick-from>
 ```
 
-- cherry-pick a range of commits in a row
+- **cherry-pick a range of commits in a row!! Verified | Important**
 
 refer to [How to cherry pick a range of commits and merge into another branch?
 ](https://stackoverflow.com/questions/1994463/how-to-cherry-pick-a-range-of-commits-and-merge-into-another-branch)
 
 ```bash
-# To cherry-pick all the commits from commit A to commit B (where A is older than B), run:
+# To cherry-pick all the commits from commit A to commit B (where A is older than B, and you want to keep A included), run:
 git cherry-pick A^..B
 
 #If you want to ignore A itself, run:
 git cherry-pick A..B
+
+# both cases B is included by default
 ```
 
 - how to record the commit
