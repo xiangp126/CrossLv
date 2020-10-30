@@ -394,21 +394,34 @@ Apply the changes introduced by some existing commits
 
 ```bash
 git checkout <branch-to-cherry-pick>
-git cherry-pick <commit-id-to-cherry-pick-from>..<last_commit>
+git cherry-pick <commit-id-to-cherry-pick-from>
 ```
 
 - cherry-pick specific commit from a different repository
 
-  You'll need to add the other repository as a remote, then  fetch its changes. From there you see the commit and you can cherry-pick it.
+  You'll need to add the specific repository as a remote repository of yours, then fetch its changes. From there you can see the commit and then cherry-pick it.
 
 ```bash
 # Here's an example of the remote-fetch-merge.
 cd /home/you/projectA
-git remote add projectB /home/you/projectB
+git remote add projectB /home/the/projectB
 git fetch projectB
 
 # Then you can:
-git cherry-pick <first_commit>..<last_commit>
+git cherry-pick <commit-id-to-cherry-pick-from>
+```
+
+- cherry-pick a range of commits in a row
+
+refer to [How to cherry pick a range of commits and merge into another branch?
+](https://stackoverflow.com/questions/1994463/how-to-cherry-pick-a-range-of-commits-and-merge-into-another-branch)
+
+```bash
+# To cherry-pick all the commits from commit A to commit B (where A is older than B), run:
+git cherry-pick A^..B
+
+#If you want to ignore A itself, run:
+git cherry-pick A..B
 ```
 
 - how to record the commit
@@ -422,7 +435,7 @@ git cherry-pick <first_commit>..<last_commit>
     (e.g. backporting a fix to a maintenance branch for an older release from a development branch), adding this information can be useful.
 ```
 
-- cherry-pick specific merge from different branch
+- cherry-pick specific **merge** from different branch(**Deprecated**)
 
 ```bash
 -m parent-number
