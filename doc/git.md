@@ -74,7 +74,13 @@ git config --global alias.dfcs 'diff --cached --stat'
 git checkout <New-Branch>
 ```
 
-or with force
+- check out paths from the index
+
+```bash
+git checkout <Path-of-File>
+# or with force
+git checkout --force <Path-of-File>
+```
 
 ```
 -f, --force
