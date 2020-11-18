@@ -15,6 +15,7 @@
     - [commit](#commit)
     - [amend](#amend)
     - [checkout](#checkout)
+    - [restore](#restore)
     - [tag](#tag)
     - [reset](#reset)
     - [remote](#remote)
@@ -102,6 +103,15 @@ git checkout <file_name>
 
 ```bash
 git checkout -b <branch_name> <sha1>
+```
+
+<a id=restore></a>
+#### restore - Discard or unstage uncommitted local changes
+
+- unstage uncommitted local changes
+
+```bash
+git restore --staged <Path-of-File>
 ```
 
 <a id=branch></a>
@@ -415,6 +425,14 @@ git fetch projectB
 
 # Then you can:
 git cherry-pick <commit-id-to-cherry-pick-from>
+```
+
+- cherry-pick but not commit, `-n/--no-commit`
+
+Only pick code changes but not make a commit
+
+```bash
+git cherry-pick --no-commit <commit-id-to-cherry-pick-from>
 ```
 
 - **cherry-pick a range of commits in a row!! Verified | Important**

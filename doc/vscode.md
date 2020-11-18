@@ -1,23 +1,25 @@
 ## VS-Code
 
-### Plugin
-- remote - `SSH`
+### Plugins Recommended
+#### Remote - SSH
 
-Essential. same as `sshfs` on Linux
+Open any folder on a remote machine using SSH and take advantage of VS Code's full feature set
 
-Template for ssh config
+**Greate: same as `sshfs` on Linux**
+
+- Template for ssh config
 
 ```bash
 # put these contents under ~/.ssh/config
 # refer https://linuxize.com/post/using-the-ssh-config-file
 Host remotedev
     HostName 192.168.1.10
-    User daenerys
-    Port 7654
-    IdentityFile ~/.ssh/myprivate.key
+    User Annonymous
+    Port 22
+    IdentityFile ~/.ssh/id_rsa_MyPrivate
 
 Host tyrell
-    HostName 192.168.10.20
+    HostName yrell.com.ca
 
 Host martell
     HostName 192.168.10.50
@@ -34,18 +36,30 @@ Host *
 
 ```
 
-then ssh `remotedev `
+Then
 
-- Vim
+```bash
+ssh remotedev
+# equals
+ssh -p 22 Annoymous@192.168.1.10 -i ~/.ssh/id_rsa_MyPrivate
+```
 
-### Useful Config
+#### Vim
 
-- get paste board when connect to remote `tmux`
+Vim emulation for VS Code
 
-on Windows **Shift + "Mouse Choose"** can paste contents from tmux
+### Useful Config and Command Tips
 
-- open file on new tab
+#### Get paste board when connect to remote `tmux`
 
-_File -> Preference -> Workbench ->Editor Management ->Enable Preview_
+    on Windows **Shift + "Mouse Choose"** can paste contents from tmux
 
-unchech Preview, then can open file on a new tab
+#### Open file on new tab
+
+    File -> Preference -> Settings -> Workbench ->Editor Management ->Enable Preview
+
+*uncheck `Enable Preview`, then a new opened file will appear in on a new tab*
+
+#### Go back to origilal location after search function's definition(F12)
+    Go -> Back
+Shortcut Key: Alt + LeftArrow
