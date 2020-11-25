@@ -16,7 +16,7 @@ dmesg --follow -T
 ### write to file
 this type of messages was originally writted to `/proc/kmsg`
 
-do not tempt to `vim` the file
+Warning: do not attempt to edit the file with `VIM`
 
 ### Explain Key Parameters
 > output of `pr_info` & `printk` can be seen using `dmesg`
