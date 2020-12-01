@@ -12,7 +12,7 @@
     foreground #b2b2b2<br>
     background #000000
 
-### iterm2 Font Install Them First
+### iterm2 Font | Install Them First
     font -> monaco 17pt<br>
     Non-ASCII font source code pro for powerline 14pt
 
