@@ -12,9 +12,9 @@
     - [apply](#apply)
     - [show](#show)
     - [branch](#branch)
+    - [checkout](#checkout)
     - [commit](#commit)
     - [amend](#amend)
-    - [checkout](#checkout)
     - [restore](#restore)
     - [tag](#tag)
     - [reset](#reset)
@@ -67,8 +67,67 @@ git config alias.co checkout
 git config --global alias.dfcs 'diff --cached --stat'
 ```
 
+<a id=restore></a>
+#### restore - Discard or unstage uncommitted local changes
+
+- unstage uncommitted local changes
+
+```bash
+git restore --staged <Path-of-File>
+```
+
+<a id=branch></a>
+#### branch
+- list all branches, using parameter `-a`
+
+```bash
+git branch -a
+```
+
+- delete **local** branch
+
+```bash
+git branch -d <Branch_Name>
+```
+
+- delete **remote** branch, add `:` before `branch_name`
+
+```bash
+git push origin :<branch_name>
+
+# Example: delete branch 'feature'
+git push origin :feature
+```
+
+- rename branch
+
+```bash
+-m, --move
+    Move/rename a branch and the corresponding reflog.
+
+# rename current branch to <NEW-BRANCH-NAME>
+git branch -m <NEW-BRANCH-NAME>
+
+# Alternative
+git branch --move <OLD-BRANCH-NAME> <NEW-BRANCH-NAME>
+```
+
+- Given one commit id, find which branch it belongs to
+
+using paramter `--contains`, refer to [Finding what branch a Git commit came from](https://stackoverflow.com/questions/2706797/finding-what-branch-a-git-commit-came-from)
+
+```bash
+git branch -a --contains <Commit_ID>
+```
+
 <a id=checkout></a>
 #### checkout
+- make a new branch, use paremeter `-b`
+
+```bash
+git checkout -b <New-Branch>
+```
+
 - switch to another branch
 
 ```bash
@@ -105,68 +164,6 @@ git checkout <file_name>
 git checkout -b <branch_name> <sha1>
 ```
 
-<a id=restore></a>
-#### restore - Discard or unstage uncommitted local changes
-
-- unstage uncommitted local changes
-
-```bash
-git restore --staged <Path-of-File>
-```
-
-<a id=branch></a>
-#### branch
-- make a new branch, notice `-b`
-
-```bash
-git checkout -b <branch_name>
-```
-
-- if you want to delete one branch
-
-```bash
-       -d, --delete
-           Delete a branch. The branch must be fully merged in its upstream branch, or in HEAD if no upstream was set with
-           --track or --set-upstream-to.
-
-       -D
-           Shortcut for --delete --force.
-```
-
-- list all branches
-
-```bash
-git branch -a
-```
-
-- delete **local** branch
-
-```bash
-git branch -d <branch_name>
-```
-
-- delete **remote** branch, notice `:` before `branch_name`
-
-```bash
-git push origin :<branch_name>
-
-# Example: delete branch 'feature'
-git push origin :feature
-```
-
-- rename branch
-
-```bash
--m, --move
-    Move/rename a branch and the corresponding reflog.
-
-# rename current branch to <NEW-BRANCH-NAME>
-git branch -m <NEW-BRANCH-NAME>
-
-# Alternative
-git branch --move <OLD-BRANCH-NAME> <NEW-BRANCH-NAME>
-```
-
 <a id=diff></a>
 #### diff
 ```bash
@@ -190,6 +187,12 @@ Limit the commits output to ones with log message that matches the specified pat
 ```bash
 # --grep=<pattern>
 git log --grep="Revert"
+```
+
+- show the log of specific branch
+
+```bash
+git log Repo_Name/Branch_Name
 ```
 
 <a id=blame></a>
