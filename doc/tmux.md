@@ -16,3 +16,5 @@ tmux new-session
 # say session name is 0
 tmux attach-session -t 0
 ```
+
+stay your version tmux 2.6, dont upgrade.
