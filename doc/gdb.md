@@ -1,7 +1,7 @@
 ## cgdb
 ~~warning: do not type **layout src** in gdb, there was bug for gdb~~
 
-### Commonly Use
+### Commonly Used
 - [thread](#thread)
 - [scheduler-locking](#locking)
 - [follow-fork-mode](#fork)
@@ -17,7 +17,7 @@
 
 ### Not Commonly Used
 - [compile for debug](#compile)
-- [debug with `core` file](#core)
+- [debug with _core_ file](#core)
 - [run with arguments](#run)
 
 #### Basic `cgdb` Manipulation
@@ -248,7 +248,7 @@ set winsplitorientation=horizontal
 
 <a id=shortcut></a>
 ### shortcut key
-> only support cgdb >= **v0.7.0**, refer <http://cgdb.github.io/docs/cgdb.html>
+> only support `cgdb` version >= **v0.7.0**, refer to <http://cgdb.github.io/docs/cgdb.html>
 
 ```bash
 # When you are in the source window, you are implicitly in CGDB mode.
