@@ -158,7 +158,7 @@ Show the current values of the logging settings.
 <a id=set></a>
 <a id=pagination></a>
 ### pagination
-surpress pagination when print long messages, or it will keep asking you to type q or Enter
+surpress pagination when print long messages, or it will keep asking you to type `q` or press `Enter`
 
 ```bash
 set pagination off
