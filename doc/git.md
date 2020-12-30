@@ -1,37 +1,38 @@
-
-
 ## Git
 
 ### Contents
-- [Git Basic Commands ](#git)
-    - [pull](#pull)
+- [Git Basic Commands](#git)
     - [alias](#alias)
-    - [diff](#diff)
-    - [log](#log)
-    - [blame](#blame)
+    - [amend](#amend)
     - [apply](#apply)
-    - [show](#show)
+    - [blame](#blame)
     - [branch](#branch)
+    - [cherry](#cherry)
+    - [cherry-pick](#cherry-pick)
+    - [config](#config)
     - [checkout](#checkout)
     - [commit](#commit)
-    - [amend](#amend)
+    - [diff](#diff)
+    - [log](#log)
+    - [pull](#pull)
+    - [revert](#revert)
+    - [reflog](#reflog)
     - [restore](#restore)
-    - [tag](#tag)
     - [reset](#reset)
     - [remote](#remote)
     - [rebase](#rebase)
-    - [cherry-pick](#cherry)
-    - [revert](#revert)
-    - [config](#config)
-- [Github Associate Manipulation](#github)
+    - [show](#show)
+    - [tag](#tag)
+
+- [GitHub Associated Manipulation](#github)
     * [Make a **bare** repository](#bare)
     * [Make repo empty](#empty)
-    * [Untrace certain files](#untrace)
+    * [How to **untrace** certain files](#untrace)
     * [Configuring a remote for a fork](#forafork)
     * [Syncing a fork](#sync)
 
 <a id=git></a>
-### Git
+### Git Basic Commands
 
 <a id=pull></a>
 #### [pull](http://hungyuhei.github.io/2012/08/07/better-git-commit-graph-using-pull---rebase-and-merge---no-ff.html)
@@ -117,7 +118,7 @@ git branch --move <OLD-BRANCH-NAME> <NEW-BRANCH-NAME>
 using paramter `--contains`, refer to [Finding what branch a Git commit came from](https://stackoverflow.com/questions/2706797/finding-what-branch-a-git-commit-came-from)
 
 ```bash
-git branch -a --contains <Commit_ID>
+git branch -a --contains <Commit_Hash>
 ```
 
 <a id=checkout></a>
@@ -193,6 +194,34 @@ git log --grep="Revert"
 
 ```bash
 git log Repo_Name/Branch_Name
+```
+
+<a id=reflog></a>
+#### reflog
+Manage reflog information
+
+```bash
+git reflog
+git reflog show <BRANCH_NAME>
+```
+
+<a id=cherry></a>
+#### cherry
+Find commits yet to be applied to upstream
+
+```bash
+-v
+Show the commit subjects next to the SHA1s.
+
+Syntax:
+git cherry [-v] <upstream> <head>
+
+For Example:
+git cherry -v master develop_branch
+
++ 18e3ba57addc Initial Sync transfer
+
+found one commit in develop_branch but not yet in master.
 ```
 
 <a id=blame></a>
@@ -404,7 +433,7 @@ s XXXX C
 
 then edit the merged commit message as you wish
 
-<a id=cherry></a>
+<a id=cherry-pick></a>
 #### cherry-pick
 
 Apply the changes introduced by some existing commits
