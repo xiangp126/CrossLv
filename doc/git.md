@@ -226,13 +226,20 @@ found one commit in develop_branch but not yet in master.
 
 <a id=blame></a>
 #### blame
+
 Show what revision and author last modified each line of a file
 
-When you are interested in **finding the origin for lines** 40-60 for file foo, you can use the `-L` option like so (they mean the same thing, that is both ask for 21 lines starting at line 40):
+    -L <start>,<end>, -L :<funcname>
+
+When you are interested in **finding the origin for lines** 40-60 for file `foo.c`, you can use the `-L` option ():
 
 ```bash
-git blame -L 40,60 foo
-git blame -L 40,+21 foo
+# they mean the same thing, both ask for 21 lines starting at line 40
+git blame -L 40,60 foo.c
+git blame -L 40,+21 foo.c
+
+# see changes only for specific function
+git blame -L:write_data_func foo.c
 ```
 
 <a id=apply></a>
