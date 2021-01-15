@@ -63,3 +63,14 @@ Vim emulation for VS Code
 #### Go back to origilal location after search function's definition(F12)
     Go -> Back
 Shortcut Key: Alt + LeftArrow
+
+#### Go to desired files
+    Ctrl + P
+Then Type file name.
+
+#### Search specific function
+    Ctr + P, followed by symbol @
+
+Then Type your desired function name. For Example:
+
+    Ctrl + P, then @write_data
