@@ -572,7 +572,8 @@ git commit
 <a id=config></a>
 #### config
 
-refer [setting tabwidth to 4 in git show / git diff](https://stackoverflow.com/questions/10581093/setting-tabwidth-to-4-in-git-show-git-diff)
+refer to [setting tabwidth to 4 in git show & git diff](https://stackoverflow.com/questions/10581093/setting-tabwidth-to-4-in-git-show-git-diff)
+<https://stackoverflow.com/questions/2183900/how-do-i-prevent-git-diff-from-using-a-pager>
 
 ```bash
 git config --global core.pager 'less -x1,5'
