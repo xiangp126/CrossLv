@@ -1,6 +1,6 @@
 ## VS-Code
 
-### Plugins Recommended
+### Plugins that I Recommend
 #### Remote - SSH
 
 Open any folder on a remote machine using SSH and take advantage of VS Code's full feature set
@@ -45,8 +45,10 @@ ssh -p 22 Annoymous@192.168.1.10 -i ~/.ssh/id_rsa_MyPrivate
 ```
 
 #### Vim
-
 Vim emulation for VS Code
+
+#### GitLens
+GitLens - Git Supercharged
 
 ### Useful Config and Command Tips
 
