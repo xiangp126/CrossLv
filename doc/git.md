@@ -392,7 +392,7 @@ done
 
 - directly update our local repo with any changes made in the central repo
 
-  set **upstream** branch
+  set up **upstream** branch
 
   ```bash
   git remote add upstream <url-to-central-repo>
