@@ -47,9 +47,9 @@ git pull origin master --rebase
 
 <a id=push></a>
 #### push
-use the -u flag (upstream) when you make your first push
+use `-u` flag (upstream) when you make your first push
 
-how to push newly created branch to upstream
+how to push newly created branch `BRANCH` to upstream
 
 ```bash
 -u, --set-upstream
