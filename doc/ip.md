@@ -7,8 +7,7 @@
 ### IPv6
 #### add
 ```bash
-$ ip -6 addr del 2001::76 dev enp7s0f0
-ip -6 addr add 2001::76 dev enp7s0f0
+ip -6 addr del 2001::76 dev enp7s0f0
 ```
 
 #### show
