@@ -67,8 +67,14 @@ GitLens - Git Supercharged
 Shortcut Key: Alt + LeftArrow
 
 #### Go to desired files
-    Ctrl + P
-Then Type file name.
+`Ctrl + P` followed by desired file name.
+
+#### Go to desired lines
+Original the shortcut key is `Ctrl + G`, due to conflict, change it to `Ctrl + '`
+
+    File -> Preferences -> Keyboard Shortcuts
+    Type "go to line" in the search bar
+    and then edit the Keybinding column
 
 #### Search specific function
     Ctr + P, followed by symbol @
