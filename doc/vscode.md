@@ -82,3 +82,13 @@ Original the shortcut key is `Ctrl + G`, due to conflict, change it to `Ctrl + '
 Then Type your desired function name. For Example:
 
     Ctrl + P, then @write_data
+
+#### Search specific commit through commit message using GitLens
+
+`CMD + Shift + P` for Mac, `Ctrl + Shift + P` for Windows
+
+<div align=left><img src="../res/GitLens commit message.png" width=95%></div>
+
+then type `search commits` followed by Searching Commit Messages or Author Info
+
+<div align=left><img src="../res/GitLens show commits.png" width=95%></div>
