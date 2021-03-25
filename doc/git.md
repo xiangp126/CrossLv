@@ -125,7 +125,7 @@ git branch -m <NEW-BRANCH-NAME>
 git branch --move <OLD-BRANCH-NAME> <NEW-BRANCH-NAME>
 ```
 
-- Given one commit id, find which branch it belongs to
+- Given one commit id, find out which branch it belongs to
 
 using paramter `--contains`, refer to [Finding what branch a Git commit came from](https://stackoverflow.com/questions/2706797/finding-what-branch-a-git-commit-came-from)
 
