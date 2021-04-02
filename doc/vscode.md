@@ -92,3 +92,36 @@ Then Type your desired function name. For Example:
 then type `search commits` followed by Searching Commit Messages or Author Info
 
 <div align=left><img src="../res/GitLens show commits.png" width=95%></div>
+
+### Troubleshooting using VSCode
+- Bug Description
+
+```bash
+Missing or invalid credentials.
+Error: connect ECONNREFUSED /var/folders/tx/53fffl0j51qb47mhnlf8zsdc0000gn/T/vscode-git-1d38026c7f.sock
+at PipeConnectWrap.afterConnect [as oncomplete] net.js:1056:14) {
+      errno: 'ECONNREFUSED',
+                   code: 'ECONNREFUSED',
+                     syscall: 'connect',
+                       address: '/var/folders/tx/53fffl0j51qb47mhnlf8zsdc0000gn/T/vscode-git-1d38026c7f.sock'
+
+}
+Missing or invalid credentials.
+Error: connect ECONNREFUSED /var/folders/tx/53fffl0j51qb47mhnlf8zsdc0000gn/T/vscode-git-1d38026c7f.sock
+at PipeConnectWrap.afterConnect [as oncomplete] net.js:1056:14) {
+      errno: 'ECONNREFUSED',
+                   code: 'ECONNREFUSED',
+                     syscall: 'connect',
+                       address: '/var/folders/tx/53fffl0j51qb47mhnlf8zsdc0000gn/T/vscode-git-1d38026c7f.sock'
+
+}
+remote: No anonymous write access.
+fatal: Authentication failed for 'https://github.com/username/repo.git/'
+```
+
+- Resolve Solution
+Close current Terminal and create a new one in VsCode. If you also use Tmux in the terminal,
+kill current tmux session and also create a new one.
+
+The problem will be fixed. April 2, 2021
+
