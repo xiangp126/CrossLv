@@ -457,11 +457,13 @@ then edit the merged commit message as you wish
 
 Apply the changes introduced by some existing commits
 
-- cherry-pick specific commit from different branch
+- cherry-pick specific commit from different branch but in the same repository
 
 ```bash
-git checkout <branch-to-cherry-pick>
-git cherry-pick <commit-id-to-cherry-pick-from>
+# checkout to the branch needs modification
+git checkout BR_FEATURE
+# 57cc8a6a16c9 is the commit id to cherry-pick from
+git cherry-pick 57cc8a6a16c9
 ```
 
 - cherry-pick specific commit from a different repository
@@ -510,6 +512,33 @@ git cherry-pick A..B
     Do not use this option if you are cherry-picking from your private branch because the information is useless to the recipient.
     If on the other hand you are cherry-picking between two publicly visible branches
     (e.g. backporting a fix to a maintenance branch for an older release from a development branch), adding this information can be useful.
+```
+
+- How to git-cherry-pick only changes to certain files?
+
+refer to [How to git-cherry-pick only changes to certain files?](https://stackoverflow.com/questions/5717026/how-to-git-cherry-pick-only-changes-to-certain-files)
+
+```bash
+# 57cc8a6a16c9 is the commit id to cherry-pick from
+# cherry-pick, not commit it
+git cherry-pick -n 57cc8a6a16c9
+
+# unstage everything
+git reset HEAD
+
+# stage the modifications you do want
+git add <path>
+
+# make the work tree match the index
+# do this from the top level of the repo)
+git checkout .
+
+# clean up the unwanted files introduced by the cherry-pick action
+git clean -n
+git clean
+
+# Optional: if you want to reuse the commit message of the cherry-picked commit, use -c parameter
+git commit -c 57cc8a6a16c9
 ```
 
 - cherry-pick specific **merge** from different branch(**Deprecated**)
