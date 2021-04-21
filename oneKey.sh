@@ -771,7 +771,7 @@ _EOF
         echo [Error]: ripgrep build returns error, quitting now
         exit
     fi
-    $cargoPath install
+    $cargoPath install --path . --force
     if [[ $? != 0 ]]; then
         echo [Error]: ripgrep install returns error, quitting now
         exit
@@ -821,7 +821,7 @@ _EOF
         echo [Error]: fd-find build returns error, quitting now
         exit
     fi
-    $cargoPath install --path .
+    $cargoPath install --path . --force
     if [[ $? != 0 ]]; then
         echo [Error]: fd-find install returns error, quitting now
         exit
