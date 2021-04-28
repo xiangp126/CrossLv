@@ -83,6 +83,10 @@ Then Type your desired function name. For Example:
 
     Ctrl + P, then @write_data
 
+#### Search for text(can be a function name) in all files in a directory | show in sidebar
+
+You can do `Edit`->`Find in Files` (or `Ctrl+Shift+F` - default key binding, `Cmd+Shift+F` on MacOS) to search the Currently open Folder.
+
 #### Search specific commit through commit message using GitLens
 
 `CMD + Shift + P` for Mac, `Ctrl + Shift + P` for Windows
