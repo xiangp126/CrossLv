@@ -76,7 +76,7 @@ Original the shortcut key is `Ctrl + G`, due to conflict, change it to `Ctrl + '
     Type "go to line" in the search bar
     and then edit the Keybinding column
 
-#### Search specific function
+#### Search specific function in current file
     Ctr + P, followed by symbol @
 
 Then Type your desired function name. For Example:
