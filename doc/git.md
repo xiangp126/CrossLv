@@ -492,13 +492,14 @@ refer to [How to cherry pick a range of commits and merge into another branch?
 ](https://stackoverflow.com/questions/1994463/how-to-cherry-pick-a-range-of-commits-and-merge-into-another-branch)
 
 ```bash
-# To cherry-pick all the commits from commit A to commit B (where A is older than B, and you want to keep A included), run:
+# To cherry-pick all the commits from commit A to commit B
+# Where A is older than B, and you want to keep A included
 git cherry-pick A^..B
 
-#If you want to ignore A itself, run:
+# If you want to ignore A itself
 git cherry-pick A..B
 
-# both cases B is included by default
+# on both cases, B is included by default
 ```
 
 - how to record the commit
