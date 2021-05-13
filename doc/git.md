@@ -466,7 +466,7 @@ git checkout BR_FEATURE
 git cherry-pick 57cc8a6a16c9
 ```
 
-- cherry-pick specific commit(s) from a different repository
+- cherry-pick specific commit(s) within a different repository
 
   You'll need to add the specific repository as a remote repository of yours, then fetch its changes. From there you can see the commit and then cherry-pick it.
 
