@@ -10,6 +10,7 @@ brew install ffmpeg
 - [print the whole help page](#help)
 - [look info](#info)
 - [video format converter](#videoformatconverter)
+- [Splitting an MP4 file](#videosplit)
 - [compress video](#compress)
 - [extract whole video](#extractvideo)
 - [extract whole audio](#extractaudio)
@@ -172,6 +173,25 @@ convert from `flv` to `mp4`, notice suffix
 
 ```bash
 ffmpeg -i who.flv -vcodec h264 who.mp4
+```
+
+<a id=videosplit></a>
+#### Splitting an MP4 file
+
+refer <https://askubuntu.com/questions/35605/splitting-an-mp4-file>
+
+```bash
+ffmpeg -i ORIGINALFILE.mp4 -acodec copy -vcodec copy -ss START -t LENGTH OUTFILE.mp4
+```
+
+where **START** is _starting positing_ in seconds or in format `hh:mm:ss` **LENGTH** is the _chunk length_ in seconds or in format `hh:mm:ss`
+
+So you will need to run this command few times depending on how long your video. If let's say your video is 31 minutes long and you want so split into 15 min chunks here is how you run it:
+
+```bash
+ffmpeg -i ORIGINALFILE.mp4 -acodec copy -vcodec copy -ss 0 -t 00:15:00 OUTFILE-1.mp4
+ffmpeg -i ORIGINALFILE.mp4 -acodec copy -vcodec copy -ss 00:15:00 -t 00:15:00 OUTFILE-2.mp4
+ffmpeg -i ORIGINALFILE.mp4 -acodec copy -vcodec copy -ss 00:30:00 -t 00:15:00 OUTFILE-3.mp4
 ```
 
 <a id=compress></a>
