@@ -1,9 +1,9 @@
-## VS-Code
+## VSCode
 
 ### Plugins that I Recommend
 #### Remote - SSH
 
-Open any folder on a remote machine using SSH and take advantage of VS Code's full feature set
+Open any folder on a remote machine using SSH and take advantage of the full features of VSCode.
 
 **Greate: same as `sshfs` on Linux**
 
@@ -45,7 +45,7 @@ ssh -p 22 Annoymous@192.168.1.10 -i ~/.ssh/id_rsa_MyPrivate
 ```
 
 #### Vim
-Vim emulation for VS Code
+Vim emulation for VSCode
 
 #### GitLens
 GitLens - Git Supercharged
@@ -128,4 +128,3 @@ Close current Terminal and create a new one in VsCode. If you also use Tmux in t
 kill current tmux session and also create a new one.
 
 The problem will be fixed. April 2, 2021
-
