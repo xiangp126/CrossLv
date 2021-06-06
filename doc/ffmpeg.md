@@ -195,7 +195,7 @@ ffmpeg -i ORIGINALFILE.mp4 -acodec copy -vcodec copy -ss 00:30:00 -t 00:15:00 OU
 ```
 
 <a id=compress></a>
-#### compress video
+#### Compress Video
 only compress video, not influence audio
 
 ```bash
@@ -205,7 +205,7 @@ ffmpeg -i input.mp4 -c:v libx264 -preset veryslow -crf 20 -c:a copy output.mp4
 ```
 
 <a id=extractvideo></a>
-#### extract whole video
+#### Extract Whole Video
 Note
 
 - -`vn`                 disable video
@@ -217,7 +217,7 @@ ffmpeg -i who.mp4 -vcodec copy -an whoNoAudio.mp4
 ```
 
 <a id=extractaudio></a>
-#### extract whole audio
+#### Extract Whole Audio
 ```bash
 ffmpeg -i who.mp4 -acodec copy -vn whoAudio.aac
 ```
@@ -229,7 +229,7 @@ ffmpeg -i who.mp4 -acodec copy -vn whoAudio.m4a
 ```
 
 <a id=bladeduration></a>
-#### blade duration of video
+#### Blade Duration of Video
 start from #5 minutes, duration of 10 minutes
 
 ```bash
@@ -237,7 +237,7 @@ ffmpeg -ss 00:05:00 -t 00:10:00 -i input.mp4 -vcodec copy -acodec copy output.mp
 ```
 
 <a id=subtitle></a>
-#### compress with subtitle
+#### Compress with Subtitle
 
 **!! Change File Encoding of SRT to UTF-8 First, or FFMPEG WILL ERR !!**
 
