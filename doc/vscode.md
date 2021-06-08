@@ -40,15 +40,17 @@ Then
 
 ```bash
 ssh remotedev
-# equals
+# it equals
 ssh -p 22 Annoymous@192.168.1.10 -i ~/.ssh/id_rsa_MyPrivate
 ```
 
 #### Vim
 Vim emulation for VSCode
 
-#### GitLens
-GitLens - Git Supercharged
+#### GitLens - Git Supercharged
+Highly recommended plugin
+
+On Windows, use `Ctrl + Click` to _Show Commits_
 
 ### Useful Config and Command Tips
 
