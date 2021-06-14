@@ -5,10 +5,10 @@
 <https://www.cyberciti.biz/tips/delete-remove-files-with-inode-number.html>
 
 ```bash
-find . -inum [inode number] -exec rm -i {} /;
+find . -inum [inode number] -exec rm -i {} \;
 ```
 
-### How to Del Dir Using Its inode number
+### How to delete Dir using its `inode number`
 take directory `iCloud Drive (Archive) - 1/` for example
 
 #### find inum(inode number)
