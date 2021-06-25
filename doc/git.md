@@ -36,9 +36,8 @@
 ### Git Basic Commands
 
 <a id=pull></a>
-#### [pull](http://hungyuhei.github.io/2012/08/07/better-git-commit-graph-using-pull---rebase-and-merge---no-ff.html)
-
-_To make commits looked more clean, use `git pull --rebase`_
+#### pull
+To make commits looked more clean, use `git pull --rebase`
 
 ```bash
 # git pull origin master
