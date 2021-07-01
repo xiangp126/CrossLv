@@ -1,6 +1,6 @@
 ## nmap
 
-nmap - Network exploration tool and security / port scanner
+nmap - Network exploration tool and security/port scanner
        
 ```bash
 nmap -v [host-ip]
