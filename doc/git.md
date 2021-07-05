@@ -8,6 +8,7 @@
     - [apply](#apply)
     - [blame](#blame)
     - [branch](#branch)
+        - [Given one commit id, find out which branch it belongs to](#branchcontains)
     - [cherry](#cherry)
     - [cherry-pick](#cherry-pick)
     - [config](#config)
@@ -15,6 +16,7 @@
     - [commit](#commit)
     - [diff](#diff)
     - [log](#log)
+        - [How do I find who delete/add the desired line](#logS)
     - [pull](#pull)
     - [revert](#revert)
     - [reflog](#reflog)
@@ -124,6 +126,8 @@ git branch -m <NEW-BRANCH-NAME>
 git branch --move <OLD-BRANCH-NAME> <NEW-BRANCH-NAME>
 ```
 
+<a id=branchcontains></a>
+
 - Given one commit id, find out which branch it belongs to
 
 using paramter `--contains`, refer to [Finding what branch a Git commit came from](https://stackoverflow.com/questions/2706797/finding-what-branch-a-git-commit-came-from)
@@ -205,6 +209,29 @@ git log --grep="Revert"
 
 ```bash
 git log Repo_Name/Branch_Name
+```
+
+<a id=logS></a>
+- **How do I find who delete/add the desired line**
+
+[How do I “git blame” a deleted line?](https://stackoverflow.com/questions/4404444/how-do-i-git-blame-a-deleted-line#:~:text=With%20git%20blame%20reverse%20%2C%20you,it%20is%20changed%20or%20removed.)
+
+```bash
+git help log
+```
+
+       -S<string>
+           Look for differences that change the number of occurrences of the specified string (i.e. addition/deletion) in a
+           file. Intended for the scripter's use.
+
+           It is useful when you're looking for an exact block of code (like a struct), and want to know the history of that
+           block since it first came into being: use the feature iteratively to feed the interesting block in the preimage back
+           into -S, and keep going until you get the very first version of the block.
+
+```bash
+# will find the commits adding or deleting
+# the specific line of code, very useful!!
+git log --full-history -S "import isi.fs.siq as siq" /xx/test.py
 ```
 
 <a id=reflog></a>
