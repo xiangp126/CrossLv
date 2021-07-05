@@ -133,9 +133,21 @@ then type `search commits` followed by Searching Commit Messages or Author Info
 
 <a id=pythonjump></a>
 #### Python function cannot jump to its definition
-~~Install Pylance in vscode extension market~~
+~~Install Pylance in vscode extension market, then change `python language server` in the settings from Default to Microsoft~~
 
-then change `python language server` in the settings from Default to Microsoft
+root cause is you did not set `Python Search Path` well. When you open terminal->problems, there're so many errors associated with unresolved and undefined.
+
+Open `Settings`, type _env_ you can find one field named `Python: Env File`, the default value is `${workspaceFolder}/.env`
+
+so goto your workspaceFolder and create the file .env (if not exist)
+
+say, you want to add absolute `/xx/isilon/test-qa/lib` into the search path, then add one line into .env:
+
+    PYTHONPATH=/xx/isilon/test-qa/lib
+
+or something like this if PYTHONPATH already exist, separated each PATH by colon:
+
+    PYTHONPATH=${PYTHONPATH}:/xx/isilon/test-qa/lib
 
 <a id=troubleshooting></a>
 ### Troubleshooting using VSCode
