@@ -149,6 +149,30 @@ or something like this if PYTHONPATH already exist, separated each PATH by colon
 
     PYTHONPATH=${PYTHONPATH}:/xx/isilon/test-qa/lib
 
+```bash
+# Template for .env
+PYTHONPATH=${PYTHONPATH}:/root/myGit/onefs/isilon/test-qa/lib
+PYTHONPATH=${PYTHONPATH}:/root/myGit/onefs/isilon/test-qa/migration/lib
+PYTHONPATH=${PYTHONPATH}:/root/myGit/onefs/isilon/test/pylib
+PYTHONPATH=${PYTHONPATH}:/root/myGit/onefs/isilon/test/syncIQ/
+PYTHONPATH=${PYTHONPATH}:/root/myGit/onefs/isilon/lib/python/
+PYTHONPATH=${PYTHONPATH}:/root/myGit/onefs/build/nose
+```
+
+```bash
+# including alias for isi
+# isi=> isilon/lib.python
+mkdir -p .isilon/lib
+cd .isilon/lib
+ln -s isi <PrePath>/isilon/lib/python
+PYTHONPATH=${PYTHONPATH}:/root/myGit/onefs/isilon/test-qa/lib
+PYTHONPATH=${PYTHONPATH}:/root/myGit/onefs/isilon/test-qa/migration/lib
+PYTHONPATH=${PYTHONPATH}:/root/myGit/onefs/isilon/test/pylib
+PYTHONPATH=${PYTHONPATH}:/root/myGit/onefs/isilon/test/syncIQ/
+PYTHONPATH=${PYTHONPATH}:/root/myGit/onefs/isilon/lib/python/
+PYTHONPATH=${PYTHONPATH}:/root/myGit/onefs/build/nose
+PYTHONPATH=${PYTHONPATH}:/root/.isilon/lib
+```
 <a id=troubleshooting></a>
 ### Troubleshooting using VSCode
 - Bug Description
