@@ -13,6 +13,7 @@
     - [Search for text (can be a function name) in all files](#searchtext)
     - [Search specific commit through commit message using GitLens](#searchcommit)
     - [Python function cannot jump to its definition](#pythonjump)
+    - [C/C++ No synbols found and cannot jump | Install from VSIX](#cnosymbol)
 - [Troubleshooting using VSCode](#troubleshooting)
 
 <a id=plugins></a>
@@ -173,6 +174,23 @@ PYTHONPATH=${PYTHONPATH}:/root/myGit/onefs/isilon/lib/python/
 PYTHONPATH=${PYTHONPATH}:/root/myGit/onefs/build/nose
 PYTHONPATH=${PYTHONPATH}:/root/.isilon/lib
 ```
+
+<a id=cnosymbol></a>
+#### C/C++ No synbols found and cannot jump | Install from VSIX
+must because the c/c++ tool was not successfully installed and enabled.
+
+check your estensions library and find C/C++ ms-vscode.cpptools, basically in the OUTPUT page of the terminal tool
+
+there must be some errors, but there're high chances that you will not see them.
+
+So, to ensure you install the cpptools well, try to install them manually.
+
+Go to the official page: https://github.com/microsoft/vscode-cpptools/releases
+
+and download the latest cpptools-linux.vsix packages. Refer to https://stackoverflow.com/questions/37071388/how-can-i-install-visual-studio-code-extensions-offline
+
+Then open VS-Code switch to Extensions sidebar, click on the sllipsis in the right upper corner, choose _Install from VSIX_, browser the packages your recentlly downloaded.
+
 <a id=troubleshooting></a>
 ### Troubleshooting using VSCode
 - Bug Description
