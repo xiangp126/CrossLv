@@ -138,11 +138,11 @@ then type `search commits` followed by Searching Commit Messages or Author Info
 
 root cause is you did not set `Python Search Path` well. When you open terminal->problems, there're so many errors associated with unresolved and undefined.
 
-Open `Settings`, type _env_ you can find one field named `Python: Env File`, the default value is `${workspaceFolder}/.env`
+Open `Settings`, type **env** you can find one field named `Python: Env File`, the default value is `${workspaceFolder}/.env`
 
 so goto your workspaceFolder and create the file .env (if not exist)
 
-say, you want to add absolute `/xx/isilon/test-qa/lib` into the search path, then add one line into .env:
+add one line into .env. Say, you want to add absolute `/xx/isilon/test-qa/lib`
 
     PYTHONPATH=/xx/isilon/test-qa/lib
 
@@ -150,8 +150,17 @@ or something like this if PYTHONPATH already exist, separated each PATH by colon
 
     PYTHONPATH=${PYTHONPATH}:/xx/isilon/test-qa/lib
 
+you should also need to check `env` command
+
+```bash
+env | grep -i python
+```
+
+**Template for .env**
+
 ```bash
 # Template for .env
+
 PYTHONPATH=${PYTHONPATH}:/root/myGit/onefs/isilon/test-qa/lib
 PYTHONPATH=${PYTHONPATH}:/root/myGit/onefs/isilon/test-qa/migration/lib
 PYTHONPATH=${PYTHONPATH}:/root/myGit/onefs/isilon/test/pylib
@@ -160,18 +169,20 @@ PYTHONPATH=${PYTHONPATH}:/root/myGit/onefs/isilon/lib/python/
 PYTHONPATH=${PYTHONPATH}:/root/myGit/onefs/build/nose
 ```
 
+**Another Template for .env, including alias for outer folder**
+
 ```bash
 # including alias for isi
 # isi=> isilon/lib.python
-mkdir -p .isilon/lib
-cd .isilon/lib
-ln -s isi <PrePath>/isilon/lib/python
-PYTHONPATH=${PYTHONPATH}:/root/myGit/onefs/isilon/test-qa/lib
-PYTHONPATH=${PYTHONPATH}:/root/myGit/onefs/isilon/test-qa/migration/lib
-PYTHONPATH=${PYTHONPATH}:/root/myGit/onefs/isilon/test/pylib
-PYTHONPATH=${PYTHONPATH}:/root/myGit/onefs/isilon/test/syncIQ/
-PYTHONPATH=${PYTHONPATH}:/root/myGit/onefs/isilon/lib/python/
-PYTHONPATH=${PYTHONPATH}:/root/myGit/onefs/build/nose
+# cd ~
+# mkdir -p .isilon/lib
+# cd .isilon/lib
+# ln -s isi <pre-path>/isilon/lib/python
+```
+
+Then add this line into the bottom of the previous standard .env template
+
+```
 PYTHONPATH=${PYTHONPATH}:/root/.isilon/lib
 ```
 
