@@ -421,8 +421,15 @@ done
   set up **upstream** branch
 
   ```bash
-  git remote add upstream <url-to-central-repo>
-  git pull upstream
+  git remote add Upstream <url-to-central-repo>
+  git fetch Upstream
+  # git pull Upstream
+  ```
+
+- list all the branches in the remote reporisoty
+
+  ```bash
+  git remote show Upstream
   ```
 
 - change your remote's URL
@@ -434,6 +441,7 @@ done
   origin  https://github.com/iqiyi/dpvs (push)
 
   git remote set-url origin https://github.com/xiangp126/dpvs
+  # or directly edit .git/config
 
   # check
   git remote -v
