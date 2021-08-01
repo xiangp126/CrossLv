@@ -16,7 +16,7 @@
     - [commit](#commit)
     - [diff](#diff)
     - [log](#log)
-        - [How do I find who delete/add the desired line](#logS)
+        - [Find out who deleted or added the desired line](#logS)
     - [pull](#pull)
     - [revert](#revert)
     - [reflog](#reflog)
