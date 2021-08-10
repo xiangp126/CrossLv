@@ -167,12 +167,18 @@ At least one output file must be specified
 ```
 
 <a id=videoformatconverter></a>
-#### video format converter
+#### video format converter, notice suffix
 
-convert from `flv` to `mp4`, notice suffix
+convert from **flv** to **mp4**
 
 ```bash
 ffmpeg -i who.flv -vcodec h264 who.mp4
+```
+
+[convert from **m4a** to **mp3**](https://qastack.cn/superuser/704493/ffmpeg-convert-m4a-files-to-mp3-without-significant-loss-of-information-quality-automated-bitrate)
+
+```bash
+ffmpeg -i filenameee.m4a -acodec libmp3lame -ab 256k output.mp3
 ```
 
 <a id=videosplit></a>
