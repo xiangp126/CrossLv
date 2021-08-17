@@ -21,7 +21,7 @@ Open `Disk Utility`
 File - New from Directory
 
 ### hotkey with Dock
- key | Explain
+ key | Description
 :---: | :---:
 **Ctrl + Command + Q** | Lock screen
 **command＋option＋D** | hide or reveal *`Dock`*
