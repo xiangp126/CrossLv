@@ -50,6 +50,31 @@ MacOS uses afp protocol other than samba, so implement afp on OpenWRT
 opkg update && opkg install avahi-utils netatalk
 ```
 
+#### create new user
+
+refer to [Create a non-privileged user in OpenWrt
+](https://oldwiki.archive.openwrt.org/doc/howto/secure.access)
+
+```bash
+opkg update
+opkg install shadow-useradd
+useradd nicolaus
+
+# However, you can't ssh to this user yet.
+# To enable ssh access, you should make a password for that user
+# create his home folder
+# and most importantly indicate the shell of that user
+
+passwd nicolaus
+mkdir /home
+mkdir /home/nicolaus
+chown nicolaus /home/nicolaus
+
+# add default shell '/bin/ash' for pi
+vi /etc/passwd
+   nicolaus:x:1000:1000:nicolaus:/home/nicolaus:/bin/ash
+```
+
 #### add user(pi) to an existing group(users)
 
 ```bash
@@ -62,18 +87,22 @@ root@LEDE:~# id pi
 uid=1000(pi) gid=1000(pi) groups=1000(pi),100(users),1001(camera)
 ```
 
+#### change the owner of a directory
+```bash
+root@OpenWrt:/mnt# chown pi DrDu_TM/
+```
+
 #### change the group owner of a directory
-change the owner of `DrDu_TM/` and `Savy_TM/` from `root` to `users`
+change the owner of `DrDu_TM/` from `root` to `users`
 
 ```bash
-root@LEDE:/mnt# chgrp users DrDu_TM/ Savy_TM/
+root@LEDE:/mnt# chgrp users DrDu_TM/
 
 ls -alF
 drwxrwxr-x    2 root     users         4096 Sep 14 14:37 DrDu_TM/
-drwxrwxr-x    2 root     users          160 Sep 13 23:52 Savy_TM/
 ```
 
-### share my `afp.conf`
+### share my `/etc/afp.conf`
 
 ```bash
 ;
@@ -85,14 +114,14 @@ drwxrwxr-x    2 root     users          160 Sep 13 23:52 Savy_TM/
 log file = /var/log/afpd.log
 afp interfaces = br-lan
 
-[XX_TM]
-path = /mnt/XX_TM
+[DrDu_TM]
+path = /mnt/DrDu_TM
 time machine = yes
 vol size limit = 0
 valid users = pi @users
 ```
 
-Note: using wrt1200 the time it takes with first backup >= 12 hours, it is very slow! The Throttle maybe CPU.
+Note: using `WRT1200` the time it takes with first backup >= 12 hours, it is very slow! The Throttle maybe CPU.
 
 #### Speed Up Time machines First back up
 [speed-up-time-machine-backups-by-10x](https://blog.shawjj.com/speed-up-time-machine-backups-by-10x-f6274330dc6f)
