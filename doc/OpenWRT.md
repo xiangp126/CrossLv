@@ -37,7 +37,27 @@ config sambashare
 
 ```
 
-After modification, remember to restart smbd
+After modification, remember to restart `smbd`
+
+#### Auto mount the partion | USB Storage
+
+refer to [Automount the partition
+](https://openwrt.org/docs/guide-user/storage/usb-drives)
+
+```bash
+# find the disk
+opkg update && opkg install fdisk
+fdisk -l
+
+# install block
+opkg update && opkg install block-mount
+# block info
+
+# manual mount the partion
+mount /dev/sda1 /mnt/Dir
+
+block detect
+```
 
 #### Setup Time Machine Server using AFP protocol
 MacOS uses afp protocol other than samba, so implement afp on OpenWRT
@@ -89,6 +109,8 @@ uid=1000(pi) gid=1000(pi) groups=1000(pi),100(users),1001(camera)
 
 #### change the owner of a directory
 ```bash
+# This method doesn't take into effect, the owner
+# will be changed to root again.
 root@OpenWrt:/mnt# chown pi DrDu_TM/
 ```
 
