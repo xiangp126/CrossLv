@@ -1,5 +1,5 @@
 ### OpenWRT
-~~My Router is `WRT1200AC`~~
+`WRT1200AC` and `WRT32X` from LINKSYS
 
 #### Setup Time Machine Server using SMB directly
 
