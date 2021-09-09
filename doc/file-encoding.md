@@ -2,9 +2,9 @@
 
 ### dos2linux
 refer to <https://www.cyberciti.biz/faq/sed-remove-m-and-line-feeds-under-unix-linux-bsd-appleosx/>
-> **!! Notice: ^M should be typed by 'Ctrl-V followed by Ctrl-M' !!**
+> **!! Notice: `^M` should be typed by 'Ctrl-V followed by Ctrl-M' !!**
 
-- show ^M
+- show `^M`
 
 ```vim
 :e ++ff=unix %
