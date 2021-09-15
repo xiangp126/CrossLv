@@ -1,5 +1,5 @@
 ## mkdir
-create directory consecutively
+**create directories**
 
 ```bash
 mkdir test
