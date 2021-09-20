@@ -13,11 +13,11 @@
 
 <div align=center><img src="../res/fittoA4size.png" width=50%></div>
 
-- Goto `Fit to`, choose A4 size.
+- Goto `Fit to`, choose `A4` size.
 
 ##### Save the re-dimensioned image
 
-- Goto `Save As`, choose JPEG. **!!Do not use Export function!!**
+- Goto `Save As`, choose `JPEG`. **!!Do not use Export function!!**
 
 ### How to Compress an image | Reduce the size
 - Open the image
