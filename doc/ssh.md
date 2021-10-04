@@ -1,5 +1,8 @@
-## ssh
-### keylogin
+## SSH
+### Markdown
+#### Using RSA keys to login
+- Generate the key pairs first
+
 ```bash
 cd ~
 ssh-keygen -t rsa
@@ -8,7 +11,16 @@ cd .ssh
 touch authorized_keys
 chmod 600 authorized_keys
 ```
-> Allow only key login and Deny root login | CentOS
+#### **Deny** root login and only **allow** login with authenticated keys | CentOS
+
+```
+..
+PermitRootLogin no
+...
+Password Authentiaction no
+```
+
+demo for modified sshd_config
 
 ```bash
 sudo vim /etc/ssh/sshd_config
@@ -30,8 +42,8 @@ sudo systemctl restart sshd.service
 # and wait ...
 ```
 
-### keepalive
-> SSH Keep Alive from server side
+#### SSH keepalive
+- SSH Keep Alive from server side
 
 ```bash
 sudo vim /etc/ssh/sshd_config
