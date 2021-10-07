@@ -23,6 +23,11 @@ brew cask install squirrel
 - [Official Github](https://github.com/rime/squirrel)
 - [鼠须管简单配置](https://www.dreamxu.com/install-config-squirrel/)
 
+### Using `Cmd + Space` to switch input method
+
+<div align=left><img src="../res/cmdspaceswitch.png" width=80%></div>
+
+
 #### On Windows
 
 - [鼠须管官网下载页面](https://rime.im/download/)
@@ -72,6 +77,6 @@ patch:
     page_size: 10
 ```
 
-then re-deploy
+Then re-deploy Squirrel
 
-<div align=center><img src="../res/rime_redeploy.png" width=48%></div>
+<div align=left><img src="../res/rime_redeploy.png" width=48%></div>
