@@ -14,7 +14,9 @@ done
 ```
 
 #### Syntax 2 - Using `seq` command
+
 ```bash
+# seq -- print sequences of numbers
 $ seq 1 3
 1
 2
@@ -38,4 +40,39 @@ for i in $(seq -f "%02g" 1 3)
 do
     echo $i
 done
+```
+
+### IF Clause
+
+[What is the difference between the Bash operators \[\[ vs \[ vs \( vs \(\(](https://unix.stackexchange.com/questions/306111/what-is-the-difference-between-the-bash-operators-vs-vs-vs)
+
+#### [ ]
+```bash
+#!/bin/bash
+
+echo "Enter a number: "
+read VAR
+
+if [ $VAR -gt 10 ]
+then
+  echo "The variable is greater than 10."
+else
+  echo "The variable is equal or less than 10."
+fi
+```
+
+#### [[ ]]
+```bash
+# Need to be upgraded
+#!/bin/bash
+
+echo "Enter a number: "
+read VAR
+
+if [[ $VAR -gt 10 ]]
+then
+  echo "The variable is greater than 10."
+else
+  echo "The variable is equal or less than 10."
+fi
 ```
