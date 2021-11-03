@@ -7,7 +7,7 @@ rsync -azP /var/www/example.com/ root@108.175.12.239:/var/www/example.com/
                                | care for the difference with this '/'
 ```
 
-### Dry Mode
+### Run with Dry Mode
 ```bash
 # Add '-n' at the end of command, Dry Mode
 rsync -azP /var/www/example.com/ root@108.175.12.239:/var/www/example.com/ -n
