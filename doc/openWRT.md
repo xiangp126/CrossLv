@@ -56,7 +56,12 @@ opkg update && opkg install block-mount
 # manual mount the partion
 mount /dev/sda1 /mnt/Dir
 
-block detect
+# should write mount info into fstab
+cat /etc/config/fstab
+block detect | uci import fstab
+
+# re-check fstab
+cat /etc/config/fstab
 ```
 
 #### Setup Time Machine Server using AFP protocol
