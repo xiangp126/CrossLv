@@ -22,13 +22,37 @@ ip -6 addr show
 add them to **/etc/rc.local** for permanent
 
 ```bash
-$ sudo ip addr del 10.124.10.103/24 dev eth0
+sudo ip addr del 10.124.10.103/24 dev eth0
 sudo ip addr add 10.124.10.103/24 dev eth0
 sudo ip route add default via 10.124.10.1
 - or
 sudo ifconfig eth0 10.123.18.129/20
 sudo route del default gw 10.123.31.254
 sudo route add default gw 10.123.31.1
+```
+
+#### ip route
+
+```bash
+# temporary add one static route
+ip route add 192.168.2.0/24 via 192.168.10.100
+
+# del
+ip route del 192.168.2.0/24 via 192.168.10.100
+# or
+ip route del 192.168.2.0/24
+```
+
+#### route command
+- Del one route (Not recommended)
+
+```
+$ sudo route del -net 10.0.0.0 netmask 255.0.0.0 gw 10.123.31.254
+```
+- Add one route
+
+```
+$ sudo route add -net 10.0.0.0 netmask 255.0.0.0 gw 10.123.31.1
 ```
 
 #### Ubuntu
@@ -67,18 +91,6 @@ DNS1=8.8.8.8
 ```
 $ sudo ifup eth0
 $ sudo ifdown eth0 && sudo ifup eth0
-```
-
-#### route
-- Del one route (Not recommended)
-
-```
-$ sudo route del -net 10.0.0.0 netmask 255.0.0.0 gw 10.123.31.254
-```
-- Add one route
-
-```
-$ sudo route add -net 10.0.0.0 netmask 255.0.0.0 gw 10.123.31.1
 ```
 
 #### neighbour | neighbor
