@@ -1,6 +1,7 @@
 ### OpenWRT
 `WRT1200AC` and `WRT32X` from LINKSYS
 
+#### OpenWrt SAMBA Setup and Config
 #### Setup Time Machine Server using SMB directly
 
 - [samba_configuration](https://openwrt.org/docs/guide-user/services/nas/samba_configuration)
@@ -33,11 +34,65 @@ config sambashare
         option path '/mnt/misc'
 
 config sambashare
-... ...
+...
 
 ```
 
-After modification, remember to restart `smbd`
+In some cases, you may want to adapt the **interface** parameter, in case the samba service should listen on different interfaces.
+
+```bash
+config samba
+        option workgroup 'WORKGROUP'
+        option name 'OpenWrt'
+        option description 'OpenWrt'
+        option homes '0'
+        option 'charset' 'UTF-8'
+        option 'interface' 'loopback lan wan'
+
+config sambashare
+...
+```
+
+Especially notice this line `option 'interface' 'loopback lan wan'`. After modification, restart `smbd`
+
+```bash
+/etc/init.d/samba restart
+```
+
+Check `/etc/samba/smb.conf` if the modification take into effect
+
+```bash
+# cat /etc/samba/smb.conf | less
+[global]
+	netbios name = OpenWrt
+	display charset = UTF-8
+	interfaces = lo br-lan br-wan
+	server string = OpenWrt
+	unix charset = UTF-8
+	workgroup = WORKGROUP
+	bind interfaces only = yes
+	deadtime = 30
+...
+```
+
+Especially notice this line `interfaces = lo br-lan br-wan`. Three interfaces are bound.
+
+##### Samba reset user's passwd
+
+```
+# smbpasswd -h
+smbpasswd: unrecognized option: h
+Usage: smbpasswd [options] <username>
+
+Options:
+  -s		read password from stdin
+  -a		add user
+  -x		delete user
+
+smbpasswd -a <user-name>
+New SMB password:
+Retype SMB password:
+```
 
 #### Auto mount the partion | USB Storage
 

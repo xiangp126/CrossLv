@@ -44,15 +44,19 @@ ip route del 192.168.2.0/24
 ```
 
 #### route command
-- Del one route (Not recommended)
-
-```
-$ sudo route del -net 10.0.0.0 netmask 255.0.0.0 gw 10.123.31.254
-```
 - Add one route
 
 ```
-$ sudo route add -net 10.0.0.0 netmask 255.0.0.0 gw 10.123.31.1
+sudo route add 192.168.2.0 netmask 255.255.255.0 gw 192.168.10.100
+
+# add one route permanently
+sudo route -p add 192.168.2.0 netmask 255.255.255.0 gw 192.168.10.100
+```
+
+- Del one route (Not recommended)
+
+```
+sudo route del -net 192.168.2.0
 ```
 
 #### Ubuntu
