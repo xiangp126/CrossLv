@@ -25,7 +25,7 @@ add them to **/etc/rc.local** for permanent
 sudo ip addr del 10.124.10.103/24 dev eth0
 sudo ip addr add 10.124.10.103/24 dev eth0
 sudo ip route add default via 10.124.10.1
-- or
+# or
 sudo ifconfig eth0 10.123.18.129/20
 sudo route del default gw 10.123.31.254
 sudo route add default gw 10.123.31.1
@@ -46,7 +46,7 @@ ip route del 192.168.2.0/24
 #### route command
 - Add one route
 
-```
+```bash
 sudo route add 192.168.2.0 netmask 255.255.255.0 gw 192.168.10.100
 
 # add one route permanently
@@ -55,15 +55,15 @@ sudo route -p add 192.168.2.0 netmask 255.255.255.0 gw 192.168.10.100
 
 - Del one route (Not recommended)
 
-```
+```bash
 sudo route del -net 192.168.2.0
 ```
 
 #### Ubuntu
-- Permanent modify
+- permanent modify
 
-```
-$ sudo vim /etc/network/interfaces
+```bash
+sudo vim /etc/network/interfaces
 
 auto eth0
 iface eth0 inet static
@@ -77,8 +77,8 @@ iface eth0 inet static
 #### CentOS
 - static
 
-```
-$ cd /etc/sysconfig/network-scripts
+```bash
+cd /etc/sysconfig/network-scripts
 
 DEVICE='eth0'
 TYPE=Ethernet
@@ -92,9 +92,9 @@ DNS1=8.8.8.8
 ```
 
 #### ifup / ifdown
-```
-$ sudo ifup eth0
-$ sudo ifdown eth0 && sudo ifup eth0
+```bash
+sudo ifup eth0
+sudo ifdown eth0 && sudo ifup eth0
 ```
 
 #### neighbour | neighbor
