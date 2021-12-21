@@ -1,13 +1,16 @@
 ## ln
-### SYNOPSIS
+### Synopsis
 ```
+NAME
+     link, ln -- make links
+
 SYNOPSIS
      ln [-Ffhinsv] source_file [target_file]
      ln [-Ffhinsv] source_file ... target_dir
      link source_file target_file
 ```
 
-### hard link
+### Hard link
 ```bash
 ln ~/.bashrc .
 
@@ -15,7 +18,7 @@ ll .bashrc
 -rwxr-xr-x  2 corsair  staff  5336 Jun 14 11:41 .bashrc*
 ```
 
-### soft link
+### Soft link
 ```bash
 ln -s ~/.bashrc .
 
