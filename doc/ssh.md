@@ -1,5 +1,4 @@
 ## SSH
-### Markdown
 #### Using RSA keys to login
 - Generate the key pairs first
 
