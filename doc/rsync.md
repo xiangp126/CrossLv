@@ -1,4 +1,6 @@
 ## rsync
+rsync - faster, flexible replacement for rcp
+
 ### Example
 ```bash
 rsync -azP /var/www/example.com root@108.175.12.239:/var/www/
