@@ -32,6 +32,11 @@ brew update
 brew cask install caskroom/versions/java8
 ```
 
+### Upgrade OS to Catalina
+Goto: [Macos Catalina Patcher](http://dosdude1.com/catalina/) and download the latest version.
+
+Note: The upgrade step **will not** delete your existing files.
+
 ### [How to cool Macbook Pro](https://www.zhihu.com/question/19837256)
 
 独显是mac的发热大户，即使是在低速运行下，都有15w的功耗。所以在不需要使用独显的时候手动禁用掉，可以降低mac的功耗，发热会得到明显改善，而且可以提高电池的续航！
