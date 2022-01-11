@@ -8,9 +8,19 @@ refer to [Execute sudo without Password?](https://askubuntu.com/questions/147241
 sudo vim /etc/sudoers
 
 # add this line
-$USER ALL=(ALL) NOPASSWD:ALL
+$USER ALL=(ALL) NOPASSWD: ALL
 
 :w !sudo tee %
+```
+
+or add current user to group `sudo` (just take for example)
+
+check `/etc/sudoers` for the exactly group name that have free sudo privilege on your system.
+
+<div align=left><img src="../res/group_sudo.png" width=90%></div>
+
+```bash
+usermod –aG sudo UserName
 ```
 
 #### How does `:w !sudo tee %` work
