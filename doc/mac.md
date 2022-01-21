@@ -1,4 +1,4 @@
-## mac
+## MAC
 
 ### Disable SIP Mode
 System Integrity Protection
