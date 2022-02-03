@@ -6,10 +6,10 @@ System Integrity Protection
 ```
 sudo reboot
 ```
-> Press `Win + R` until Apple Logo appears<br>
+Press `Win + R` until Apple Logo appears<br>
 At the top menu, launch Terminal
 
-```
+```bash
 csrutil status
 csrutil disable
 # csrutil enable
