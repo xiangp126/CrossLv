@@ -26,9 +26,9 @@ Vim emulation for VSCode
 <a id=remotessh></a>
 #### Remote - SSH
 
-Open any folder on a remote machine using SSH and take advantage of the full features of VSCode. Featured as `sshfs` on Linux.
+Open any folder on a remote machine using SSH and take advantage of the full features of VSCode. Think about `sshfs` on Linux.
 
-- Template for `SSH config`
+- Template for `SSH config` | Connect to a server
 
 ```bash
 # put these contents under ~/.ssh/config
@@ -57,7 +57,7 @@ Host *
 
 ```
 
-Then you could
+Then you could connect to the server use
 
 ```bash
 ssh remotedev
@@ -66,8 +66,8 @@ ssh -p 22 Annoymous@192.168.1.10 -i ~/.ssh/id_rsa_MyPrivate
 ```
 
 <a id=gitlens></a>
-#### GitLens - Git Supercharged
-Highly recommended plugin
+#### GitLens
+GitLens - Git Supercharged | Highly recommended plugin
 
 On Windows, use `Ctrl + Click` to _Show Commits_
 
