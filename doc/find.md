@@ -1,7 +1,7 @@
 ## find
 #### easiest way to use
 ```bash
-find / -name for.txt
+find / -name fake.txt
 ```
 
 ### find the linked files and delete them
