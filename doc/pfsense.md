@@ -15,3 +15,8 @@ That command will disable the firewall, including all NAT functions. Access to t
 ```
 pfctl -e
 ```
+
+### wireguard
+
+
+### frr | bgp
