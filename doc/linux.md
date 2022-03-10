@@ -34,3 +34,20 @@ usermod –aG sudo UserName
 
 :w !sudo tee %
 ```
+
+#### Get route info
+```bash
+netstat -rn
+```
+
+or
+
+```bash
+ip route
+```
+
+or
+
+```bash
+route -n
+```

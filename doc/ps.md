@@ -3,6 +3,7 @@ Get the start time of certain process
 
 ### find pid
 ```bash
+ps aux
 ps aux | grep -i tmux
 
 corsair   1885  0.0  1.4 138336 14912 ?        Ss   Jul02   0:58 tmux -u
