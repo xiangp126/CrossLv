@@ -9,7 +9,9 @@ find . -inum [inode number] -exec rm -i {} \;
 ```
 
 ### How to delete Dir using its `inode number`
-take directory `iCloud Drive (Archive) - 1/` for example
+**Do Not Use iCloud Drive**
+
+~~take directory `iCloud Drive (Archive) - 1/` for example~~
 
 #### find inum(inode number)
 ```bash
