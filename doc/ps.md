@@ -12,7 +12,7 @@ corsair  24704  0.0  0.0 112716  1008 pts/13   R+   08:10   0:00 grep -i --color
 ```
 
 ### get time according to pid
-take 1885 for example
+take PID `1885` for example
 
 ```bash
 ps -A -opid,stime,etime,args | grep -i 1885
@@ -22,6 +22,7 @@ ps -A -opid,stime,etime,args | grep -i 1885
 ```
 
 ### read the output of `ps` command
+ps -- process status
 
 ```bash
 man ps
