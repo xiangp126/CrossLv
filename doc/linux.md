@@ -35,6 +35,16 @@ usermod –aG sudo UserName
 :w !sudo tee %
 ```
 
+#### about rsyslog.conf - remote syslog
+       rsyslog.conf - rsyslogd(8) configuration file
+
+       The rsyslog.conf file is the main configuration file for the
+       rsyslogd(8) which logs system messages on *nix systems.  This
+       file specifies rules for logging.  For special features see the
+       rsyslogd(8) manpage. Rsyslog.conf is backward-compatible with
+       sysklogd's syslog.conf file. So if you migrate from sysklogd you
+       can rename it and it should work.
+
 #### Get route info
 ```bash
 netstat -rn
