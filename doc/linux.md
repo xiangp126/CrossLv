@@ -1,4 +1,31 @@
-### Linux Manipulation
+## Linux Manipulation
+
+### Configuration
+--
+#### Configure static IP address
+```bash
+auto eth0
+iface eth0 inet static
+address 192.168.1.36/24
+gateway 192.168.1.1
+```
+
+#### nslookup
+```bash
+nslookup google.com
+# specify dns server
+nslookup google.com 8.8.8.8
+```
+
+### Configure DNS server manually
+**IMPORTANT NOTE**: Dont separate DNS adresses with commas, write **nameserver** before each adress, like here
+
+```bash
+> sudo vim /etc/resolv.conf/
+
+nameserver 8.8.8.8
+nameserver 8.8.4.4
+```
 
 #### How to execute sudo without password
 
@@ -17,12 +44,14 @@ or add current user to group `sudo` (just take for example)
 
 check `/etc/sudoers` for the exactly group name that have free sudo privilege on your system.
 
-<div align=left><img src="../res/group_sudo.png" width=90%></div>
+<div align=left><img src="../res/group_sudo.png" width=50%></div>
 
 ```bash
 usermod –aG sudo UserName
 ```
 
+### Tricks
+--
 #### How does `:w !sudo tee %` work
 
 - https://unix.stackexchange.com/questions/301256/how-does-w-sudo-tee-work
@@ -46,17 +75,19 @@ usermod –aG sudo UserName
        can rename it and it should work.
 
 #### Get route info
+- netstat
+
 ```bash
 netstat -rn
 ```
 
-or
+- ip command
 
 ```bash
 ip route
 ```
 
-or
+- route command
 
 ```bash
 route -n
