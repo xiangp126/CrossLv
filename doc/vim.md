@@ -1,12 +1,10 @@
-## vim
+## VIM - VI Improved
 ### add blank line between each line
 refer to [add blank line between each line](https://qastack.cn/superuser/592503/vim-adding-empty-line-between-lines)
 
 ```bash
 :%s/\n\@<!\n\n\@!/\r\r/g
 ```
-
-VI Improved
 
 ### Removing trailing whitespace
 ```vim
@@ -19,7 +17,7 @@ VI Improved
 ```
 
 ### Shortcut Key with Iterm2
-> As illustrated
+As illustrated
 
 ![](../res/iterm2-Alt.png)
 
