@@ -218,7 +218,6 @@ git log Repo_Name/Branch_Name
 
 ```bash
 git help log
-```
 
        -S<string>
            Look for differences that change the number of occurrences of the specified string (i.e. addition/deletion) in a
@@ -227,6 +226,7 @@ git help log
            It is useful when you're looking for an exact block of code (like a struct), and want to know the history of that
            block since it first came into being: use the feature iteratively to feed the interesting block in the preimage back
            into -S, and keep going until you get the very first version of the block.
+```
 
 ```bash
 # will find the commits adding or deleting
