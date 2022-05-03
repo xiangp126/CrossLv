@@ -2,7 +2,7 @@
 - [Github Link](https://github.com/mpv-player/mpv)
 - [Manual](https://mpv.io/manual/master/)
 
-### how to install?
+### How to install?
 - Mac
 
 ```bash
@@ -39,7 +39,8 @@ mpv [url]
 ```
 
 ### ShortCut Key
-### from Official
+- Officially
+
 Operation|Intent
 :---:|:---:
 LEFT and RIGHT|Seek backward/forward 5 seconds. Shift+arrow does a 1 second exact seek (see --hr-seek).
