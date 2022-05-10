@@ -27,7 +27,6 @@ brew cask install squirrel
 
 <div align=left><img src="../res/cmdspaceswitch.png" width=80%></div>
 
-
 #### On Windows
 
 - [鼠须管官网下载页面](https://rime.im/download/)

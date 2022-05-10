@@ -1,5 +1,5 @@
 ## aircrack-ng
-Use `aircrack-ng` utility and Kali Linux to crack WIFI password
+Use `aircrack-ng` utility and Kali Linux to crack WiFi password
 
 ### Sepup wireless card
 ```bash
