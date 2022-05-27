@@ -1,5 +1,5 @@
 ## cgdb
-~~warning: do not type **layout src** in gdb, there was bug for gdb~~
+**Warning**: There is a bug of gdb. To avoid it, do not type ~~layout src~~ in gdb.
 
 ### Commonly Used
 - [thread](#thread)
