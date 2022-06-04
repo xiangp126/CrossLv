@@ -12,9 +12,8 @@ brew cask install mpv
 ### config path
 ```bash
 cd ~/.config/mpv
+# mpv.conf & input.conf
 ```
-
-`mpv.conf` & `input.conf`
 
 #### mpv.conf
 ```bash
