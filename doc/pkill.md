@@ -1,6 +1,6 @@
 ## pkill
 
-kici out someone that was logined
+find or signal process by name, then kill the process
 
 ### who
 ```bash
