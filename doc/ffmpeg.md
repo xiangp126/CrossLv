@@ -1,7 +1,7 @@
 ## ffmpeg
 <https://www.ffmpeg.org/about.html>
 
-### Install - for Mac
+### Install for Mac is easy
 ```bash
 brew install ffmpeg
 ```
