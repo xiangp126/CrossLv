@@ -19,7 +19,7 @@ PermitRootLogin no
 Password Authentiaction no
 ```
 
-~~Demo for modified sshd_config~~
+Demo to modify `sshd_config`
 
 ```bash
 sudo vim /etc/ssh/sshd_config
