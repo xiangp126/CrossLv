@@ -1,4 +1,4 @@
-## mpv
+## MPV - Media Player
 - [Github Link](https://github.com/mpv-player/mpv)
 - [Manual](https://mpv.io/manual/master/)
 
