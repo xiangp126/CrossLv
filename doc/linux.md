@@ -57,14 +57,29 @@ usermod –aG sudo UserName
 - https://unix.stackexchange.com/questions/301256/how-does-w-sudo-tee-work
 - https://stackoverflow.com/questions/2600783/how-does-the-vim-write-with-sudo-trick-work
 
-```bash
-# Already opened and edited a file
-# To save your work
+**The situation to use this trick**
 
+- You have sudo privilege.
+- You already opened a file and have done some work and forgot to use sudo command before opening the file.
+- You do not want to waste the time you already spent on editing the file, so instead, you use the following trick to rescue your content:
+
+```bash
 :w !sudo tee %
 ```
 
-#### about rsyslog.conf - remote syslog
+**The principle of how the trick works**
+
+The structure `:w !cmd` means "write the current buffer piped through command".
+
+So you can do, for example `:w !cat` and it will pipe the buffer through cat.
+
+Now `%` is the FILENAME associated with the buffer.
+
+So `:w !sudo tee %` will pipe the contents of the buffer through sudo tee FILENAME.
+
+This effectively writes the contents of the buffer out to the file.
+
+#### About rsyslog.conf - remote syslog
        rsyslog.conf - rsyslogd(8) configuration file
 
        The rsyslog.conf file is the main configuration file for the
