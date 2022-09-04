@@ -4,6 +4,7 @@
     - [vim](#vim)
     - [Remote - SSH](#remotessh)
     - [GitLens - Git Supercharged](#gitlens)
+    - [C/C++ Compile Run](#ccompilerun)
 - [Useful Config and Command Tips](#configs)
     - [Get paste board when connect to remote tmux](#pastefromtmux)
     - [Open file on a new tab](#openfileonnewtab)
@@ -70,6 +71,19 @@ ssh -p 22 Annoymous@192.168.1.10 -i ~/.ssh/id_rsa_MyPrivate
 GitLens - Git Supercharged | Highly recommended plugin
 
 On Windows, use `Ctrl + Click` to _Show Commits_
+
+<a id=ccompilerun></a>
+#### C/C++ Compile Run
+Compile & Run single c/c++ files easly
+
+- Keybindings
+
+Linux|	Windows|	Mac	| Description
+:---:|:---:|:---:|:---
+f6|	f6|_cmd+r_|	Compiles and runs the file
+crtl+6	| ctrl+6|	cmd+6|	Compiles and runs the file
+f8|	f8|	cmd+y|	Compiles and run the file in external console
+f7|f7|	cmd+t|	Compiles and run the file specifying custom arguments and flags
 
 ---
 <a id=configs></a>
