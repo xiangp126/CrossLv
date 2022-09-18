@@ -15,6 +15,8 @@
     - [Search specific commit through commit message using GitLens](#searchcommit)
     - [Python function cannot jump to its definition](#pythonjump)
     - [C/C++ No synbols found and cannot jump | Install from VSIX](#cnosymbol)
+- [How to create user snippets for language programming](#usersnippets)
+- [How to execute command in Debug mode](#gdbexecmode)
 - [Troubleshooting using VSCode](#troubleshooting)
 
 <a id=plugins></a>
@@ -215,6 +217,30 @@ Go to the official page: https://github.com/microsoft/vscode-cpptools/releases
 and download the latest cpptools-linux.vsix packages. Refer to https://stackoverflow.com/questions/37071388/how-can-i-install-visual-studio-code-extensions-offline
 
 Then open VS-Code switch to Extensions sidebar, click on the sllipsis in the right upper corner, choose _Install from VSIX_, browser the packages your recentlly downloaded.
+
+<a id=usersnippets></a>
+### How to create user snippets for language programming
+```
+Code > Preferences -> Configure User Snppets
+```
+
+Then select specific language.
+
+Here is the link for [vscode-defined Python snippets](https://github.com/microsoft/vscode-python/blob/2020.12.424452561/snippets/python.json) that can be pasted as user snippets.
+
+<a id=gdbexecmode></a>
+### How to execute command in Debug mode
+refer to <https://github.com/microsoft/vscode-cpptools/issues/7400> &
+<https://github.com/microsoft/MIEngine/pull/976>
+
+- launch debugging
+- in Debug Console, type `-exec` or ` as the prefix of your command
+
+```bash
+# print the value of i
+p i
+```
+<div align=left><img src="../res/gdbexecmode.png" width=95%></div>
 
 <a id=troubleshooting></a>
 ### Troubleshooting using VSCode
