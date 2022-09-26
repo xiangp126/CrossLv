@@ -333,7 +333,7 @@ git commit -m 'This is my first commit'
 git show 82fb783
 
 commit 82fb78377e99c98a902bc174e67d3913ed419ce7
-Author: Peng Xiang <hi.pxiang@gmail.com>
+Author: Peng <hi.pxiang@gmail.com>
 Date:   Fri Dec 13 11:13:23 2019 +0800
 
     add rime pro package
