@@ -1,5 +1,7 @@
 ## Git
 
+Use [githug](https://github.com/Gazler/githug) to practice your Git skills.
+
 ### Contents
 - [Git Basic Commands](#git)
     - [add](#add)
@@ -182,6 +184,16 @@ git checkout -b <branch_name> <sha1>
 
 <a id=diff></a>
 #### diff
+```bash
+git-diff - Show changes between commits, commit and working tree, etc
+
+git diff <commit> <commit>
+# the first <commit> corresponds to the base commit
+# the second <commit> corresponds to the commit to compare to the base commit.
+```
+
+Exp:
+
 ```bash
 git diff --since=1.hour.ago --until=1.minute.ago
 ```
@@ -451,7 +463,39 @@ done
 
 <a id=rebase></a>
 #### rebase
-EXP: use rebase to merge three recent commit into one
+```
+NAME
+       git-rebase - Reapply commits on top of another base tip
+
+SYNOPSIS
+       git rebase [-i | --interactive] [<options>] [--exec <cmd>]
+               [--onto <newbase> | --keep-base] [<upstream> [<branch>]]
+       git rebase [-i | --interactive] [<options>] [--exec <cmd>] [--onto <newbase>]
+               --root [<branch>]
+       git rebase (--continue | --skip | --abort | --quit | --edit-todo | --show-current-patch)
+```
+
+```
+DESCRIPTION
+       Assume the following history exists and the current branch is "topic":
+
+                     A---B---C topic
+                    /
+               D---E---F---G master
+
+       From this point, the result of either of the following commands:
+
+           git rebase master
+           git rebase master topic
+
+       would be:
+
+                             A'--B'--C' topic
+                            /
+               D---E---F---G master
+```
+
+EXP: use rebase to merge three recent commits into one
 
 take A/B/C for example, H denotes HEAD
 
