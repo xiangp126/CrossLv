@@ -1765,7 +1765,7 @@ _EOF
                 libgtk2.0-dev libatk1.0-dev libbonoboui2-dev expat \
                 libcairo2-dev libx11-dev libxpm-dev libxt-dev sshfs \
                 python-dev python3-dev ruby-dev lua5.1 lua5.1-dev net-tools \
-                x11-xkb-utils vim openssh-server p7zip* htop iftop -y
+                x11-xkb-utils vim openssh-server p7zip* htop iftop autoconf -y
 
         elif [[ $platOsType = 'centos' &&
                 ($execPrefix == "sudo" || $instFlag == "mixed") ]]; then
