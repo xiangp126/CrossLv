@@ -247,8 +247,8 @@ git log --full-history -S "import isi.fs.siq as siq" /xx/test.py
 ```
 
 <a id=reflog></a>
-#### reflog
-Manage reflog information
+#### reflog - Manage reflog information
+Reference logs, or "reflogs", record when the tips of branches and other references were updated in the local repository.
 
 ```bash
 git reflog
@@ -495,7 +495,7 @@ DESCRIPTION
                D---E---F---G master
 ```
 
-EXP: use rebase to merge three recent commits into one
+- EXP: use rebase to merge three recent commits into one
 
 take A/B/C for example, H denotes HEAD
 
@@ -518,7 +518,7 @@ pick XXXX C
 ... some words to guide you
 ```
 
-change pick at the left of each commit id to s or squash
+change `pick` at the left of each commit to `s` which represents `squash`
 
 ```bash
 pick XXXX A
@@ -529,6 +529,57 @@ s XXXX C
 ```
 
 then edit the merged commit message as you wish
+
+- EXP: usage of `git rebase --onto`
+
+```
+Name: rebase_onto
+Level: 41
+Difficulty: **
+
+You have created your branch from `wrong_branch` and already made some commits,
+and you realise that you needed to create your branch from `master`.
+Rebase your commits onto `master` branch
+so that you don't have `wrong_branch` commits.
+```
+
+Analyse:
+
+```git
+# lgg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)'
+root@dust:~/myGit/githug/git_hug# git br
+  master
+* readme-update
+  wrong_branch
+root@dust:~/myGit/githug/git_hug# git lgg readme-update
+* d391c84 - (HEAD -> readme-update) Add `Install` header in readme (6 seconds ago)
+* 3de3b80 - Add `About` header in readme (6 seconds ago)
+* 636702f - Add app name in readme (6 seconds ago)
+* 8d1ddb0 - (wrong_branch) Wrong changes (6 seconds ago)
+* 67c1a71 - (master) Create authors file (6 seconds ago)
+
+root@dust:~/myGit/githug/git_hug# git lgg master
+* 67c1a71 - (HEAD -> master) Create authors file (60 seconds ago)
+
+root@dust:~/myGit/githug/git_hug# git lgg wrong_branch
+* 8d1ddb0 - (HEAD -> wrong_branch) Wrong changes (67 seconds ago)
+* 67c1a71 - (master) Create authors file (67 seconds ago)
+
+Originally:
+               o  master
+                \
+                  o  wrong_branch
+                    \
+                      o---o---o  readme-update
+
+We want:
+               o  master
+                \
+                  o'---o'---o'  readme-update
+
+with command:
+git rebase --onto=master wrong_branch readme-update
+```
 
 <a id=cherry-pick></a>
 #### cherry-pick
