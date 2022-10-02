@@ -382,7 +382,7 @@ let g:UltiSnipsEditSplit = "vertical"
 """"""""""""""""""""""""""""""
 " CONFIG COMPLETEPARAMETER.VIM
 """"""""""""""""""""""""""""""
-inoremap <silent><expr> ( complete_parameter#pre_complete("()")
+" inoremap <silent><expr> ( complete_parameter#pre_complete("()")
 nmap <C-J> <Plug>(complete_parameter#goto_next_parameter)
 imap <C-J> <Plug>(complete_parameter#goto_next_parameter)
 smap <C-J> <Plug>(complete_parameter#goto_next_parameter)
