@@ -4,6 +4,7 @@
     - [vim](#vim)
     - [Remote - SSH](#remotessh)
     - [GitLens - Git Supercharged](#gitlens)
+    - [Solve LeetCode problems in VS Code](#leetcode)
     - [C/C++ Compile Run](#ccompilerun)
 - [Useful Config and Command Tips](#configs)
     - [Get paste board when connect to remote tmux](#pastefromtmux)
@@ -73,6 +74,22 @@ ssh -p 22 Annoymous@192.168.1.10 -i ~/.ssh/id_rsa_MyPrivate
 GitLens - Git Supercharged | Highly recommended plugin
 
 On Windows, use `Ctrl + Click` to _Show Commits_
+
+<a id=leetcode></a>
+#### Leetcode
+[Solve LeetCode problems in VS Code](https://marketplace.visualstudio.com/items?itemName=LeetCode.vscode-leetcode&ssr=false)
+
+Due to the update of the login mechanism of leetcode, I recommend using Cookie to login leetcode via this vs plugin. Here is the steps to find the desired cookie.
+
+Install [Node.js v16.18.1 for your old version MacOS](https://nodejs.org/download/release/v16.18.1/) & [Previous Releases of Node.js](https://nodejs.org/en/download/releases/)
+
+1. Log in with the cookie
+2. Open the browser and navigate to leetcode.com.
+3. Right click on the page and select “Inspect”
+4. In the developer tools, go to the Network tab and then choose XHR.
+5. Click on any link on the leetcode.com page.
+6. Select any of the http calls in the Network tab.
+7. Find the Cookie attribute in the Request Headers.
 
 <a id=ccompilerun></a>
 #### C/C++ Compile Run
