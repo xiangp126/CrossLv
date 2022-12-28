@@ -86,7 +86,7 @@ Install [Node.js v16.18.1 for your old version MacOS](https://nodejs.org/downloa
 1. Log in with the cookie
 2. Open the browser and navigate to leetcode.com.
 3. Right click on the page and select “Inspect”
-4. In the developer tools, go to the Network tab and then choose XHR.
+4. In the developer tools, go to the Network tab and then choose XHR (**XMLHttpRequest**).
 5. Click on any link on the leetcode.com page.
 6. Select any of the http calls in the Network tab.
 7. Find the Cookie attribute in the Request Headers.
