@@ -7,7 +7,12 @@
 
 ```bash
 sftp root@ip
-# add a 'l' (means local) before the normal original command
+```
+
+- list resources
+
+```bash
+# add a 'l' (means local) before the originally standard command
 # ls -> lls, cd -> lcd
 lls -l
 lcd
