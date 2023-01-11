@@ -1,6 +1,6 @@
 ## Bash Scripting
 
-### For Loop
+### `for` Loop
 #### Syntax 1
 ```bash
 #!/usr/bin/bash
@@ -13,7 +13,7 @@ done
 # before execution of sh testsh
 ```
 
-#### Syntax 2 - Using `seq` command
+#### Syntax 2 - use `seq`
 
 ```bash
 # seq -- print sequences of numbers
@@ -23,7 +23,7 @@ $ seq 1 3
 3
 ```
 
-- Formatted seq
+- formatted seq
 
 ```bash
 # printf syntax
@@ -33,7 +33,7 @@ $ seq -f "%02g" 1 3
 03
 ```
 
-using seq command
+using `seq`
 
 ```bash
 for i in $(seq -f "%02g" 1 3)
@@ -42,7 +42,7 @@ do
 done
 ```
 
-### IF Clause
+### `if` Clause
 
 [What is the difference between the Bash operators \[\[ vs \[ vs \( vs \(\(](https://unix.stackexchange.com/questions/306111/what-is-the-difference-between-the-bash-operators-vs-vs-vs)
 
