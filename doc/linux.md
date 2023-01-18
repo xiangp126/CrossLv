@@ -89,7 +89,7 @@ This effectively writes the contents of the buffer out to the file.
        sysklogd's syslog.conf file. So if you migrate from sysklogd you
        can rename it and it should work.
 
-#### Get route info
+#### Commands to get the route info
 - netstat
 
 ```bash
