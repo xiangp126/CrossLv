@@ -11,7 +11,7 @@ corsair  24702  0.0  0.1 119500  1408 pts/17   S+   08:10   0:00 tmux -u attach 
 corsair  24704  0.0  0.0 112716  1008 pts/13   R+   08:10   0:00 grep -i --color=auto -i tmux
 ```
 
-### get time according to pid
+### get the time according to pid
 take PID `1885` for example
 
 ```bash
@@ -22,7 +22,7 @@ ps -A -opid,stime,etime,args | grep -i 1885
 ```
 
 ### read the output of `ps` command
-ps -- process status
+ps -> process status
 
 ```bash
 man ps
