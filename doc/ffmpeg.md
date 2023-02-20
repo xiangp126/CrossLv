@@ -1,7 +1,6 @@
 ## ffmpeg
 <https://www.ffmpeg.org/about.html>
 
-### Install for Mac is easy
 ```bash
 brew install ffmpeg
 ```
@@ -256,13 +255,13 @@ ffmpeg -i Inside.Man.2006.mp4 -vf subtitles=Inside.Man.2006.bd.chs.srt out.mp4
 
 <a id=extractsub></a>
 #### extract subtitle from video
-This would download the first subtitle track. If there are several, use 0:s:1 to download the second one, 0:s:2 to download the third one, and so on.
+This would extract the first subtitle track. If there are several, use 0:s:1 to extract the second one, 0:s:2 to download the third one, and so on.
 
 ```
 ffmpeg -i Movie.mkv -map 0:s:0 subs.srt
 ```
 
-- -i: Input file URL/path.
+- -i: Input file Path/URL.
 - -map: Designate one or more input streams as a source for the output file.
 - s:0: Select the subtitle stream.
 
