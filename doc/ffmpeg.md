@@ -1,7 +1,8 @@
 ## ffmpeg
-<https://www.ffmpeg.org/about.html>
+[FFmpeg](https://www.ffmpeg.org/about.html) is a free and open-source software project consisting of a suite of libraries and programs for handling video, audio, and other multimedia files and streams.
 
 ```bash
+# for Mac user
 brew install ffmpeg
 ```
 
