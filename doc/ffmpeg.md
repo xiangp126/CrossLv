@@ -268,7 +268,7 @@ ffmpeg -i Movie.mkv -map 0:s:0 subs.srt
 
 <a id=downloadm3u8></a>
 #### download M3U8 and combine all slices to whole video
-for more detailed info, please refer [Teach You to Find M3U8 Manually
+for more details, please refer to [Teach You to Find M3U8 Manually
 ](https://github.com/xiangp126/XGot/blob/master/Teach%20You%20to%20Find%20M3U8%20Manually.md)
 
 ```bash
