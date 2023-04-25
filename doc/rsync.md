@@ -13,7 +13,7 @@ rsync - faster, flexible replacement for rcp
        -v, --verbose               increase verbosity
        -r, --recursive             recurse into directories
 
-### Run with Dry Mode **!! Must do this before actually syncing !!**
+### **!! Must run Dry Mode before actually syncing !!**
 
 With the **-n** flag enabled, it did not actually copy the files.
 
@@ -50,7 +50,12 @@ rsync -azP /var/www/example.com root@108.175.12.239:/var/www/
 ```
 
 ### Exclude hidden files
-**--exclude=".*"**
+```bash
+# exclude syntax
+--exclude="PATTERN"       exclude files matching PATTERN
+```
+
+Here, the pattern for hidden files is **--exclude=".*"**
 
 ```
 $ rsync -arzP -nv --exclude=".*" /Volumes/misc/RAWVV-NoDel/ /Volumes/Dust/RAWVV-DustNoDel
