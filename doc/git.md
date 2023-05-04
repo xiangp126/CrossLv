@@ -473,7 +473,15 @@ SYNOPSIS
        git rebase [-i | --interactive] [<options>] [--exec <cmd>] [--onto <newbase>]
                --root [<branch>]
        git rebase (--continue | --skip | --abort | --quit | --edit-todo | --show-current-patch)
+
 ```
+
+#### Detailed
+    git rebase [<upstream> [<branch>]]
+
+1. `Upstream` is the branch where new commits are to be based on.
+1. However, the branch that was last modified is still `branch`.
+
 
 ```
 DESCRIPTION
@@ -515,10 +523,10 @@ pick XXXX A
 pick XXXX B
 pick XXXX C
 
-... some words to guide you
+...
 ```
 
-change `pick` at the left of each commit to `s` which represents `squash`
+Change `pick` at the left of each commit to `s`, which represents `squash.`
 
 ```bash
 pick XXXX A
