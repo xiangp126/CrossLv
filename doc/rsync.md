@@ -1,6 +1,24 @@
 ## rsync
 rsync - faster, flexible replacement for rcp
 
+By default, rsync operates in a **unidirectional** manner, synchronizing files from a source location to a destination location. However, rsync can also be used to achieve a bidirectional synchronization by running two separate rsync commands—one to synchronize files from the source to the destination, and another to synchronize files from the destination back to the source.
+
+For example, to perform a bidirectional synchronization between a local directory and a remote directory, you would need to run two rsync commands:
+
+1. To sync from local to remote:
+```
+rsync -avz /path/to/local/directory username@remote_host:/path/to/remote/directory
+```
+
+2. To sync from remote to local:
+```
+rsync -avz username@remote_host:/path/to/remote/directory /path/to/local/directory
+```
+
+By running these two commands, you can keep the files in both the local and remote directories synchronized with each other. However, it's worth noting that bidirectional synchronization can be complex and potentially lead to conflicts if the same files are modified on both ends simultaneously. It's essential to carefully manage and plan the synchronization process to avoid data loss or unintended changes.
+
+If bidirectional synchronization is a critical requirement for your use case, you might consider using specialized tools or version control systems that are designed for handling bidirectional syncing or collaboration scenarios, such as Git or Syncthing.
+
 ### Use Scenario of DRDU
 ```bash
 cd Document
