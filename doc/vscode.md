@@ -69,6 +69,8 @@ ssh remotedev
 ssh -p 22 Annoymous@192.168.1.10 -i ~/.ssh/id_rsa_MyPrivate
 ```
 
+[How Using VSCode SSH Key to connect to remote Linux host from a Windows Host?](https://www.linkedin.com/pulse/how-using-vscode-ssh-key-connect-remote-linux-host-soheil-amiri/) **Verified!!**
+
 <a id=gitlens></a>
 #### GitLens
 GitLens - Git Supercharged | Highly recommended plugin
