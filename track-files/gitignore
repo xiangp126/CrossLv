@@ -9,3 +9,4 @@ __pycache__/
 core
 .nfs*
 !lib.o
+.vscode
