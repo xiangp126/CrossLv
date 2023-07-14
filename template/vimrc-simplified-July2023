@@ -73,26 +73,14 @@ set pastetoggle=<F12>
 nmap <F10> :set invnumber<CR>
 nmap <leader>k :mark<Space>
 " Inverse Highlight searched word
-nnoremap <C-H> :call InvHlSearch()<CR>
-function! InvHlSearch()
-    set invhlsearch
-endfunc
-" Jump to end of line in all Mode
-nmap <C-L>      A
-imap <C-L> <ESC>A
-vmap <C-L> <ESC>A
-imap <C-I> <ESC>I
+"
 " Removing trailing white spaces
 nmap <C-G> :%s/\s\+$//gc<CR>
 " Easy vim manipulator
 nmap <leader>R :source ~/.vimrc<CR>
 nmap <silent> <leader>q       :qall!<CR>
 nmap <silent> <leader>w       :wq!<CR>
-" may mishandle on VIM when Q near W
-" nnoremap <silent> <C-Q>       :qall!<CR>
-" inoremap <silent> <C-Q>  <ESC>:qall!<CR>
 imap <C-D> <ESC>dd
-vnoremap <silent> <C-Q>  <ESC>:qall!<CR>
 " Set stty -ixon on ~/.bashrc
 nnoremap <leader>W       :write!<CR>
 nnoremap <C-S>            :write<CR>
@@ -115,18 +103,4 @@ nmap <leader>d :bdelete
 " Jump to previous/next buffer
 nmap <leader>- <C-O><CR>
 nmap <leader>+ <C-I><CR>
-" Jump to end of current func block
-nmap } :/^}<CR>
-" Jump to begin, need better solution
-nmap { }%
-" nmap { ?^[^ ].*\s\+{<CR>
-" Copy current visual-selection/line to buffer file
-vnoremap <leader>y :w!   /tmp/pvim.txt<CR>
-nnoremap <leader>y :.w!  /tmp/pvim.txt<CR>
-nnoremap <leader>p :read /tmp/pvim.txt<CR>
-" unnamed for '* register', unnamedplus for '+ register'
 set clipboard=unnamedplus,unnamed
-" noremap <silent> <leader>y "*y <CR>
-" noremap <silent> <leader>Y "+y <CR>
-" noremap <silent> <leader>p "*p <CR>
-" noremap <silent> <leader>P "+p <CR>
