@@ -27,6 +27,9 @@ set incsearch       " Incremental search
 set hidden          " Hide buffers when they are abandoned
 set mouse=a         " Enable mouse usage (all modes), or 'ni' for normal & insert
 set noautochdir     " No need change dir with help of fuzzy finder tools
+let g:solarized_termcolors=256
+set background=dark
+colorscheme solarized
 " set showcmd       " Show (partial) command in status line.
 " set autowrite     " Automatically save before commands like :next and :make
 filetype plugin indent on
@@ -47,7 +50,7 @@ set t_Co=256          " number of colors
 " match OverLength /\%81v.\+/
 set background=dark
 "------ private under ~/.vim/colors -----
-:colorscheme darkcoding
+" :colorscheme darkcoding
 
 """"""""""""""""""""""""""""""
 " BASIC KEYBIND
@@ -70,26 +73,14 @@ set pastetoggle=<F12>
 nmap <F10> :set invnumber<CR>
 nmap <leader>k :mark<Space>
 " Inverse Highlight searched word
-nnoremap <C-H> :call InvHlSearch()<CR>
-function! InvHlSearch()
-    set invhlsearch
-endfunc
-" Jump to end of line in all Mode
-nmap <C-L>      A
-imap <C-L> <ESC>A
-vmap <C-L> <ESC>A
-imap <C-I> <ESC>I
+"
 " Removing trailing white spaces
 nmap <C-G> :%s/\s\+$//gc<CR>
 " Easy vim manipulator
 nmap <leader>R :source ~/.vimrc<CR>
 nmap <silent> <leader>q       :qall!<CR>
 nmap <silent> <leader>w       :wq!<CR>
-" may mishandle on VIM when Q near W
-" nnoremap <silent> <C-Q>       :qall!<CR>
-" inoremap <silent> <C-Q>  <ESC>:qall!<CR>
 imap <C-D> <ESC>dd
-vnoremap <silent> <C-Q>  <ESC>:qall!<CR>
 " Set stty -ixon on ~/.bashrc
 nnoremap <leader>W       :write!<CR>
 nnoremap <C-S>            :write<CR>
@@ -112,332 +103,4 @@ nmap <leader>d :bdelete
 " Jump to previous/next buffer
 nmap <leader>- <C-O><CR>
 nmap <leader>+ <C-I><CR>
-" Jump to end of current func block
-nmap } :/^}<CR>
-" Jump to begin, need better solution
-nmap { }%
-" nmap { ?^[^ ].*\s\+{<CR>
-" Copy current visual-selection/line to buffer file
-vnoremap <leader>y :w!   /tmp/pvim.txt<CR>
-nnoremap <leader>y :.w!  /tmp/pvim.txt<CR>
-nnoremap <leader>p :read /tmp/pvim.txt<CR>
-" unnamed for '* register', unnamedplus for '+ register'
 set clipboard=unnamedplus,unnamed
-" noremap <silent> <leader>y "*y <CR>
-" noremap <silent> <leader>Y "+y <CR>
-" noremap <silent> <leader>p "*p <CR>
-" noremap <silent> <leader>P "+p <CR>
-
-""""""""""""""""""""""""""""""
-" SUMMARIZE PLUGIN MAPPING
-""""""""""""""""""""""""""""""
-" nnoremap <silent> <F2> :IndentLinesToggle <CR>
-" nnoremap <silent> <F3> :NERDTreeToggle<CR>
-" map <F4> <leader>ci <CR>
-" nnoremap <silent> <F5> :call TagbarMyOpen() <CR>
-" nnoremap <silent> <F6> :AirlineToggle <CR>
-
-""""""""""""""""""""""""""""""
-" VIM-PLUG CONFIG
-""""""""""""""""""""""""""""""
-call plug#begin('~/.vim/bundle')
-
-"------ OPTIONAL PLUGINS -----
-" Plug 'davidhalter/jedi'
-" Plug 'tell-k/vim-autopep8'
-" Plug 'Chiel92/vim-autoformat'
-" Plug 'majutsushi/tagbar', { 'on': 'TagbarToggle' }
-"------ NEW PLUGINS -----
-Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
-Plug 'scrooloose/nerdcommenter'
-Plug 'jiangmiao/auto-pairs'
-Plug 'majutsushi/tagbar'
-Plug 'Yggdroot/indentLine'
-"------ FUZZY FINDER -----
-Plug 'junegunn/fzf'
-Plug 'junegunn/fzf.vim'
-"------ BEAUTIFY LINE -----
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
-"------ CODE EXPAND -----
-Plug 'ervandew/supertab'
-Plug 'SirVer/ultisnips'
-Plug 'honza/vim-snippets'
-"------ CODE COMPLETION -----
-" Plug 'Valloric/YouCompleteMe'
-" Plug 'tenfyzhong/CompleteParameter.vim'
-
-" Initialize plugin system
-call plug#end()
-
-""""""""""""""""""""""""""""""
-" CONFIG VIM-AIRLINE
-""""""""""""""""""""""""""""""
-nnoremap <silent> <F6> :AirlineToggle<CR>
-let g:airline_powerline_fonts = 1
-if !exists('g:airline_symbols')
-    let g:airline_symbols = {}
-endif
-let g:airline_theme = 'base16_grayscale'
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#buffer_nr_show = 1
-let g:airline#extensions#tabline#show_tab_type = 0
-let airline#extensions#tabline#disable_refresh = 0
-let g:airline#extensions#tabline#buffer_min_count = 2
-let g:airline#extensions#tabline#show_buffers = 1
-let g:airline#parts#ffenc#skip_expected_string='utf-8[unix]'
-" let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
-let g:airline#extensions#tabline#formatter = 'unique_tail'
-let g:tmuxline_powerline_separators = 0
-let g:airline#extensions#tmuxline#enabled = 0
-
-""""""""""""""""""""""""""""""
-" CONFIG FZF.VIM
-""""""""""""""""""""""""""""""
-" -----------------+-----------------------------------------------------------------------
-" Command          | List                                                                  ~
-" -----------------+-----------------------------------------------------------------------
-"  `Files [PATH]`    | Files (similar to  `:FZF` )
-"  `GFiles [OPTS]`   | Git files ( `git ls-files` )
-"  `GFiles?`         | Git files ( `git status` )
-"  `Buffers`         | Open buffers
-"  `Colors`          | Color schemes
-"  `Ag [PATTERN]`    | {ag}{6} search result ( `ALT-A`  to select all,  `ALT-D`  to deselect all)
-"  `Lines [QUERY]`   | Lines in loaded buffers
-"  `BLines [QUERY]`  | Lines in the current buffer
-"  `Tags [QUERY]`    | Tags in the project ( `ctags -R` )
-"  `BTags [QUERY]`   | Tags in the current buffer
-"  `Marks`           | Marks
-"  `Windows`         | Windows
-"  `Locate PATTERN`  |  `locate`  command output
-"  `History`         |  `v:oldfiles`  and open buffers
-"  `History:`        | Command history
-"  `History/`        | Search history
-"  `Snippets`        | Snippets ({UltiSnips}{7})
-"  `Commits`         | Git commits (requires {fugitive.vim}{8})
-"  `BCommits`        | Git commits for the current buffer
-"  `Commands`        | Commands
-"  `Maps`            | Normal mode mappings
-"  `Helptags`        | Help tags [1]
-"  `Filetypes`       | File types
-" -----------------+-----------------------------------------------------------------------
-let g:fzf_action = {
-  \ 'ctrl-t': 'tab split',
-  \ 'ctrl-x': 'split',
-  \ 'ctrl-v': 'vsplit' }
-let g:fzf_layout = { 'down': '~50%'  }
-" [Buffers] Jump to the existing window if possible
-let g:fzf_buffers_jump = 1
-" [[B]Commits] Customize the options used by 'git log':
-let g:fzf_commits_log_options = '--graph --color=always
-   \ --format="%C(auto)%h%d %s %C(black)%C(bold)%cr"'
-" [Tags] Command to generate tags file
-let g:fzf_tags_command = 'ctags -R −−fields=S'
-" [Commands] --expect expression for directly executing the command
-let g:fzf_commands_expect = 'alt-enter,ctrl-x'
-" Customize fzf colors to match your color scheme
-let g:fzf_colors =
-\ { 'fg':      ['fg', 'Normal'],
-  \ 'bg':      ['bg', 'Normal'],
-  \ 'hl':      ['fg', 'Comment'],
-  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
-  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
-  \ 'hl+':     ['fg', 'Statement'],
-  \ 'info':    ['fg', 'PreProc'],
-  \ 'border':  ['fg', 'Ignore'],
-  \ 'prompt':  ['fg', 'Conditional'],
-  \ 'pointer': ['fg', 'Exception'],
-  \ 'marker':  ['fg', 'Keyword'],
-  \ 'spinner': ['fg', 'Label'],
-  \ 'header':  ['fg', 'Comment'] }
-let g:fzf_history_dir = '~/.local/share/fzf-history'
-" Reset FZF_DEFAULT_OPTS from bash, for Lines/Tags not support cat/head
-let $FZF_DEFAULT_OPTS = '--inline-info --color=fg+:247'
-" files
-nnoremap <leader>f   :Files<CR>
-" Likewise, Files command with preview window
-command! -bang -nargs=? -complete=dir Files
-  \ call fzf#vim#files(<q-args>,
-  \ fzf#vim#with_preview('right:50%:hidden', '?'), <bang>0)
-
-" git-files
-nnoremap <leader>F   :GFiles<CR>
-command! -bang -nargs=? -complete=dir GFiles
-  \ call fzf#vim#gitfiles(<q-args>,
-  \ fzf#vim#with_preview('right:50%:hidden', '?'), <bang>0)
-
-" git-grep
-nnoremap <leader>g  :GGrep<CR>
-" - fzf#vim#grep(command, with_column, [options], [fullscreen])
-command! -bang -nargs=* GGrep
-  \ call fzf#vim#grep(
-  \   'git grep --line-number '.shellescape(<q-args>), 0,
-  \   <bang>0 ? fzf#vim#with_preview('up:60%')
-  \           : fzf#vim#with_preview('right:50%:hidden', '?'),
-  \   <bang>0)
-
-" commits
-nnoremap <silent> <leader>c   :BCommits<CR>
-
-" lines
-" nnoremap <leader>l   :BLines<CR> " nnoremap <leader>la  :Lines<CR>
-nnoremap <leader>l   :call fzf#vim#buffer_lines({'options': '--no-reverse'})<CR>
-" <leader>lw will slow down heavily for <leader>l
-nnoremap <leader>L   :call fzf#vim#buffer_lines(expand('<cword>'),
-  \ {'options': '--no-reverse'})<CR>
-" nnoremap <leader>la  :call fzf#vim#lines({'options': '--no-reverse'})<CR>
-
-" tags
-" nnoremap <leader>t   :BTags<CR> " nnoremap <leader>ta  :Tags<CR>
-nnoremap <leader>t   :call fzf#vim#buffer_tags('', {'options': '--no-reverse'})<CR>
-nnoremap <leader>T   :call fzf#vim#buffer_tags(expand('<cword>'),
-  \ {'options': '--no-reverse'})<CR>
-" nnoremap <leader>ta  :call fzf#vim#tags('', {'options': '--no-reverse'})<CR>
-
-" buffers
-nnoremap <leader>b   :Buffers<CR>
-
-" marks
-nnoremap <leader>m   : Marks<CR>
-
-" rg => ripgrep
-nnoremap <Leader>r   :Rg<CR>
-" Similarly, we can apply it to fzf#vim#grep. To use ripgrep instead of ag:
-command! -bang -nargs=* Rg
-  \ call fzf#vim#grep(
-  \   'rg --column --line-number --no-heading --color=never '.shellescape(<q-args>), 1,
-  \   <bang>0 ? fzf#vim#with_preview('up:60%')
-  \           : fzf#vim#with_preview('right:50%:hidden', '?'),
-  \   <bang>0)
-
-" colors
-" Override Colors command. You can safely do this in your .vimrc as fzf.vim
-" will not override existing commands.
-command! -bang Colors
-  \ call fzf#vim#colors({'left': '15%', 'options': '--reverse --margin 30%,0'}, <bang>0)
-
-""""""""""""""""""""""""""""""
-" CONFIG TAGBAR
-""""""""""""""""""""""""""""""
-" let g:tagbar_ctags_bin = "/usr/bin/ctags"
-nmap <silent> <F5> :TagbarToggle<CR>
-let g:Tagbar_title = "[Tagbar]"
-let g:tagbar_left = 0
-let g:tagbar_width = 25
-let g:tagbar_indent = 1
-" originally Yellow value 11
-" highlight Search ctermbg=88
-highlight TagbarSignature ctermfg=68
-
-""""""""""""""""""""""""""""""
-" CONFIG INDENTLINE
-""""""""""""""""""""""""""""""
-let g:indentLine_char = '¦'
-let g:indentLine_color_term = 245
-let g:indentLine_enabled = 0
-nnoremap <silent> <F2> :IndentLinesToggle<CR>
-
-""""""""""""""""""""""""""""""
-" CONFIG NERDTREE
-""""""""""""""""""""""""""""""
-" When pressed F3, toggle nerd tree
-nnoremap <silent> <F3> :NERDTreeToggle<CR>
-let g:NERDTree_title = "[NERDTree]"
-let g:NERDTreeShowBookmarks = 0
-let g:NERDTreeWinSize = 20 " default 30
-let g:NERDTreeWinPos = 'left' " only left or right
-" all dirs ending in ".d" and all files ending in ".o" to be ignored
-let NERDTreeIgnore=['\.d$[[dir]]', '\.dSYM[[dir]]', '\.o$[[file]]']
-
-""""""""""""""""""""""""""""""
-" CONFIG NERDCOMMENTER
-""""""""""""""""""""""""""""""
-"quick comment/uncomment
-map <F4> <leader>ci<CR>
-"add a space after comment flag
-let g:NERDSpaceDelims = 1
-
-""""""""""""""""""""""""""""""
-" CONFIG SUPERTAB
-""""""""""""""""""""""""""""""
-let g:SuperTabDefaultCompletionType = '<C-N>'
-
-""""""""""""""""""""""""""""""
-" CONFIG AUTO-PAIRS
-""""""""""""""""""""""""""""""
-let g:AutoPairs = {'[':']', '{':'}',"'":"'",'"':'"', '`':'`'}
-inoremap <buffer><silent> ) <C-R>=AutoPairsInsert(')')<CR>
-
-""""""""""""""""""""""""""""""
-" CONFIG ULTISNIPS
-""""""""""""""""""""""""""""""
-"Trigger configuration. Do not use <tab>
-"if you use https://github.com/Valloric/YouCompleteMe.
-let g:UltiSnipsExpandTrigger = "<Tab>"
-let g:UltiSnipsJumpForwardTrigger = "<Tab>"
-let g:UltiSnipsJumpBackwardTrigger = "<C-B>"
-" If you want :UltiSnipsEdit to split your window.
-let g:UltiSnipsEditSplit = "vertical"
-
-""""""""""""""""""""""""""""""
-" CONFIG COMPLETEPARAMETER.VIM
-""""""""""""""""""""""""""""""
-" inoremap <silent><expr> ( complete_parameter#pre_complete("()")
-nmap <C-J> <Plug>(complete_parameter#goto_next_parameter)
-imap <C-J> <Plug>(complete_parameter#goto_next_parameter)
-smap <C-J> <Plug>(complete_parameter#goto_next_parameter)
-nmap <C-K> <Plug>(complete_parameter#goto_previous_parameter)
-imap <C-K> <Plug>(complete_parameter#goto_previous_parameter)
-smap <C-K> <Plug>(complete_parameter#goto_previous_parameter)
-nmap <M-D> <Plug>(complete_parameter#overload_down)
-imap <M-D> <Plug>(complete_parameter#overload_down)
-smap <M-D> <Plug>(complete_parameter#overload_down)
-nmap <M-U> <Plug>(complete_parameter#overload_up)
-imap <M-U> <Plug>(complete_parameter#overload_up)
-smap <M-U> <Plug>(complete_parameter#overload_up)
-" use ultisnips mapping to goto next or previous parameter if set
-let g:complete_parameter_use_ultisnips_mapping = 0
-
-""""""""""""""""""""""""""""""
-" CONFIG YOUCOMPLETEME
-""""""""""""""""""""""""""""""
-let g:ycm_semantic_triggers =  {
-  \   'c' : ['->', '.', 're![_a-zA-z0-9]'],
-  \   'objc' : ['->', '.', 're!\[[_a-zA-Z]+\w*\s', 're!^\s*[^\W\d]\w*\s',
-  \             're!\[.*\]\s'],
-  \   'ocaml' : ['.', '#'],
-  \   'cpp,objcpp' : ['->', '.', '::', 're![_a-zA-z0-9]'],
-  \   'perl' : ['->'],
-  \   'php' : ['->', '::'],
-  \   'cs,java,javascript,typescript,d,python,perl6,scala,vb,elixir,go' : ['.'],
-  \   'ruby' : ['.', '::'],
-  \   'lua' : ['.', ':'],
-  \   'erlang' : [':'],
-  \ }
-" let g:ycm_keep_logfiles = 1
-" let g:ycm_log_level = 'debug'
-set completeopt=longest,menu
-let g:ycm_global_ycm_extra_conf = '~/.ycm_extra_conf.py'
-let g:ycm_confirm_extra_conf = 0
-let g:ycm_enable_diagnostic_signs = 0
-let g:ycm_enable_diagnostic_highlighting = 0
-let g:ycm_error_symbol = '>>'
-let g:ycm_warning_symbol = '>*'
-"let g:ycm_key_invoke_completion = '<F9>'
-let g:ycm_collect_identifiers_from_tags_files = 1
-let g:ycm_min_num_of_chars_for_completion = 2
-let g:ycm_complete_in_comments = 1
-let g:ycm_complete_in_strings = 1
-let g:ycm_collect_identifiers_from_comments_and_strings = 0
-let g:ycm_cache_omnifunc = 0
-" make YCM compatible with UltiSnips (using supertab)
-let g:ycm_key_list_select_completion = ['<C-N>', '<Down>']
-let g:ycm_key_list_previous_completion = ['<C-P>', '<Up>']
-" Do not delete next line | specify python3 interpreter
-let g:ycm_server_python_interpreter = '/usr/local/bin/python3'
-let g:ycm_add_preview_to_completeopt = 0
-let g:ycm_autoclose_preview_window_after_insertion = 0
-let g:ycm_autoclose_preview_window_after_completion = 0
-nnoremap <leader>j :YcmCompleter GoToDefinitionElseDeclaration<CR>
-nnoremap <leader>D :YcmDiags<CR>
-nnoremap <leader>I :YcmCompleter FixIt<CR>
