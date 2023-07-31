@@ -9,8 +9,20 @@ preInstallForUbuntu () {
 }
 
 handleTrackedFiles () {
-    cp $trackedFileDir/vimrc $HOME/.vimrc -y
-    cp $trackedFileDir/bashrc $HOME/.bashrc -y
+    # Deploy solarized
+    git clone https://github.com/altercation/vim-colors-solarized
+    cd vim-colors-solarized/colors
+    mkdir -p ~/.vim/colors
+    mv solarized.vim ~/.vim/colors/
+
+    trackedVimrc=$trackedFileDir/vimrc
+    trackedBashrc=$trackedFileDir/bashrc
+    trackedGitconfig=$trackedFileDir/gitconfig
+    trackedGitignore=$trackedFileDir/gitignore
+    cp $trackedVimrc $HOME/.vimrc
+    cp $trackedBashrc $HOME/.bashrc
+    cp $trackedGitconfig $HOME/.gitconfig
+    cp $trackedGitignore $HOME/.gitignore
 }
 
 install () {
