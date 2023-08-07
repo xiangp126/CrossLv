@@ -56,6 +56,17 @@ _EOF
     sudo ln -sf /bin/bash /bin/sh
 }
 
+restoreTrackedFiles() {
+    cat << _EOF
+------------------------------------------------------
+Copy tracked files to home dir, including:
+    ${trackedFiles[@]}
+_EOF
+    for file in ${trackedFiles[@]}; do
+        cp $trackedFileDir/$file ~/.$file
+    done
+}
+
 installSolarizedColorScheme() {
     cat << _EOF
 ------------------------------------------------------
@@ -74,35 +85,23 @@ _EOF
     cp  $solarizedSrc $HOME/.vim/colors/
 }
 
-handleTrackedFiles() {
-    cat << _EOF
-------------------------------------------------------
-Copy tracked files to home dir, including:
-    ${trackedFiles[@]}
-_EOF
-    for file in ${trackedFiles[@]}; do
-        cp $trackedFileDir/$file ~/.$file
-    done
-}
-
 installVimPlug (){
     if [ -d ~/.vim/autoload ]; then
         vim +PlugUpdate +qall
+        installSolarizedColorScheme
         return
     fi
 
     curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
-    # install vim plugins
     vim +PlugInstall +qall
-
     installSolarizedColorScheme
 }
 
 install () {
     installForUbuntu
-    handleTrackedFiles
+    restoreTrackedFiles
 }
 
 install
