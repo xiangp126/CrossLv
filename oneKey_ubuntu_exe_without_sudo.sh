@@ -19,6 +19,7 @@ prerequesitesForUbuntu=(
     fd-find
     ripgrep
     universal-ctags
+    libvirt-clients
     tmux
     net-tools
     bash-completion
@@ -29,7 +30,8 @@ prerequesitesForUbuntu=(
 
 installForUbuntu() {
     sudo apt-get update
-    echo "sudo apt-get install -y ${prerequesitesForUbuntu[@]}"
+    # install prerequesites
+    sudo apt-get install -y ${prerequesitesForUbuntu[@]}
 
     installVimPlug
     createFdLinkToFdfind
@@ -89,7 +91,8 @@ installVimPlug (){
         return
     fi
 
-    curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+    # use the `--insecure`` option to avoid certificate check
+    curl --insecure -fLo ~/.vim/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
     vim +PlugInstall +qall
