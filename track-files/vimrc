@@ -1,3 +1,20 @@
+""""""""""""""""""""""""""""""
+" VIM-PLUG CONFIG
+""""""""""""""""""""""""""""""
+call plug#begin('~/.vim/bundle')
+
+"------ OPTIONAL PLUGINS -----
+Plug 'jiangmiao/auto-pairs'
+Plug 'Yggdroot/indentLine'
+"------ FUZZY FINDER -----
+Plug 'junegunn/fzf'
+Plug 'junegunn/fzf.vim'
+"------ CODE EXPAND -----
+Plug 'ervandew/supertab'
+
+" Initialize plugin system
+call plug#end()
+
 """"""""""""""""""""""""""""
 " BASIC CONFIG
 """"""""""""""""""""""""""""""
@@ -102,3 +119,169 @@ nmap <leader>d :bdelete
 nmap <leader>- <C-O><CR>
 nmap <leader>+ <C-I><CR>
 set clipboard=unnamedplus,unnamed
+
+""""""""""""""""""""""""""""""
+" CONFIG VIM-AIRLINE
+""""""""""""""""""""""""""""""
+nnoremap <silent> <F6> :AirlineToggle<CR>
+let g:airline_powerline_fonts = 1
+if !exists('g:airline_symbols')
+    let g:airline_symbols = {}
+endif
+let g:airline_theme = 'base16_grayscale'
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#buffer_nr_show = 1
+let g:airline#extensions#tabline#show_tab_type = 0
+let airline#extensions#tabline#disable_refresh = 0
+let g:airline#extensions#tabline#buffer_min_count = 2
+let g:airline#extensions#tabline#show_buffers = 1
+let g:airline#parts#ffenc#skip_expected_string='utf-8[unix]'
+" let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
+let g:airline#extensions#tabline#formatter = 'unique_tail'
+let g:tmuxline_powerline_separators = 0
+let g:airline#extensions#tmuxline#enabled = 0
+
+""""""""""""""""""""""""""""""
+" CONFIG FZF.VIM
+""""""""""""""""""""""""""""""
+" -----------------+-----------------------------------------------------------------------
+" Command          | List                                                                  ~
+" -----------------+-----------------------------------------------------------------------
+"  `Files [PATH]`    | Files (similar to  `:FZF` )
+"  `GFiles [OPTS]`   | Git files ( `git ls-files` )
+"  `GFiles?`         | Git files ( `git status` )
+"  `Buffers`         | Open buffers
+"  `Colors`          | Color schemes
+"  `Ag [PATTERN]`    | {ag}{6} search result ( `ALT-A`  to select all,  `ALT-D`  to deselect all)
+"  `Lines [QUERY]`   | Lines in loaded buffers
+"  `BLines [QUERY]`  | Lines in the current buffer
+"  `Tags [QUERY]`    | Tags in the project ( `ctags -R` )
+"  `BTags [QUERY]`   | Tags in the current buffer
+"  `Marks`           | Marks
+"  `Windows`         | Windows
+"  `Locate PATTERN`  |  `locate`  command output
+"  `History`         |  `v:oldfiles`  and open buffers
+"  `History:`        | Command history
+"  `History/`        | Search history
+"  `Snippets`        | Snippets ({UltiSnips}{7})
+"  `Commits`         | Git commits (requires {fugitive.vim}{8})
+"  `BCommits`        | Git commits for the current buffer
+"  `Commands`        | Commands
+"  `Maps`            | Normal mode mappings
+"  `Helptags`        | Help tags [1]
+"  `Filetypes`       | File types
+" -----------------+-----------------------------------------------------------------------
+let g:fzf_action = {
+  \ 'ctrl-t': 'tab split',
+  \ 'ctrl-x': 'split',
+  \ 'ctrl-v': 'vsplit' }
+let g:fzf_layout = { 'down': '~50%'  }
+" [Buffers] Jump to the existing window if possible
+let g:fzf_buffers_jump = 1
+" [[B]Commits] Customize the options used by 'git log':
+let g:fzf_commits_log_options = '--graph --color=always
+   \ --format="%C(auto)%h%d %s %C(black)%C(bold)%cr"'
+" [Tags] Command to generate tags file
+let g:fzf_tags_command = 'ctags -R −−fields=S'
+" [Commands] --expect expression for directly executing the command
+let g:fzf_commands_expect = 'alt-enter,ctrl-x'
+" Customize fzf colors to match your color scheme
+let g:fzf_colors =
+\ { 'fg':      ['fg', 'Normal'],
+  \ 'bg':      ['bg', 'Normal'],
+  \ 'hl':      ['fg', 'Comment'],
+  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+  \ 'hl+':     ['fg', 'Statement'],
+  \ 'info':    ['fg', 'PreProc'],
+  \ 'border':  ['fg', 'Ignore'],
+  \ 'prompt':  ['fg', 'Conditional'],
+  \ 'pointer': ['fg', 'Exception'],
+  \ 'marker':  ['fg', 'Keyword'],
+  \ 'spinner': ['fg', 'Label'],
+  \ 'header':  ['fg', 'Comment'] }
+let g:fzf_history_dir = '~/.local/share/fzf-history'
+" Reset FZF_DEFAULT_OPTS from bash, for Lines/Tags not support cat/head
+let $FZF_DEFAULT_OPTS = '--inline-info --color=fg+:247'
+" files
+nnoremap <leader>f   :Files<CR>
+" Likewise, Files command with preview window
+command! -bang -nargs=? -complete=dir Files
+  \ call fzf#vim#files(<q-args>,
+  \ fzf#vim#with_preview('right:50%:hidden', '?'), <bang>0)
+
+" git-files
+nnoremap <leader>F   :GFiles<CR>
+command! -bang -nargs=? -complete=dir GFiles
+  \ call fzf#vim#gitfiles(<q-args>,
+  \ fzf#vim#with_preview('right:50%:hidden', '?'), <bang>0)
+
+" git-grep
+nnoremap <leader>g  :GGrep<CR>
+" - fzf#vim#grep(command, with_column, [options], [fullscreen])
+command! -bang -nargs=* GGrep
+  \ call fzf#vim#grep(
+  \   'git grep --line-number '.shellescape(<q-args>), 0,
+  \   <bang>0 ? fzf#vim#with_preview('up:60%')
+  \           : fzf#vim#with_preview('right:50%:hidden', '?'),
+  \   <bang>0)
+
+" commits
+nnoremap <silent> <leader>c   :BCommits<CR>
+
+" lines
+" nnoremap <leader>l   :BLines<CR> " nnoremap <leader>la  :Lines<CR>
+nnoremap <leader>l   :call fzf#vim#buffer_lines({'options': '--no-reverse'})<CR>
+" <leader>lw will slow down heavily for <leader>l
+nnoremap <leader>L   :call fzf#vim#buffer_lines(expand('<cword>'),
+  \ {'options': '--no-reverse'})<CR>
+" nnoremap <leader>la  :call fzf#vim#lines({'options': '--no-reverse'})<CR>
+
+" tags
+" nnoremap <leader>t   :BTags<CR> " nnoremap <leader>ta  :Tags<CR>
+nnoremap <leader>t   :call fzf#vim#buffer_tags('', {'options': '--no-reverse'})<CR>
+nnoremap <leader>T   :call fzf#vim#buffer_tags(expand('<cword>'),
+  \ {'options': '--no-reverse'})<CR>
+" nnoremap <leader>ta  :call fzf#vim#tags('', {'options': '--no-reverse'})<CR>
+
+" buffers
+nnoremap <leader>b   :Buffers<CR>
+
+" marks
+nnoremap <leader>m   : Marks<CR>
+
+" rg => ripgrep
+nnoremap <Leader>r   :Rg<CR>
+" Similarly, we can apply it to fzf#vim#grep. To use ripgrep instead of ag:
+command! -bang -nargs=* Rg
+  \ call fzf#vim#grep(
+  \   'rg --column --line-number --no-heading --color=never '.shellescape(<q-args>), 1,
+  \   <bang>0 ? fzf#vim#with_preview('up:60%')
+  \           : fzf#vim#with_preview('right:50%:hidden', '?'),
+  \   <bang>0)
+
+" colors
+" Override Colors command. You can safely do this in your .vimrc as fzf.vim
+" will not override existing commands.
+command! -bang Colors
+  \ call fzf#vim#colors({'left': '15%', 'options': '--reverse --margin 30%,0'}, <bang>0)
+
+""""""""""""""""""""""""""""""
+" CONFIG INDENTLINE
+""""""""""""""""""""""""""""""
+let g:indentLine_char = '¦'
+let g:indentLine_color_term = 245
+let g:indentLine_enabled = 0
+nnoremap <silent> <F2> :IndentLinesToggle<CR>
+
+""""""""""""""""""""""""""""""
+" CONFIG SUPERTAB
+""""""""""""""""""""""""""""""
+let g:SuperTabDefaultCompletionType = '<C-N>'
+
+""""""""""""""""""""""""""""""
+" CONFIG AUTO-PAIRS
+""""""""""""""""""""""""""""""
+let g:AutoPairs = {'[':']', '{':'}',"'":"'",'"':'"', '`':'`'}
+inoremap <buffer><silent> ) <C-R>=AutoPairsInsert(')')<CR>
+
