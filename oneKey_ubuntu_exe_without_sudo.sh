@@ -2,7 +2,9 @@
 # Only for ubuntu with sudo privilege
 # Life is hard, let's make code easier
 mainWd=$(cd $(dirname $0); pwd)
-trackedFileDir=$mainWd/track-files
+trackedFilesDir=$mainWd/track-files
+completionDirSRC=$mainWd/completion-files
+completionDirDst=$HOME/.bash_completion.d
 downloadDir=$mainWd/Downloads
 trackedFiles=(
     vimrc
@@ -56,17 +58,6 @@ _EOF
     sudo ln -sf /bin/bash /bin/sh
 }
 
-restoreTrackedFiles() {
-    cat << _EOF
-------------------------------------------------------
-Copy tracked files to home dir, including:
-    ${trackedFiles[@]}
-_EOF
-    for file in ${trackedFiles[@]}; do
-        cp $trackedFileDir/$file ~/.$file
-    done
-}
-
 installSolarizedColorScheme() {
     cat << _EOF
 ------------------------------------------------------
@@ -99,9 +90,46 @@ installVimPlug (){
     installSolarizedColorScheme
 }
 
+installTrackedFiles() {
+    cat << _EOF
+------------------------------------------------------
+Copy tracked files to home dir, including:
+    ${trackedFiles[@]}
+_EOF
+    for file in ${trackedFiles[@]}; do
+        cp $trackedFilesDir/$file ~/.$file
+    done
+}
+
+installCompletionFiles() {
+    cat << _EOF
+------------------------------------------------------
+Install completion files
+_EOF
+    if [ ! -d $completionDirDst ]; then
+        mkdir -p $completionDirDst
+    fi
+
+    for file in $(ls $completionDirSRC); do
+        cp $completionDirSRC/$file $completionDirDst/
+    done
+}
+
+changeTMOUTToWritable() {
+    cat << _EOF
+------------------------------------------------------
+Change TMOUT to writable
+_EOF
+    # TMOUT is readonly in /etc/profile, change it to writable
+    # so that we can unset it in .bashrc
+    sudo sed -i 's/readonly TMOUT/ # readonly TMOUT/g' /etc/profile
+}
+
 install () {
     installForUbuntu
-    restoreTrackedFiles
+    installTrackedFiles
+    installCompletionFiles
+    changeTMOUTToWritable
 }
 
 install
