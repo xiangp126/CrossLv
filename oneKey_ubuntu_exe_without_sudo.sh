@@ -16,16 +16,19 @@ trackedFiles=(
 
 # prerequesites for ubuntu
 prerequesitesForUbuntu=(
+    # Level 1
+    fzf
     fd-find
     ripgrep
     universal-ctags
-    libvirt-clients
     tmux
+    sshfs
+    # Level 2
     net-tools
+    libvirt-clients
     bash-completion
     build-essential
     openssh-server
-    sshfs
 )
 
 installForUbuntu() {
