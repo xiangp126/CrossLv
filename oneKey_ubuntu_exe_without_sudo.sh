@@ -10,6 +10,7 @@ trackedFiles=(
     gitconfig
     gitignore
 )
+downloadDir=~/Downloads
 
 # prerequesites for ubuntu
 PrerequesForUbuntu=(
@@ -44,6 +45,23 @@ _EOF
     fi
     # link sh to bash
     sudo ln -sf /bin/bash /bin/sh
+    cat << _EOF
+------------------------------------------------------
+Manual install and deploy colorized color scheme for vim https://github.com/altercation/vim-colors-solarized
+------------------------------------------------------
+_EOF
+    git clone $downloadDir/https://github.com/altercation/vim-colors-solarized
+
+    if [ -f ~/.vim/colors/solarized.vim ]; then
+        echo "solarized.vim already exists, skip"
+        return
+    fi
+
+    if [ ! -d ~/.vim/colors ]; then
+        mkdir -p ~/.vim/colors
+    fi
+
+    cp vim-colors-solarized/colors/solarized.vim ~/.vim/colors/
 }
 
 handleTrackedFiles () {
@@ -80,7 +98,7 @@ _EOF
 }
 
 install () {
-    preInstallForUbuntu
+    installForUbuntu
     installVimPlug
     handleTrackedFiles
 }

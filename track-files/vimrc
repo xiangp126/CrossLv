@@ -1,20 +1,3 @@
-""""""""""""""""""""""""""""""
-" VIM-PLUG CONFIG
-""""""""""""""""""""""""""""""
-call plug#begin('~/.vim/bundle')
-
-"------ OPTIONAL PLUGINS -----
-Plug 'jiangmiao/auto-pairs'
-Plug 'Yggdroot/indentLine'
-"------ FUZZY FINDER -----
-Plug 'junegunn/fzf'
-Plug 'junegunn/fzf.vim'
-"------ CODE EXPAND -----
-Plug 'ervandew/supertab'
-
-" Initialize plugin system
-call plug#end()
-
 """"""""""""""""""""""""""""
 " BASIC CONFIG
 """"""""""""""""""""""""""""""
@@ -119,6 +102,26 @@ nmap <leader>d :bdelete
 nmap <leader>- <C-O><CR>
 nmap <leader>+ <C-I><CR>
 set clipboard=unnamedplus,unnamed
+
+""""""""""""""""""""""""""""""
+" VIM-PLUG CONFIG
+""""""""""""""""""""""""""""""
+call plug#begin('~/.vim/bundle')
+
+"------ OPTIONAL PLUGINS -----
+Plug 'jiangmiao/auto-pairs'
+Plug 'Yggdroot/indentLine'
+"------ FUZZY FINDER -----
+Plug 'junegunn/fzf'
+Plug 'junegunn/fzf.vim'
+"------ BEAUTIFY LINE -----
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+"------ CODE EXPAND -----
+Plug 'ervandew/supertab'
+
+" Initialize plugin system
+call plug#end()
 
 """"""""""""""""""""""""""""""
 " CONFIG VIM-AIRLINE
