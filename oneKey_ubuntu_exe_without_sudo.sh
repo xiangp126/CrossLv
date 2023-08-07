@@ -31,14 +31,46 @@ prerequesitesForUbuntu=(
     openssh-server
 )
 
-installForUbuntu() {
+installPrequesitesForUbuntu() {
+    cat << _EOF
+------------------------------------------------------
+Install prerequesites for ubuntu
+_EOF
     sudo apt-get update
-    # install prerequesites
     sudo apt-get install -y ${prerequesitesForUbuntu[@]}
 
+    installLatestFzf
+}
+
+installForUbuntu() {
+    installPrequesitesForUbuntu
     installVimPlug
     createFdLinkToFdfind
     relinkShToBash
+}
+
+installLatestFzf() {
+    cat << _EOF
+------------------------------------------------------
+Install latest fzf (>= 0.23.0)
+_EOF
+    if [ -f $(which fzf) ]; then
+        fzfVersion=$(fzf --version | awk '{print $1}')
+        version=${fzfVersion%.*}
+        if [ $(echo "$version >= 0.23" | bc) -eq 1 ]; then
+            echo "fzf version is greater than 0.23.0, skip"
+            return
+        fi
+    fi
+    # remove fzf installed by apt-get, which is too old
+    sudo apt-get remove -y fzf
+    if [ -f $HOME/.fzf/bin/fzf ]; then
+        echo "Manual installed fzf already exists, skip"
+        return
+    fi
+
+    git clone --depth 1 https://github.com/junegunn/fzf.git $HOME/.fzf
+    ~/.fzf/install
 }
 
 createFdLinkToFdfind() {
@@ -102,7 +134,8 @@ installVimPlug (){
     curl --insecure -fLo ~/.vim/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
-    vim +PlugInstall +qall
+    vim -c "PlugInstall | qall"
+    # vim +PlugInstall +qall
     installSolarizedColorScheme
 }
 
