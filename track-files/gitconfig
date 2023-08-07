@@ -1,6 +1,6 @@
 [user]
-	name = PENG
-	email = hi.pxiang@gmail.com
+	name = Peter X
+    email = hi.pxiang@gmail.com
 [core]
 	excludesfile = ~/.gitignore
 	editor = vim
@@ -32,7 +32,8 @@
 [push]
 	followTags = true
 	default = current
-[diff]
-	tool = meld
-[merge]
-	tool = meld
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true

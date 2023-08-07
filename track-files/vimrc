@@ -78,17 +78,15 @@ nmap <leader>k :mark<Space>
 nmap <C-G> :%s/\s\+$//gc<CR>
 " Easy vim manipulator
 nmap <leader>R :source ~/.vimrc<CR>
-nmap <silent> <leader>q       :qall!<CR>
-nmap <silent> <leader>w       :wq!<CR>
+" nmap <silent> <leader>q       :qall!<CR>
+nmap <silent> <leader>q       :q<CR>
+nmap <silent> <leader>w       :w<CR>
 imap <C-D> <ESC>dd
 " Set stty -ixon on ~/.bashrc
-nnoremap <leader>W       :write!<CR>
+" nnoremap <leader>W       :write!<CR>
 nnoremap <C-S>            :write<CR>
 inoremap <C-S>       <ESC>:write<CR>
 vnoremap <C-S>       <ESC>:write<CR>
-nmap <C-\>            <leader>ci<CR>
-imap <C-\>       <ESC><leader>ci<CR>
-vmap <C-\>            <leader>ci<CR>
 " Jump between buffers
 nmap <leader>1 :buffer1<CR>
 nmap <leader>2 :buffer2<CR>
