@@ -74,7 +74,11 @@ _EOF
 
     sed -i 's/^\([[:space:]]*curl\)/\1 -k/g' $HOME/.fzf/install
     sed -i 's/^\([[:space:]]*wget\)/\1 --no-check-certificate/g' $HOME/.fzf/install
-    ~/.fzf/install
+    # ~/.fzf/install --completion --key-bindings --no-update-rc
+    ~/.fzf/install --completion --key-bindings --update-rc
+
+    # link this fzf to /usr/local/bin/fzf
+    sudo ln -sf $HOME/.fzf/bin/fzf /usr/local/bin/fzf
 }
 
 createFdLinkToFdfind() {
@@ -138,8 +142,13 @@ installVimPlug (){
     curl --insecure -fLo ~/.vim/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
+    # comment the line in .vimrc starts with colorscheme
+    sed -i 's/^colorscheme/\" colorscheme/g' ~/.vimrc
+
     vim +PlugInstall +qall
     installSolarizedColorScheme
+    # uncomment the line in .vimrc starts with colorscheme
+    sed -i 's/^\" colorscheme/colorscheme/g' ~/.vimrc
 }
 
 installTrackedFiles() {
