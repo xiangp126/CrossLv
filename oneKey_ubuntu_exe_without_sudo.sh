@@ -72,8 +72,8 @@ _EOF
     fzfOfficialSite=https://github.com/junegunn/fzf.git
     git clone -c http.sslVerify=false --depth 1 $fzfOfficialSite $HOME/.fzf
 
-    sed -i 's/curl/curl -k/g' $HOME/.fzf/install
-    sed -i 's/wget/wget --no-check-certificate/g' $HOME/.fzf/install
+    sed -i 's/$curl/curl -k/g' $HOME/.fzf/install
+    sed -i 's/$wget/wget --no-check-certificate/g' $HOME/.fzf/install
     ~/.fzf/install
 }
 
