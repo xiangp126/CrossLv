@@ -81,6 +81,10 @@ _EOF
     fi
 
     solarizedSrc=$HOME/.vim/bundle/vim-colors-solarized/colors/solarized.vim
+    if [ ! -f $solarizedSrc ]; then
+        echo "solarized.vim not found, skip"
+        exit
+    fi
     cp  $solarizedSrc $HOME/.vim/colors/
 }
 
@@ -135,8 +139,8 @@ _EOF
 }
 
 install () {
-    installForUbuntu
     installTrackedFiles
+    installForUbuntu
     installCompletionFiles
     changeTMOUTToWritable
 }
