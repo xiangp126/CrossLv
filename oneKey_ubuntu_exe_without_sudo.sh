@@ -70,7 +70,7 @@ _EOF
     fi
 
     fzfOfficialSite=https://github.com/junegunn/fzf.git
-    git clone --no-check-certificate --depth 1 $fzfOfficialSite $HOME/.fzf
+    git clone -c http.sslVerify=false --depth 1 $fzfOfficialSite $HOME/.fzf
     ~/.fzf/install
 }
 
