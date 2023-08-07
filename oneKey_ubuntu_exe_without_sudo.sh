@@ -69,7 +69,8 @@ _EOF
         return
     fi
 
-    git clone --depth 1 https://github.com/junegunn/fzf.git $HOME/.fzf
+    fzfOfficialSite=https://github.com/junegunn/fzf.git
+    git clone --no-check-certificate --depth 1 $fzfOfficialSite $HOME/.fzf
     ~/.fzf/install
 }
 
@@ -134,8 +135,7 @@ installVimPlug (){
     curl --insecure -fLo ~/.vim/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
-    vim -c "PlugInstall | qall"
-    # vim +PlugInstall +qall
+    vim +PlugInstall +qall 2>/dev/null
     installSolarizedColorScheme
 }
 
