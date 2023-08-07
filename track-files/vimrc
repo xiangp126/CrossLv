@@ -1,3 +1,25 @@
+""""""""""""""""""""""""""""""
+" VIM-PLUG CONFIG
+""""""""""""""""""""""""""""""
+call plug#begin('~/.vim/bundle')
+
+"------ OPTIONAL PLUGINS -----
+Plug 'jiangmiao/auto-pairs'
+Plug 'Yggdroot/indentLine'
+Plug 'altercation/vim-colors-solarized'
+" Plug 'majutsushi/tagbar'
+"------ FUZZY FINDER -----
+Plug 'junegunn/fzf'
+Plug 'junegunn/fzf.vim'
+"------ BEAUTIFY LINE -----
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+"------ CODE EXPAND -----
+Plug 'ervandew/supertab'
+
+" Initialize plugin system
+call plug#end()
+
 """"""""""""""""""""""""""""
 " BASIC CONFIG
 """"""""""""""""""""""""""""""
@@ -102,26 +124,6 @@ nmap <leader>d :bdelete
 nmap <leader>- <C-O><CR>
 nmap <leader>+ <C-I><CR>
 set clipboard=unnamedplus,unnamed
-
-""""""""""""""""""""""""""""""
-" VIM-PLUG CONFIG
-""""""""""""""""""""""""""""""
-call plug#begin('~/.vim/bundle')
-
-"------ OPTIONAL PLUGINS -----
-Plug 'jiangmiao/auto-pairs'
-Plug 'Yggdroot/indentLine'
-"------ FUZZY FINDER -----
-Plug 'junegunn/fzf'
-Plug 'junegunn/fzf.vim'
-"------ BEAUTIFY LINE -----
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
-"------ CODE EXPAND -----
-Plug 'ervandew/supertab'
-
-" Initialize plugin system
-call plug#end()
 
 """"""""""""""""""""""""""""""
 " CONFIG VIM-AIRLINE
@@ -268,6 +270,19 @@ command! -bang -nargs=* Rg
 " will not override existing commands.
 command! -bang Colors
   \ call fzf#vim#colors({'left': '15%', 'options': '--reverse --margin 30%,0'}, <bang>0)
+
+""""""""""""""""""""""""""""""
+" CONFIG TAGBAR
+" """"""""""""""""""""""""""""""
+" " let g:tagbar_ctags_bin = "/usr/bin/ctags"
+" nmap <silent> <F5> :TagbarToggle<CR>
+" let g:Tagbar_title = "[Tagbar]"
+" let g:tagbar_left = 0
+" let g:tagbar_width = 25
+" let g:tagbar_indent = 1
+" " originally Yellow value 11
+" " highlight Search ctermbg=88
+" highlight TagbarSignature ctermfg=68
 
 """"""""""""""""""""""""""""""
 " CONFIG INDENTLINE
