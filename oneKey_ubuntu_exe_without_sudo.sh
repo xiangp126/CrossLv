@@ -15,15 +15,21 @@ trackedFiles=(
 )
 
 # prerequesites for ubuntu
-PrerequesForUbuntu=(
+prerequesitesForUbuntu=(
     fd-find
     ripgrep
     universal-ctags
+    tmux
+    net-tools
+    bash-completion
+    build-essential
+    openssh-server
+    sshfs
 )
 
 installForUbuntu() {
     sudo apt-get update
-    echo "sudo apt-get install -y ${PrerequesForUbuntu[@]}"
+    echo "sudo apt-get install -y ${prerequesitesForUbuntu[@]}"
 
     installVimPlug
     createFdLinkToFdfind
@@ -122,7 +128,7 @@ Change TMOUT to writable
 _EOF
     # TMOUT is readonly in /etc/profile, change it to writable
     # so that we can unset it in .bashrc
-    sudo sed -i 's/readonly TMOUT/ # readonly TMOUT/g' /etc/profile
+    sudo sed -i 's/^readonly TMOUT/# readonly TMOUT/g' /etc/profile
 }
 
 install () {
