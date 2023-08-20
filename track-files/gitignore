@@ -10,3 +10,4 @@ core
 .nfs*
 !lib.o
 .vscode
+enc.key
