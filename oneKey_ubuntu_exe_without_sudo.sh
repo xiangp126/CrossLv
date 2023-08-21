@@ -1,4 +1,5 @@
 #!/bin/bash
+# set -x
 # Only for ubuntu with sudo privilege
 # Life is hard, let's make code easier
 mainWd=$(cd $(dirname $0); pwd)
@@ -160,6 +161,13 @@ _EOF
     for file in ${trackedFiles[@]}; do
         cp $trackedFilesDir/$file ~/.$file
     done
+
+    # Copy back the privileged git config.
+    gitconfigCheckFile=$HOME/.gitconfig.fortinet
+    if [ -f $gitconfigCheckFile  ]; then
+        echo "$gitconfigCheckFile exists. Copy it back to $HOME/.gitconfig ..."
+        cp $gitconfigCheckFile $HOME/.gitconfig
+    fi
 }
 
 installCompletionFiles() {
