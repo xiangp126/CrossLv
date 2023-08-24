@@ -36,13 +36,13 @@ export LS_COLORS=$LS_COLORS:'ex=0;0'
 if [[ "`uname -s`" == 'Darwin' ]]; then
     # Compatible with Mac
     alias ls='ls -G'
-    alias netstat='netstat -an -p tcp'
+    # alias netstat='netstat -an -p tcp'
 else
     # Linux
     alias ls='ls --color=auto'
     alias dir='dir --color=auto'
     alias vdir='vdir --color=auto'
-    alias netstat='netstat -tuanp'
+    # alias netstat='netstat -tuanp'
 fi
 alias ll='ls -lF'
 alias ll.='ls -alF'
