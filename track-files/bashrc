@@ -102,9 +102,9 @@ else
     fi
 fi
 # Loop to source extra completions for tmux/git, etc
-extraCompDir=$HOME/.completion.d
-if [[ -d "$extraCompDir" ]]; then
-    for file in `find $extraCompDir -regex ".*.bash$" -type f`
+extraCompletionDir=$HOME/.bash_completion.d
+if [[ -d "$extraCompletionDir" ]]; then
+    for file in `find $extraCompletionDir -regex ".*.bash$" -type f`
     do
         source $file
     done
@@ -136,12 +136,6 @@ _fzf_compgen_path() {
 _fzf_compgen_dir() {
   fd --type d --hidden --follow --exclude ".git" . "$1"
 }
-
-fzf-history-widget() {
-    local selected_command=$(history | fzf --tac | sed 's/ *[0-9]* *//')
-    [[ -n "$selected_command" ]] && READLINE_LINE="$selected_command" READLINE_POINT=${#selected_command}
-}
-bind -x '"\C-r": fzf-history-widget'
 
 # Mapping capslock to esc
 pathOfsetxkbmap=`which setxkbmap 2> /dev/null`

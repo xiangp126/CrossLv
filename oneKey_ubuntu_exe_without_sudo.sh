@@ -84,8 +84,8 @@ _EOF
 
 createFdLinkToFdfind() {
     cat << _EOF
-Create fd link to fdfind
 ------------------------------------------------------
+Create fd link to fdfind
 _EOF
     fdLinkLocation=/usr/local/bin/fd
     if [ -L $fdLinkLocation ]; then
@@ -146,7 +146,7 @@ installVimPlug (){
     # comment the line in .vimrc starts with colorscheme
     sed -i 's/^colorscheme/\" colorscheme/g' ~/.vimrc
 
-    vim +PlugInstall +qall
+    vim +PlugInstall +PlugUpdate +qall
     installSolarizedColorScheme
     # uncomment the line in .vimrc starts with colorscheme
     sed -i 's/^\" colorscheme/colorscheme/g' ~/.vimrc
@@ -156,7 +156,7 @@ installTrackedFiles() {
     cat << _EOF
 ------------------------------------------------------
 Copy tracked files to home dir, including:
-    ${trackedFiles[@]}
+->   ${trackedFiles[@]}
 _EOF
     for file in ${trackedFiles[@]}; do
         cp $trackedFilesDir/$file ~/.$file
@@ -165,7 +165,8 @@ _EOF
     # Copy back the privileged git config.
     gitconfigCheckFile=$HOME/.gitconfig.fortinet
     if [ -f $gitconfigCheckFile  ]; then
-        echo "$gitconfigCheckFile exists. Copy it back to $HOME/.gitconfig ..."
+        echo "->   The privileged file $gitconfigCheckFile exists."
+        echo "     Copy it back to $HOME/.gitconfig ..."
         cp $gitconfigCheckFile $HOME/.gitconfig
     fi
 }
@@ -177,11 +178,18 @@ Install completion files
 _EOF
     if [ ! -d $completionDirDst ]; then
         mkdir -p $completionDirDst
+        for file in $(ls $completionDirSRC); do
+            echo "copy $file to $completionDirDst"
+            cp $completionDirSRC/$file $completionDirDst/
+        done
+    else
+        for file in $(ls $completionDirSRC); do
+            if [ ! -f $completionDirDst/$file ]; then
+                echo "copy $file to $completionDirDst"
+                cp $completionDirSRC/$file $completionDirDst/
+            fi
+        done
     fi
-
-    for file in $(ls $completionDirSRC); do
-        cp $completionDirSRC/$file $completionDirDst/
-    done
 }
 
 changeTMOUTToWritable() {
@@ -192,6 +200,12 @@ _EOF
     # TMOUT is readonly in /etc/profile, change it to writable
     # so that we can unset it in .bashrc
     sudo sed -i 's/^readonly TMOUT/# readonly TMOUT/g' /etc/profile
+    if [ $? -eq 0 ]; then
+        echo "Success!"
+    else
+        echo "Failed!"
+    fi
+    echo
 }
 
 install () {
