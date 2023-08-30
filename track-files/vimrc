@@ -94,14 +94,22 @@ cmap w!! w !sudo tee %
 set pastetoggle=<F12>
 nmap <F10> :set invnumber<CR>
 nmap <leader>k :mark<Space>
-" Inverse Highlight searched word
-"
 " Removing trailing white spaces
 nmap <C-G> :%s/\s\+$//gc<CR>
-" Easy vim manipulator
 nmap <leader>R :source ~/.vimrc<CR>
-" nmap <silent> <leader>q       :qall!<CR>
-nmap <silent> <leader>q       :q<CR>
+" nmap <silent> <leader>q       :q<CR>
+nmap <silent> <leader>q :call CloseBufferOrQuit()<CR>
+function! CloseBufferOrQuit()
+    " Check if there's only one buffer open
+    if len(filter(range(1, bufnr('$')), 'buflisted(v:val)')) <= 1
+        " Quit Vim if there's only one buffer
+        q
+    else
+        " Close the current buffer if there are multiple buffers
+        bdelete
+    endif
+endfunction
+
 nmap <silent> <leader>w       :w<CR>
 imap <C-D> <ESC>dd
 " Set stty -ixon on ~/.bashrc
