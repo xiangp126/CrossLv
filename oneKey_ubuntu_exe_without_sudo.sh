@@ -7,6 +7,8 @@ trackedFilesDir=$mainWd/track-files
 completionDirSRC=$mainWd/completion-files
 completionDirDst=$HOME/.bash_completion.d
 downloadDir=$mainWd/Downloads
+beautifyGap1="-> "
+beautifyGap2="   "
 trackedFiles=(
     vimrc
     bashrc
@@ -38,13 +40,13 @@ Install prerequesites for ubuntu
 _EOF
     sudo apt-get update
     sudo apt-get install -y ${prerequesitesForUbuntu[@]}
-
-    installLatestFzf
 }
 
 installForUbuntu() {
     installPrequesitesForUbuntu
-    installVimPlug
+    # installVimPlugs before installLatestFzf
+    installVimPlugs
+    installLatestFzf
     createFdLinkToFdfind
     relinkShToBash
 }
@@ -52,25 +54,23 @@ installForUbuntu() {
 installLatestFzf() {
     cat << _EOF
 ------------------------------------------------------
-Install latest fzf (>= 0.23.0)
+Install latest fzf (should >= 0.23.0)
 _EOF
-    if [ -f $(which fzf) ]; then
+    if [ -x "$(command -v fzf)" ]; then
         fzfVersion=$(fzf --version | awk '{print $1}')
         version=${fzfVersion%.*}
         if [ $(echo "$version >= 0.23" | bc) -eq 1 ]; then
-            echo "fzf version is greater than 0.23.0, skip"
+            echo "$beautifyGap1 fzf version is greater than 0.23.0, skip"
             return
         fi
+        sudo apt-get remove -y fzf
     fi
-
-    # Remove fzf installed by apt-get
-    sudo apt-get remove -y fzf
 
     # Check if fzf was already installed by vim-plug in ~/.vim/bundle/fzf
     fzfBinFromVimPlug=$HOME/.vim/bundle/fzf/bin/fzf
     if [ -f $fzfBinFromVimPlug ]; then
         if [ -L /usr/local/bin/fzf ] && [ $(readlink /usr/local/bin/fzf) == $fzfBinFromVimPlug ]; then
-            echo "fzf is already linked to $fzfBinFromVimPlug, skip"
+            echo "$beautifyGap1 fzf is already linked to $fzfBinFromVimPlug, skip"
             return
         fi
         sudo ln -sf $fzfBinFromVimPlug /usr/local/bin/fzf
@@ -102,7 +102,7 @@ Create fd link to fdfind
 _EOF
     fdLinkLocation=/usr/local/bin/fd
     if [ -L $fdLinkLocation ]; then
-        echo "fd link already exists, skip"
+        echo "$beautifyGap1 fd link already exists, skip"
         return
     fi
 
@@ -115,7 +115,7 @@ relinkShToBash() {
 Relink sh to bash
 _EOF
     if [ -L /bin/sh ] && [ $(readlink /bin/sh) == "/bin/bash" ]; then
-        echo "sh is already linked to bash, skip"
+        echo "$beautifyGap1 sh is already linked to bash, skip"
         return
     fi
 
@@ -125,11 +125,10 @@ _EOF
 
 installSolarizedColorScheme() {
     cat << _EOF
-------------------------------------------------------
-Install Solarized Color Scheme for VIM
+$beautifyGap1 Install Solarized Color Scheme for VIM
 _EOF
     if [ -f ~/.vim/colors/solarized.vim ]; then
-        echo "solarized.vim already exists, skip"
+        echo "$beautifyGap2 solarized.vim already exists, skip"
         return
     fi
 
@@ -139,13 +138,17 @@ _EOF
 
     solarizedSrc=$HOME/.vim/bundle/vim-colors-solarized/colors/solarized.vim
     if [ ! -f $solarizedSrc ]; then
-        echo "solarized.vim not found, skip"
+        echo "$beautifyGap2 solarized.vim not found, skip"
         exit
     fi
     cp  $solarizedSrc $HOME/.vim/colors/
 }
 
-installVimPlug (){
+installVimPlugs (){
+    cat << _EOF
+------------------------------------------------------
+Install Vim Plugs
+_EOF
     if [ -d ~/.vim/autoload ]; then
         vim +PlugUpdate +qall
         installSolarizedColorScheme
@@ -169,7 +172,7 @@ installTrackedFiles() {
     cat << _EOF
 ------------------------------------------------------
 Copy tracked files to home dir, including:
-->   ${trackedFiles[@]}
+$beautifyGap1 ${trackedFiles[@]}
 _EOF
     for file in ${trackedFiles[@]}; do
         cp $trackedFilesDir/$file ~/.$file
@@ -178,8 +181,8 @@ _EOF
     # Copy back the privileged git config.
     gitconfigCheckFile=$HOME/.gitconfig.fortinet
     if [ -f $gitconfigCheckFile  ]; then
-        echo "->   The privileged file $gitconfigCheckFile exists."
-        echo "     Copy it back to $HOME/.gitconfig ..."
+        echo "$beautifyGap1 The privileged file $gitconfigCheckFile exists."
+        echo "$beautifyGap2 Copy it back to $HOME/.gitconfig ..."
         cp $gitconfigCheckFile $HOME/.gitconfig
     fi
 }
@@ -187,21 +190,26 @@ _EOF
 installCompletionFiles() {
     cat << _EOF
 ------------------------------------------------------
-Install completion files
+Copy completion files to $completionDirDst
 _EOF
     if [ ! -d $completionDirDst ]; then
         mkdir -p $completionDirDst
         for file in $(ls $completionDirSRC); do
-            echo "copy $file to $completionDirDst"
+            echo "$beautifyGap1 copy $file to $completionDirDst"
             cp $completionDirSRC/$file $completionDirDst/
         done
     else
         for file in $(ls $completionDirSRC); do
             if [ ! -f $completionDirDst/$file ]; then
-                echo "copy $file to $completionDirDst"
+                hasNewFile=true
+                echo "$beautifyGap1 copy $file to $completionDirDst"
                 cp $completionDirSRC/$file $completionDirDst/
             fi
         done
+        # rewrite the following code for me
+        if [ "$hasNewFile" != "true" ]; then
+            echo "$beautifyGap1 All completion files already exist, skip"
+        fi
     fi
 }
 
@@ -214,9 +222,9 @@ _EOF
     # so that we can unset it in .bashrc
     sudo sed -i 's/^readonly TMOUT/# readonly TMOUT/g' /etc/profile
     if [ $? -eq 0 ]; then
-        echo "Success!"
+        echo "$beautifyGap1 Success!"
     else
-        echo "Failed!"
+        echo "$beautifyGap2 Failed!"
     fi
     echo
 }
