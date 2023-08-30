@@ -9,7 +9,7 @@ Plug 'Yggdroot/indentLine'
 Plug 'altercation/vim-colors-solarized'
 " Plug 'majutsushi/tagbar'
 "------ FUZZY FINDER -----
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf', { 'do': './install --bin' }
 Plug 'junegunn/fzf.vim'
 "------ BEAUTIFY LINE -----
 Plug 'vim-airline/vim-airline'

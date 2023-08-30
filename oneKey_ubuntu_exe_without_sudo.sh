@@ -18,7 +18,6 @@ trackedFiles=(
 # prerequesites for ubuntu
 prerequesitesForUbuntu=(
     # Level 1
-    fzf
     fd-find
     ripgrep
     universal-ctags
@@ -63,8 +62,22 @@ _EOF
             return
         fi
     fi
-    # remove fzf installed by apt-get, which is too old
+
+    # Remove fzf installed by apt-get
     sudo apt-get remove -y fzf
+
+    # Check if fzf was already installed by vim-plug in ~/.vim/bundle/fzf
+    fzfBinFromVimPlug=$HOME/.vim/bundle/fzf/bin/fzf
+    if [ -f $fzfBinFromVimPlug ]; then
+        if [ -L /usr/local/bin/fzf ] && [ $(readlink /usr/local/bin/fzf) == $fzfBinFromVimPlug ]; then
+            echo "fzf is already linked to $fzfBinFromVimPlug, skip"
+            return
+        fi
+        sudo ln -sf $fzfBinFromVimPlug /usr/local/bin/fzf
+        return
+    fi
+
+    # Then we have to install fzf manually
     if [ -f $HOME/.fzf/bin/fzf ]; then
         echo "Manual installed fzf already exists, skip"
         return
@@ -76,7 +89,7 @@ _EOF
     sed -i 's/^\([[:space:]]*curl\)/\1 -k/g' $HOME/.fzf/install
     sed -i 's/^\([[:space:]]*wget\)/\1 --no-check-certificate/g' $HOME/.fzf/install
     # ~/.fzf/install --completion --key-bindings --no-update-rc
-    ~/.fzf/install --completion --key-bindings --update-rc
+    ~/.fzf/install --bin
 
     # link this fzf to /usr/local/bin/fzf
     sudo ln -sf $HOME/.fzf/bin/fzf /usr/local/bin/fzf
