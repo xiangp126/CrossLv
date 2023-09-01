@@ -25,6 +25,7 @@ prerequesitesForUbuntu=(
     universal-ctags
     tmux
     sshfs
+    cgdb
     # Level 2
     net-tools
     libvirt-clients
@@ -49,6 +50,20 @@ installForUbuntu() {
     installLatestFzf
     createFdLinkToFdfind
     relinkShToBash
+}
+
+updateTimeZone() {
+    # set timezone to vancouver, on ubuntu
+    cat << _EOF
+------------------------------------------------------
+Set timezone to vancouver
+_EOF
+    # check time zone if it is already vancouver
+    if [ $(timedatectl | grep "Time zone" | awk '{print $3}') == "America/Vancouver" ]; then
+        echo "$beautifyGap1 Time zone is already vancouver, skip"
+        return
+    fi
+    sudo timedatectl set-timezone America/Vancouver
 }
 
 installLatestFzf() {
