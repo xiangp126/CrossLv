@@ -7,6 +7,8 @@ trackedFilesDir=$mainWd/track-files
 completionDirSRC=$mainWd/completion-files
 completionDirDst=$HOME/.bash_completion.d
 downloadDir=$mainWd/Downloads
+catBanner="---------------------------------------------------"
+catBanner=$(echo "$catBanner" | sed 's/------/------ /g')
 beautifyGap1="-> "
 beautifyGap2="   "
 trackedFiles=(
@@ -26,6 +28,7 @@ prerequesitesForUbuntu=(
     tmux
     sshfs
     cgdb
+    rsync
     # Level 2
     net-tools
     libvirt-clients
@@ -36,7 +39,7 @@ prerequesitesForUbuntu=(
 
 installPrequesitesForUbuntu() {
     cat << _EOF
-------------------------------------------------------
+$catBanner
 Install prerequesites for ubuntu
 _EOF
     sudo apt-get update
@@ -55,7 +58,7 @@ installForUbuntu() {
 updateTimeZone() {
     # set timezone to vancouver, on ubuntu
     cat << _EOF
-------------------------------------------------------
+$catBanner
 Set timezone to vancouver
 _EOF
     # check time zone if it is already vancouver
@@ -68,7 +71,7 @@ _EOF
 
 installLatestFzf() {
     cat << _EOF
-------------------------------------------------------
+$catBanner
 Install latest fzf (should >= 0.23.0)
 _EOF
     if [ -x "$(command -v fzf)" ]; then
@@ -112,7 +115,7 @@ _EOF
 
 createFdLinkToFdfind() {
     cat << _EOF
-------------------------------------------------------
+$catBanner
 Create fd link to fdfind
 _EOF
     fdLinkLocation=/usr/local/bin/fd
@@ -126,7 +129,7 @@ _EOF
 
 relinkShToBash() {
     cat << _EOF
-------------------------------------------------------
+$catBanner
 Relink sh to bash
 _EOF
     if [ -L /bin/sh ] && [ $(readlink /bin/sh) == "/bin/bash" ]; then
@@ -161,7 +164,7 @@ _EOF
 
 installVimPlugs (){
     cat << _EOF
-------------------------------------------------------
+$catBanner
 Install Vim Plugs
 _EOF
     if [ -d ~/.vim/autoload ]; then
@@ -185,14 +188,16 @@ _EOF
 
 installTrackedFiles() {
     cat << _EOF
-------------------------------------------------------
-Copy tracked files to home dir, including:
-$beautifyGap1 ${trackedFiles[@]}
+$catBanner
+Sync tracked files from $trackedFilesDir to $HOME
+$beautifyGap1 including ${trackedFiles[@]}
 _EOF
+    # use rsync to copy tracked files
     for file in ${trackedFiles[@]}; do
-        cp $trackedFilesDir/$file ~/.$file
+        rsync -av $trackedFilesDir/$file $HOME/.${file}
     done
 
+return
     # Copy back the privileged git config.
     gitconfigCheckFile=$HOME/.gitconfig.fortinet
     if [ -f $gitconfigCheckFile  ]; then
@@ -204,33 +209,18 @@ _EOF
 
 installCompletionFiles() {
     cat << _EOF
-------------------------------------------------------
-Copy completion files to $completionDirDst
+$catBanner
+Install completion files into $completionDirDst
 _EOF
     if [ ! -d $completionDirDst ]; then
         mkdir -p $completionDirDst
-        for file in $(ls $completionDirSRC); do
-            echo "$beautifyGap1 copy $file to $completionDirDst"
-            cp $completionDirSRC/$file $completionDirDst/
-        done
-    else
-        for file in $(ls $completionDirSRC); do
-            if [ ! -f $completionDirDst/$file ]; then
-                hasNewFile=true
-                echo "$beautifyGap1 copy $file to $completionDirDst"
-                cp $completionDirSRC/$file $completionDirDst/
-            fi
-        done
-        # rewrite the following code for me
-        if [ "$hasNewFile" != "true" ]; then
-            echo "$beautifyGap1 All completion files already exist, skip"
-        fi
     fi
+    rsync -av --delete $completionDirSRC/ $completionDirDst/
 }
 
 changeTMOUTToWritable() {
     cat << _EOF
-------------------------------------------------------
+$catBanner
 Change TMOUT to writable
 _EOF
     # TMOUT is readonly in /etc/profile, change it to writable
@@ -244,10 +234,29 @@ _EOF
     echo
 }
 
+checkSudoPrivilege() {
+    cat << _EOF
+$catBanner
+Check sudo privilege
+_EOF
+    sudo -v 2> /dev/null
+    if [ $? -eq 0 ]; then
+        # echo You have sudo privilege
+        echo "$beautifyGap1 You have sudo privilege. Continue!"
+    else
+        echo "$beautifyGap2 You do not have sudo privilege. Abort!"
+        exit
+    fi
+}
+
 install () {
+    # Pre install
+    checkSudoPrivilege
+    # Install In Progress
     installTrackedFiles
     installForUbuntu
     installCompletionFiles
+    # After install
     changeTMOUTToWritable
 }
 
