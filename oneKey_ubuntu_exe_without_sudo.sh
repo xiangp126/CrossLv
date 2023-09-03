@@ -197,7 +197,6 @@ _EOF
         rsync -av $trackedFilesDir/$file $HOME/.${file}
     done
 
-return
     # Copy back the privileged git config.
     gitconfigCheckFile=$HOME/.gitconfig.fortinet
     if [ -f $gitconfigCheckFile  ]; then

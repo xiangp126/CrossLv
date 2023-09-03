@@ -151,9 +151,7 @@ if command -v tmux &>/dev/null; then
         # Extract the name of the first session.
         firstSession=$(echo "$sessions" | head -n 1)
         cat << _EOF
-------------------------------------------------------
-tmux attach -t $firstSession
-------------------------------------------------------
+-> tmux attach -t $firstSession
 _EOF
     fi
 fi
