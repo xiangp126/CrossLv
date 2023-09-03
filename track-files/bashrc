@@ -94,13 +94,14 @@ alias build_tags='ctags -R --extra=+f --languages=C,+C++ --links=no;cscope -Rbqk
 # sources /etc/bash.bashrc).
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
-else
-    # source full bash completion manually
-    myBashCompTool=$HOME/.bash_completion.sh
-    if [[ -f $myBashCompTool ]]; then
-        source $myBashCompTool
-    fi
 fi
+
+# Check if Git completion hasn't been sourced already
+if ! type __git_dequote &>/dev/null; then
+    # Source the Git completion script
+    source /usr/share/bash-completion/completions/git
+fi
+
 # Loop to source extra completions for tmux/git, etc
 extraCompletionDir=$HOME/.bash_completion.d
 if [[ -d "$extraCompletionDir" ]]; then
@@ -144,15 +145,15 @@ if [[ "$pathOfsetxkbmap" != "" && "$DISPLAY" != "" ]]; then
 fi
 
 # Test if command 'tmux' exist.
-if command -v tmux >/dev/null 2>&1; then
-    if [ -z "$TMUX" ]; then
-        firstSession=$(tmux list-sessions -F "#{session_name}" | head -n 1)
-        if [ -n "$firstSession" ]; then
-            cat << _EOF
+if command -v tmux &>/dev/null; then
+    sessions=$(tmux list-sessions -F "#{session_name}" 2>/dev/null)
+    if [ -n "$sessions" ]; then
+        # Extract the name of the first session.
+        firstSession=$(echo "$sessions" | head -n 1)
+        cat << _EOF
 ------------------------------------------------------
 tmux attach -t $firstSession
 ------------------------------------------------------
 _EOF
-        fi
     fi
 fi

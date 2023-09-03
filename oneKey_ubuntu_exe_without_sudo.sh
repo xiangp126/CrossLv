@@ -231,7 +231,6 @@ _EOF
     else
         echo "$beautifyGap2 Failed!"
     fi
-    echo
 }
 
 checkSudoPrivilege() {
@@ -239,13 +238,12 @@ checkSudoPrivilege() {
 $catBanner
 Check sudo privilege
 _EOF
-    sudo -v 2> /dev/null
+    sudo -v &> /dev/null
     if [ $? -eq 0 ]; then
-        # echo You have sudo privilege
         echo "$beautifyGap1 You have sudo privilege. Continue!"
     else
         echo "$beautifyGap2 You do not have sudo privilege. Abort!"
-        exit
+        exit 0
     fi
 }
 
