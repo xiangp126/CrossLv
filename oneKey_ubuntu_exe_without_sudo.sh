@@ -11,13 +11,13 @@ catBanner="---------------------------------------------------"
 catBanner=$(echo "$catBanner" | sed 's/------/------ /g')
 beautifyGap1="-> "
 beautifyGap2="   "
-trackedFiles=(
-    vimrc
-    bashrc
-    tmux.conf
-    gitconfig
-    gitignore
-)
+# trackedFiles=(
+#     vimrc
+#     bashrc
+#     tmux.conf
+#     gitconfig
+#     gitignore
+# )
 
 # prerequesites for ubuntu
 prerequesitesForUbuntu=(
@@ -57,7 +57,7 @@ _EOF
         echo "$beautifyGap1 batcat is not installed, skip"
         return
     fi
-    
+
     batLinkedPath=$HOME/.usr/bin/bat
     # check if bat is already linked to batcat
     if [ -L $batLinkedPath ] && [ $(readlink $batLinkedPath) == $(which batcat) ]; then
@@ -206,11 +206,10 @@ installTrackedFiles() {
     cat << _EOF
 $catBanner
 Sync tracked files from $trackedFilesDir to $HOME
-$beautifyGap1 including ${trackedFiles[@]}
+$beautifyGap1 $(ls $trackedFilesDir | tr '\n' ' ')
 _EOF
-    # use rsync to copy tracked files
-    for file in ${trackedFiles[@]}; do
-        rsync -av $trackedFilesDir/$file $HOME/.${file}
+    for file in $(ls $trackedFilesDir); do
+        rsync -av $trackedFilesDir/$file $HOME/.$file
     done
 
     # Copy back the privileged git config.
