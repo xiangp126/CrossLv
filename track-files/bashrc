@@ -63,7 +63,7 @@ alias 7zA='7z a'
 alias 7zX='7z x'
 # fix tmux utf8 issue
 alias tmux='tmux -u'
-# quick change directory
+# alias to change directory
 alias cdg='cd $HOME/myGit'
 alias cdd='cd $HOME/Downloads'
 alias cdt='cd $HOME/Templates'
@@ -79,7 +79,7 @@ export SHELL=/bin/bash
 export EDITOR=vim
 PKG_CONFIG_PATH=$HOME/.usr/lib/pkgconfig:/usr/local/lib/pkgconfig
 LD_LIBRARY_PATH=$HOME/.usr/lib:$HOME/.usr/lib64:/usr/local/lib:/usr/local/lib64
-PATH=$HOME/.usr/bin:$HOME/.local/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin
+PATH=$HOME/.local/bin:$HOME/.usr/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin
 export PATH
 export PKG_CONFIG_PATH
 export LD_LIBRARY_PATH
@@ -102,7 +102,13 @@ if ! type __git_dequote &>/dev/null; then
     source /usr/share/bash-completion/completions/git
 fi
 
-# Loop to source extra completions for tmux/git, etc
+fzf_bash_completion="$HOME/.vim/bundle/fzf-tab-completion/bash/fzf-bash-completion.sh"
+if [[ -f "$fzf_bash_completion" ]]; then
+    source $fzf_bash_completion
+    bind -x '"/\t": fzf_bash_completion'
+fi
+
+# Loop to source extra bash completions
 extraCompletionDir=$HOME/.bash_completion.d
 if [[ -d "$extraCompletionDir" ]]; then
     for file in `find $extraCompletionDir -regex ".*.bash$" -type f`
@@ -110,6 +116,7 @@ if [[ -d "$extraCompletionDir" ]]; then
         source $file
     done
 fi
+
 
 # Settings for fzf -- fuzzy finder
 if [[ "`which fd 2> /dev/null`" != '' ]]; then

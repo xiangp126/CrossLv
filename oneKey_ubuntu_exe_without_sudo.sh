@@ -29,6 +29,7 @@ prerequesitesForUbuntu=(
     sshfs
     cgdb
     rsync
+    bat
     # Level 2
     net-tools
     libvirt-clients
@@ -46,16 +47,31 @@ _EOF
     sudo apt-get install -y ${prerequesitesForUbuntu[@]}
 }
 
-installForUbuntu() {
-    installPrequesitesForUbuntu
-    # installVimPlugs before installLatestFzf
-    installVimPlugs
-    installLatestFzf
-    createFdLinkToFdfind
-    relinkShToBash
+relinkBatToBatcat() {
+    cat << _EOF
+$catBanner
+Relink bat to batcat
+_EOF
+    # check if batcat is installed
+    if [ ! -x "$(command -v batcat)" ]; then
+        echo "$beautifyGap1 batcat is not installed, skip"
+        return
+    fi
+    
+    batLinkedPath=$HOME/.usr/bin/bat
+    # check if bat is already linked to batcat
+    if [ -L $batLinkedPath ] && [ $(readlink $batLinkedPath) == $(which batcat) ]; then
+        echo "$beautifyGap1 bat is already linked to batcat, skip"
+        return
+    fi
+
+    if [ ! -d $HOME/.usr/bin ]; then
+        mkdir -p $HOME/.usr/bin
+    fi
+    sudo ln -sf $(which batcat) $batLinkedPath
 }
 
-updateTimeZone() {
+setTimeZone() {
     # set timezone to vancouver, on ubuntu
     cat << _EOF
 $catBanner
@@ -113,10 +129,10 @@ _EOF
     sudo ln -sf $HOME/.fzf/bin/fzf /usr/local/bin/fzf
 }
 
-createFdLinkToFdfind() {
+relinkFdToFdfind() {
     cat << _EOF
 $catBanner
-Create fd link to fdfind
+Relink fd to fdfind
 _EOF
     fdLinkLocation=/usr/local/bin/fd
     if [ -L $fdLinkLocation ]; then
@@ -246,14 +262,22 @@ _EOF
     fi
 }
 
-install () {
-    # Pre install
-    checkSudoPrivilege
-    # Install In Progress
+installForUbuntu() {
+    installPrequesitesForUbuntu
+    installVimPlugs
     installTrackedFiles
-    installForUbuntu
     installCompletionFiles
-    # After install
+    # Notice: installLatestFz after installVimPlugs
+    installLatestFzf
+}
+
+install () {
+    checkSudoPrivilege
+    installForUbuntu
+    relinkBatToBatcat
+    relinkFdToFdfind
+    relinkShToBash
+    setTimeZone
     changeTMOUTToWritable
 }
 

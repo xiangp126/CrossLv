@@ -16,6 +16,7 @@ Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 "------ CODE EXPAND -----
 Plug 'ervandew/supertab'
+Plug 'lincheney/fzf-tab-completion'
 
 " Initialize plugin system
 call plug#end()
