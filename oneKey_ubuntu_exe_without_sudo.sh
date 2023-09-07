@@ -237,7 +237,7 @@ changeTMOUTToWritable() {
 $catBanner
 Change TMOUT to writable
 _EOF
-    # TMOUT is readonly in /etc/profile, change it to writable
+    # TMOUT is readonly in /etc/pr/.ofile, change it to writable
     # so that we can unset it in .bashrc
     sudo sed -i 's/^readonly TMOUT/# readonly TMOUT/g' /etc/profile
     if [ $? -eq 0 ]; then
@@ -261,6 +261,10 @@ _EOF
     fi
 }
 
+printMessage() {
+    echo "$beautifyGap1 Please source ~/.bashrc manually to take effect."
+}
+
 installForUbuntu() {
     installPrequesitesForUbuntu
     installVimPlugs
@@ -278,6 +282,7 @@ install () {
     relinkShToBash
     setTimeZone
     changeTMOUTToWritable
+    printMessage
 }
 
 install
