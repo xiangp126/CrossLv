@@ -2,22 +2,8 @@
 # refer https://linuxize.com/post/using-the-ssh-config-file
 Host remotedev
     HostName 192.168.1.10
-    User daenerys
-    Port 7654
-    IdentityFile ~/.ssh/myprivate.key
-
-Host tyrell
-    HostName 192.168.10.20
-
-Host martell
-    HostName 192.168.10.50
-
-Host *ell
-    user oberyn
-
-Host * !martell
-    LogLevel INFO
-
-Host *
-    User root
-    Compression yes
+    User Annoymous
+    Port 22
+    IdentityFile ~/.ssh/id_rsa
+    ServerAliveInterval 60
+    ServerAliveCountMax 3
