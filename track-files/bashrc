@@ -22,7 +22,7 @@ shopt -s checkwinsize
 # shopt -s globstar
 
 # bash command prompt
-export PS1="\u@\h:\W\$ "
+export PS1="\u@${HOSTNAME:0:10}:\W\$ "
 
 # Let <C-S> work in Vim.
 stty -ixon

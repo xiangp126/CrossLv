@@ -30,6 +30,7 @@ prerequesitesForUbuntu=(
     cgdb
     rsync
     bat
+    shellcheck
     # Level 2
     net-tools
     libvirt-clients
