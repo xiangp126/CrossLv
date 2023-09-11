@@ -63,11 +63,18 @@ alias 7zA='7z a'
 alias 7zX='7z x'
 alias tmux='tmux -u'
 # alias to change directory
-alias cdg='cd $HOME/myGit'
-alias cdd='cd $HOME/Downloads'
-alias cdt='cd $HOME/Templates'
-alias cdp='cd $HOME/Public'
-alias cdsrc='cd /usr/local/src'
+function __cd () {
+    if [ -d "$1" ]; then
+        cd "$1"
+    fi
+}
+alias cdg='__cd $HOME/myGit'
+alias cdD='__cd $HOME/Downloads'
+alias cdT='__cd $HOME/Templates'
+alias cdP='__cd $HOME/Public'
+alias cdsrc='__cd /usr/local/src'
+alias cdR='__cd $HOME/Recycled'
+alias cdd='__cd /data'
 alias cdf='cdg && cd fos'
 
 # print entry names without quoting
@@ -154,6 +161,7 @@ if command -v tmux &>/dev/null; then
         # Extract the name of the first session.
         firstSession=$(echo "$sessions" | head -n 1)
         cat << _EOF
+---------------------------------
 -> tmux attach -t $firstSession
 _EOF
     fi
