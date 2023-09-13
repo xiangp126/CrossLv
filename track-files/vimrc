@@ -4,6 +4,8 @@
 call plug#begin('~/.vim/bundle')
 
 "------ OPTIONAL PLUGINS -----
+Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+Plug 'majutsushi/tagbar'
 Plug 'jiangmiao/auto-pairs'
 Plug 'Yggdroot/indentLine'
 Plug 'altercation/vim-colors-solarized'
@@ -40,7 +42,6 @@ set fileencodings=utf-8,gb2312,gb18030,gbk,ucs-bom,cp936,latin1
 set fileencoding=utf-8
 set termencoding=utf-8
 set backspace=indent,eol,start
-" Reference from /etc/vim/vimrc on Ubuntu
 set nocompatible    " No vi compatible
 set showmatch       " Show matching brackets.
 set ignorecase      " Do case insensitive matching
@@ -51,29 +52,20 @@ set hidden          " Hide buffers when they are abandoned
 set mouse=a         " Enable mouse usage (all modes), or 'ni' for normal & insert
 set noautochdir     " No need change dir with help of fuzzy finder tools
 let g:solarized_termcolors=256
-set background=dark
-colorscheme solarized
-" set showcmd       " Show (partial) command in status line.
-" set autowrite     " Automatically save before commands like :next and :make
 filetype plugin indent on
 " Jump to the last position when reopening a file
 if has("autocmd")
     au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$")
                 \ | exe "normal! g'\"" | endif
 endif
-" Let .php use html snippets
-" autocmd filetype php set filetype=php.html.js
-"------ :help ins-completion-menu -----
 set pumheight=12      " maximum height of popup menu
 set shell=/bin/bash   " set vim default shell
 let mapleader=';'     " leader key, default is '\'
 set t_Co=256          " number of colors
-" Tip: below two lines handle characters over 80c
-" highlight OverLength ctermbg=33 ctermfg=Grey
-" match OverLength /\%81v.\+/
+" Reduce the 'updatetime' to 500 milliseconds for responsiveness
+autocmd CursorHold,CursorHoldI * set updatetime=500
 set background=dark
-"------ private under ~/.vim/colors -----
-" :colorscheme darkcoding
+colorscheme solarized
 
 """"""""""""""""""""""""""""""
 " BASIC KEYBIND
@@ -95,10 +87,8 @@ cmap w!! w !sudo tee %
 set pastetoggle=<F12>
 nmap <F10> :set invnumber<CR>
 nmap <leader>k :mark<Space>
-" Removing trailing white spaces
-nmap <C-G> :%s/\s\+$//gc<CR>
+nmap <C-G> :%s/\s\+$//gc<CR>   " Removing trailing white spaces
 nmap <leader>R :source ~/.vimrc<CR>
-" nmap <silent> <leader>q       :q<CR>
 nmap <silent> <leader>q :call CloseBufferOrQuit()<CR>
 function! CloseBufferOrQuit()
     " Check if there's only one buffer open
@@ -113,8 +103,6 @@ endfunction
 
 nmap <silent> <leader>w       :w<CR>
 imap <C-D> <ESC>dd
-" Set stty -ixon on ~/.bashrc
-" nnoremap <leader>W       :write!<CR>
 nnoremap <C-S>            :write<CR>
 inoremap <C-S>       <ESC>:write<CR>
 vnoremap <C-S>       <ESC>:write<CR>
@@ -283,15 +271,26 @@ command! -bang Colors
 """"""""""""""""""""""""""""""
 " CONFIG TAGBAR
 " """"""""""""""""""""""""""""""
-" " let g:tagbar_ctags_bin = "/usr/bin/ctags"
-" nmap <silent> <F5> :TagbarToggle<CR>
-" let g:Tagbar_title = "[Tagbar]"
-" let g:tagbar_left = 0
-" let g:tagbar_width = 25
-" let g:tagbar_indent = 1
-" " originally Yellow value 11
-" " highlight Search ctermbg=88
-" highlight TagbarSignature ctermfg=68
+let g:tagbar_ctags_bin = "/usr/bin/ctags"
+nmap <silent> <F8> :TagbarToggle<CR>
+let g:Tagbar_title = "[Tagbar]"
+let g:tagbar_left = 0
+let g:tagbar_width = 25
+let g:tagbar_indent = 1
+" highlight Search ctermbg=88
+highlight TagbarSignature ctermfg=68
+
+""""""""""""""""""""""""""""""
+" CONFIG NERDTREE
+""""""""""""""""""""""""""""""
+" When pressed F3, toggle nerd tree
+nnoremap <silent> <F3> :NERDTreeToggle<CR>
+let g:NERDTree_title = "[NERDTree]"
+let g:NERDTreeShowBookmarks = 0
+let g:NERDTreeWinSize = 20 " default 30
+let g:NERDTreeWinPos = 'left' " only left or right
+" all dirs ending in ".d" and all files ending in ".o" to be ignored
+let NERDTreeIgnore=['\.d$[[dir]]', '\.dSYM[[dir]]', '\.o$[[file]]']
 
 """"""""""""""""""""""""""""""
 " CONFIG INDENTLINE
@@ -311,4 +310,3 @@ let g:SuperTabDefaultCompletionType = '<C-N>'
 """"""""""""""""""""""""""""""
 let g:AutoPairs = {'[':']', '{':'}',"'":"'",'"':'"', '`':'`'}
 inoremap <buffer><silent> ) <C-R>=AutoPairsInsert(')')<CR>
-

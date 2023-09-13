@@ -72,10 +72,12 @@ alias cdg='__cd $HOME/myGit'
 alias cdD='__cd $HOME/Downloads'
 alias cdT='__cd $HOME/Templates'
 alias cdP='__cd $HOME/Public'
-alias cdsrc='__cd /usr/local/src'
+alias cdL='__cd $HOME/Logs'
 alias cdR='__cd $HOME/Recycled'
+alias cdT='__cd $HOME/Test'
 alias cdd='__cd /data'
 alias cdf='cdg && cd fos'
+alias cdsrc='__cd /usr/local/src'
 
 # print entry names without quoting
 export QUOTING_STYLE=literal
