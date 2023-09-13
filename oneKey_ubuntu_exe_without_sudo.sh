@@ -4,6 +4,7 @@
 # Life is hard, let's make code easier
 mainWd=$(cd $(dirname $0); pwd)
 trackedFilesDir=$mainWd/track-files
+templateFilesDir=$mainWd/template
 completionDirSRC=$mainWd/completion-files
 completionDirDst=$HOME/.bash_completion.d
 downloadDir=$mainWd/Downloads
@@ -26,12 +27,14 @@ prerequesitesForUbuntu=(
     ripgrep
     universal-ctags
     tmux
-    sshfs
-    cgdb
     rsync
+    # Level 2
     bat
     shellcheck
-    # Level 2
+    expect
+    sshfs
+    cgdb
+    # Level 3
     net-tools
     libvirt-clients
     bash-completion
@@ -89,7 +92,7 @@ _EOF
 installLatestFzf() {
     cat << _EOF
 $catBanner
-Install latest fzf (should >= 0.23.0)
+Install fzf - The fuzzy finder (v >= 0.23.0)
 _EOF
     if [ -x "$(command -v fzf)" ]; then
         fzfVersion=$(fzf --version | awk '{print $1}')
@@ -185,7 +188,7 @@ $catBanner
 Install Vim Plugs
 _EOF
     if [ -d ~/.vim/autoload ]; then
-        vim +PlugUpdate +qall
+        vim +PlugInstall +PlugUpdate +qall
         installSolarizedColorScheme
         return
     fi
@@ -206,8 +209,8 @@ _EOF
 installTrackedFiles() {
     cat << _EOF
 $catBanner
-Sync tracked files from $trackedFilesDir to $HOME
-$beautifyGap1 $(ls $trackedFilesDir | tr '\n' ' ')
+$beautifyGap1 Sync tracked files to $HOME
+$beautifyGap2 $(ls $trackedFilesDir | tr '\n' ' ')
 _EOF
     for file in $(ls $trackedFilesDir); do
         rsync -av $trackedFilesDir/$file $HOME/.$file
@@ -220,6 +223,17 @@ _EOF
         echo "$beautifyGap2 Copy it back to $HOME/.gitconfig ..."
         cp $gitconfigCheckFile $HOME/.gitconfig
     fi
+    installTrackedFileForCgdb
+}
+
+installTrackedFileForCgdb() {
+    cgdbTargetDir=$HOME/.cgdb
+    echo "$beautifyGap1 Sync cgdbrc to $cgdbTargetDir"
+    # create target dir if not exist
+    if [ ! -d $cgdbTargetDir ]; then
+        mkdir -p $cgdbTargetDir
+    fi
+    rsync -av $templateFilesDir/cgdbrc $cgdbTargetDir/cgdbrc
 }
 
 installCompletionFiles() {
@@ -278,9 +292,9 @@ installForUbuntu() {
 install () {
     checkSudoPrivilege
     installForUbuntu
+    relinkShToBash
     relinkBatToBatcat
     relinkFdToFdfind
-    relinkShToBash
     setTimeZone
     changeTMOUTToWritable
     printMessage
