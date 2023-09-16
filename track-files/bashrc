@@ -68,16 +68,17 @@ function __cd () {
         cd "$1"
     fi
 }
-alias cdg='__cd $HOME/myGit'
 alias cdD='__cd $HOME/Downloads'
-alias cdT='__cd $HOME/Templates'
+alias cdU='__cd $HOME/Uploads'
 alias cdP='__cd $HOME/Public'
-alias cdL='__cd $HOME/Logs'
 alias cdR='__cd $HOME/Recycled'
-alias cdT='__cd $HOME/Test'
+alias cdL='__cd $HOME/Logs'
+alias cdT='__cd $HOME/Templates'
+alias cdt='__cd $HOME/Test'
 alias cdd='__cd /data'
-alias cdf='cdg && cd fos'
 alias cdsrc='__cd /usr/local/src'
+alias cdg='__cd $HOME/myGit'
+alias cdf='cdg && cd fos'
 
 # print entry names without quoting
 export QUOTING_STYLE=literal

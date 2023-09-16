@@ -34,6 +34,7 @@ prerequesitesForUbuntu=(
     expect
     sshfs
     cgdb
+    dos2unix
     # Level 3
     net-tools
     libvirt-clients

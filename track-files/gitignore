@@ -1,7 +1,7 @@
 *.swp
 *.swo
+diff
 *.diff
-tags
 *.o
 *.pyc
 __pycache__/
@@ -11,3 +11,4 @@ core
 !lib.o
 .vscode
 enc.key
+fgtcoveragebuild.tar.xz
