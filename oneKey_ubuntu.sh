@@ -12,13 +12,6 @@ catBanner="---------------------------------------------------"
 catBanner=$(echo "$catBanner" | sed 's/------/------ /g')
 beautifyGap1="-> "
 beautifyGap2="   "
-# trackedFiles=(
-#     vimrc
-#     bashrc
-#     tmux.conf
-#     gitconfig
-#     gitignore
-# )
 
 # prerequesites for ubuntu
 prerequesitesForUbuntu=(
@@ -28,12 +21,12 @@ prerequesitesForUbuntu=(
     universal-ctags
     tmux
     rsync
+    gdb
     # Level 2
     bat
     shellcheck
     expect
     sshfs
-    cgdb
     dos2unix
     # Level 3
     net-tools
@@ -224,17 +217,6 @@ _EOF
         echo "$beautifyGap2 Copy it back to $HOME/.gitconfig ..."
         cp $gitconfigCheckFile $HOME/.gitconfig
     fi
-    installTrackedFileForCgdb
-}
-
-installTrackedFileForCgdb() {
-    cgdbTargetDir=$HOME/.cgdb
-    echo "$beautifyGap1 Sync cgdbrc to $cgdbTargetDir"
-    # create target dir if not exist
-    if [ ! -d $cgdbTargetDir ]; then
-        mkdir -p $cgdbTargetDir
-    fi
-    rsync -av $templateFilesDir/cgdbrc $cgdbTargetDir/cgdbrc
 }
 
 installCompletionFiles() {

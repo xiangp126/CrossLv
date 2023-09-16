@@ -1,0 +1,21 @@
+# GDB Configuration. Put in ~/.gdbinit
+
+# Display source code layout in TUI
+layout src
+
+set tui active-border-mode normal
+set logging file ~/gdb.log
+set print pretty on
+set pagination off
+set tui tab-width 4
+set disassembly-flavor intel
+winheight cmd +5
+set logging off
+set trace-commands on
+set logging on
+
+set prompt (gdb) 
+
+# Specify your custom GDB aliases (if any)
+# For example, alias "run" to "r"
+# alias r run
