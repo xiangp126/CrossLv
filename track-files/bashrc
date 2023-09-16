@@ -159,13 +159,10 @@ fi
 
 # Test if command 'tmux' exist.
 if command -v tmux &>/dev/null; then
-    sessions=$(tmux list-sessions -F "#{session_name}" 2>/dev/null)
-    if [ -n "$sessions" ]; then
-        # Extract the name of the first session.
-        firstSession=$(echo "$sessions" | head -n 1)
-        cat << _EOF
----------------------------------
--> tmux attach -t $firstSession
+    sessions=$(tmux list-sessions 2>/dev/null)
+    if [[ -n "$sessions" ]]; then
+cat << _EOF
+`tmux ls`
 _EOF
     fi
 fi
