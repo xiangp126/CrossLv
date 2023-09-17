@@ -269,8 +269,7 @@ checkSudoPrivilege() {
 $catBanner
 Check sudo privilege
 _EOF
-    sudo -v &> /dev/null
-    if [ $? -eq 0 ]; then
+    if id | grep -q '(sudo)'; then
         echo "$beautifyGap1 You have sudo privilege. Continue!"
     else
         echo "$beautifyGap2 You do not have sudo privilege. Abort!"
