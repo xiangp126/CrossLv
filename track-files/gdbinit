@@ -4,12 +4,13 @@
 layout src
 
 set tui active-border-mode normal
-set logging file ~/gdb.log
+set logging file ~/.gdb.log
 set print pretty on
 set pagination off
 set tui tab-width 4
 set disassembly-flavor intel
 winheight cmd +5
+fs cmd
 set logging off
 set trace-commands on
 set logging on

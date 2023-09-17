@@ -5,6 +5,7 @@
 mainWd=$(cd $(dirname $0); pwd)
 trackedFilesDir=$mainWd/track-files
 templateFilesDir=$mainWd/template
+handyToolsDir=$mainWd/handy
 completionDirSRC=$mainWd/completion-files
 completionDirDst=$HOME/.bash_completion.d
 downloadDir=$mainWd/Downloads
@@ -219,6 +220,24 @@ _EOF
     fi
 }
 
+installHandyTools() {
+    cat << _EOF
+$catBanner
+$beautifyGap1 Link handy tools to $HOME/.usr/bin
+$beautifyGap2 $(ls $handyToolsDir | tr '\n' ' ')
+_EOF
+    if [ ! -d $HOME/.usr/bin ]; then
+        mkdir -p $HOME/.usr/bin
+    fi
+    for file in $(ls $handyToolsDir); do
+        if [ -f $HOME/.usr/bin/$file ] && [ ! -L $HOME/.usr/bin/$file ]; then
+            echo "$beautifyGap1 $HOME/.usr/bin/$file already exists, skip"
+            return
+        fi
+        ln -sf $handyToolsDir/$file $HOME/.usr/bin/$file
+    done
+}
+
 installCompletionFiles() {
     cat << _EOF
 $catBanner
@@ -268,6 +287,7 @@ installForUbuntu() {
     installVimPlugs
     installTrackedFiles
     installCompletionFiles
+    installHandyTools
     # Notice: installLatestFz after installVimPlugs
     installLatestFzf
 }
