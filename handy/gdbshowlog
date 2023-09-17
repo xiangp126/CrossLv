@@ -1,0 +1,13 @@
+#!/bin/bash
+gdbLogLocation=~/.gdb.log
+if [ ! -f $gdbLogLocation ]; then
+    echo "$gdbLogLocation not found, exit"
+    exit
+fi
+if ! command -v bat &> /dev/null
+then
+    tail -f $gdbLogLocation
+    exit
+fi
+
+tail -f $gdbLogLocation | bat --paging=never -p -l c

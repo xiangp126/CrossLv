@@ -11,4 +11,5 @@ core
 !lib.o
 .vscode
 enc.key
+credentials.txt
 fgtcoveragebuild.tar.xz
