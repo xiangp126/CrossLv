@@ -135,6 +135,7 @@ if [[ "`which fd 2> /dev/null`" != '' ]]; then
         --follow \
         --no-ignore \
         --exclude '.git' \
+        --exclude '.cache' \
         --exclude '*.sw[p|o]' \
         --exclude '*.[a|o]' \
         --exclude '*.so'"
