@@ -17,17 +17,18 @@ beautifyGap2="   "
 # prerequesites for ubuntu
 prerequesitesForUbuntu=(
     # Level 1
+    tmux
+    rsync
     fd-find
     ripgrep
     universal-ctags
-    tmux
-    rsync
-    gdb
     # Level 2
+    gdb
     bat
-    shellcheck
+    curl
     expect
     sshfs
+    shellcheck
     dos2unix
     # Level 3
     net-tools
@@ -204,9 +205,13 @@ _EOF
 installTrackedFiles() {
     cat << _EOF
 $catBanner
-$beautifyGap1 Sync tracked files to $HOME
-$beautifyGap2 $(ls $trackedFilesDir | tr '\n' ' ')
+Sync tracked files to $HOME
 _EOF
+    ls "$trackedFilesDir" | while read -r file; do
+      echo "$beautifyGap2 $file"
+    done
+    echo
+
     for file in $(ls $trackedFilesDir); do
         rsync -av $trackedFilesDir/$file $HOME/.$file
     done
@@ -223,16 +228,21 @@ _EOF
 installHandyTools() {
     cat << _EOF
 $catBanner
-$beautifyGap1 Link handy tools to $HOME/.usr/bin
-$beautifyGap2 $(ls $handyToolsDir | tr '\n' ' ')
+Link handy tools to $HOME/.usr/bin
 _EOF
+    ls "$handyToolsDir" | while read -r file; do
+      echo "$beautifyGap2 $file"
+    done
+    echo
+
     if [ ! -d $HOME/.usr/bin ]; then
         mkdir -p $HOME/.usr/bin
     fi
+
     for file in $(ls $handyToolsDir); do
-        if [ -f $HOME/.usr/bin/$file ] && [ ! -L $HOME/.usr/bin/$file ]; then
+        if [ -L $HOME/.usr/bin/$file ] && [ $(readlink $HOME/.usr/bin/$file) == $handyToolsDir/$file ]; then
             echo "$beautifyGap1 $HOME/.usr/bin/$file already exists, skip"
-            return
+            continue
         fi
         ln -sf $handyToolsDir/$file $HOME/.usr/bin/$file
     done
