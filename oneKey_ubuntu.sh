@@ -249,6 +249,30 @@ _EOF
     done
 }
 
+installTemplateFiles() {
+    cat << _EOF
+$catBanner
+Link template files to $HOME/Template
+_EOF
+    ls "$templateFilesDir" | while read -r file; do
+      echo "$beautifyGap2 $file"
+    done
+    echo
+
+    targetDir=$HOME/Templates
+    if [ ! -d $targetDir ]; then
+        mkdir -p $targetDir
+    fi
+
+    for file in $(ls $templateFilesDir); do
+        if [ -L $targetDir/$file ] && [ $(readlink $targetDir/$file) == $templateFilesDir/$file ]; then
+            echo "$beautifyGap1 $targetDir/$file already exists, skip"
+            continue
+        fi
+        ln -sf $templateFilesDir/$file $targetDir/$file
+    done
+}
+
 installCompletionFiles() {
     cat << _EOF
 $catBanner
@@ -298,6 +322,7 @@ installForUbuntu() {
     installTrackedFiles
     installCompletionFiles
     installHandyTools
+    installTemplateFiles
     # Notice: installLatestFz after installVimPlugs
     installLatestFzf
 }

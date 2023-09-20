@@ -7,10 +7,8 @@ core
 core-*
 core.*
 inc/
-backup/
 log/
 downloads/
-backup.*/
 dry_install/
 dry-restore/
 __pycache__/
