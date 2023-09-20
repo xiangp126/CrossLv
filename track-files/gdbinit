@@ -13,7 +13,7 @@ set print pretty on
 set pagination off
 set tui tab-width 4
 set disassembly-flavor intel
-winheight cmd +5
+# winheight cmd +5
 fs cmd
 set logging off
 set trace-commands on

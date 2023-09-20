@@ -10,8 +10,8 @@
 # Define the GDB version and source URL
 GDB_VERSION="12.1"
 
-# Get the current GDB version
-if [ -x "$(command -v gdb)" ]; then
+# Get the current GDB version and check if the passed argument is not -f
+if [ -x "$(command -v gdb)" ] && [ "$1" != "-f" ]; then
     current_version=$(gdb --version | grep -oE "[0-9]+\.[0-9]+")
 
     # Compare the versions
@@ -26,7 +26,7 @@ fi
 GDB_SOURCE_URL="https://ftp.gnu.org/gnu/gdb/gdb-$GDB_VERSION.tar.gz"
 
 # Define installation directory
-INSTALL_DIR="$HOME/.usr/bin"
+INSTALL_DIR="$HOME/.usr/"
 DOWNLOAD_DIR="$HOME/Downloads"
 PATCH_URL="https://github.com/mduft/tachyon3/raw/master/tools/patches/gdb-12.1-archswitch.patch"
 
@@ -58,7 +58,9 @@ if [ ! -f "gdb-12.1-archswitch.patch" ]; then
 fi
 
 cd $DOWNLOAD_DIR/gdb-$GDB_VERSION
-# make distclean
+if [ "$1" == "-f" ]; then
+    make distclean
+fi
 
 # Configure the build
 # https://sourceware.org/gdb/wiki/BuildingNatively
@@ -101,8 +103,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 echo "GDB $GDB_VERSION with the patch applied has been installed to $INSTALL_DIR"
-find . -name "gdb" -type f -executable -exec cp -f {} $INSTALL_DIR \;
-cd $INSTALL_DIR
+cd $INSTALL_DIR/bin
 ./gdb --version
 ldd gdb
 
