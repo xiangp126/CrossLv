@@ -1,9 +1,13 @@
-# GDB Configuration. Put in ~/.gdbinit
+# To configure GDB, put the file as ~/.gdbinit.
 
 # Display source code layout in TUI
 layout src
 
 set tui active-border-mode normal
+set style function foreground magenta
+set style function intensity dim
+set style filename foreground red
+set style filename intensity dim
 set logging file ~/.gdb.log
 set print pretty on
 set pagination off

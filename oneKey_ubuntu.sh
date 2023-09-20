@@ -32,6 +32,7 @@ prerequesitesForUbuntu=(
     dos2unix
     # Level 3
     net-tools
+    texinfo
     libvirt-clients
     bash-completion
     build-essential
