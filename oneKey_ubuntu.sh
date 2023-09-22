@@ -214,6 +214,9 @@ _EOF
     echo
 
     for file in $(ls $trackedFilesDir); do
+        if [ -L $HOME/.$file ]; then
+            rm -f $HOME/.$file
+        fi
         rsync -av $trackedFilesDir/$file $HOME/.$file
     done
 
@@ -226,13 +229,41 @@ _EOF
     fi
 }
 
-installHandyTools() {
+linkTrackedFiles() {
+    cat << _EOF
+$catBanner
+Link tracked files to $HOME
+_EOF
+    ls "$trackedFilesDir" | while read -r file; do
+        echo "$beautifyGap2 $file"
+    done
+    echo
+
+    for file in $(ls $trackedFilesDir); do
+        if [ -f $HOME/.$file ] && [ ! -L $HOME/.$file ]; then
+            local backupDir=$HOME/Public/env.bak
+            echo "$beautifyGap1 $HOME/.$file is not link, backup it to $backupDir"
+            if [ ! -d $backupDir ]; then
+                mkdir -p $backupDir
+            fi
+            mv $HOME/.$file $backupDir
+        fi
+
+        if [ -L $HOME/.$file ] && [ $(readlink $HOME/.$file) == $trackedFilesDir/$file ]; then
+            echo "$beautifyGap1 $HOME/.$file already exists, skip"
+            continue
+        fi
+        ln -sf $trackedFilesDir/.$file $HOME/.usr/bin/$file
+    done
+}
+
+linkHandyTools() {
     cat << _EOF
 $catBanner
 Link handy tools to $HOME/.usr/bin
 _EOF
     ls "$handyToolsDir" | while read -r file; do
-      echo "$beautifyGap2 $file"
+        echo "$beautifyGap2 $file"
     done
     echo
 
@@ -249,13 +280,13 @@ _EOF
     done
 }
 
-installTemplateFiles() {
+linkTemplateFiles() {
     cat << _EOF
 $catBanner
 Link template files to $HOME/Template
 _EOF
     ls "$templateFilesDir" | while read -r file; do
-      echo "$beautifyGap2 $file"
+        echo "$beautifyGap2 $file"
     done
     echo
 
@@ -316,20 +347,36 @@ printMessage() {
     echo "$beautifyGap1 Please source ~/.bashrc manually to take effect."
 }
 
+help() {
+    cat << _EOF
+Usage: ./oneKey.sh [OPTION]
+Install all the tools and configurations for ubuntu
+OPTION:
+    soft    Only link tracked files to $HOME
+    hard    Install tracked files to $HOME
+    help    Print this message
+_EOF
+    exit 0
+}
+
 installForUbuntu() {
     installPrequesitesForUbuntu
     installVimPlugs
-    installTrackedFiles
+    if [ "$1" == "soft" ]; then
+        linkTrackedFiles
+    else
+        installTrackedFiles
+    fi
     installCompletionFiles
-    installHandyTools
-    installTemplateFiles
+    linkHandyTools
+    linkTemplateFiles
     # Notice: installLatestFz after installVimPlugs
     installLatestFzf
 }
 
 install () {
     checkSudoPrivilege
-    installForUbuntu
+    installForUbuntu $1
     relinkShToBash
     relinkBatToBatcat
     relinkFdToFdfind
@@ -338,4 +385,14 @@ install () {
     printMessage
 }
 
-install
+case "$1" in
+    "soft")
+        install "soft"
+        ;;
+    "help")
+        help
+        ;;
+    *)
+        install
+        ;;
+esac

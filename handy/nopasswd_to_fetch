@@ -52,4 +52,24 @@ expect {
     }
 }
 
-exit 0
+expect eof
+
+set fetch_cmd "git fetch origin $branch"
+# Set the custom prompt
+set prompt "$ "
+
+# Spawn a local Bash session
+spawn /bin/bash
+expect $prompt
+
+# Send a command to the Bash session (change 'ls' to your desired command)
+send "pwd\r"
+expect $prompt
+
+# Send another command (e.g., 'echo "Hello, world!"')
+send "$fetch_cmd\r"
+expect $prompt
+
+# Exit the Bash session
+send "exit\r"
+expect eof
