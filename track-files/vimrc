@@ -5,6 +5,7 @@ call plug#begin('~/.vim/bundle')
 
 "------ OPTIONAL PLUGINS -----
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+Plug 'preservim/nerdcommenter'
 Plug 'majutsushi/tagbar'
 Plug 'jiangmiao/auto-pairs'
 Plug 'Yggdroot/indentLine'
@@ -233,19 +234,14 @@ command! -bang -nargs=* GGrep
 nnoremap <silent> <leader>c   :BCommits<CR>
 
 " lines
-" nnoremap <leader>l   :BLines<CR> " nnoremap <leader>la  :Lines<CR>
 nnoremap <leader>l   :call fzf#vim#buffer_lines({'options': '--no-reverse'})<CR>
-" <leader>lw will slow down heavily for <leader>l
 nnoremap <leader>L   :call fzf#vim#buffer_lines(expand('<cword>'),
   \ {'options': '--no-reverse'})<CR>
-" nnoremap <leader>la  :call fzf#vim#lines({'options': '--no-reverse'})<CR>
 
 " tags
-" nnoremap <leader>t   :BTags<CR> " nnoremap <leader>ta  :Tags<CR>
 nnoremap <leader>t   :call fzf#vim#buffer_tags('', {'options': '--no-reverse'})<CR>
 nnoremap <leader>T   :call fzf#vim#buffer_tags(expand('<cword>'),
   \ {'options': '--no-reverse'})<CR>
-" nnoremap <leader>ta  :call fzf#vim#tags('', {'options': '--no-reverse'})<CR>
 
 " buffers
 nnoremap <leader>b   :Buffers<CR>
@@ -292,6 +288,22 @@ let g:NERDTreeWinSize = 20 " default 30
 let g:NERDTreeWinPos = 'left' " only left or right
 " all dirs ending in ".d" and all files ending in ".o" to be ignored
 let NERDTreeIgnore=['\.d$[[dir]]', '\.dSYM[[dir]]', '\.o$[[file]]']
+
+""""""""""""""""""""""""""""""
+" CONFIG NERDCOMMENTER
+""""""""""""""""""""""""""""""
+" toggle comment and uncomment
+map <F4> <Leader>ci
+" refer https://github.com/preservim/nerdcommenter
+let g:NERDCreateDefaultMappings = 1
+let g:NERDSpaceDelims = 1
+let g:NERDCompactSexyComs = 1
+let g:NERDDefaultAlign = 'left'
+let g:NERDAltDelims_java = 1
+let g:NERDCustomDelimiters = { 'c': { 'left': '//','right': '' } }
+let g:NERDCommentEmptyLines = 1
+let g:NERDTrimTrailingWhitespace = 1
+let g:NERDToggleCheckAllLines = 1
 
 """"""""""""""""""""""""""""""
 " CONFIG INDENTLINE
