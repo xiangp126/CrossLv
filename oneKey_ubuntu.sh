@@ -1,7 +1,6 @@
 #!/bin/bash
-# set -x
-# Only for ubuntu with sudo privilege
-# Life is hard, let's make code easier
+# Only for Ubuntu user having sudo privilege.
+# Life is tough, so let's make code easier
 mainWd=$(cd $(dirname $0); pwd)
 trackedFilesDir=$mainWd/track-files
 templateFilesDir=$mainWd/template
@@ -239,21 +238,22 @@ _EOF
     done
     echo
 
+    local backupDir=$HOME/Public/env.bak
+    if [ ! -d $backupDir ]; then
+        mkdir -p $backupDir
+    fi
+
     for file in $(ls $trackedFilesDir); do
         if [ -f $HOME/.$file ] && [ ! -L $HOME/.$file ]; then
-            local backupDir=$HOME/Public/env.bak
             echo "$beautifyGap1 $HOME/.$file is not link, backup it to $backupDir"
-            if [ ! -d $backupDir ]; then
-                mkdir -p $backupDir
-            fi
-            mv $HOME/.$file $backupDir
+            mv $HOME/.$file $backupDir/$file.bak
         fi
 
         if [ -L $HOME/.$file ] && [ $(readlink $HOME/.$file) == $trackedFilesDir/$file ]; then
             echo "$beautifyGap1 $HOME/.$file already exists, skip"
             continue
         fi
-        ln -sf $trackedFilesDir/.$file $HOME/.usr/bin/$file
+        ln -sf $trackedFilesDir/$file $HOME/.$file
     done
 }
 
@@ -350,11 +350,14 @@ printMessage() {
 help() {
     cat << _EOF
 Usage: ./oneKey.sh [OPTION]
-Install all the tools and configurations for ubuntu
+
+Deploy all the tools and configurations for ubuntu
+
 OPTION:
-    soft    Only link tracked files to $HOME
-    hard    Install tracked files to $HOME
-    help    Print this message
+    soft   Link tracked files to $HOME. Default Option.
+    hard   Install tracked files to $HOME
+    help   Print this message
+    
 _EOF
     exit 0
 }
@@ -362,10 +365,10 @@ _EOF
 installForUbuntu() {
     installPrequesitesForUbuntu
     installVimPlugs
-    if [ "$1" == "soft" ]; then
-        linkTrackedFiles
-    else
+    if [ "$1" == "hard" ] || [ "$1" == "install" ]; then
         installTrackedFiles
+    else
+        linkTrackedFiles
     fi
     installCompletionFiles
     linkHandyTools
@@ -385,14 +388,20 @@ install () {
     printMessage
 }
 
+#!/bin/bash
+
 case "$1" in
-    "soft")
-        install "soft"
-        ;;
     "help")
         help
         ;;
+    "hard"|"install")
+        install "hard"
+        ;;
+    "soft"|"link")
+        # Fall through to the default case
+        :
+        ;;
     *)
-        install
+        install "soft"
         ;;
 esac
