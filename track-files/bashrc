@@ -27,12 +27,11 @@ export PS1="\u@${HOSTNAME:0:10}:\W\$ "
 # Let <C-S> work in Vim.
 stty -ixon
 
-# Add an "alert" alias for long running commands.  Use like so:
-#   sleep 10; alert
-# alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
-
 # Below is my own configuration.
-export LS_COLORS=$LS_COLORS:'ex=0;0'
+# LS_COLORS="rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:\
+#        cd=40;33;01:or=01;05;37;41:mi=01;05;37;41:su=37;41:sg=30;43:ca=30;41:tw=30;42"
+export LS_COLORS=$LS_COLORS:'ex=0;0:ln=36:di=34'
+
 if [[ "`uname -s`" == 'Darwin' ]]; then
     # Compatible with Mac
     alias ls='ls -G'
@@ -78,9 +77,11 @@ alias cdsrc='__cd /usr/local/src'
 alias cdg='__cd $HOME/myGit'
 alias cdb='__cd $HOME/.usr/bin'
 alias cdf='cdg && cd fos'
+alias cdF='cdg && cd crosslv'
 
 # print entry names without quoting
 export QUOTING_STYLE=literal
+# set theme for the bat(batcat) command
 export BAT_THEME=TwoDark
 
 # Useful local variables.
