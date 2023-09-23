@@ -89,6 +89,7 @@ else
   # bind -m vi-command -x '"\C-t": fzf-file-widget'
   # bind -m vi-insert -x '"\C-t": fzf-file-widget'
 
+  # *\t - Paste the selected file path into the command line
   bind -m emacs-standard -x '"*\t": fzf-file-widget'
   bind -m vi-command -x '"*\t": fzf-file-widget'
   bind -m vi-insert -x '"*\t": fzf-file-widget'
@@ -100,8 +101,13 @@ else
 fi
 
 # ALT-C - cd into the selected directory
-bind -m emacs-standard '"\ec": " \C-b\C-k \C-u`__fzf_cd__`\e\C-e\er\C-m\C-y\C-h\e \C-y\ey\C-x\C-x\C-d"'
-bind -m vi-command '"\ec": "\C-z\ec\C-z"'
-bind -m vi-insert '"\ec": "\C-z\ec\C-z"'
+# bind -m emacs-standard '"\ec": " \C-b\C-k \C-u`__fzf_cd__`\e\C-e\er\C-m\C-y\C-h\e \C-y\ey\C-x\C-x\C-d"'
+# bind -m vi-command '"\ec": "\C-z\ec\C-z"'
+# bind -m vi-insert '"\ec": "\C-z\ec\C-z"'
+
+# ALT-X - cd into the selected directory
+bind -m emacs-standard '"\ex": " \C-b\C-k \C-u`__fzf_cd__`\e\C-e\er\C-m\C-y\C-h\e \C-y\ey\C-x\C-x\C-d"'
+bind -m vi-command '"\ex": "\C-z\e-\C-z"'
+bind -m vi-insert '"\ex": "\C-z\e-\C-z"'
 
 fi
