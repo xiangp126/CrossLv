@@ -91,6 +91,7 @@ nmap <leader>k :mark<Space>
 nmap <C-G> :%s/\s\+$//gc<CR>   " Removing trailing white spaces
 nnoremap <C-M> :%s/\r//g<CR>
 nmap <leader>R :source ~/.vimrc<CR>
+nmap <silent> <leader>` :qall!<CR>
 nmap <silent> <leader>q :call CloseBufferOrQuit()<CR>
 function! CloseBufferOrQuit()
     " Check if there's only one buffer open

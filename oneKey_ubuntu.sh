@@ -357,7 +357,7 @@ OPTION:
     soft   Link tracked files to $HOME. Default Option.
     hard   Install tracked files to $HOME
     help   Print this message
-    
+
 _EOF
     exit 0
 }
@@ -405,3 +405,4 @@ case "$1" in
         install "soft"
         ;;
 esac
+
