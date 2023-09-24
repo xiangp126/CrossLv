@@ -302,6 +302,9 @@ _EOF
         fi
         ln -sf $templateFilesDir/$file $targetDir/$file
     done
+
+    # remove broken links in $targetDir
+    find $targetDir -type l -exec test ! -e {} \; -delete
 }
 
 installCompletionFiles() {
