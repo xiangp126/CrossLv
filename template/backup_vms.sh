@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# Set the backup destination directory
+backup_dir="/data/Backup/vms"
+
+# Check if the backup directory exists, create it if not
+if [ ! -d "$backup_dir" ]; then
+    mkdir -p "$backup_dir"
+fi
+
+# Get the current date and time as a timestamp
+timestamp=$(date +"%Y%m%d%H%M%S")
+
+# List all running VMs and store them in an array
+vms=($(virsh list --name))
+
+# Loop through the running VMs and create backups
+for vm in "${vms[@]}"; do
+    echo "Backing up VM: $vm"
+    # Get the source path of the VM's disk image file for vda or hda
+    source_path=$(virsh domblklist "$vm" | awk '/vda|hda/{print $2}')
+    
+    # Check if the source path is not empty
+    if [ -n "$source_path" ]; then
+        # Extract the file name from the source path
+        file_name=$(basename "$source_path")
+        # Copy the VM's disk image file to the backup directory using rsync
+        sudo rsync -av "$source_path" "$backup_dir/$file_name"
+        
+        # Backup the XML configuration file
+        sudo virsh dumpxml "$vm" > "$backup_dir/$vm.xml"
+        
+        echo -e "Backup complete for VM: $vm\n"
+    else
+        echo -e "Error: Source path is empty for VM $vm\n"
+    fi
+done
+
+echo -e "All VM backups completed.\n"

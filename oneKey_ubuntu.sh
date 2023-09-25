@@ -12,6 +12,7 @@ catBanner="---------------------------------------------------"
 catBanner=$(echo "$catBanner" | sed 's/------/------ /g')
 beautifyGap1="-> "
 beautifyGap2="   "
+beautifyGap3="♣  "
 
 # prerequesites for ubuntu
 prerequesitesForUbuntu=(
@@ -304,7 +305,10 @@ _EOF
     done
 
     # remove broken links in $targetDir
-    find $targetDir -type l -exec test ! -e {} \; -delete
+    find "$targetDir" -type l \
+    -exec test ! -e {} \; \
+    -exec echo "$beautifyGap3 Deleting broken link: {}" \; \
+    -exec rm -f {} \;
 }
 
 installCompletionFiles() {

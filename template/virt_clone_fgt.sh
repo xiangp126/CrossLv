@@ -15,13 +15,12 @@ clone_virtual_machine() {
         --check path_exists=off \
         --original="$vm_name" \
         --name="$cloned_name" \
-        --file="/usr/local/vms/ubuntu20-$cloned_name.qcow2"
+        --file="/var/lib/libvirt/images/$cloned_name.qcow2"
 
     if [ $? -ne 0 ]; then
         echo "Failed to clone virtual machine: $vm_name"
         return 1
     fi
-
     echo "Cloned virtual machine: $cloned_name"
     echo "To change the VNC port for $cloned_name, run the following command:"
     echo "sudo virsh edit $cloned_name"
