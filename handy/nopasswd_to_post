@@ -1,6 +1,6 @@
 #!/usr/bin/expect -f
 
-set header_exp get_credentials.exp
+set header_exp get_credentials
 
 # Get the real directory of the script, resolving any symlinks
 set script_path [file normalize [info script]]
