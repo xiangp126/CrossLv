@@ -9,8 +9,8 @@ ip_mapping_fgt2=("172.16.67.183:172.16.67.181" "192.168.103.1:192.168.101.1")
 
 # Loop through .conf files in the source directory
 for file in "$target_dir"/*.conf; do
-    # Check if the file name contains "fgt1" or "fgt2"
-    if [[ "$file" =~ .*fgt1.* || "$file" =~ .*fgt2.* ]]; then
+    # Check if the file name contains "fgt1" or "fgt2" or "fosndr"
+    if [[ "$file" =~ .*fgt1.* || "$file" =~ .*fgt2.* || "$file" =~ .*fosndr.* ]]; then
         continue
     fi
 
@@ -50,32 +50,26 @@ for file in "$target_dir"/*.conf; do
         # Print some value information
         cat << _EOF_
 Processing $file:
-$file => $new_filename
-$file => $dup_filename
+New $new_filename
+Dup $dup_filename
 $source_ip1 ===> $destination_ip1
 $source_ip2 ===> $destination_ip2
 _EOF_
         cd $target_dir
-        # check if the $new_filename exists
-        if [ ! -f $new_filename ]; then
-            tmp_file=$(mktemp)
-            sudo sed -e "s/${source_ip1}/${destination_ip1}/g; s/${source_ip2}/${destination_ip2}/g" "$file" > $tmp_file
-            sudo mv $tmp_file $new_filename
-        else
-            echo -e "$new_filename already exists, skipping..."
-        fi
-        # check if the $dup_filename exists
-        if [ ! -f $dup_filename ]; then
-            sudo cp "$file" $dup_filename
-        else
-            echo -e "$dup_filename already exists, skipping..."
-        fi
+        
+        # overriten the file even if the file is exist
+        tmp_file=$(mktemp)
+        sudo sed -e "s/${source_ip1}/${destination_ip1}/g; s/${source_ip2}/${destination_ip2}/g" "$file" > $tmp_file
+        sudo mv $tmp_file $new_filename
+        sudo cp "$file" $dup_filename
 
         if [ $? -ne 0 ]; then
             echo -e "Error: Failed to procses file: $file\n"
             continue
         else
             sudo chown tftp:tftp $new_filename
+            sudo chmod 666 $new_filename
+            sudo chmod 666 $dup_filename
             echo -e "\nSuccess: Processed file: $file\n"
         fi
     fi

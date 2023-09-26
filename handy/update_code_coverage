@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Set the destination directory as a variable
+destination_dir=~/Public
+
+# Change directory to "fos"
+source_dir=~/myGit/fos
+cd $source_dir
+
+# Run git diff and save the output to a file named "diff" in the destination directory
+git diff HEAD~1 HEAD > "$destination_dir/diff"
+
+# Copy "fgtcoveragebuild.tar.xz" to the destination directory
+cp fgtcoveragebuild.tar.xz "$destination_dir/"
+
+bat -p "$destination_dir/diff"
+
+echo "Done!"
