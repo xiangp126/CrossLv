@@ -1,6 +1,7 @@
 #!/bin/bash
 # Only for Ubuntu user having sudo privilege.
 # Life is tough, so let's make code easier
+
 mainWd=$(cd $(dirname $0); pwd)
 trackedFilesDir=$mainWd/track-files
 templateFilesDir=$mainWd/template
@@ -268,17 +269,24 @@ _EOF
     done
     echo
 
-    if [ ! -d $HOME/.usr/bin ]; then
-        mkdir -p $HOME/.usr/bin
+    local targetDir=$HOME/.usr/bin
+    if [ ! -d $targetDir ]; then
+        mkdir -p $targetDir
     fi
 
     for file in $(ls $handyToolsDir); do
-        if [ -L $HOME/.usr/bin/$file ] && [ $(readlink $HOME/.usr/bin/$file) == $handyToolsDir/$file ]; then
-            echo "$beautifyGap1 $HOME/.usr/bin/$file already exists, skip"
+        if [ -L $targetDir/$file ] && [ $(readlink $targetDir/$file) == $handyToolsDir/$file ]; then
+            echo "$beautifyGap1 $targetDir/$file already exists, skip"
             continue
         fi
-        ln -sf $handyToolsDir/$file $HOME/.usr/bin/$file
+        ln -sf $handyToolsDir/$file $targetDir/$file
     done
+
+    # remove broken links in $targetDir
+    find "$targetDir" -type l \
+    -exec test ! -e {} \; \
+    -exec echo "$beautifyGap3 Deleting broken link: {}" \; \
+    -exec rm -f {} \;
 }
 
 linkTemplateFiles() {
@@ -327,8 +335,13 @@ changeTMOUTToWritable() {
 $catBanner
 Change TMOUT to writable
 _EOF
-    # TMOUT is readonly in /etc/pr/.ofile, change it to writable
+    # TMOUT is readonly in /etc/profile, change it to writable
     # so that we can unset it in .bashrc
+    if ! grep -q "TMOUT" /etc/profile; then
+        echo "$beautifyGap1 TMOUT is not found in /etc/profile, skip"
+        return
+    fi
+
     sudo sed -i 's/^readonly TMOUT/# readonly TMOUT/g' /etc/profile
     if [ $? -eq 0 ]; then
         echo "$beautifyGap1 Success!"

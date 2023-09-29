@@ -5,6 +5,11 @@ destination_dir=~/Public
 
 # Change directory to "fos"
 source_dir=~/myGit/fos
+
+if [ -n "$1" ]; then
+    source_dir=$1
+fi
+
 cd $source_dir
 
 # Run git diff and save the output to a file named "diff" in the destination directory
@@ -12,7 +17,16 @@ git diff HEAD~1 HEAD > "$destination_dir/diff"
 
 # Copy "fgtcoveragebuild.tar.xz" to the destination directory
 cp fgtcoveragebuild.tar.xz "$destination_dir/"
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to copy fgtcoveragebuild.tar.xz to $destination_dir"
+    exit 1
+fi
 
+cp image.out "$destination_dir/"
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to copy image.out to $destination_dir"
+    exit 1
+fi
+
+cd - &> /dev/null
 bat -p "$destination_dir/diff"
-
-echo "Done!"

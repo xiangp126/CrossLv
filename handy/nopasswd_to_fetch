@@ -54,6 +54,9 @@ expect {
 
 expect eof
 
+exit 1
+
+
 set fetch_cmd "git fetch origin $branch"
 # Set the custom prompt
 set prompt "$ "
