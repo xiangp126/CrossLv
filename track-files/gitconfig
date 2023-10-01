@@ -6,6 +6,8 @@
 	editor = vim
 [help]
 	autocorrect = 1
+[clean]
+	requireForce = false
 [alias]
 	st = status
 	ad = add

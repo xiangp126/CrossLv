@@ -220,13 +220,19 @@ _EOF
         fi
         rsync -av $trackedFilesDir/$file $HOME/.$file
     done
+}
 
+cleanUpTheExceptions() {
+    cat << _EOF
+$catBanner
+Clean up the exceptions
+_EOF
     # Copy back the privileged git config.
     gitconfigCheckFile=$HOME/.gitconfig.fortinet
     if [ -f $gitconfigCheckFile  ]; then
-        echo "$beautifyGap1 The privileged file $gitconfigCheckFile exists."
-        echo "$beautifyGap2 Copy it back to $HOME/.gitconfig ..."
-        cp $gitconfigCheckFile $HOME/.gitconfig
+        echo "$beautifyGap3 The privileged file $gitconfigCheckFile exists."
+        echo "$beautifyGap1 Relink $HOME/.gitconfig to $gitconfigCheckFile"
+        ln -sf $gitconfigCheckFile $HOME/.gitconfig
     fi
 }
 
@@ -395,6 +401,7 @@ installForUbuntu() {
     linkTemplateFiles
     # Notice: installLatestFz after installVimPlugs
     installLatestFzf
+    cleanUpTheExceptions
 }
 
 install () {

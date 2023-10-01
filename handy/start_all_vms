@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# List all defined VMs
+vm_list=$(sudo virsh list --all --name)
+
+# Loop through the list of VMs
+for vm in $vm_list; do
+    # Check if the VM is running
+    if sudo virsh domstate "$vm" | grep -q "running"; then
+        echo "VM '$vm' is already running."
+        continue
+    fi
+    
+    # Start the VM if it's not running
+    sudo virsh start "$vm"
+    if [ $? -ne 0 ]; then
+        echo "Failed to start VM: $vm"
+        echo "Use sudo lsof -i :590X to check if the port is in use."
+        echo "And then use kill <PID> to kill the process."
+    fi
+done
