@@ -1,0 +1,19 @@
+#!/bin/bash
+
+fgt1_ip="192.168.101.1"
+fpx1_ip="192.168.101.2"
+
+new_gateway=$fpx1_ip
+
+hostname=$(hostname)
+if [ "$hostname" != "client1" ]; then
+    echo "This script is only for client1"
+    exit 1
+fi
+
+# Change the default route
+set -x
+sudo ip route replace default via "$new_gateway"
+set +x
+
+ip route
