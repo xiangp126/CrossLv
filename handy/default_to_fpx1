@@ -3,12 +3,31 @@
 fgt1_ip="192.168.101.1"
 fpx1_ip="192.168.101.2"
 
-new_gateway=$fpx1_ip
+# Check the value of $1 and set the default IP accordingly
+if [ "$1" = "fpx1" ]; then
+    new_gateway="$fpx1_ip"
+elif [ "$1" = "fgt1" ]; then
+    new_gateway="$fgt1_ip"
+elif [ -z "$1" ]; then
+    new_gateway="$fpx1_ip"
+else
+    echo "Invalid value for \$1: $1"
+    exit 1
+fi
 
 hostname=$(hostname)
 if [ "$hostname" != "client1" ]; then
     echo "This script is only for client1"
     exit 1
+fi
+
+# Check the current default route
+current_gateway=$(ip route show default | awk '/default/ {print $3}')
+
+# Compare the current gateway with the new gateway
+if [ "$current_gateway" = "$new_gateway" ]; then
+    echo "The default route is already set to $new_gateway."
+    exit 0
 fi
 
 # Change the default route
