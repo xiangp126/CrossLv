@@ -28,7 +28,7 @@ expect {
     "Username: " {
         send "$username\r"
         exp_continue
-    ;s
+    }
     "Password: " {
         send "$password\r"
         exp_continue
