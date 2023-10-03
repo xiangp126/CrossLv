@@ -3,7 +3,7 @@
 # Check if both FortiGate VM name and qcow2 path are provided as arguments
 if [ $# -lt 2 ]; then
     echo "Usage: $0 <vm_name> <qcow2_path>"
-    echo "Example: $0 fgt1 /var/lib/libvirt/images/fgt1.qcow2"
+    echo "Example: $0 fgt1 /usr/local/vms/fgt1.qcow2"
     echo "Example: $0 fpx1 /var/lib/libvirt/images/fpx1.qcow2"
     exit 1
 fi

@@ -9,7 +9,7 @@ if [ ! -d "$backup_dir" ]; then
 fi
 
 # Get the current date and time as a timestamp
-timestamp=$(date +"%Y%m%d%H%M%S")
+# timestamp=$(date +"%Y%m%d%H%M%S")
 
 # List all running VMs and store them in an array
 vms=($(virsh list --name))
@@ -28,7 +28,9 @@ for vm in "${vms[@]}"; do
         sudo rsync -av "$source_path" "$backup_dir/$file_name"
         
         # Backup the XML configuration file
-        sudo virsh dumpxml "$vm" > "$backup_dir/$vm.xml"
+        # sudo virsh dumpxml "$vm" > "$backup_dir/$vm.xml"
+        qemu_xml_path=/etc/libvirt/qemu
+        sudo rsync -av "$qemu_xml_path/$vm.xml" "$backup_dir/$vm.xml"
         
         echo -e "Backup complete for VM: $vm\n"
     else
