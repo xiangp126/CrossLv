@@ -1,13 +1,16 @@
 #!/bin/bash
-gdbLogLocation=~/.gdb.log
-if [ ! -f $gdbLogLocation ]; then
-    echo "$gdbLogLocation not found, exit"
-    exit
+
+gdbLogFile=$(eval echo "$(grep -oP '(?<=set logging file ).*' ~/.gdbinit)")
+
+if [ ! -f "$gdbLogFile" ]; then
+    # if not exist, create it
+    touch "$gdbLogFile"
 fi
+
 if ! command -v bat &> /dev/null
 then
-    tail -f $gdbLogLocation
+    tail -f "$gdbLogFile"
     exit
 fi
 
-tail -f $gdbLogLocation | bat --paging=never -p -l c
+tail -f "$gdbLogFile" | bat --paging=never -p -l c

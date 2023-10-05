@@ -15,7 +15,7 @@ for vm in $vm_list; do
     sudo virsh start "$vm"
     if [ $? -ne 0 ]; then
         echo "Failed to start VM: $vm"
-        echo "Use sudo lsof -i :590X to check if the port is in use."
+        echo "Use sudo lsof -i :[Port_Number] to check if the vnc port of $vm is in use."
         echo "And then use kill <PID> to kill the process."
     fi
 done
