@@ -1,17 +1,24 @@
 #!/bin/bash
+set -x
 
-sudo brctl addbr br1
-sudo brctl stp br1 on
-# sudo brctl showstp br1
-# sudo ip link show
-sudo ip addr add 192.168.101.254/24 dev br1
-sudo ip link set br1 up
+cd $HOME/Templates
+# setup bridge
+./create_bridge.sh
 
-sudo brctl addbr br2
-sudo brctl stp br2 on
-sudo ip addr add 192.168.102.254/24 dev br2
-sudo ip link set br2 up
+./vscode_max_user_watches.sh
 
 # setup vnc server
-cd $HOME/.vnc
-vncserver :9
+vncPort=5909
+if lsof -i :$vncPort | grep --quiet LISTEN
+then
+    set +x
+    echo "Port $vncPort is already in use. Stop setting up VNC server"
+    # vncserver -kill :9
+    set -x
+else
+    cd $HOME/.vnc
+    vncserver :9
+fi
+
+# start all vms
+start_all_vms
