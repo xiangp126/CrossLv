@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Misc Info
+catBanner="---------------------------------------------------"
+catBanner=$(echo "$catBanner" | sed 's/------/------ /g')
+beautifyGap1="-> "
+beautifyGap2="   "
+beautifyGap3="♣  "
+
 # Define the the target dir
 target_dir="/srv/tftp"
 
@@ -7,10 +14,21 @@ target_dir="/srv/tftp"
 ip_mapping_fgt1=("172.16.67.181:172.16.67.183" "192.168.101.1:192.168.103.1")
 ip_mapping_fgt2=("172.16.67.183:172.16.67.181" "192.168.103.1:192.168.101.1")
 
+# Define the substrings to exclude in the file name
+exclude_strings=("fgt1" "fgt2" "fosndr" "yang")
+
 # Loop through .conf files in the source directory
 for file in "$target_dir"/*.conf; do
-    # Check if the file name contains "fgt1" or "fgt2" or "fosndr"
-    if [[ "$file" =~ .*fgt1.* || "$file" =~ .*fgt2.* || "$file" =~ .*fosndr.* ]]; then
+    is_matched=false
+    for exclude_string in "${exclude_strings[@]}"; do
+        if [[ "$file" =~ .*$exclude_string.* ]]; then
+            is_matched=true
+            break
+        fi
+    done
+
+    if [ "$is_matched" = true ]; then
+        echo -e "$beautifyGap1 Skip file: $file\n"
         continue
     fi
 
@@ -49,6 +67,7 @@ for file in "$target_dir"/*.conf; do
 
         # Print some value information
         cat << _EOF_
+$catBanner
 Processing $file:
 New $new_filename
 Dup $dup_filename
@@ -70,7 +89,7 @@ _EOF_
             sudo chown tftp:tftp $new_filename
             sudo chmod 666 $new_filename
             sudo chmod 666 $dup_filename
-            echo -e "\nSuccess: Processed file: $file\n"
+            echo -e "Success: Processed file: $file\n"
         fi
     fi
 done
