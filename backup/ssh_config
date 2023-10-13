@@ -1,9 +1,0 @@
-# put these contents under ~/.ssh/config
-# refer https://linuxize.com/post/using-the-ssh-config-file
-Host remotedev
-    HostName 192.168.1.10
-    User Annoymous
-    Port 22
-    IdentityFile ~/.ssh/id_rsa
-    ServerAliveInterval 60
-    ServerAliveCountMax 3
