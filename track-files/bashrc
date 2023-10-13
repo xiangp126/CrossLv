@@ -115,9 +115,17 @@ if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
 
+# find bash completion for third-party tools | only for Mac
+if [[ -d /usr/local/etc/bash_completion.d ]]; then
+    for file in `find /usr/local/etc/bash_completion.d -type l`
+    do
+        source $file &> /dev/null
+    done
+fi
+
 fzf_bash_completion="$HOME/.vim/bundle/fzf-tab-completion/bash/fzf-bash-completion.sh"
 if [[ -f "$fzf_bash_completion" ]]; then
-    source $fzf_bash_completion
+    source $fzf_bash_completion &> /dev/null
     bind -x '"/\t": fzf_bash_completion'
 fi
 

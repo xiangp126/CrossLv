@@ -12,7 +12,7 @@ catBanner=$(echo "$catBanner" | sed 's/------/------ /g')
 beautifyGap1="-> "
 beautifyGap2="   "
 beautifyGap3="♣  "
-# default platform is ubuntu
+# ubuntu is the default platform
 platform=ubuntu
 
 checkPlatform() {
@@ -433,10 +433,11 @@ _EOF
 
 installCore() {
     if [ "$platform" == "ubuntu" ]; then
+        echo "$beautifyGap1 Processing Ubuntu..."
         installPrequesitesForUbuntu
     elif [ "$platform" == "mac" ]; then
+        echo "$beautifyGap1 Processing MacOS..."
         # installPrequesitesForMac
-        echo "Processing MacOS..."
     fi
 
     if [ "$1" == "hard" ] || [ "$1" == "install" ]; then
@@ -459,8 +460,8 @@ installPrequesitesForMac() {
        fzf
        fd
        bat
+       vim
     )
-
 
     cat << _EOF
 $catBanner

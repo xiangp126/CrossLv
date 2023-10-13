@@ -10,7 +10,6 @@ Plug 'majutsushi/tagbar'
 Plug 'jiangmiao/auto-pairs'
 Plug 'Yggdroot/indentLine'
 Plug 'altercation/vim-colors-solarized'
-" Plug 'majutsushi/tagbar'
 "------ FUZZY FINDER -----
 Plug 'junegunn/fzf', { 'do': './install --bin' }
 Plug 'junegunn/fzf.vim'
