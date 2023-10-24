@@ -64,8 +64,9 @@ let mapleader=';'     " leader key, default is '\'
 set t_Co=256          " number of colors
 " Reduce the 'updatetime' to 500 milliseconds for responsiveness
 autocmd CursorHold,CursorHoldI * set updatetime=500
-set background=dark
 colorscheme solarized
+set background=dark
+" highlight Normal ctermbg=0
 
 """"""""""""""""""""""""""""""
 " BASIC KEYBIND

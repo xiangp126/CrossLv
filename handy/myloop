@@ -1,0 +1,37 @@
+#!/usr/bin/expect
+
+# Check for the correct number of arguments
+# if {$argc != 2} {
+#     puts "Usage: $argv0 <command> <pattern>"
+#     exit 1
+# }
+
+# Set command and pattern from command-line arguments
+set command curl -k --ftp-ssl -u test:test ftp://172.16.67.182 -T ~/Uploads/fortiauto.pdf
+set pattern "server did not report OK, got 553"
+
+# Set the loop counter
+set loop_cnt 100
+
+# Function to execute the command and check for the pattern
+proc execute_and_check {} {
+    global command pattern loop_cnt
+    spawn $command
+    expect {
+        -re $pattern {
+            send_user "Pattern found: $expect_out(0,string)\n"
+        }
+        -re "(.*)" {
+            send_user "Received: $expect_out(0,string)"
+            if {$loop_cnt > 0} {
+                set loop_cnt [expr $loop_cnt - 1]
+                exp_continue
+            } else {
+                send_user "Loop counter reached zero. Exiting.\n"
+            }
+        }
+    }
+}
+
+# Call the function to execute and check the command
+execute_and_check
