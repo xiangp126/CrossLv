@@ -1,37 +1,35 @@
 #!/usr/bin/expect
 
-# Check for the correct number of arguments
-# if {$argc != 2} {
-#     puts "Usage: $argv0 <command> <pattern>"
-#     exit 1
-# }
+# Set the pattern to look for in the output
+set pattern "got 553"
+set pattern "226 Transfer complete"
 
-# Set command and pattern from command-line arguments
-set command curl -k --ftp-ssl -u test:test ftp://172.16.67.182 -T ~/Uploads/fortiauto.pdf
-set pattern "server did not report OK, got 553"
+# Set the number of iterations
+set max_iterations 100
+set timeout -1
 
-# Set the loop counter
-set loop_cnt 100
+for {set i 1} {$i <= $max_iterations} {incr i} {
+        spawn curl -k --ftp-ssl -u test:test ftp://172.16.67.182 -T /home/corsair/Uploads/fortiauto.pdf --trace-ascii -
 
-# Function to execute the command and check for the pattern
-proc execute_and_check {} {
-    global command pattern loop_cnt
-    spawn $command
-    expect {
-        -re $pattern {
-            send_user "Pattern found: $expect_out(0,string)\n"
-        }
-        -re "(.*)" {
-            send_user "Received: $expect_out(0,string)"
-            if {$loop_cnt > 0} {
-                set loop_cnt [expr $loop_cnt - 1]
-                exp_continue
-            } else {
-                send_user "Loop counter reached zero. Exiting.\n"
+        expect {
+            -re $pattern {
+                # Pattern found
+                puts "\n\nPattern '$pattern' found in the output (Iteration $i)."
+                exit
+            }
+            timeout {
+                puts "\nTimeout occurred. Pattern not found in the output."
+            }
+            eof {
+                puts "\nEnd of command output."
             }
         }
-    }
+
+    # Wait for the spawned process to complete
+    # wait
+
+    # Sleep for a while before the next iteration
+    after 1000 # 1 second
 }
 
-# Call the function to execute and check the command
-execute_and_check
+puts "\n\nMaximum number of iterations reached. Pattern not found in the output."
