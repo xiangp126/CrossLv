@@ -14,7 +14,8 @@ if {[llength $argv] > 0} {
 }
 
 for {set i 1} {$i <= $max_iterations} {incr i} {
-        spawn curl -k --ftp-ssl -u test:test ftp://172.16.67.182 -T /home/corsair/Uploads/fortiauto.pdf --trace-ascii -
+        # spawn curl -k --ftp-ssl -u test:test ftp://172.16.67.182 -T /home/corsair/Uploads/fortiauto.pdf --trace-ascii -
+        spawn curl -k --ftp-ssl -u test:test ftp://172.16.67.182 -T /home/corsair/Uploads/fortiauto.pdf
 
         expect {
             -re $pattern {
@@ -31,10 +32,10 @@ for {set i 1} {$i <= $max_iterations} {incr i} {
         }
 
     # Wait for the spawned process to complete
-    # wait
+    wait
 
     # Sleep for a while before the next iteration
     after 1000 # 1 second
 }
 
-puts "\n\nMaximum number of iterations reached. Pattern not found in the output."
+puts "\nMaximum number of iterations $max_iterations reached. Pattern not found in the output."
