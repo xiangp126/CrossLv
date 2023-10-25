@@ -34,8 +34,7 @@ for {set i 1} {$i <= $max_iterations} {incr i} {
     # Wait for the spawned process to complete
     wait
 
-    # Sleep for a while before the next iteration
-    after 1000 # 1 second
+    sleep 1
 }
 
-puts "\nMaximum number of iterations $max_iterations reached. Pattern not found in the output."
+puts "Maximum number of iterations reached."
