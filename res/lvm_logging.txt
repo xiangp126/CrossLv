@@ -1,0 +1,240 @@
+ir@client2:~$ sudo fdisk -l
+
+Disk /dev/vda: 10 GiB, 10737418240 bytes, 20971520 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: gpt
+Disk identifier: 85B00221-7A8C-4F4F-8AA7-4DE59A3E4E8F
+
+Device       Start      End  Sectors  Size Type
+/dev/vda1     2048     4095     2048    1M BIOS boot
+/dev/vda2     4096  3674111  3670016  1.8G Linux filesystem
+/dev/vda3  3674112 20969471 17295360  8.3G Linux filesystem
+
+
+Disk /dev/mapper/ubuntu--vg-ubuntu--lv: 8.25 GiB, 8854175744 bytes, 17293312 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+
+
+corsair@client2:~$ sudo pvdisplay
+  --- Physical volume ---
+  PV Name               /dev/vda3
+  VG Name               ubuntu-vg
+  PV Size               <8.25 GiB / not usable 0
+  Allocatable           yes (but full)
+  PE Size               4.00 MiB
+  Total PE              2111
+  Free PE               0
+  Allocated PE          2111
+  PV UUID               YPBQil-o0Dn-JZ7a-BGTe-nvih-NaMJ-3mEWE0
+
+
+See, the /dev/mapper/ubuntu--vg-ubuntu--lv actually uses /dev/vda3.
+Now I'd like to extend /dev/mapper/ubuntu--vg-ubuntu--lv without losing any data.
+
+On the host machine:
+$ sudo virsh shutdown client2
+Domain client2 is being shutdown
+
+
+$ sudo qemu-img resize /usr/local/vms/client2.qcow2 +10G
+Image resized.
+
+$ sudo virsh start client2
+Domain client2 started
+
+corsair@client2:~$ sudo fdisk -l
+
+GPT PMBR size mismatch (20971519 != 41943039) will be corrected by write.
+The backup GPT table is not on the end of the device. This problem will be corrected by write.
+Disk /dev/vda: 20 GiB, 21474836480 bytes, 41943040 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: gpt
+Disk identifier: 85B00221-7A8C-4F4F-8AA7-4DE59A3E4E8F
+
+Device       Start      End  Sectors  Size Type
+/dev/vda1     2048     4095     2048    1M BIOS boot
+/dev/vda2     4096  3674111  3670016  1.8G Linux filesystem
+/dev/vda3  3674112 20969471 17295360  8.3G Linux filesystem
+
+
+Disk /dev/mapper/ubuntu--vg-ubuntu--lv: 8.25 GiB, 8854175744 bytes, 17293312 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+
+
+corsair@client2:~$ sudo fdisk /dev/vda
+
+Command (m for help): p
+
+Disk /dev/vda: 20 GiB, 21474836480 bytes, 41943040 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: gpt
+Disk identifier: 85B00221-7A8C-4F4F-8AA7-4DE59A3E4E8F
+
+Device       Start      End  Sectors  Size Type
+/dev/vda1     2048     4095     2048    1M BIOS boot
+/dev/vda2     4096  3674111  3670016  1.8G Linux filesystem
+/dev/vda3  3674112 20969471 17295360  8.3G Linux filesystem
+
+Command (m for help): n
+Partition number (4-128, default 4):
+First sector (20969472-41943006, default 20969472):
+Last sector, +/-sectors or +/-size{K,M,G,T,P} (20969472-41943006, default 41943006):
+
+Created a new partition 4 of type 'Linux filesystem' and of size 10 GiB.
+
+Command (m for help): p
+Disk /dev/vda: 20 GiB, 21474836480 bytes, 41943040 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: gpt
+Disk identifier: 85B00221-7A8C-4F4F-8AA7-4DE59A3E4E8F
+
+Device        Start      End  Sectors  Size Type
+/dev/vda1      2048     4095     2048    1M BIOS boot
+/dev/vda2      4096  3674111  3670016  1.8G Linux filesystem
+/dev/vda3   3674112 20969471 17295360  8.3G Linux filesystem
+/dev/vda4  20969472 41943006 20973535   10G Linux filesystem
+
+
+
+Command (m for help): w
+The partition table has been altered.
+Syncing disks.
+
+
+corsair@client2:~$ sudo fdisk -l
+
+Disk /dev/vda: 20 GiB, 21474836480 bytes, 41943040 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: gpt
+Disk identifier: 85B00221-7A8C-4F4F-8AA7-4DE59A3E4E8F
+
+Device        Start      End  Sectors  Size Type
+/dev/vda1      2048     4095     2048    1M BIOS boot
+/dev/vda2      4096  3674111  3670016  1.8G Linux filesystem
+/dev/vda3   3674112 20969471 17295360  8.3G Linux filesystem
+/dev/vda4  20969472 41943006 20973535   10G Linux filesystem     <=== The new partition
+
+
+Disk /dev/mapper/ubuntu--vg-ubuntu--lv: 8.25 GiB, 8854175744 bytes, 17293312 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+
+
+If `/dev/vda4` is an unused 10GB partition that you'd like to add to the Ubuntu LVM, you can do so by following these steps.
+
+Please ensure you have a backup of your data before proceeding, as modifying partitions carries some risk:
+
+1. **Backup Data**: Before making any changes to your disk configuration, ensure you have a backup of your important data.
+
+2. **Create a Physical Volume (PV)**: Initialize the unused partition as a physical volume for LVM. Use the following command:
+
+   ```bash
+corsair@client2:~$ sudo pvcreate /dev/vda4
+  Physical volume "/dev/vda4" successfully created.
+   ```
+
+
+3. **Extend the Volume Group (VG)**: Add the new physical volume to the existing volume group. In your case, it's the "ubuntu-vg" volume group:
+
+   ```bash
+corsair@client2:~$ sudo vgdisplay
+  --- Volume group ---
+  VG Name               ubuntu-vg
+  System ID
+  Format                lvm2
+  Metadata Areas        1
+  Metadata Sequence No  2
+  VG Access             read/write
+  VG Status             resizable
+  MAX LV                0
+  Cur LV                1
+  Open LV               1
+  Max PV                0
+  Cur PV                1
+  Act PV                1
+  VG Size               <8.25 GiB
+  PE Size               4.00 MiB
+  Total PE              2111
+  Alloc PE / Size       2111 / <8.25 GiB
+  Free  PE / Size       0 / 0
+  VG UUID               1qyZo0-VJnc-qvEn-xIaH-3K4C-3fHU-LNB2Bo
+
+corsair@client2:~$ sudo vgextend ubuntu-vg /dev/vda4
+  Volume group "ubuntu-vg" successfully extended
+   ```
+
+4. **Extend the Logical Volume (LV)**: Finally, extend the logical volume to use the newly added space. You can extend it to use the entire free space by specifying 100%FREE:
+
+   ```bash
+corsair@client2:~$ sudo lvdisplay
+  --- Logical volume ---
+  LV Path                /dev/ubuntu-vg/ubuntu-lv
+  LV Name                ubuntu-lv
+  VG Name                ubuntu-vg
+  LV UUID                SwJfgg-7kTi-IKg9-tZjo-dflY-W2g4-44iHJM
+  LV Write Access        read/write
+  LV Creation host, time ubuntu-server, 2023-07-16 11:54:51 -0700
+  LV Status              available
+  # open                 1
+  LV Size                <8.25 GiB
+  Current LE             2111
+  Segments               1
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     256
+  Block device           253:0
+
+corsair@client2:~$ sudo lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
+  Size of logical volume ubuntu-vg/ubuntu-lv changed from <8.25 GiB (2111 extents) to 18.24 GiB (4670 extents).
+  Logical volume ubuntu-vg/ubuntu-lv successfully resized.
+
+   ```
+
+5. **Resize the Filesystem**: Resize the filesystem to use the new space. For example, if it's an ext4 filesystem, use:
+
+   ```bash
+
+   corsair@client2:~$ sudo resize2fs /dev/mapper/ubuntu--vg-ubuntu--lv
+resize2fs 1.45.5 (07-Jan-2020)
+Filesystem at /dev/mapper/ubuntu--vg-ubuntu--lv is mounted on /; on-line resizing required
+old_desc_blocks = 2, new_desc_blocks = 3
+The filesystem on /dev/mapper/ubuntu--vg-ubuntu--lv is now 4782080 (4k) blocks long.
+
+   ```
+
+6. **Verify the Expansion**: Confirm that the new space is available by running `df -h`.
+
+corsair@client2:~$ df -h
+Filesystem                         Size  Used Avail Use% Mounted on
+udev                               941M     0  941M   0% /dev
+tmpfs                              198M  1.4M  196M   1% /run
+/dev/mapper/ubuntu--vg-ubuntu--lv   18G  6.9G   11G  41% /
+tmpfs                              986M     0  986M   0% /dev/shm
+tmpfs                              5.0M     0  5.0M   0% /run/lock
+tmpfs                              986M     0  986M   0% /sys/fs/cgroup
+/dev/loop0                          64M   64M     0 100% /snap/core20/2015
+/dev/vda2                          1.7G  209M  1.4G  13% /boot
+/dev/loop2                          41M   41M     0 100% /snap/snapd/20290
+/dev/loop1                          64M   64M     0 100% /snap/core20/1974
+/dev/loop4                          41M   41M     0 100% /snap/snapd/20092
+/dev/loop3                          92M   92M     0 100% /snap/lxd/24061
+tmpfs                              198M   36K  198M   1% /run/user/123
+tmpfs                              198M  4.0K  198M   1% /run/user/1000
+
+After completing these steps, the logical volume `/dev/mapper/ubuntu--vg-ubuntu--lv` should have been extended to include the previously unused space from `/dev/vda4`. You can then make use of this additional space for your system.
+

@@ -1,218 +1,161 @@
-## Extend a Logical Volume (LV) in Linux without losing data
+### Extend a Logical Volume (LV) in Linux without losing data
+Say if the client name is `client1`. Please follow these steps:
 
-**Step 1: Preparations**
+Highly recommend to back up the client2 domain before you start.
 
-Before initiating the extension process, it's essential to create a backup of your important data to ensure its safety during the procedure.
+1. **Resize the Disk Image**:
+   - On the host machine, shut down the client2 domain:
+     ```bash
+     $ sudo virsh shutdown client2
+     ```
 
-Next, we need to check the existing disk and logical volume (LV) information on the client2 machine:
+   - Find the disk image file:
+     ```bash
+     $ sudo virsh domblklist client2
+     Target     Source
+     ------------------------------------------------
+     vda        /usr/local/vms/client2.qcow2
+     ```
+     Here, the disk image file is `/usr/local/vms/client2.qcow2`.
 
-```bash
-corsair@client2:~$ sudo fdisk -l
-```
+   - Resize the disk image by adding 10GB:
+     ```bash
+     $ sudo qemu-img resize /usr/local/vms/client2.qcow2 +10G
+     ```
 
-```plaintext
-Disk /dev/vda: 10 GiB, 10737418240 bytes, 20971520 sectors
-Units: sectors of 1 * 512 = 512 bytes
-Sector size (logical/physical): 512 bytes / 512 bytes
-I/O size (minimum/optimal): 512 bytes / 512 bytes
-Disklabel type: gpt
-Disk identifier: 85B00221-7A8C-4F4F-8AA7-4DE59A3E4E8F
+   - Start the client2 domain again:
+     ```bash
+     $ sudo virsh start client2
+     ```
 
-Device       Start      End  Sectors  Size Type
-/dev/vda1     2048     4095     2048    1M BIOS boot
-/dev/vda2     4096  3674111  3670016  1.8G Linux filesystem
-/dev/vda3  3674112 20969471 17295360  8.3G Linux filesystem
-```
+2. **Partition the New Space**:
+   - Log in to the client2 domain:
+     ```bash
+     $ sudo virsh console client2
+     ```
+     or if you can ssh to the client2 directly, then:
+     ```bash
+     $ ssh corsair@client2
+     ```
 
-```bash
-corsair@client2:~$ sudo pvdisplay
-```
+   - Use `sudo fdisk /dev/vda` to create a new partition:
+     - Enter `p` to print the current partition table.
+     - Enter `n` for a new partition.
+     - Choose the default partition number (4).
+     - Set the first sector to the default value.
+     - Set the last sector to the default value to use the entire space.
 
-```plaintext
---- Physical volume ---
-PV Name               /dev/vda3
-VG Name               ubuntu-vg
-PV Size               <8.25 GiB / not usable 0
-Allocatable           yes (but full)
-PE Size               4.00 MiB
-Total PE              2111
-Free PE               0
-Allocated PE          2111
-PV UUID               YPBQil-o0Dn-JZ7a-BGTe-nvih-NaMJ-3mEWE0
-```
+   - Write the changes and exit by typing `w`.
 
-This command reveals the Physical Volume (PV) information associated with `/dev/mapper/ubuntu--vg-ubuntu--lv`. It's important to note that this LV is currently linked to `/dev/vda3`.
+3. **Create a Physical Volume (PV)**:
+   - List the existing physical volumes:
+     ```bash
+     corsair@client2:~$ sudo pvdisplay
+     --- Physical volume ---
+     PV Name               /dev/vda3
+     VG Name               ubuntu-vg
+     PV Size               <8.25 GiB / not usable 0
+     Allocatable           yes (but full)
+     PE Size               4.00 MiB
+     Total PE              2111
+     Free PE               0
+     Allocated PE          2111
+     PV UUID               YPBQil-o0Dn-JZ7a-BGTe-nvih-NaMJ-3mEWE0
+     ```
+     Here, the existing physical volume is `/dev/vda3`.
+   - Initialize the unused partition as a NEW physical volume for LVM:
+     ```bash
+     corsair@client2:~$ sudo pvcreate /dev/vda4
+     ```
 
-**Step 2: Shutdown the Virtual Machine**
+4. **Extend the Volume Group (VG)**:
+   - List the existing volume groups:
+     ```bash
+     corsair@client2:~$ sudo vgdisplay
+     --- Volume group ---
+     VG Name               ubuntu-vg
+     System ID
+     Format                lvm2
+     Metadata Areas        1
+     Metadata Sequence No  2
+     VG Access             read/write
+     VG Status             resizable
+     MAX LV                0
+     Cur LV                1
+     Open LV               1
+     Max PV                0
+     Cur PV                1
+     Act PV                1
+     VG Size               <8.25 GiB
+     PE Size               4.00 MiB
+     Total PE              2111
+     Alloc PE / Size       2111 / <8.25 GiB
+     Free  PE / Size       0 / 0
+     VG UUID               1qyZo0-VJnc-qvEn-xIaH-3K4C-3fHU-LNB2Bo
+     ```
+     Here, the existing volume group is `ubuntu-vg`.
+   - Add the new physical volume to the existing volume group "ubuntu-vg":
+     ```bash
+     corsair@client2:~$ sudo vgextend ubuntu-vg /dev/vda4
+     ```
 
-On the host machine, we must ensure that the virtual machine (client2) is powered off. To achieve this, use the following command:
+5. **Extend the Logical Volume (LV)**:
+   - List the existing logical volumes:
+     ```bash
+     corsair@client2:~$ sudo lvdisplay
+     --- Logical volume ---
+     LV Path                /dev/ubuntu-vg/ubuntu-lv
+     LV Name                ubuntu-lv
+     VG Name                ubuntu-vg
+     LV UUID                SwJfgg-7kTi-IKg9-tZjo-dflY-W2g4-44iHJM
+     LV Write Access        read/write
+     LV Creation host, time ubuntu-server, 2023-07-16 11:54:51 -0700
+     LV Status              available
+     # open                 1
+     LV Size                <8.25 GiB
+     Current LE             2111
+     Segments               1
+     Allocation             inherit
+     Read ahead sectors     auto
+     - currently set to     256
+     Block device           253:0
+     ```
+     Here, the existing logical volume is `ubuntu-lv` and the path is `/dev/mapper/ubuntu--vg-ubuntu--lv`.
+   - Extend the logical volume to use the newly added space (100%FREE):
+     ```bash
+     corsair@client2:~$ sudo lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
+     ```
 
-```bash
-sudo virsh shutdown client2
-```
+6. **Resize the Filesystem**:
+   - Resize the filesystem to use the new space.
+     ```bash
+     corsair@client2:~$ sudo resize2fs /dev/mapper/ubuntu--vg-ubuntu--lv
 
-This command initiates the shutdown process for the virtual machine, ensuring a safe environment for further operations.
+     resize2fs 1.45.5 (07-Jan-2020)
+     Filesystem at /dev/mapper/ubuntu--vg-ubuntu--lv is mounted on /; on-line resizing required
+     old_desc_blocks = 2, new_desc_blocks = 3
+     The filesystem on /dev/mapper/ubuntu--vg-ubuntu--lv is now 4782080 (4k) blocks long.
+     ```
 
-**Step 3: Resize the Virtual Disk**
+7. **Verify the Expansion**:
+   - Confirm that the new space is available by running `df -h`:
+     ```bash
+     corsair@client2:~$ df -h
+     Filesystem                         Size  Used Avail Use% Mounted on
+     udev                               941M     0  941M   0% /dev
+     tmpfs                              198M  1.4M  196M   1% /run
+     /dev/mapper/ubuntu--vg-ubuntu--lv   18G  6.9G   11G  41% /
+     tmpfs                              986M     0  986M   0% /dev/shm
+     tmpfs                              5.0M     0  5.0M   0% /run/lock
+     tmpfs                              986M     0  986M   0% /sys/fs/cgroup
+     /dev/loop0                          64M   64M     0 100% /snap/core20/2015
+     /dev/vda2                          1.7G  209M  1.4G  13% /boot
+     /dev/loop2                          41M   41M     0 100% /snap/snapd/20290
+     /dev/loop1                          64M   64M     0 100% /snap/core20/1974
+     /dev/loop4                          41M   41M     0 100% /snap/snapd/20092
+     /dev/loop3                          92M   92M     0 100% /snap/lxd/24061
+     tmpfs                              198M   36K  198M   1% /run/user/123
+     tmpfs                              198M  4.0K  198M   1% /run/user/1000
+     ```
 
-1. On the host machine, we'll resize the virtual disk (client2.qcow2) by adding 10GB to it. Execute the following command:
-
-```bash
-sudo qemu-img resize /usr/local/vms/client2.qcow2 +10G
-```
-
-This command increases the size of the virtual disk by 10GB, providing additional space for the logical volume extension.
-
-**Step 4: Start the Virtual Machine**
-
-1. Start the virtual machine (client2) on the host machine with the following command:
-
-```bash
-sudo virsh start client2
-```
-
-This command reboots the virtual machine, making the added disk space available for use.
-
-**Step 5: Check the Disk Information on the Virtual Machine (client2)**
-
-Now that the virtual machine is up and running, let's verify the disk information within the client2 environment:
-
-```bash
-sudo fdisk -l
-```
-
-This command provides comprehensive information about the existing partitions, including the newly added space from the resized virtual disk.
-
-```plaintext
-Disk /dev/vda: 20 GiB, 21474836480 bytes, 41943040 sectors
-Units: sectors of 1 * 512 = 512 bytes
-Sector size (logical/physical): 512 bytes / 512 bytes
-I/O size (minimum/optimal): 512 bytes / 512 bytes
-Disklabel type: gpt
-Disk identifier: 85B00221-7A8C-4F4F-8AA7-4DE59A3E4E8F
-
-Device        Start      End  Sectors  Size Type
-/dev/vda1      2048     4095     2048    1M BIOS boot
-/dev/vda2      4096  3674111  3670016  1.8G Linux filesystem
-/dev/vda3   3674112 20969471 17295360  8.3G Linux filesystem
-/dev/vda4  20969472 41943006 20973535   10G Linux filesystem
-```
-
-```bash
-sudo vgdisplay
-```
-
-Take note of your VG name (e.g., "ubuntu-vg") for future reference.
-
-```plaintext
-corsair@client2:~$ sudo vgdisplay
-```
-
-```plaintext
---- Volume group ---
-VG Name               ubuntu-vg
-...
-```
-
-```bash
-sudo pvcreate /dev/vda4
-```
-
-This step initializes the newly added partition as a PV for Logical Volume Manager (LVM).
-
-```bash
-sudo pvdisplay
-```
-
-This command provides detailed information about the created PV and ensures it's correctly associated with /dev/vda4.
-
-```plaintext
---- Physical volume ---
-PV Name               /dev/vda4
-VG Name               ubuntu-vg
-PV Size               10 GiB / not usable 0
-Allocatable           yes (but full)
-PE Size               4.00 MiB
-Total PE              2559
-Free PE               2559
-Allocated PE          0
-PV UUID               [...]
-```
-
-**Step 6: Extend the Volume Group (VG)**
-
-1. To extend the VG, add the newly created physical volume to it:
-
-```bash
-sudo vgextend ubuntu-vg /dev/vda4
-```
-
-Replace "ubuntu-vg" with your specific VG name obtained in the previous step.
-
-```plaintext
-Volume group "ubuntu-vg" successfully extended
-```
-
-**Step 7: Identify the Logical Volume (LV) Name**
-
-1. Identify the name of your logical volume (LV) using:
-
-```bash
-sudo lvdisplay
-```
-
-In this instance, it is "ubuntu-vg/ubuntu-lv."
-
-```plaintext
-corsair@client2:~$ sudo lvdisplay
-```
-
-```plaintext
---- Logical volume ---
-LV Path                /dev/ubuntu-vg/ubuntu-lv
-...
-```
-
-**Step 8: Extend the Logical Volume (LV)**
-
-1. Extend the LV to make use of all available free space with the following command:
-
-```bash
-sudo lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
-```
-
-Ensure to replace "/dev/ubuntu-vg/ubuntu-lv" with your specific LV name obtained in the previous step.
-
-```plaintext
-corsair@client2:~$ sudo lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
-```
-
-```plaintext
-Size of logical volume ubuntu-vg/ubuntu-lv changed from <8.25 GiB (2111 extents) to 18.24 GiB (4670 extents).
-Logical volume ubuntu-vg/ubuntu-lv successfully resized.
-```
-
-**Step 9: Resize the Filesystem**
-
-1. Resize
-
- the filesystem to use the new space. For example, if it's an ext4 filesystem, use:
-
-```bash
-sudo resize2fs /dev/mapper/ubuntu--vg-ubuntu--lv
-```
-
-This command resizes the filesystem to make use of the added space.
-
-**Step 10: Verify the Expansion**
-
-1. Confirm that the new space is available by running:
-
-```bash
-df -h
-```
-
-This command shows the updated filesystem size and usage.
-
-After completing these steps, your logical volume `/dev/mapper/ubuntu--vg-ubuntu--lv` should have been extended to include the previously unused space from `/dev/vda4`.
-You can then make use of this additional space for your system.
+Done!
