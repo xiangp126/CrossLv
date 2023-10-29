@@ -1,5 +1,5 @@
 ### Extend a Logical Volume (LV) in Linux without losing data
-Say if the client name is `client1`. Please follow these steps:
+Say if the client name is `client2`. Please follow these steps:
 
 Highly recommend to back up the client2 domain before you start.
 
