@@ -1,5 +1,7 @@
 #!/bin/bash
 
+vm_location="/usr/local/vms"
+
 # Define the clone_virtual_machine function
 clone_virtual_machine() {
     local vm_name="$1"
@@ -15,11 +17,20 @@ clone_virtual_machine() {
         --check path_exists=off \
         --original="$vm_name" \
         --name="$cloned_name" \
-        --file="/usr/local/vms/ubuntu20-$cloned_name.qcow2"
+        --file="$vm_location/$cloned_name.qcow2"
 
     if [ $? -ne 0 ]; then
         echo "Failed to clone virtual machine: $vm_name"
         return 1
+    fi
+
+    # check the user of the qcow2 file, if not libvirt-qumu and the group not kvm, change them
+    local qcow2_file="$vm_location/$cloned_name.qcow2"
+    local qcow2_user=$(stat -c '%U' "$qcow2_file")
+    local qcow2_group=$(stat -c '%G' "$qcow2_file")
+    if [ "$qcow2_user" != "libvirt-qemu" ] || [ "$qcow2_group" != "kvm" ]; then
+        echo "Changing the owner of $qcow2_file to libvirt-qemu:kvm"
+        sudo chown libvirt-qemu:kvm "$qcow2_file"
     fi
 
     echo "Cloned virtual machine: $cloned_name"

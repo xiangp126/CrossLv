@@ -15,11 +15,14 @@ if ! virsh list --all | grep -q " $vm_name "; then
     exit 1
 fi
 
+# Get the path of the VM's disk image using awk
+disk_image=$(virsh domblklist "$vm_name" | awk '/vda|hda/{print $2}')
+
 # Shutdown the VM if it is running
 if virsh list --state-running | grep -q " $vm_name "; then
     echo "Shutting down VM: $vm_name"
     virsh shutdown "$vm_name"
-    
+
     # Wait for the VM to completely shut down
     while virsh list --state-running | grep -q " $vm_name "; do
         sleep 1
@@ -29,9 +32,6 @@ fi
 # Undefine (delete) the VM
 echo "Deleting VM: $vm_name"
 virsh undefine "$vm_name"
-
-# Get the path of the VM's disk image using awk
-disk_image=$(virsh domblklist "$vm_name" | awk '/vda|hda/{print $2}')
 
 # Check if the disk image path is not empty
 if [ -n "$disk_image" ]; then
