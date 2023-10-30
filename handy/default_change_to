@@ -1,6 +1,14 @@
 #!/bin/bash
 
+# This script is only for client1 and client3
+hostname=$(hostname)
+if [ "$hostname" != "client1" ] && [ "$hostname" != "client3" ]; then
+    echo "Dangerous! This script is only for client1 and client3"
+    exit 1
+fi
+
 fgt1_ip="192.168.101.1"
+fgt2_ip="192.168.103.1"
 fpx1_ip="192.168.101.2"
 
 # Check the value of $1 and set the default IP accordingly
@@ -8,17 +16,13 @@ if [ "$1" = "fpx1" ]; then
     new_gateway="$fpx1_ip"
 elif [ "$1" = "fgt1" ]; then
     new_gateway="$fgt1_ip"
+elif [ "$1" = "fgt2" ]; then
+    new_gateway="$fgt2_ip"
 elif [ -z "$1" ]; then
-    new_gateway="$fpx1_ip"
+    echo "No argument supplied, set the default gateway to $fgt1_ip"
+    new_gateway="$fgt1_ip"
 else
-    echo "Invalid value for \$1: $1"
-    exit 1
-fi
-
-hostname=$(hostname)
-if [ "$hostname" != "client1" ]; then
-    echo "This script is only for client1"
-    exit 1
+    new_gateway="$1"
 fi
 
 # Check the current default route
