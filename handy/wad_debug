@@ -1,0 +1,84 @@
+#!/usr/bin/expect -f
+
+set fgt_name [lindex $argv 0]
+if {[llength $argv] == 0} {
+    set fgt_name "fgt1"
+}
+
+# Set your SSH credentials
+set user "admin"
+set port "22"
+
+# Define the expected command prompt
+set prompt "# "
+
+# Check if fgt_name is "fgt1" and assign the appropriate IP address
+if {$fgt_name == "fgt1"} {
+    set fgt_address "192.168.101.1"
+} elseif {$fgt_name == "fgt2"} {
+    # Add more conditions for different devices if needed
+    set fgt_address "192.168.103.1"
+    # You can continue adding more conditions for other device names
+    # elseif {$fgt_name == "fgt3"} {
+    #     set fgt_address "192.168.100.3"
+    # }
+} else {
+    puts "Unknown FortiGate device: $fgt_name"
+    exit 1
+}
+
+# Spawn the SSH process
+spawn ssh -p $port $user@$fgt_address
+
+expect {
+    "yes/no" {
+        send "yes\r"
+    }
+    $prompt {
+	send "\r"
+    }
+}
+
+expect $prompt
+send "diagnose debug enable\r"
+expect $prompt
+send "diagnose test application wad 1000\r"
+expect $prompt
+set output $expect_out(buffer)
+
+# Search for the line with "type=worker" and extract the PID
+set worker_pid ""
+foreach line [split $output "\n"] {
+    if {[string match "*type=worker*" $line]} {
+        # Extract the PID from the line
+        set regex {pid=(\d+)}
+        if {[regexp $regex $line match worker_pid]} {
+            break
+        }
+    }
+}
+
+if {$worker_pid == ""} {
+    puts "Could not find worker PID"
+    exit 1
+}
+
+send "\r"
+expect $prompt
+
+send "sys sh\r"
+expect $prompt
+
+# start gdbserver
+set timeout -1
+send "gdbserver 0.0.0.0:444 --attach $worker_pid\r"
+
+# \x03 is used to send a Ctrl-C signal when the trap detects the SIGINT (Ctrl-C) signal.
+trap {
+    send \x03
+    send_user "You pressed Ctrl+C\n"
+} SIGINT
+
+# interact
+expect $prompt
+# send "exit\r"

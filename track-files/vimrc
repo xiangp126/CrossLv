@@ -46,7 +46,7 @@ set nocompatible    " No vi compatible
 set showmatch       " Show matching brackets.
 set ignorecase      " Do case insensitive matching
 set smartcase       " Do smart case matching
-set nohlsearch        " Highlight searched word
+set hlsearch        " Highlight searched word
 set incsearch       " Incremental search
 set hidden          " Hide buffers when they are abandoned
 set mouse=a         " Enable mouse usage (all modes), or 'ni' for normal & insert
