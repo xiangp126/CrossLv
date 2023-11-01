@@ -61,6 +61,8 @@ alias 7zP='7z a -mhe=on -p'
 alias 7zA='7z a'
 alias 7zX='7z x'
 alias tmux='tmux -u'
+alias youtube-dl='yt-dlp'
+alias yt-aria2c='yt-dlp --external-downloader aria2c --external-downloader-args "-x 16 -s 16" --output "%(title)s.%(ext)s"'
 # alias to change directory
 function __cd () {
     if [ -d "$1" ]; then
@@ -120,13 +122,13 @@ fi
 if [[ -d /usr/local/etc/bash_completion.d ]]; then
     for file in `find /usr/local/etc/bash_completion.d -type l`
     do
-        source $file &> /dev/null
+        source $file
     done
 fi
 
 fzf_bash_completion="$HOME/.vim/bundle/fzf-tab-completion/bash/fzf-bash-completion.sh"
 if [[ -f "$fzf_bash_completion" ]]; then
-    source $fzf_bash_completion &> /dev/null
+    source $fzf_bash_completion
     bind -x '"/\t": fzf_bash_completion'
 fi
 
