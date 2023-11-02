@@ -9,7 +9,7 @@ fi
 
 fgt1_ip="192.168.101.1"
 fgt2_ip="192.168.103.1"
-fpx1_ip="192.168.101.2"
+fpx1_ip="192.168.103.2"
 
 # Check the value of $1 and set the default IP accordingly
 if [ "$1" = "fpx1" ]; then

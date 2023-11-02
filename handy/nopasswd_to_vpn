@@ -22,6 +22,7 @@ if {$argc > 0} {
 }
 
 # Spawn your target script or command using the "mode" variable
+# spawn /opt/forticlient/fortivpn connect "SCM SSLVPN" -u $username -w -s -a
 spawn sudo /opt/forticlient/vpn -s scm.van.corp.fortinet.com:443 -u $username -p
 
 # Set the timeout value for this specific interaction

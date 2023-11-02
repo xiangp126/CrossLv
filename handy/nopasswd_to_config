@@ -15,14 +15,19 @@ source "$script_directory/$header_exp"
 # Set a custom timeout value in seconds (e.g., 180 seconds)
 set custom_timeout 180
 
-# Set the value of the "mode" variable
 # set mode "FGT_601F"
 set mode "FGT_VM64_KVM"
 
-# Check if an argument is provided
+# Check if an argument is provided and set mode accordingly
 if {$argc > 0} {
-    # Access the variable from the command line argument
-    set mode [lindex $argv 0]
+    set provided_mode [lindex $argv 0]
+    if {$provided_mode eq "fpx"} {
+        set mode FPX_KVM
+    } elseif {$provided_mode eq "fgt"} {
+        set mode FGT_VM64_KVM
+    } else {
+        set mode $provided_mode
+    }
 }
 
 # Spawn your target script or command using the "mode" variable
