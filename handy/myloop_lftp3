@@ -22,8 +22,7 @@ proc createBashScript {} {
     global bashScriptPath
     if {![file exists $bashScriptPath]} {
         # The temporary script file does not exist, create it
-        set bashScript {
-#!/bin/bash
+        set bashScript {#!/bin/bash
 file_path="/home/test/fortiauto.pdf"
 ssh client2 "stat -c %s $file_path"
 }
