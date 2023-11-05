@@ -434,6 +434,7 @@ _EOF
 installCore() {
     if [ "$platform" == "ubuntu" ]; then
         echo "$beautifyGap1 Processing Ubuntu..."
+        checkSudoPrivilege
         installPrequesitesForUbuntu
     elif [ "$platform" == "mac" ]; then
         echo "$beautifyGap1 Processing MacOS..."
@@ -474,7 +475,6 @@ _EOF
 
 install () {
     checkPlatform
-    checkSudoPrivilege
     installCore $1
     if [ "$platform" == "ubuntu" ]; then
         relinkShToBash
