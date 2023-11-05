@@ -28,6 +28,22 @@ if {$argc > 0} {
     } else {
         set mode $provided_mode
     }
+} else {
+    # Get the current working directory
+    set current_dir [exec pwd]
+
+    # Check if the directory name contains "fos"
+    if {[string match -nocase "*fos*" $current_dir]} {
+        set mode "FGT_VM64_KVM"
+    } else {
+        # Check if the directory name contains "fpx" or "proxy"
+        if {[string match -nocase "*fpx*" $current_dir] || [string match -nocase "*proxy*" $current_dir]} {
+            set mode "FPX_KVM"
+        } else {
+            puts "Unknown mode. Please provide a mode as an argument."
+            exit 1
+        }
+    }
 }
 
 # Spawn your target script or command using the "mode" variable
@@ -52,5 +68,4 @@ expect {
     }
 }
 
-# Continue with the script or additional interactions
-
+wait
