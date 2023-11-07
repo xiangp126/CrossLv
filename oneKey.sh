@@ -23,17 +23,17 @@ checkPlatform() {
         case "$os_name" in
             "ubuntu")
                 platform=ubuntu
-                echo "The current platform is Ubuntu."
+                echo "$beautifyGap1 The current platform is Ubuntu."
                 ;;
             "centos")
                 platform=centos
-                echo "The current platform is CentOS."
-                echo "We currently do not support CentOS."
+                echo "$beautifyGap1 The current platform is CentOS."
+                echo "$beautifyGap1 We currently do not support CentOS."
                 exit
                 ;;
             *)
-                echo "The current platform is not Ubuntu or CentOS."
-                echo "We currently do not support this platform."
+                echo "$beautifyGap1 The current platform is not Ubuntu or CentOS."
+                echo "$beautifyGap1 We currently do not support this platform."
                 exit
                 ;;
         esac
@@ -368,15 +368,27 @@ _EOF
     -exec rm -f {} \;
 }
 
-installCompletionFiles() {
+linkCompletionFiles() {
     cat << _EOF
 $catBanner
 Install completion files into $completionDirDst
 _EOF
+    ls "$completionDirSRC" | while read -r file; do
+        echo "$beautifyGap2 $file"
+    done
+    echo
+
     if [ ! -d $completionDirDst ]; then
         mkdir -p $completionDirDst
     fi
-    rsync -av --delete $completionDirSRC/ $completionDirDst/
+    # rsync -av --delete $completionDirSRC/ $completionDirDst/
+    for file in $(ls $completionDirSRC); do
+        if [ -L $completionDirDst/$file ] && [ $(readlink $completionDirDst/$file) == $completionDirSRC/$file ]; then
+            echo "$beautifyGap1 $completionDirDst/$file already exists, skip"
+            continue
+        fi
+        ln -sf $completionDirSRC/$file $completionDirDst/$file
+    done
 }
 
 changeTMOUTToWritable() {
@@ -447,7 +459,7 @@ installCore() {
         linkTrackedFiles
     fi
     installVimPlugs
-    installCompletionFiles
+    linkCompletionFiles
     linkHandyTools
     linkTemplateFiles
     # Notice: installLatestFz after installVimPlugs

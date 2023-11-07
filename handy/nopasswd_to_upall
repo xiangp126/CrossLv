@@ -89,7 +89,7 @@ if command -v callIndexer &> /dev/null; then
 else
     echo "callIndexer command not found"
 fi
-}}
+}
 
 # Create the bash script
 set script_file [open $script_location "w"]
@@ -98,6 +98,8 @@ close $script_file
 
 # Set the executable permission for the script
 exec chmod +x $script_location
+}
+
 
 # run authentication
 spawn ssh git@git-van.corp.fortinet.com 2fa_verify
