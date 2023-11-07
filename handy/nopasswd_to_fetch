@@ -17,11 +17,12 @@ set custom_timeout 180
 
 set script_location "/tmp/git_fetch_repos"
 
-if {[file exists $script_location]} {
+if {![file exists $script_location]} {
     set script_contents {#!/bin/bash
 
 # Define the directory containing your Git repositories
 repos=(
+    "$HOME/myGit/fos"
     "/data/fos2"
     "/data/fortiproxy"
 )
@@ -37,7 +38,7 @@ update_git_repo() {
 
     # Check if it's a Git repository
     if [ -d ".git" ]; then
-        git pull origin main
+        git fetch origin main
     else
         echo "Not a Git repository: $repo_path"
     fi
@@ -50,9 +51,7 @@ update_git_repo() {
 for repo in "${repos[@]}"; do
     update_git_repo "$repo"
 done
-
-}}
-
+}
 # Create the bash script
 set script_file [open $script_location "w"]
 puts $script_file $script_contents
@@ -60,6 +59,7 @@ close $script_file
 
 # Set the executable permission for the script
 exec chmod +x $script_location
+}
 
 # Spawn your target script or command using the "mode" variable
 spawn ssh git@git-van.corp.fortinet.com 2fa_verify

@@ -11,9 +11,6 @@ set script_directory [file dirname $script_path]
 # Source the other Expect script in the same directory
 source "$script_directory/$header_exp"
 
-# Set a custom timeout value in seconds (e.g., 180 seconds)
-set custom_timeout 180
-
 # Check if an argument is provided
 if {$argc > 0} {
     # Access the variable from the command line argument
@@ -22,6 +19,7 @@ if {$argc > 0} {
 
 # Import necessary functions and set variables
 set prompt "$ "
+set timeout -1
 
 set script_location "/tmp/git_upall_repos"
 
@@ -100,7 +98,6 @@ close $script_file
 exec chmod +x $script_location
 }
 
-
 # run authentication
 spawn ssh git@git-van.corp.fortinet.com 2fa_verify
 expect {
@@ -118,7 +115,7 @@ expect {
         send "$token\r"
     }
     timeout {
-        puts "Timed out waiting for a response."
+        puts "Timed out waiting for a response from 2fa_verify."
         exit 1
     }
 }
@@ -139,9 +136,7 @@ expect {
         exit 1
     }
     timeout {
-        puts "Timed out waiting for a response."
+        puts "Timed out waiting for a response from the bash script."
         exit 1
     }
 }
-
-wait
