@@ -135,7 +135,7 @@ fi
 # Loop to source extra bash completions
 extraCompletionDir=$HOME/.bash_completion.d
 if [[ -d "$extraCompletionDir" ]]; then
-    for file in `find $extraCompletionDir -regex ".*.bash$" -type f`
+    for file in `find $extraCompletionDir -regex ".*.bash$"`
     do
         source $file
     done

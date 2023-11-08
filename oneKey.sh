@@ -3,7 +3,7 @@
 mainWd=$(cd $(dirname $0); pwd)
 trackedFilesDir=$mainWd/track-files
 templateFilesDir=$mainWd/template
-handyToolsDir=$mainWd/handy
+ftntToolsDir=$mainWd/ftnt-tools
 completionDirSRC=$mainWd/completion-files
 completionDirDst=$HOME/.bash_completion.d
 downloadDir=$mainWd/Downloads
@@ -122,7 +122,7 @@ _EOF
 installLatestFzf() {
     cat << _EOF
 $catBanner
-Install fzf - The fuzzy finder (v >= 0.23.0)
+Install fzf - The fuzzy finder
 _EOF
     if [ -x "$(command -v fzf)" ]; then
         fzfVersion=$(fzf --version | awk '{print $1}')
@@ -193,10 +193,10 @@ _EOF
 
 installSolarizedColorScheme() {
     cat << _EOF
-$beautifyGap1 Install Solarized Color Scheme for VIM
+Install Solarized Color Scheme for VIM
 _EOF
     if [ -f ~/.vim/colors/solarized.vim ]; then
-        echo "$beautifyGap2 solarized.vim already exists, skip"
+        echo "$beautifyGap1 solarized.vim already exists, skip"
         return
     fi
 
@@ -265,10 +265,10 @@ _EOF
     done
 }
 
-cleanUpTheExceptions() {
+followUpTheExceptions() {
     cat << _EOF
 $catBanner
-Clean up the exceptions
+Follow up the exceptions
 _EOF
     # Copy back the privileged git config.
     gitconfigCheckFile=$HOME/.gitconfig.fortinet
@@ -308,12 +308,12 @@ _EOF
     done
 }
 
-linkHandyTools() {
+linkFtntTools() {
     cat << _EOF
 $catBanner
-Link handy tools to $HOME/.usr/bin
+Link ftnt tools to $HOME/.usr/bin
 _EOF
-    ls "$handyToolsDir" | while read -r file; do
+    ls "$ftntToolsDir" | while read -r file; do
         echo "$beautifyGap2 $file"
     done
     echo
@@ -323,12 +323,12 @@ _EOF
         mkdir -p $targetDir
     fi
 
-    for file in $(ls $handyToolsDir); do
-        if [ -L $targetDir/$file ] && [ $(readlink $targetDir/$file) == $handyToolsDir/$file ]; then
+    for file in $(ls $ftntToolsDir); do
+        if [ -L $targetDir/$file ] && [ $(readlink $targetDir/$file) == $ftntToolsDir/$file ]; then
             echo "$beautifyGap1 $targetDir/$file already exists, skip"
             continue
         fi
-        ln -sf $handyToolsDir/$file $targetDir/$file
+        ln -sf $ftntToolsDir/$file $targetDir/$file
     done
 
     # remove broken links in $targetDir
@@ -447,7 +447,7 @@ installCore() {
     if [ "$platform" == "ubuntu" ]; then
         echo "$beautifyGap1 Processing Ubuntu..."
         checkSudoPrivilege
-        installPrequesitesForUbuntu
+        installPrerequisitesForUbuntu
     elif [ "$platform" == "mac" ]; then
         echo "$beautifyGap1 Processing MacOS..."
         # installPrequesitesForMac
@@ -459,12 +459,11 @@ installCore() {
         linkTrackedFiles
     fi
     installVimPlugs
+    installLatestFzf # this should be after installVimPlugs
     linkCompletionFiles
-    linkHandyTools
-    linkTemplateFiles
-    # Notice: installLatestFz after installVimPlugs
-    installLatestFzf
-    cleanUpTheExceptions
+    [ "$platform" == "ubuntu" ] && linkFtntTools
+    [ "$platform" == "ubuntu" ] && linkTemplateFiles
+    [ "$platform" == "ubuntu" ] && followUpTheExceptions
 }
 
 installPrequesitesForMac() {

@@ -53,7 +53,7 @@ update_git_repo() {
                 git checkout main
             else
                 echo "Neither 'master' nor 'main' branch found."
-                return 1
+                echo "Staying on the $current_branch branch."
             fi
         fi
         # Pull the latest changes
