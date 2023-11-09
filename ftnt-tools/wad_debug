@@ -1,16 +1,25 @@
 #!/usr/bin/expect -f
 
-set fgt_name [lindex $argv 0]
 if {[llength $argv] == 0} {
     set fgt_name "fgt1"
+} else {
+    set fgt_name [lindex $argv 0]
 }
 
-# Set your SSH credentials
-set user "admin"
-set port "22"
-
-# Define the expected command prompt
-set prompt "# "
+# Function to check if the parameter is a valid IPv3 address
+proc is_valid_ipv4 {ip} {
+    if {[regexp {^(\d{0,3}\.){3}\d{1,3}$} $ip]} {
+        set octets [split $ip .]
+        foreach octet $octets {
+            if {$octet > 254} {
+                return 0 ;# Not a valid IPv4 address
+            }
+        }
+        return 1 ;# Valid IPv4 address
+    } else {
+        return 0 ;# Not a valid IPv4 address
+    }
+}
 
 # Check if fgt_name is "fgt1" and assign the appropriate IP address
 if {$fgt_name == "fgt1"} {
@@ -22,10 +31,17 @@ if {$fgt_name == "fgt1"} {
     # elseif {$fgt_name == "fgt3"} {
     #     set fgt_address "192.168.100.3"
     # }
+} elseif {[is_valid_ipv4 $fgt_name]} {
+    set fgt_address $fgt_name
 } else {
     puts "Unknown FortiGate device: $fgt_name"
     exit 1
 }
+
+# Set your SSH credentials
+set user "admin"
+set port "22"
+set prompt "# "
 
 # Spawn the SSH process
 spawn ssh -p $port $user@$fgt_address
