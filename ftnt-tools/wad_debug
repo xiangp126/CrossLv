@@ -21,16 +21,13 @@ proc is_valid_ipv4 {ip} {
     }
 }
 
-# Check if fgt_name is "fgt1" and assign the appropriate IP address
+# check if the parameter is a valid IPv4 address or a FortiGate name
 if {$fgt_name == "fgt1"} {
     set fgt_address "192.168.101.1"
 } elseif {$fgt_name == "fgt2"} {
-    # Add more conditions for different devices if needed
     set fgt_address "192.168.103.1"
-    # You can continue adding more conditions for other device names
-    # elseif {$fgt_name == "fgt3"} {
-    #     set fgt_address "192.168.100.3"
-    # }
+} elseif {$fgt_name == "fpx1"} {
+        set fgt_address "192.168.103.2"
 } elseif {[is_valid_ipv4 $fgt_name]} {
     set fgt_address $fgt_name
 } else {
@@ -56,6 +53,8 @@ expect {
 }
 
 expect $prompt
+send "diagnose debug reset\r"
+expect $prompt
 send "diagnose debug enable\r"
 expect $prompt
 send "diagnose test application wad 1000\r"
@@ -80,6 +79,12 @@ if {$worker_pid == ""} {
 }
 
 send "\r"
+expect $prompt
+
+send "diagnose wad debug enable all\r"
+expect $prompt
+
+send "diagnose sys scanunit debug all\r"
 expect $prompt
 
 send "sys sh\r"
