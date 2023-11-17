@@ -39,6 +39,11 @@ update_git_repo() {
     # Check if it's a Git repository
     if [ -d ".git" ]; then
         git fetch origin main
+        if [[ $repo_path == *"proxy"* ]] || [[ $repo_path == *"fpx"* ]]; then
+            # also fetch the 7.0 and 7.2 branches for fortiproxy repo
+            git fetch origin 7.0
+            git fetch origin 7.2
+        fi
     else
         echo "Not a Git repository: $repo_path"
     fi

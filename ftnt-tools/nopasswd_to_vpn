@@ -43,8 +43,8 @@ while {$i <= $max_retry} {
             exp_continue
         }
         $loop_prompt {
+            send_user "@@@@ Error found, retry $i\n\n"
             incr i
-            send_user "\n@@@@ $loop_prompt found, retry $i\n"
             close $spawn_id
             continue
         }
@@ -60,16 +60,16 @@ while {$i <= $max_retry} {
     }
 }
 
-expect_user -re "(.*)\n"
-set token $expect_out(1,string)
-send "$token\r"
-
 if {$i > $max_retry} {
-    send_user "\n@@@@ maximum retry reached, exit\n"
-    send_user " Please try the following commands:\n"
+    send_user "\n@@@@ Maximum retry reached, exit\n"
+    send_user "Please try the following commands:\n"
     send_user "sudo rm /opt/forticlient/ems_*.crt\n"
     send_user "sudo systemctl restart forticlient.service\n"
     exit 1
 }
+
+expect_user -re "(.*)\n"
+set token $expect_out(1,string)
+send "$token\r"
 
 interact
