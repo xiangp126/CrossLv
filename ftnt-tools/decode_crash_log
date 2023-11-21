@@ -14,7 +14,7 @@ def verify_exe_file(exe_file_path):
         print(e)
         sys.exit(1)
 
-def start_decode(pointer, exe_file_path):
+def start_decoding(pointer, exe_file_path):
     cmd = ['gdb', exe_file_path, '-q', '-batch', '-nx', '-ex', 'list *' + pointer, '-ex', 'quit']
     try:
         result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -67,7 +67,7 @@ def main():
         # Check if the line contains a function pointer
         pointer = extract_func_pointer(line)
         if pointer != "":
-            start_decode(pointer, exe_file_path)
+            start_decoding(pointer, exe_file_path)
         else:
             # Print the line as is if it doesn't contain a function pointer
             print(line.strip())

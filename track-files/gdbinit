@@ -19,7 +19,8 @@ set logging off
 set trace-commands on
 set logging on
 
-set prompt (gdb)
+# Do not remove the trailing space
+set prompt (gdb) 
 
 # Specify your custom GDB aliases (if any)
 # For example, alias "run" to "r"
