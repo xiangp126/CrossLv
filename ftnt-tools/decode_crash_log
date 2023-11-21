@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+import os
+import sys
+import subprocess
+
+def verify_exe_file(exe_file_path):
+    print("@@@@ Verifying", exe_file_path)
+    # -nx: prevents GDB from reading the .gdbinit initialization file.
+    # cmd = ['gdb', exe_file_path, '-q', '-batch', '-nx', '-ex', 'quit']
+    cmd = ['gdb', exe_file_path, '-q', '-batch', '-ex', 'quit']
+    try:
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    except Exception as e:
+        print(e)
+        sys.exit(1)
+
+def start_decode(pointer, exe_file_path):
+    cmd = ['gdb', exe_file_path, '-q', '-batch', '-nx', '-ex', 'list *' + pointer, '-ex', 'quit']
+    try:
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    except Exception as e:
+        print(e)
+        sys.exit(1)
+
+    if result.returncode == 0:
+        # Split the output into lines
+        lines = result.stdout.split('\n')
+
+        # Print the first and middle lines
+        if lines:
+            first_line = lines[0]
+            middle_line_index = len(lines) // 2
+            middle_line = lines[middle_line_index]
+
+            print(first_line)
+            print(middle_line)
+    else:
+        print("Error running GDB command:")
+        print(result.stderr)
+
+def read_crash_file(crash_file_path):
+    print("@@@@ Reading", crash_file_path)
+    with open(crash_file_path, "r") as f:
+        return f.readlines()
+
+# Function to check if a line contains a function pointer
+def extract_func_pointer(line):
+    if line.strip() != "":
+        for s in line.split():
+            # add the check len(s) == 12 to avoid the case like [0x7f4a1850fdeb].
+            if len(s) <= 12 and s[0] == '[' and s[-1] == ']':
+                return s[1:-1]
+    return ""
+
+def main():
+    if len(sys.argv) != 3:
+        print("Usage: python3 script.py <exe_file_path> <crash_file_path>")
+        sys.exit(1)
+
+    exe_file_path = sys.argv[1]
+    crash_file_path = sys.argv[2]
+
+    verify_exe_file(exe_file_path)
+    crash_lines = read_crash_file(crash_file_path)
+    print("@@@@ Start Decoding ...")
+    for line in crash_lines:
+        # Check if the line contains a function pointer
+        pointer = extract_func_pointer(line)
+        if pointer != "":
+            start_decode(pointer, exe_file_path)
+        else:
+            # Print the line as is if it doesn't contain a function pointer
+            print(line.strip())
+
+# Entry point for the script
+if __name__ == "__main__":
+    main()

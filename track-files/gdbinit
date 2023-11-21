@@ -19,7 +19,7 @@ set logging off
 set trace-commands on
 set logging on
 
-set prompt (gdb) 
+set prompt (gdb)
 
 # Specify your custom GDB aliases (if any)
 # For example, alias "run" to "r"
