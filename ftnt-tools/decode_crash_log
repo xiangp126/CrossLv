@@ -54,7 +54,8 @@ def extract_func_pointer(line):
 
 def main():
     if len(sys.argv) != 3:
-        print("Usage: python3 script.py <exe_file_path> <crash_file_path>")
+        print("Usage: {} <exe_file_path> <crash_file_path>".format(sys.argv[0]))
+        print("Example: {} ./sysinit/init ./crash.log".format(sys.argv[0]))
         sys.exit(1)
 
     exe_file_path = sys.argv[1]

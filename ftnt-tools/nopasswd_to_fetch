@@ -39,11 +39,9 @@ update_git_repo() {
     # Check if it's a Git repository
     if [ -d ".git" ]; then
         git fetch origin main
-        if [[ $repo_path == *"proxy"* ]] || [[ $repo_path == *"fpx"* ]]; then
-            # also fetch the 7.0 and 7.2 branches for fortiproxy repo
-            git fetch origin 7.0
-            git fetch origin 7.2
-        fi
+        # if [[ $repo_path == *"proxy"* ]] || [[ $repo_path == *"fpx"* ]]; then
+        git fetch origin 7.0
+        git fetch origin 7.2
     else
         echo "Not a Git repository: $repo_path"
     fi
@@ -73,6 +71,10 @@ spawn ssh git@git-van.corp.fortinet.com 2fa_verify
 set timeout $custom_timeout
 
 expect {
+    {yes/no} {
+        send "yes\r"
+        exp_continue
+    }
     "username: " {
         send "$username\r"
         exp_continue

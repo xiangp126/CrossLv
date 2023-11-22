@@ -33,8 +33,8 @@ clone_virtual_machine() {
         sudo chown libvirt-qemu:kvm "$qcow2_file"
     fi
 
-    echo "Cloned virtual machine: $cloned_name"
-    echo "To change the VNC port for $cloned_name, run the following command:"
+    echo "@@@@ Cloned virtual machine: $cloned_name"
+    echo "@@@@ To change the VNC port for $cloned_name, run the following command:"
     echo "sudo virsh edit $cloned_name"
 
 }
