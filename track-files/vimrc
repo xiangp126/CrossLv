@@ -71,9 +71,16 @@ set background=dark
 """"""""""""""""""""""""""""""
 " BASIC KEYBIND
 """"""""""""""""""""""""""""""
-" map: recursive mapping, case ignorance
-" nnoremap: no recursive mapping, avoid below shortcut key mapping
-" Important: <leader>lw will slow down heavily for <leader>l
+" map: Recursive mapping with case ignorance.
+"   nmap - Recursive mapping in Normal mode
+"   imap - Recursive mapping in Insert mode
+"   vmap - Recursive mapping in Visual mode
+"   cmap - Recursive mapping in Command-line mode
+" noremap: Non-recursive mapping"   nnoremap: Non-recursive mapping in Normal mode
+"   inoremap: Non-recursive mapping in Insert mode
+"   vnoremap: Non-recursive mapping in Visual mode
+"   cnoremap: Non-recursive mapping in Command-line mode
+" Be cautious about setting new keybinds.
 " <S-...> Shift +
 " <C-...> Control +
 " <M-...> Alt +
@@ -103,12 +110,15 @@ function! CloseBufferOrQuit()
         bdelete
     endif
 endfunction
-
-nmap <silent> <leader>w       :w<CR>
+nmap <silent> <leader>w :w<CR>
 imap <C-D> <ESC>dd
-nnoremap <C-S>            :write<CR>
-inoremap <C-S>       <ESC>:write<CR>
-vnoremap <C-S>       <ESC>:write<CR>
+" Disable Ctrl + Q
+nnoremap <C-Q> <Nop>
+inoremap <C-Q> <Nop>
+vnoremap <C-Q> <Nop>
+nnoremap <C-S> :write<CR>
+inoremap <C-S> <ESC>:write<CR>
+vnoremap <C-S> <ESC>:write<CR>
 " Jump between buffers
 nmap <leader>1 :buffer1<CR>
 nmap <leader>2 :buffer2<CR>

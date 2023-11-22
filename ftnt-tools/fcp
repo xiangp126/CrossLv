@@ -1,0 +1,6 @@
+#!/bin/bash
+file_path=$HOME/Public/fcp.txt
+if [ ! -f $file_path ]; then
+    touch $file_path
+fi
+vim -c "set paste" +"normal! gg" $file_path
