@@ -1,0 +1,65 @@
+#!/usr/bin/expect
+
+if {$argc < 1} {
+    puts "Usage: $argv0 <fgt2> \[password\]"
+    puts "Example: $argv0 fgt2"
+    exit 1
+}
+
+# Check if the password argument is provided
+if {$argc > 1} {
+    set password [lindex $argv 1]
+} else {
+    set password "fos"
+}
+set user_notation "@@@@"
+set fgt_prompt "# "
+set fgt_name [lindex $argv 0]
+set max_iterations 2
+
+for {set i 1} {$i <= $max_iterations} {incr i} {
+    spawn -noecho ssh $fgt_name
+    expect {
+        # remove with:\r\r\n  ssh-keygen -f "/home/user_name/.ssh/known_hosts" -R "192.16X.10X.X"\r\r\n
+        # remove with:\r\r\n  ssh-keygen -f "/home/username/.ssh/known_hosts" -R "fgt2"\r\r\n
+        -re {remove with:\r\r\n\s+([^\r\n]+)\r\r\n} {
+            set remove_line $expect_out(1,string)
+            lappend captured_commands $remove_line
+            exp_continue
+        }
+        {yes/no} {
+            send "yes\r"
+            exp_continue
+        }
+        "password: " {
+            send "fos\r"
+            exp_continue
+        }
+        eof {
+            # Handle the case where the SSH connection failed
+            puts "$user_notation Failed to connect to $fgt_name"
+            foreach command $captured_commands {
+                puts "$user_notation $command"
+                eval exec $command
+            }
+        }
+        timeout {
+            # Handle timeout actions, such as error handling
+            puts "Timed out waiting for a response."
+            exit 1
+        }
+        $fgt_prompt {
+            puts "$user_notation Successfully connected to $fgt_name"
+            break
+        }
+    }
+}
+
+send "\r"
+expect $fgt_prompt
+
+# Now you can add additional commands or interactions as needed
+# For example, you can automate further commands here
+
+# End the Expect script
+interact
