@@ -32,32 +32,22 @@ repo_dir="/opt/src"
 # Function to update a Git repository
 update_git_repo() {
     local repo_path="$1"
-
     echo -e  "\nUpdating repository: $repo_path"
 
-    # Change to the repository directory
-    cd "$repo_path" || exit 1
-
+    # switch to the repository directory
+    cd "$repo_path" || return 1
     # Check if it's a Git repository
     if [ -d ".git" ]; then
         # Get the current branch name
         current_branch=$(git symbolic-ref --short HEAD 2>/dev/null)
-
-        if [ "$current_branch" == "master" ] || [ "$current_branch" == "main" ]; then
-            echo "Currently on the $current_branch branch"
-        else
-            # Check if "master" exists, and if not, check if "main" exists
-            if git show-ref --verify --quiet "refs/heads/master"; then
-                git checkout master
-            elif git show-ref --verify --quiet "refs/heads/main"; then
-                git checkout main
-            else
-                echo "Neither 'master' nor 'main' branch found."
-                echo "Staying on the $current_branch branch."
-            fi
+        # check the return code, if error then exit
+        if [ $? -ne 0 ]; then
+            echo "Warning: Not on any branch"
+            return 1
         fi
-        # Pull the latest changes
-        git pull
+
+        # git pull current branch
+        git pull origin "$current_branch"
     else
         echo "Not a Git repository: $repo_path"
     fi
