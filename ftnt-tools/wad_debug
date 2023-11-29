@@ -81,11 +81,14 @@ if {$worker_pid == ""} {
 send "\r"
 expect $prompt
 
-send "diagnose wad debug enable all\r"
+send "diagnose debug reset\r"
 expect $prompt
 
-send "diagnose sys scanunit debug all\r"
-expect $prompt
+# send "diagnose wad debug enable all\r"
+# expect $prompt
+
+# send "diagnose sys scanunit debug all\r"
+# expect $prompt
 
 send "sys sh\r"
 expect $prompt

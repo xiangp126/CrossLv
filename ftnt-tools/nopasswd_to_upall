@@ -22,6 +22,7 @@ set prompt "$ "
 set timeout -1
 
 set script_location "/tmp/git_upall_repos"
+set user_notation "@@@@"
 
 if {![file exists $script_location]} {
     set script_contents {#!/bin/bash
@@ -48,6 +49,10 @@ update_git_repo() {
 
         # git pull current branch
         git pull origin "$current_branch"
+        if [ $? -ne 0 ]; then
+            echo "@@@@ Error: Failed to pull the current branch"
+            return 1
+        fi
     else
         echo "Not a Git repository: $repo_path"
     fi
@@ -88,45 +93,66 @@ close $script_file
 exec chmod +x $script_location
 }
 
-# run authentication
-spawn ssh git@git-van.corp.fortinet.com 2fa_verify
-expect {
-    "username: " {
-        send "$username\r"
-        exp_continue
-    }
-    "password:" {
-        send "$password\r"
-        exp_continue
-    }
-    "OTP: " {
-        expect_user -re "(.*)\n"
-        set token $expect_out(1,string)
-        send "$token\r"
-    }
-    timeout {
-        puts "Timed out waiting for a response from 2fa_verify."
-        exit 1
+proc common_expect_block {fa_pattern} {
+    global pattern_found user_notation
+    expect {
+        {yes/no} {
+            send "yes\r"
+            exp_continue
+        }
+        -nocase -re "Username: " {
+            send "$username\r"
+            exp_continue
+        }
+        -nocase -re "Password:" {
+            send "$password\r"
+            exp_continue
+        }
+        -re $fa_pattern {
+            puts "$user_notation Pattern '$fa_pattern' Found in the output."
+            set pattern_found true
+            exp_continue
+        }
+        -re "OTP: " {
+            # Prompt for and read the FortiToken from the user
+            # set timeout -1
+            expect_user -re "(.*)\n"
+            set token $expect_out(1,string)
+            send "$token\r"
+            exp_continue
+        }
+        timeout {
+            puts "$user_notation Timed out! Have you set up your VPN?"
+            exit 1
+        }
+        eof {}
     }
 }
-wait
 
-# run the bash script
+set fa_pattern "2fa_verify"
+set pattern_found false
+set timeout 180
 spawn bash $script_location
-expect {
-    -re "Username: " {
-        send "$username\r"
-        exp_continue
-    }
-    -re "Password:" {
-        send "$password\r"
-        exp_continue
-    }
-    -re "fatal: " {
-        exit 1
-    }
-    timeout {
-        puts "Timed out waiting for a response from the bash script."
-        exit 1
-    }
+common_expect_block $fa_pattern
+if {$pattern_found == false} {
+    exit 1
 }
+
+set fa_pattern "OTP validation failed:"
+set pattern_found false
+spawn ssh git@git-van.corp.fortinet.com 2fa_verify
+common_expect_block $fa_pattern
+if {$pattern_found == true} {
+    exit 1
+}
+
+set fa_pattern "2fa_verify"
+set pattern_found false
+set timeout 180
+spawn bash $script_location
+common_expect_block $fa_pattern
+if {$pattern_found == false} {
+    exit 1
+}
+
+wait

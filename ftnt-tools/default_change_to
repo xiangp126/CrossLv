@@ -19,8 +19,8 @@ elif [ "$1" = "fgt1" ]; then
 elif [ "$1" = "fgt2" ]; then
     new_gateway="$fgt2_ip"
 elif [ -z "$1" ]; then
-    echo "No argument supplied, set the default gateway to $fgt1_ip"
-    new_gateway="$fgt1_ip"
+    echo "Usage: $0 <fpx1|fgt1|fgt2>"
+    exit 1
 else
     new_gateway="$1"
 fi
