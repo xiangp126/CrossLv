@@ -1,7 +1,5 @@
 #!/usr/bin/expect
 
-#!/usr/bin/expect
-
 # Check if the correct number of arguments is provided
 if {$argc < 2} {
     puts "Usage: $argv0 <commands_file> <fgt_dev> \[max_iter\]"
@@ -9,24 +7,32 @@ if {$argc < 2} {
     exit 1
 }
 
+# puts "argv: $argv"
 set commands_file [lindex $argv 0]
 set fgt_dev [lindex $argv 1]
 
-set header_exp nopasswd_to_ssh
+# set header_exp nopasswd_to_ssh
 
-# Get the real directory of the script, resolving any symlinks
-set script_path [file normalize [info script]]
+# # Get the real directory of the script, resolving any symlinks
+# set script_path [file normalize [info script]]
 
-# Determine the directory of the real script
-set script_directory [file dirname $script_path]
-puts "script directory is : $script_directory"
+# # Determine the directory of the real script
+# set script_directory [file dirname $script_path]
 
-# Source the other Expect script in the same directory
+# proc lshift {inputlist} {
+#   upvar $inputlist argv
+#   set arg  [lindex $argv 0]
+#   #set argv [lrange $argv 1 end] ;# below is much faster - lreplace can make use of unshared Tcl_Obj to avoid alloc'ing the result
+#   set argv [lreplace $argv[set argv {}] 0 0]
+#   return $arg
+# }
+
+# lshift argv
+# # puts "argv: $argv"
 # source "$script_directory/$header_exp"
-eval [read [open "$script_directory/$header_exp"] ] $fgt_dev
 
+spawn ssh -p 22 admin@$fgt_dev
 
-exit
 # Set the pattern to look for in the output
 set fgt_prompt "# "
 
@@ -35,50 +41,45 @@ set user_anotation "@@@@"
 set max_iterations 100
 set timeout -1
 
+proc exe_commands {file fgt_prompt} {
+    # Open the commands file for reading
+    set file_handle [open $file r]
+
+    # Read commands from the file line by line
+    while {[gets $file_handle command] != -1} {
+        # Send the command to the spawned SSH session
+        send "$command\r"
+
+        # Wait for the command to complete (adjust the timeout as needed)
+        expect {
+            -timeout 10
+            "$fgt_prompt" {
+                # Assuming the shell prompt is "% "; adjust if your prompt is different
+                # This indicates that the command has completed
+                # puts "Command: $command completed successfully"
+            }
+            timeout {
+                puts "Timeout occurred while waiting for command completion: $command"
+                exit 1
+            }
+        }
+    }
+}
+
 # Check if an argument for max_iterations was provided
 if {[llength $argv] > 3} {
     set max_iterations [lindex $argv 2]
 }
-
-# for {set i 1} {$i <= $max_iterations} {incr i} {
-#     puts "$user_anotation Start of try #$i"
-#     # spawn curl -k --ftp-ssl -u test:test ftp://172.16.67.182 -T /home/corsair/Uploads/fortiauto.pdf
-#     spawn curl --max-time 259200 --insecure --trace-ascii - $url
-#     expect {
-#         "$pattern" {
-#         }
-#         timeout {
-#             puts "Timeout occurred. Pattern not found in the output."
-#         }
-#         eof {
-#             puts "$user_anotation End of try #$i"
-#         }
-#     }
-#     sleep 1
-# }
-
-
 # Open the commands file for reading
 set file [open $commands_file r]
 
-# Read commands from the file line by line
-while {[gets $file command] != -1} {
-    # Send the command to the spawned SSH session
-    send "$command\r"
-
-    # Wait for the command to complete (adjust the timeout as needed)
-    expect {
-        -timeout 10
-        "$fgt_prompt" {
-            # Assuming the shell prompt is "% "; adjust if your prompt is different
-            # This indicates that the command has completed
-            puts "Command: $command completed successfully"
-        }
-        timeout {
-            puts "Timeout occurred while waiting for command completion: $command"
-            exit 1
-        }
-    }
+for {set i 1} {$i <= $max_iterations} {incr i} {
+    send "\r"
+    expect "$fgt_prompt"
+    puts "$user_anotation Start of try #$i"
+    exe_commands $commands_file $fgt_prompt
+    puts "$user_anotation End of try #$i"
+    sleep 5
 }
 
 # Close the file
@@ -89,4 +90,3 @@ send "exit\r"
 expect eof
 
 puts "Maximum number of iterations $max_iterations reached."
-
