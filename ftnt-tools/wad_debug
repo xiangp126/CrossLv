@@ -1,9 +1,12 @@
 #!/usr/bin/expect -f
 
-if {[llength $argv] == 0} {
-    set fgt_name "fgt1"
+# check if an argument is provided, argc must > 1
+if {$argc > 0} {
+    set fgt_dev [lindex $argv 0]
 } else {
-    set fgt_name [lindex $argv 0]
+    puts "Usage: $argv0 <Device name or IP address>"
+    puts "Example: $argv0 fgt1"
+    exit 1
 }
 
 # Function to check if the parameter is a valid IPv3 address
@@ -22,17 +25,11 @@ proc is_valid_ipv4 {ip} {
 }
 
 # check if the parameter is a valid IPv4 address or a FortiGate name
-if {$fgt_name == "fgt1"} {
-    set fgt_address "192.168.101.1"
-} elseif {$fgt_name == "fgt2"} {
-    set fgt_address "192.168.103.1"
-} elseif {$fgt_name == "fpx1"} {
-        set fgt_address "192.168.103.2"
-} elseif {[is_valid_ipv4 $fgt_name]} {
-    set fgt_address $fgt_name
-} else {
-    puts "Unknown FortiGate device: $fgt_name"
-    exit 1
+if {$fgt_dev ni {"fgt1" "fgt2" "fpx1"}} {
+    if {![is_valid_ipv4 $fgt_dev]} {
+        puts "Invalid FortiGate name or IP address: $fgt_dev"
+        exit 1
+    }
 }
 
 # Set your SSH credentials
@@ -41,7 +38,7 @@ set port "22"
 set prompt "# "
 
 # Spawn the SSH process
-spawn ssh -p $port $user@$fgt_address
+spawn ssh -p $port $user@$fgt_dev
 
 expect {
     "yes/no" {

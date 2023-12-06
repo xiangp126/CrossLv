@@ -39,13 +39,19 @@ for {set i 1} {$i <= $max_iterations} {incr i} {
         eof {
             # Check the exit status of the spawned process
             set spawn_result [wait]
-            if {[lindex $spawn_result 3] != 0} {
-                puts "$user_notation Error: Failed to connect to $fgt_name."
-                exit 1
-            }
+            # Index 0: Process ID of the spawned process.
+            # Index 1: The spawn id associated with the process.
+            # Index 2: The string representation of the spawn id.
+            # Index 3: The exit status of the spawned process.
+            # puts "spawn_result: $spawn_result"
+            # Exp: spawn_result: 1494514 exp5 0 255
+            # if {[lindex $spawn_result 3] != 0} {
+            #     puts "$user_notation Error: Failed to connect to $fgt_name."
+            #     exit 1
+            # }
 
             foreach command $captured_commands {
-                puts "$user_notation $command"
+                puts "$user_notation Executing command: $command"
                 eval exec $command
             }
         }

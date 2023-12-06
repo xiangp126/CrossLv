@@ -24,16 +24,17 @@ set timeout -1
 set script_location "/tmp/git_upall_repos"
 set user_notation "@@@@"
 
-if {![file exists $script_location]} {
+if {[file exists $script_location]} {
     set script_contents {#!/bin/bash
 
 # Define the directory containing your Git repositories
 repo_dir="/opt/src"
+user_notation="@@@@"
 
 # Function to update a Git repository
 update_git_repo() {
     local repo_path="$1"
-    echo -e  "\nUpdating repository: $repo_path"
+    echo -e  "\n$user_notation Updating repository: $repo_path"
 
     # switch to the repository directory
     cd "$repo_path" || return 1
@@ -43,18 +44,21 @@ update_git_repo() {
         current_branch=$(git symbolic-ref --short HEAD 2>/dev/null)
         # check the return code, if error then exit
         if [ $? -ne 0 ]; then
-            echo "Warning: Not on any branch"
+            echo "$user_notation Warning: Not on any branch"
             return 1
         fi
 
         # git pull current branch
-        git pull origin "$current_branch"
+        echo "$user_notation Fetching tags:"
+        git fetch --tags
+        echo "$user_notation Pulling the current branch: $current_branch"
+        git pull --rebase
         if [ $? -ne 0 ]; then
-            echo "@@@@ Error: Failed to pull the current branch"
+            echo "$user_notation Error: Failed to pull the current branch: $current_branch"
             return 1
         fi
     else
-        echo "Not a Git repository: $repo_path"
+        echo "$user_notation Not a Git repository: $repo_path"
     fi
 
     # Return to the original directory
@@ -63,7 +67,7 @@ update_git_repo() {
 
 # Check if the directory exists
 if [ ! -d "$repo_dir" ]; then
-    echo "Error: The directory $repo_dir does not exist."
+    echo "$user_notation Error: The directory $repo_dir does not exist."
     exit 1
 fi
 
@@ -80,7 +84,7 @@ if command -v callIndexer &> /dev/null; then
     # The command callIndexer exists, so you can execute it
     callIndexer
 else
-    echo "callIndexer command not found"
+    echo "$user_notation callIndexer command not found"
 fi
 }
 
@@ -140,19 +144,12 @@ if {$pattern_found == false} {
 
 set fa_pattern "OTP validation failed:"
 set pattern_found false
+set timeout 180
 spawn ssh git@git-van.corp.fortinet.com 2fa_verify
 common_expect_block $fa_pattern
 if {$pattern_found == true} {
     exit 1
 }
 
-set fa_pattern "2fa_verify"
-set pattern_found false
-set timeout 180
+set timeout -1
 spawn bash $script_location
-common_expect_block $fa_pattern
-if {$pattern_found == false} {
-    exit 1
-}
-
-wait

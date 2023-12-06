@@ -33,7 +33,7 @@ def start_decoding(pointer, exe_file_path):
             middle_line = lines[middle_line_index]
 
             print(first_line)
-            print(middle_line)
+            # print(middle_line)
     else:
         print("Error running GDB command:")
         print(result.stderr)

@@ -38,7 +38,11 @@ set fgt_prompt "# "
 
 # Set the number of iterations
 set user_anotation "@@@@"
-set max_iterations 100
+if {[llength $argv] > 2} {
+    set max_iterations [lindex $argv 2]
+} else {
+    set max_iterations 100
+}
 set timeout -1
 
 proc exe_commands {file fgt_prompt} {
@@ -47,20 +51,26 @@ proc exe_commands {file fgt_prompt} {
 
     # Read commands from the file line by line
     while {[gets $file_handle command] != -1} {
-        # Send the command to the spawned SSH session
-        send "$command\r"
+        if {[string match "#*" $command]} {
+            continue
+        } elseif {[string length $command] == 0} {
+            sleep 1
+        } else {
+            # Send the command to the spawned SSH session
+            send "$command\r"
 
-        # Wait for the command to complete (adjust the timeout as needed)
-        expect {
-            -timeout 10
-            "$fgt_prompt" {
-                # Assuming the shell prompt is "% "; adjust if your prompt is different
-                # This indicates that the command has completed
-                # puts "Command: $command completed successfully"
-            }
-            timeout {
-                puts "Timeout occurred while waiting for command completion: $command"
-                exit 1
+            # Wait for the command to complete (adjust the timeout as needed)
+            expect {
+                -timeout 10
+                "$fgt_prompt" {
+                    # Assuming the shell prompt is "% "; adjust if your prompt is different
+                    # This indicates that the command has completed
+                    # puts "Command: $command completed successfully"
+                }
+                timeout {
+                    puts "Timeout occurred while waiting for command completion: $command"
+                    exit 1
+                }
             }
         }
     }
@@ -79,7 +89,7 @@ for {set i 1} {$i <= $max_iterations} {incr i} {
     puts "$user_anotation Start of try #$i"
     exe_commands $commands_file $fgt_prompt
     puts "$user_anotation End of try #$i"
-    sleep 5
+    sleep 2
 }
 
 # Close the file

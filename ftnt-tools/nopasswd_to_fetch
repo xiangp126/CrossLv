@@ -19,37 +19,44 @@ if {![file exists $script_location]} {
     set script_contents {#!/bin/bash
 
 # Define the directory containing your Git repositories
+user_notation="@@@@"
 repos=(
     "$HOME/myGit/fos"
     "/data/fos2"
     "/data/fortiproxy"
+    "/data/sandbox/fos_repro"
+    "/data/sandbox/fpx_repro"
 )
 
 # Function to update a Git repository
 update_git_repo() {
     local repo_path="$1"
 
-    echo -e  "\nUpdating repository: $repo_path"
+    echo -e  "\n$user_notation Updating repository: $repo_path"
 
     # Change to the repository directory
     cd "$repo_path" || exit 1
 
     # Check if it's a Git repository
     if [ -d ".git" ]; then
+        echo "$user_notation Fetching tags:"
         git fetch --tags
         # Check if fetching was successful
         if [ $? -ne 0 ]; then
             echo "@@@@ Error fetching tags. Aborting."
             exit 1
         fi
+        echo "$user_notation Fetching branches: main"
         git fetch origin main
-        # if [[ $repo_path == *"proxy"* ]] || [[ $repo_path == *"fpx"* ]]; then
+        echo "$user_notation Fetching and rebasing branches: 7.0"
         git fetch origin 7.0
-        git rebase origin/7.0 7.0
+        # git rebase may involve checkout, so not using it here
+        # git rebase origin/7.0 7.0
+        echo "$user_notation Fetching and rebasing branches: 7.2"
         git fetch origin 7.2
-        git rebase origin/7.2 7.2
+        # git rebase origin/7.2 7.2
     else
-        echo "Not a Git repository: $repo_path"
+        echo "$user_notation Not a Git repository: $repo_path"
     fi
 
     # Return to the original directory
@@ -109,7 +116,7 @@ proc common_expect_block {fa_pattern} {
 
 set fa_pattern "2fa_verify"
 set pattern_found false
-set timeout 180
+set timeout -1
 spawn bash $script_location
 common_expect_block $fa_pattern
 if {$pattern_found == false} {
@@ -118,19 +125,12 @@ if {$pattern_found == false} {
 
 set fa_pattern "OTP validation failed:"
 set pattern_found false
+set timeout 180
 spawn ssh git@git-van.corp.fortinet.com 2fa_verify
 common_expect_block $fa_pattern
 if {$pattern_found == true} {
     exit 1
 }
 
-set fa_pattern "2fa_verify"
-set pattern_found false
-set timeout 180
+set timeout -1
 spawn bash $script_location
-common_expect_block $fa_pattern
-if {$pattern_found == false} {
-    exit 1
-}
-
-wait
