@@ -1,19 +1,21 @@
 #!/bin/bash
 
-# Set the destination directory as a variable
-destination_dir=~/Public
-
-# Change directory to "fos"
-source_dir=~/myGit/fos
-
-if [ -n "$1" ]; then
-    source_dir=$1
+if [[ "$#" < 1 ]]; then
+    echo "Usage: $0 <commit_path>"
+    echo "Example: $0 . "
+    exit 1
 fi
 
+# set the destination directory
+destination_dir=~/Public
+diff_name="diff"
+
+# get the source directory from the argument
+source_dir=$1
 cd $source_dir
 
 # Run git diff and save the output to a file named "diff" in the destination directory
-git diff HEAD~1 HEAD > "$destination_dir/diff"
+git diff HEAD~1 HEAD > "$destination_dir/$diff_name"
 
 # Copy "fgtcoveragebuild.tar.xz" to the destination directory
 cp fgtcoveragebuild.tar.xz "$destination_dir/"

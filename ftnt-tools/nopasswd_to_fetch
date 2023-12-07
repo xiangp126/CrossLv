@@ -48,11 +48,11 @@ update_git_repo() {
         fi
         echo "$user_notation Fetching branches: main"
         git fetch origin main
-        echo "$user_notation Fetching and rebasing branches: 7.0"
+        echo "$user_notation Fetching branches: 7.0"
         git fetch origin 7.0
         # git rebase may involve checkout, so not using it here
         # git rebase origin/7.0 7.0
-        echo "$user_notation Fetching and rebasing branches: 7.2"
+        echo "$user_notation Fetching branches: 7.2"
         git fetch origin 7.2
         # git rebase origin/7.2 7.2
     else

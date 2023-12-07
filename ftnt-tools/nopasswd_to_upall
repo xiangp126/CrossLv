@@ -24,7 +24,7 @@ set timeout -1
 set script_location "/tmp/git_upall_repos"
 set user_notation "@@@@"
 
-if {[file exists $script_location]} {
+if {![file exists $script_location]} {
     set script_contents {#!/bin/bash
 
 # Define the directory containing your Git repositories
@@ -51,11 +51,15 @@ update_git_repo() {
         # git pull current branch
         echo "$user_notation Fetching tags:"
         git fetch --tags
+        if [ $? -ne 0 ]; then
+            echo "@@@@ Error fetching tags. Aborting."
+            exit 1
+        fi
         echo "$user_notation Pulling the current branch: $current_branch"
         git pull --rebase
         if [ $? -ne 0 ]; then
             echo "$user_notation Error: Failed to pull the current branch: $current_branch"
-            return 1
+            exit 1
         fi
     else
         echo "$user_notation Not a Git repository: $repo_path"
@@ -153,3 +157,4 @@ if {$pattern_found == true} {
 
 set timeout -1
 spawn bash $script_location
+expect eof
