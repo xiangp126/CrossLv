@@ -1,15 +1,14 @@
 #!/usr/bin/expect
 
 # Set the pattern to look for in the output
-set bash_pattern "$ "
+set pattern "$ "
 
 # Set the number of iterations
 set user_anotation "@@@@"
 set max_iterations 100
-set url "https://172.16.67.186/"
+set url "https://172.16.67.184/"
 set username "test"
 set password "test"
-set ftp_pattern "ftp> "
 
 # Check if an argument for max_iterations was provided
 if {[llength $argv] > 0} {
@@ -17,23 +16,40 @@ if {[llength $argv] > 0} {
 }
 
 set timeout -1
-
+set flag 0
 for {set i 1} {$i <= $max_iterations} {incr i} {
     puts "$user_anotation Start of try #$i"
     spawn ftp -d $url
-    expect "Name"
-    send "$username\r"
-    expect "Password:"
-    send "$password\r"
-    expect "$ftp_pattern"
-    send "pass\r"
-    expect "$ftp_pattern"
-    send "ls\r"
-    expect "Passive mode refused."
-    send "send "\004"\r"
-    expect $bash_pattern
-
-    sleep 10
+    expect "Name ("
+            send "$username\r"
+            exp_continue
+        }
+        "Password:" {
+            send "$password\r"
+            exp_continue
+        }
+        "Passive mode on." {
+            # send ctrl + D to exit ftp
+            send "\x04"
+            exp_continue
+        }
+        "ftp>" {
+            if {$flag == 0} {
+                send "pass\r"
+                incr flag
+            } else {
+                send "ls\r"
+            }
+            exp_continue
+        }
+        timeout {
+            puts "Timeout occurred. Pattern not found in the output."
+        }
+        eof {
+            puts "$user_anotation End of try #$i"
+        }
+    }
+    sleep 2
 }
 
 puts "Maximum number of iterations $max_iterations reached."
