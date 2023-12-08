@@ -87,8 +87,9 @@ expect $prompt
 # send "diagnose sys scanunit debug all\r"
 # expect $prompt
 
+set shell_prompt "/ # "
 send "sys sh\r"
-expect $prompt
+expect $shell_prompt
 
 # start gdbserver
 set timeout -1
@@ -96,10 +97,12 @@ send "gdbserver 0.0.0.0:444 --attach $worker_pid\r"
 
 # \x03 is used to send a Ctrl-C signal when the trap detects the SIGINT (Ctrl-C) signal.
 trap {
+    # Disable console logging. The output may contain multiple blank lines starts with '/ # '.
+    log_user 0
+    puts "\nYou pressed Ctrl+C. Sending SIGINT to the gdbserver as well."
     send \x03
-    send_user "You pressed Ctrl+C\n"
 } SIGINT
 
 # interact
-expect $prompt
-# send "exit\r"
+log_user 1
+expect $shell_prompt
