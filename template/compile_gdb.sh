@@ -8,23 +8,34 @@
 # Codename:       focal
 
 # Define the target GDB version
-GDB_TARG_VERSION="12.1"
+GDB_TARG_VERSION="14.1"
+USER_NOTATION="@@@@"
 
 # Get the current GDB version and check if the passed argument is not -f
+echo "$USER_NOTATION Checking the current GDB version"
 if [ -x "$(command -v gdb)" ] && [ "$1" != "-f" ]; then
     gdb_path=$(which gdb)
-    current_version=$(gdb --version | grep -oE "[0-9]+\.[0-9]+")
+    if [ $? -ne 0 ]; then
+        echo "$USER_NOTATION Failed to get the path to the current GDB"
+        exit 1
+    fi
+    # current_version=$(gdb --version | grep -oE "[0-9]+\.[0-9]+")
+    current_version=$(gdb --version | head -n 1 | awk '{print $NF}')
 
     # Compare the versions
-    if [[ "$(printf "%s\n" "$GDB_TARG_VERSION" "$current_version" | sort -V | tail -n 1)" == "$GDB_TARG_VERSION" ]]; then
+    # use bc to compare the versions
+    if [ $(echo "$current_version >= $GDB_TARG_VERSION" | bc -l) -eq 1 ]; then
         cat << _EOF_
-GDB version $GDB_TARG_VERSION is already installed in $gdb_path
+GDB version $current_version is already installed in $gdb_path
 Current GDB version ($current_version) is greater than or equal to $GDB_TARG_VERSION
 Use -f to force the installation
 _EOF_
         exit
     else
-        echo "Current GDB version ($current_version) is older than $GDB_TARG_VERSION"
+        cat << _EOF_
+Current GDB version ($current_version) is older than $GDB_TARG_VERSION
+Start installing GDB $GDB_TARG_VERSION
+_EOF_
     fi
 fi
 
@@ -33,8 +44,10 @@ GDB_SOURCE_URL="https://ftp.gnu.org/gnu/gdb/gdb-$GDB_TARG_VERSION.tar.gz"
 # Define installation directory
 INSTALL_DIR="$HOME/.usr/"
 DOWNLOAD_DIR="$HOME/Downloads"
-PATCH_URL="https://github.com/mduft/tachyon3/raw/master/tools/patches/gdb-12.1-archswitch.patch"
+PATCH_NAME="gdb-12.1-archswitch.patch"
+PATCH_URL="https://github.com/mduft/tachyon3/raw/master/tools/patches/$PATCH_NAME"
 
+echo "$USER_NOTATION Installing necessary build tools"
 # Ensure you have necessary build tools installed
 sudo apt-get update
 sudo apt-get install -y build-essential \
@@ -42,28 +55,44 @@ sudo apt-get install -y build-essential \
                         libisl-dev \
                         libgmp-dev \
                         libncurses-dev \
-                        python3-dev
+                        python3-dev \
+                        source-highlight \
+                        libsource-highlight-dev \
+                        libmpfr-dev
 
 # Navigate to the download directory
 cd "$DOWNLOAD_DIR"
 
-# Download GDB source code
+echo "$USER_NOTATION Downloading GDB source code"
 if [ ! -f "gdb-$GDB_TARG_VERSION.tar.gz" ]; then
     wget "$GDB_SOURCE_URL"
 fi
 
+echo "$USER_NOTATION Extracting GDB source code"
 if [ ! -d "gdb-$GDB_TARG_VERSION" ]; then
     tar -xzvf "gdb-$GDB_TARG_VERSION.tar.gz"
 fi
 
-# Download the patch
-if [ ! -f "gdb-12.1-archswitch.patch" ]; then
-    wget "$PATCH_URL" -O gdb-12.1-archswitch.patch
-    cd "gdb-$GDB_TARG_VERSION"
-    patch -p1 < ../gdb-12.1-archswitch.patch
+cd $DOWNLOAD_DIR/gdb-$GDB_TARG_VERSION
+if [ ! -f "$PATCH_NAME" ]; then
+    echo "$USER_NOTATION Downloading the patch"
+    wget "$PATCH_URL" -O "$PATCH_NAME"
+    if [ $? -ne 0 ]; then
+        echo "$USER_NOTATION Failed to download the patch"
+        exit 1
+    fi
+
+    echo "$USER_NOTATION Patching $PATCH_NAME"
+    set -x
+    patch -p1 < $PATCH_NAME
+    set +x
+    if [ $? -ne 0 ]; then
+        echo "$USER_NOTATION Failed to apply the patch"
+        exit 1
+    fi
 fi
 
-cd $DOWNLOAD_DIR/gdb-$GDB_TARG_VERSION
+echo "$USER_NOTATION Cleaning up the build directory"
 if [ "$1" == "-f" ]; then
     make distclean
 fi
@@ -79,6 +108,7 @@ python3_path=$(which python3)
   --disable-gas \
   --disable-gprof \
   --with-python=$python3_path \
+  --enable-source-highlight \
   --enable-sim \
   --enable-gdb-stub \
   --enable-tui \
@@ -89,14 +119,14 @@ python3_path=$(which python3)
 
 # Compile and install GDB
 if [ $? -ne 0 ]; then
-    echo "Failed to configure GDB"
+    echo "$USER_NOTATION Failed to configure GDB"
     exit 1
 fi
 # Make full use of all CPU cores
 make -j$(nproc)
 
 if [ $? -ne 0 ]; then
-    echo "Failed to compile GDB"
+    echo "$USER_NOTATION Failed to compile GDB"
     exit 1
 fi
 make install
@@ -108,27 +138,13 @@ make install
 
 # Verify GDB installation
 if [ $? -ne 0 ]; then
-    echo "Failed to install GDB"
+    echo "$USER_NOTATION Failed to install GDB"
     exit 1
 fi
-echo "GDB $GDB_TARG_VERSION with the patch applied has been installed to $INSTALL_DIR"
+
+echo "$USER_NOTATION GDB $GDB_TARG_VERSION with the patch applied has been installed to $INSTALL_DIR"
+
 cd $INSTALL_DIR/bin
 ./gdb --version
+./gdb -configuration
 ldd gdb
-
-# $ ldd `which gdb`
-#         linux-vdso.so.1 (0x00007ffdbe5aa000)
-#         libncursesw.so.6 => /lib/x86_64-linux-gnu/libncursesw.so.6 (0x00007f5911724000)
-#         libtinfo.so.6 => /lib/x86_64-linux-gnu/libtinfo.so.6 (0x00007f59116f4000)
-#         libdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007f59116ee000)
-#         libpython3.8.so.1.0 => /lib/x86_64-linux-gnu/libpython3.8.so.1.0 (0x00007f5911198000)
-#         libpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007f5911175000)
-#         libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f5911026000)
-#         libexpat.so.1 => /lib/x86_64-linux-gnu/libexpat.so.1 (0x00007f5910ff6000)
-#         libgmp.so.10 => /lib/x86_64-linux-gnu/libgmp.so.10 (0x00007f5910f72000)
-#         libstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f5910d90000)
-#         libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f5910d75000)
-#         libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f5910b83000)
-#         /lib64/ld-linux-x86-64.so.2 (0x00007f5912638000)
-#         libz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007f5910b67000)
-#         libutil.so.1 => /lib/x86_64-linux-gnu/libutil.so.1 (0x00007f5910b60000)
