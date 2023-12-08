@@ -12,6 +12,7 @@ set logging file ~/.gdb.log
 set print pretty on
 set pagination off
 set tui tab-width 8
+set tui compact-source
 set disassembly-flavor intel
 winheight cmd +3
 fs cmd
@@ -25,3 +26,6 @@ set prompt (gdb)
 # Specify your custom GDB aliases (if any)
 # For example, alias "run" to "r"
 # alias r run
+
+# Load the custom GDB commands
+source ~/Templates/gdb_useful.py

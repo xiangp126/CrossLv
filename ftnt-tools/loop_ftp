@@ -33,6 +33,10 @@ for {set i 1} {$i <= $max_iterations} {incr i} {
             send "\x04"
             exp_continue
         }
+        "Not connected." {
+            send "exit\r"
+            exp_continue
+        }
         "ftp>" {
             if {$flag == 0} {
                 send "pass\r"
