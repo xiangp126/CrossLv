@@ -37,18 +37,38 @@ set user "admin"
 set port "22"
 set prompt "# "
 
-# Spawn the SSH process
-spawn ssh -p $port $user@$fgt_dev
-
-expect {
-    "yes/no" {
-        send "yes\r"
-    }
-    $prompt {
-	send "\r"
+set i 0
+set timeout 2
+while { $i < 3 } {
+    # Spawn the SSH process
+    spawn ssh -p $port $user@$fgt_dev
+    set process_id $spawn_id
+    expect {
+        "yes/no" {
+            send "yes\r"
+            break
+        }
+        "Connection refused" {
+            # puts "Connection refused when connecting to $fgt_dev"
+            exit 1
+        }
+        $prompt {
+            send "\r"
+            break
+        }
+        timeout {
+            puts "Timeout when connecting to $fgt_dev"
+            close $process_id
+            if {$i == 2} {
+                exit 1
+            }
+            incr i
+            continue
+        }
     }
 }
 
+set timeout 10
 expect $prompt
 send "diagnose debug reset\r"
 expect $prompt

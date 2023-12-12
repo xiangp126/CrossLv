@@ -134,3 +134,5 @@ if {$pattern_found == true} {
 
 set timeout -1
 spawn bash $script_location
+# without this, the script will exit before the fully execution of the script above
+expect eof
