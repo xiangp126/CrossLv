@@ -1,29 +1,61 @@
 #!/bin/bash
 
-# This script is only for client1 and client3
+username=$(whoami)
+username=corsair
 hostname=$(hostname)
-if [ "$hostname" != "client1" ] && [ "$hostname" != "client3" ]; then
-    echo "Dangerous! This script is only for client1 and client3"
+hostname=client2
+# In Bash, =~ is used for regular expression matching
+if [[ "$username" != "corsair" || ! "$hostname" =~ ^client[0-9]+$ ]]; then
+    echo "Username: $username"
+    echo "Hostname: $hostname"
+    echo "This script is only for client VMs and the username corsair"
     exit 1
 fi
 
 fgt1_ip="192.168.101.1"
 fgt2_ip="192.168.103.1"
 fpx1_ip="192.168.103.2"
+host_router_ip="172.16.67.1"
+host_br1_ip="192.168.101.254"
+host_br2_ip="192.168.102.254"
+host_br3_ip="192.168.103.254"
 
-# Check the value of $1 and set the default IP accordingly
-if [ "$1" = "fpx1" ]; then
-    new_gateway="$fpx1_ip"
-elif [ "$1" = "fgt1" ]; then
-    new_gateway="$fgt1_ip"
-elif [ "$1" = "fgt2" ]; then
-    new_gateway="$fgt2_ip"
-elif [ -z "$1" ]; then
-    echo "Usage: $0 <fpx1|fgt1|fgt2>"
-    exit 1
-else
-    new_gateway="$1"
-fi
+case "$1" in
+    "host_br1")
+        new_gateway="$host_br1_ip"
+        ;;
+    "host_br2")
+        new_gateway="$host_br2_ip"
+        ;;
+    "host_br3")
+        new_gateway="$host_br3_ip"
+    "host_router")
+        new_gateway="$host_router_ip"
+        ;;
+    "fpx1")
+        new_gateway="$fpx1_ip"
+        ;;
+    "fgt1")
+        new_gateway="$fgt1_ip"
+        ;;
+    "fgt2")
+        new_gateway="$fgt2_ip"
+        ;;
+    "")
+        echo "Usage: $0 <host_br1|host_br2|host_br3|host_router|fpx1|fgt1|fgt2>"
+        echo "host_br1: $host_br1_ip"
+        echo "host_br2: $host_br2_ip"
+        echo "host_br3: $host_br3_ip"
+        echo "host_router: $host_router_ip"
+        echo "fpx1: $fpx1_ip"
+        echo "fgt1: $fgt1_ip"
+        echo "fgt2: $fgt2_ip"
+        exit 1
+        ;;
+    *)
+        new_gateway="$1"
+        ;;
+esac
 
 # Check the current default route
 current_gateway=$(ip route show default | awk '/default/ {print $3}')
