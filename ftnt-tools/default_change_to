@@ -29,6 +29,7 @@ case "$1" in
         ;;
     "host_br3")
         new_gateway="$host_br3_ip"
+        ;;
     "host_router")
         new_gateway="$host_router_ip"
         ;;
