@@ -71,5 +71,9 @@ fi
 # Change the default route
 echo "sudo ip route replace default via $new_gateway"
 sudo ip route replace default via "$new_gateway"
+if [ $? -ne 0 ]; then
+    echo "Failed to change the default route"
+    exit 1
+fi
 echo "Default route has been changed successfully"
 ip route
