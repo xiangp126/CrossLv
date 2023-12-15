@@ -43,7 +43,8 @@ case "$1" in
         new_gateway="$fgt2_ip"
         ;;
     "")
-        echo "Usage: $0 <host_br1|host_br2|host_br3|host_router|fpx1|fgt1|fgt2>"
+        echo "Usage: $0
+                        <host_br1|host_br2|host_br3|host_router|fpx1|fgt1|fgt2>"
         echo "host_br1: $host_br1_ip"
         echo "host_br2: $host_br2_ip"
         echo "host_br3: $host_br3_ip"
@@ -68,8 +69,7 @@ if [ "$current_gateway" = "$new_gateway" ]; then
 fi
 
 # Change the default route
-set -x
+echo "sudo ip route replace default via $new_gateway"
 sudo ip route replace default via "$new_gateway"
-set +x
-
+echo "Default route has been changed successfully"
 ip route
