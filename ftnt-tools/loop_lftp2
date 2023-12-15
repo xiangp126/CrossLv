@@ -10,6 +10,7 @@ set timeout -1
 set pattern_found 1
 set max_iterations 100
 set user_notation "@@@@"
+set pdf_file_path "/home/corsair/Uploads/fortiauto.pdf"
 
 # Check if an argument for max_iterations was provided
 if {[llength $argv] > 0} {
@@ -21,7 +22,7 @@ expect "$lftp_prompt"
 
 for {set i 1} {$i <= $max_iterations} {incr i} {
     # puts "-------> Start of try #$i"
-    send "put fortiauto.pdf\r"
+    send "put $pdf_file_path\r"
 
     expect {
         -re $pattern {
