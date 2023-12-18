@@ -16,6 +16,7 @@ set user_notation "@@@@"
 set bash_prompt "$ "
 set expected_pdf_size 285442
 set file_size 0
+set pdf_file_path "/home/corsair/Uploads/fortiauto.pdf"
 
 # Define a function to create or reuse the Bash script
 proc createBashScript {} {
@@ -50,7 +51,7 @@ set lftp_spawn_id $spawn_id
 for {set i 1} {$i <= $max_iterations} {incr i} {
     set spawn_id $lftp_spawn_id
     expect $lftp_prompt
-    send "put fortiauto.pdf\r"
+    send "put $pdf_file_path\r"
 
     expect {
         -re $pattern {

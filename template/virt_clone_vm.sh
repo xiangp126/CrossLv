@@ -8,7 +8,7 @@ clone_virtual_machine() {
     local cloned_name="$2"
 
     if [ -z "$vm_name" ] || [ -z "$cloned_name" ]; then
-        echo "Usage: ./$0 <vm_name> <cloned_name>"
+        echo "Usage: $0 <vm_name> <cloned_name>"
         sudo virsh list --all
         return 1
     fi

@@ -16,6 +16,7 @@ FGT_RAM="2048"  # in MB
 FGT_VCPUS="1"
 FGT_DISK_SIZE="10"  # in GB
 
+    # --graphics "vnc" \
 # Create the FortiGate VM using virt-install
 sudo virt-install \
     --check path_in_use=off \
@@ -24,7 +25,6 @@ sudo virt-install \
     --ram="$FGT_RAM" \
     --vcpus="$FGT_VCPUS" \
     --disk "path=$FGT_QCOW2_PATH,format=qcow2,size=$FGT_DISK_SIZE" \
-    --graphics "vnc" \
     --import
 
 # Check the exit status of virt-install

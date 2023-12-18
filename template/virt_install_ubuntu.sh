@@ -5,7 +5,7 @@ VM_NAME="$1"
 VM_DESCRIPTION="ubuntu20"
 VM_RAM="2048"  # in MB
 VM_VCPUS="1"
-VM_DISK_SIZE="10"  # in GB
+VM_DISK_SIZE="20"  # in GB
 VM_ISO_PATH="/usr/local/share/ubuntu-20.04.6-live-server-amd64.iso"
 VM_DISK_PATH="/usr/local/vms/ubuntu20-$VM_NAME.qcow2"
 
