@@ -1,0 +1,30 @@
+#!/bin/bash
+
+backup_dir="/data/Backup/vms"
+
+# check $1 is not empty
+if [ -z "$1" ]; then
+    echo "Usage: $0 <vm_name>"
+    echo "Example: $0 client2"
+    exit 1
+fi
+
+vm_name=$1
+backup_vm="$backup_dir/$vm_name.qcow2"
+target_dir=/usr/local/vms
+if [ ! -f "$backup_vm" ]; then
+    echo "Error: $backup_vm does not exist."
+    exit 1
+fi
+
+echo "Restoring VM: $vm_name"
+sudo cp -v "$backup_vm" "$target_dir/$vm_name.qcow2"
+
+file_owner=$(stat -c %U "$target_dir/$vm_name.qcow2")
+if [ "$file_owner" == "libvirt-qemu" ]; then
+    exit 1
+fi
+
+sudo chown -v libvirt-qemu:kvm "$target_dir/$vm_name.qcow2"
+
+echo "Restore complete for VM: $vm_name"
