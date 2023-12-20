@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Check if the VM name is provided as a parameter
+if [ -z "$1" ]; then
+    echo "Usage: $0 <vm_name>"
+    echo "Example: $0 client1"
+    exit 1
+fi
+
+# Assign the VM name from the parameter
+vm_name="$1"
+
+# Check if the VM exists
+if virsh list --name --all | grep -q "^$vm_name$"; then
+    # Shut down the VM if it is running
+    if virsh domstate "$vm_name" | grep -qi "running"; then
+        sudo virsh destroy "$vm_name"
+    fi
+
+    # Get the path to the qcow2 file using xmllint
+    qcow2_file=$(virsh dumpxml "$vm_name" | xmllint --xpath "string(//disk/source/@file)" -)
+
+    # Undefine (delete) the VM
+    sudo virsh undefine "$vm_name"
+
+    # Remove the qcow2 file
+    sudo rm -f "$qcow2_file"
+
+    echo "VM $vm_name has been deleted, and its qcow2 file has been removed."
+else
+    echo "VM $vm_name not found."
+fi
