@@ -1,28 +1,3 @@
-""""""""""""""""""""""""""""""
-" VIM-PLUG CONFIG
-""""""""""""""""""""""""""""""
-call plug#begin('~/.vim/bundle')
-
-"------ OPTIONAL PLUGINS -----
-Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
-Plug 'preservim/nerdcommenter'
-Plug 'majutsushi/tagbar'
-Plug 'jiangmiao/auto-pairs'
-Plug 'Yggdroot/indentLine'
-Plug 'altercation/vim-colors-solarized'
-"------ FUZZY FINDER -----
-Plug 'junegunn/fzf', { 'do': './install --bin' }
-Plug 'junegunn/fzf.vim'
-"------ BEAUTIFY LINE -----
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
-"------ CODE EXPAND -----
-Plug 'ervandew/supertab'
-Plug 'lincheney/fzf-tab-completion'
-
-" Initialize plugin system
-call plug#end()
-
 """"""""""""""""""""""""""""
 " BASIC CONFIG
 """"""""""""""""""""""""""""""
@@ -64,9 +39,35 @@ let mapleader=';'     " leader key, default is '\'
 set t_Co=256          " number of colors
 " Reduce the 'updatetime' to 500 milliseconds for responsiveness
 autocmd CursorHold,CursorHoldI * set updatetime=500
-colorscheme solarized
 set background=dark
+" colorscheme solarized
+colorscheme darkcoding
 " highlight Normal ctermbg=0
+
+""""""""""""""""""""""""""""""
+" VIM-PLUG CONFIG
+""""""""""""""""""""""""""""""
+call plug#begin('~/.vim/bundle')
+
+"------ OPTIONAL PLUGINS -----
+Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+Plug 'preservim/nerdcommenter'
+Plug 'majutsushi/tagbar'
+Plug 'jiangmiao/auto-pairs'
+Plug 'Yggdroot/indentLine'
+Plug 'altercation/vim-colors-solarized'
+"------ FUZZY FINDER -----
+Plug 'junegunn/fzf', { 'do': './install --bin' }
+Plug 'junegunn/fzf.vim'
+"------ BEAUTIFY LINE -----
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+"------ CODE EXPAND -----
+Plug 'ervandew/supertab'
+Plug 'lincheney/fzf-tab-completion'
+
+" Initialize plugin system
+call plug#end()
 
 """"""""""""""""""""""""""""""
 " BASIC KEYBIND
