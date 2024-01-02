@@ -1,8 +1,8 @@
 #!/bin/bash
-
 mainWd=$(cd $(dirname $0); pwd)
 trackedFilesDir=$mainWd/track-files
 templateFilesDir=$mainWd/template
+vimColorsDir=$mainWd/vim-colors
 ftntToolsDir=$mainWd/ftnt-tools
 completionDirSRC=$mainWd/completion-files
 completionDirDst=$HOME/.bash_completion.d
@@ -14,8 +14,37 @@ beautifyGap2="   "
 beautifyGap3="♣  "
 # ubuntu is the default platform
 platform=ubuntu
+# flags
+usageFlag=false
+forceUpdateFlag=false
+installFlag=false
+linkFlag=true
+checkSudoFlag=false
+
+usage() {
+    cat << _EOF
+Usage: ./$0 [OPTIONS]
+Examples:
+    ./$0 -i            # Install (link)
+    ./$0 -iu           # Install (link), force update
+    ./$0 -iuH          # Hard install (not just link), force update
+    ./$0 -h            # Print this help message
+
+Options:
+    -i, --install       Install
+    -u, --update        Force update
+    -c, --check         Check sudo privilege
+    -h, --help          Print this help message
+    -H, --hard-install  Hard install (not just link)
+
+_EOF
+}
 
 checkPlatform() {
+cat << _EOF
+$catBanner
+Check platform
+_EOF
     if [[ -f /etc/os-release ]]; then
         local os_name
         os_name=$(awk -F= '/^ID=/{print $2}' /etc/os-release)
@@ -79,6 +108,24 @@ _EOF
 
     sudo apt-get update
     sudo apt-get install -y "${prerequisitesForUbuntu[@]}"
+}
+
+installPrequesitesForMac() {
+    prerequisitesForMac=(
+       yt-dlp
+       fzf
+       fd
+       bat
+       vim
+    )
+
+    cat << _EOF
+$catBanner
+Installing prerequisites for macOS
+_EOF
+
+    brew update
+    brew install "${prerequisitesForMac[@]}"
 }
 
 relinkBatToBatcat() {
@@ -265,7 +312,7 @@ _EOF
     done
 }
 
-followUpTheExceptions() {
+followUpTrackExceptions() {
     cat << _EOF
 $catBanner
 Follow up the exceptions
@@ -305,6 +352,60 @@ _EOF
             continue
         fi
         ln -sf $trackedFilesDir/$file $HOME/.$file
+    done
+}
+
+linkVimColors() {
+    cat << _EOF
+$catBanner
+Link vim colors to $HOME/.vim/colors
+_EOF
+    ls "$vimColorsDir" | while read -r file; do
+        echo "$beautifyGap2 $file"
+    done
+    echo
+
+    local targetDir=$HOME/.vim/colors
+    if [ ! -d $targetDir ]; then
+        mkdir -p $targetDir
+    fi
+
+    for file in $(ls $vimColorsDir); do
+        if [ -L $targetDir/$file ] && [ $(readlink $targetDir/$file) == $vimColorsDir/$file ]; then
+            echo "$beautifyGap1 $targetDir/$file already exists, skip"
+            continue
+        fi
+        ln -sf $vimColorsDir/$file $targetDir/$file
+    done
+
+    # remove broken links in $targetDir
+    find "$targetDir" -type l \
+    -exec test ! -e {} \; \
+    -exec echo "$beautifyGap3 Deleting broken link: {}" \; \
+    -exec rm -f {} \;
+}
+
+installVimColors() {
+    cat << _EOF
+$catBanner
+Install vim colors to $HOME/.vim/colors
+_EOF
+    ls "$vimColorsDir" | while read -r file; do
+        echo "$beautifyGap2 $file"
+    done
+    echo
+
+    local targetDir=$HOME/.vim/colors
+    if [ ! -d $targetDir ]; then
+        mkdir -p $targetDir
+    fi
+
+    for file in $(ls $vimColorsDir); do
+        if [ -f $targetDir/$file ]; then
+            echo "$beautifyGap1 $targetDir/$file already exists, skip"
+            continue
+        fi
+        rsync -av $vimColorsDir/$file $targetDir/$file
     done
 }
 
@@ -428,89 +529,91 @@ printMessage() {
     echo "$beautifyGap1 Please source ~/.bashrc manually to take effect."
 }
 
-help() {
-    cat << _EOF
-Usage: ./oneKey.sh [OPTION]
-
-Deploy all the tools and configurations for ubuntu
-
-OPTION:
-    soft   Link tracked files to $HOME. Default Option.
-    hard   Install tracked files to $HOME
-    help   Print this message
-
-_EOF
-    exit 0
-}
-
-installCore() {
+mainInstallProcedure() {
     if [ "$platform" == "ubuntu" ]; then
         echo "$beautifyGap1 Processing Ubuntu..."
-        checkSudoPrivilege
-        installPrerequisitesForUbuntu
-    elif [ "$platform" == "mac" ]; then
-        echo "$beautifyGap1 Processing MacOS..."
-        # installPrequesitesForMac
-    fi
-
-    if [ "$1" == "hard" ] || [ "$1" == "install" ]; then
-        installTrackedFiles
-    else
-        linkTrackedFiles
-    fi
-    installVimPlugs
-    installLatestFzf # this should be after installVimPlugs
-    linkCompletionFiles
-    [ "$platform" == "ubuntu" ] && linkFtntTools
-    [ "$platform" == "ubuntu" ] && linkTemplateFiles
-    [ "$platform" == "ubuntu" ] && followUpTheExceptions
-}
-
-installPrequesitesForMac() {
-    prerequisitesForMac=(
-       yt-dlp
-       fzf
-       fd
-       bat
-       vim
-    )
-
-    cat << _EOF
-$catBanner
-Installing prerequisites for macOS
-_EOF
-
-    brew update
-    brew install "${prerequisitesForMac[@]}"
-}
-
-install () {
-    checkPlatform
-    installCore $1
-    if [ "$platform" == "ubuntu" ]; then
+        # Pre-Installation
+        [ "$checkSudoFlag" == "true" ] && checkSudoPrivilege
+        [ "$forceUpdateFlag" == "true" ] && installPrerequisitesForUbuntu
+        # In-Installation
+        if [ "$linkFlag" == "true" ]; then
+            linkTrackedFiles
+        else
+            installTrackedFiles
+        fi
+        linkCompletionFiles
+        linkVimColors
+        linkFtntTools
+        linkTemplateFiles
+        followUpTrackExceptions
+        # Vim plugins & fzf
+        installVimPlugs
+        installLatestFzf # This should be after installVimPlugs
+        # Post-Installation, currentlu only enabled for ubuntu
         relinkShToBash
         relinkBatToBatcat
         relinkFdToFdfind
         setTimeZone
         changeTMOUTToWritable
+    elif [ "$platform" == "mac" ]; then
+        echo "$beautifyGap1 Processing MacOS..."
+        # Pre-Installation, currently disabled for MacOS
+        # [ "$checkSudoFlag" == "true" ] && checkSudoPrivilege
+        # [ "$forceUpdateFlag" == "true" ] && installPrequesitesForMac
+
+        # In-Installation
+        if [ "$linkFlag" == "true" ]; then
+            linkTrackedFiles
+        else
+            installTrackedFiles
+        fi
+        installVimPlugs
+        installLatestFzf # This should be after installVimPlugs
+        linkCompletionFiles
     fi
+}
+
+install () {
+    checkPlatform
+    mainInstallProcedure
     printMessage
 }
 
-#!/bin/bash
+# Parse options
+[ $# -eq 0 ] && usage
+# if '-i' need an argument, like '-i hard' then you should use
+# while 'getopts "fhi:" opt; do'
+# There should be a colon after i
+while getopts "uhicH" opt; do
+    # opt is the option, like 'i' or 'h'
+    case $opt in
+        u)
+            forceUpdateFlag=true
+            ;;
+        h)
+            usage
+            exit
+            ;;
+        i)
+            installFlag=true
+            ;;
+        c)
+            checkSudoFlag=true
+            ;;
+        H)  # Hard install
+            linkFlag=false
+            ;;
+        ?)
+            echo "Invalid option: -$OPTARG" >&2
+            ;;
+    esac
+done
 
-case "$1" in
-    "help")
-        help
-        ;;
-    "hard"|"install")
-        install "hard"
-        ;;
-    "soft"|"link")
-        # Fall through to the default case
-        :
-        ;;
-    *)
-        install "soft"
-        ;;
-esac
+# Shift to process non-option arguments. New $1, $2, ..., $@
+shift $((OPTIND - 1))
+if [ $# -gt 0 ]; then
+    echo "Illegal non-option arguments: $@"
+    exit
+fi
+
+[ "$installFlag" == "true" ] && install

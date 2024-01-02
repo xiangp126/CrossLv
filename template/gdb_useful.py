@@ -92,6 +92,8 @@ class PrintMemoryCommand4(gdb.Command):
             # Check if the address is ses_ctx
             if arg == "ses_ctx" or arg == "&ses_ctx":
                 self.print_ses_ctx_memories()
+                return
+
             # pt4 0x7f01609f5c88
             elif "0x" in arg:
                 address = arg

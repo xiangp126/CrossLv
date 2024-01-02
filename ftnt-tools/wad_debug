@@ -119,7 +119,7 @@ send "gdbserver 0.0.0.0:444 --attach $worker_pid\r"
 trap {
     # Disable console logging. The output may contain multiple blank lines starts with '/ # '.
     log_user 0
-    puts "\nYou pressed Ctrl+C. Sending SIGINT to the gdbserver as well."
+    puts "\nYou pressed 'Ctrl + C'. Sending SIGINT to the gdbserver as well."
     send \x03
 } SIGINT
 

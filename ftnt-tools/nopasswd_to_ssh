@@ -14,27 +14,39 @@ if {$argc > 1} {
 }
 set user_notation "@@@@"
 set fgt_prompt "# "
+set diff_key_pattern "differs from"
+set remove_key_flag 0
 set fgt_name [lindex $argv 0]
 set max_iterations 2
+set remove_key_command "ssh-keygen -R $fgt_name"
 
 for {set i 1} {$i <= $max_iterations} {incr i} {
     # ssh -o StrictHostKeyChecking=no $fgt_name
     spawn -noecho ssh $fgt_name
 
     expect {
-        # remove with:\r\r\n  ssh-keygen -f "/home/user_name/.ssh/known_hosts" -R "192.16X.10X.X"\r\r\n
-        # remove with:\r\r\n  ssh-keygen -f "/home/username/.ssh/known_hosts" -R "fgt2"\r\r\n
-        -re {remove with:\r\r\n\s+([^\r\n]+)\r\r\n} {
-            set remove_line $expect_out(1,string)
-            lappend captured_commands $remove_line
+        "$diff_key_pattern" {
+            set remove_key_flag 1
             exp_continue
         }
         {yes/no} {
+            if {$remove_key_flag == 1} {
+                set remove_key_flag 0
+                puts "Removing $fgt_name from known_hosts"
+                eval exec $remove_key_command
+            }
             send "yes\r"
             exp_continue
         }
         "password: " {
             send "fos\r"
+            exp_continue
+        }
+        # remove with:\r\r\n  ssh-keygen -f "/home/user_name/.ssh/known_hosts" -R "192.16X.10X.X"\r\r\n
+        # remove with:\r\r\n  ssh-keygen -f "/home/username/.ssh/known_hosts" -R "fgt2"\r\r\n
+        -re {remove with:\r\r\n\s+([^\r\n]+)\r\r\n} {
+            set remove_line $expect_out(1,string)
+            lappend captured_commands $remove_line
             exp_continue
         }
         eof {
@@ -50,7 +62,8 @@ for {set i 1} {$i <= $max_iterations} {incr i} {
             #     puts "$user_notation Error: Failed to connect to $fgt_name."
             #     exit 1
             # }
-
+            puts "Removing $fgt_name from known_hosts"
+            eval exec $remove_key_command
             foreach command $captured_commands {
                 puts "$user_notation Executing command: $command"
                 eval exec $command
