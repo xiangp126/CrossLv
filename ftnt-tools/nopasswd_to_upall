@@ -86,7 +86,7 @@ done
 # call the indexer
 if command -v callIndexer &> /dev/null; then
     # The command callIndexer exists, so you can execute it
-    callIndexer
+    callIndexer -u
 else
     echo "$user_notation callIndexer command not found"
 fi
