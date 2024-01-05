@@ -1,4 +1,5 @@
 #!/bin/bash
+# Misc Info
 mainWd=$(cd $(dirname $0); pwd)
 trackedFilesDir=$mainWd/track-files
 templateFilesDir=$mainWd/template
@@ -14,7 +15,7 @@ beautifyGap2="   "
 beautifyGap3="♣  "
 # ubuntu is the default platform
 platform=ubuntu
-# flags
+# Flags
 usageFlag=false
 forceUpdateFlag=false
 installFlag=false
@@ -99,6 +100,10 @@ installPrerequisitesForUbuntu() {
         bash-completion
         build-essential
         openssh-server
+        # clangd
+        clangd
+        bear
+        libear
     )
 
     cat << _EOF
@@ -573,7 +578,7 @@ mainInstallProcedure() {
     fi
 }
 
-install () {
+main() {
     checkPlatform
     mainInstallProcedure
     printMessage
@@ -616,4 +621,4 @@ if [ $# -gt 0 ]; then
     exit
 fi
 
-[ "$installFlag" == "true" ] && install
+[ "$installFlag" == "true" ] && main
