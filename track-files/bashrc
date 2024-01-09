@@ -64,8 +64,12 @@ alias tmux='tmux -u'
 alias youtube-dl='yt-dlp'
 alias aria2c-yt='yt-dlp --external-downloader aria2c --external-downloader-args "-x 16 -s 16" --output "%(title)s.%(ext)s"'
 alias rsync='rsync -azPv'
-# libear.so path in ubuntu
-alias bear='bear -l /usr/lib/x86_64-linux-gnu/bear/libear.so'
+pathOfLibear=$(locate libear.so | grep -m 1 libear.so)
+if [[ "$pathOfLibear" != "" ]]; then
+    alias bear='bear -l $pathOfLibear'
+else
+    alias bear='bear -l /usr/lib/x86_64-linux-gnu/bear/libear.so'
+fi
 # alias to change directory
 function __cd () {
     if [ -d "$1" ]; then

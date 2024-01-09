@@ -18,8 +18,11 @@ set custom_timeout 180
 # set mode "FGT_601F"
 set mode "FGT_VM64_KVM"
 
+# Set the working directory to the current directory
+set working_dir [exec pwd]
+
 # Check if an argument is provided and set mode accordingly
-if {$argc > 0} {
+if {$argc == 1} {
     set provided_mode [lindex $argv 0]
     if {$provided_mode eq "fpx"} {
         set mode FPX_KVM
@@ -29,25 +32,34 @@ if {$argc > 0} {
         set mode $provided_mode
     }
 } else {
-    # Get the current working directory
-    set current_dir [exec pwd]
+    if {$argc > 1} {
+        set working_dir [lindex $argv 1]
+    }
 
     # Check if the directory name contains "fos"
-    if {[string match -nocase "*fos*" $current_dir]} {
+    if {[string match -nocase "*fos*" $working_dir]} {
         set mode "FGT_VM64_KVM"
     } else {
         # Check if the directory name contains "fpx" or "proxy"
-        if {[string match -nocase "*fpx*" $current_dir] || [string match -nocase "*proxy*" $current_dir]} {
+        if {[string match -nocase "*fpx*" $working_dir] || [string match -nocase "*proxy*" $working_dir]} {
             set mode "FPX_KVM"
         } else {
-            puts "Unknown mode. Please provide a mode as an argument."
+            puts "Unknown product. Please provide a fos/fpx path as an argument."
             exit 1
         }
     }
 }
 
 # Spawn your target script or command using the "mode" variable
-spawn ./Configure -m $mode -d y -c
+set bash_prompt "$ "
+spawn -noecho bash
+log_user 0
+expect $bash_prompt
+send "cd $working_dir\r"
+expect $bash_prompt
+set spawned_config_cmd "./Configure -m $mode -d y -c"
+log_user 1
+send "$spawned_config_cmd\r"
 
 # Set the timeout value for this specific interaction
 set timeout $custom_timeout
@@ -61,6 +73,11 @@ expect {
         send "$password\r"
         exp_continue
     }
+    "$bash_prompt" {
+        # log_user 0
+        # send "exit\r"
+        send "\x04\r"
+    }
     timeout {
         # Handle timeout actions, such as error handling
         puts "Timed out waiting for a response."
@@ -68,4 +85,4 @@ expect {
     }
 }
 
-wait
+expect eof

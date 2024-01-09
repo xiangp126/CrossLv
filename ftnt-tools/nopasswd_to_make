@@ -1,0 +1,192 @@
+#!/bin/bash
+# Flags
+fMode=FGT_VM64_KVM
+fNumOfWorkers=$(nproc)
+fWorkingDir=$(pwd)
+fUseBear=false
+fRunConfigure=false
+fGitClean=false
+fMake=false
+# Variables
+scriptName=$(basename $0)
+scriptWd=$(dirname $0)
+pathOfNoPasswdToConfig=$scriptWd/nopasswd_to_config
+userNotation="@@@@"
+
+usage() {
+    cat << _EOF
+Usage: $scriptName [- mode] [-w working_dir] [-j num_of_workers] [-bcCah]
+Options:
+    -h      Print this help message
+    -M      Run Configure and make accepting the default values (default: $fMake)
+    -C      Run Configure (default: $fRunConfigure)
+    -c      Run "git clean -xdf" before building (default: $fGitClean)
+    -b      Use Bear to generate compile_commands.json (default: $fUseBear)
+    -m      Set build mode (default: $fMode)
+    -j      Set the number of workers (default: $fNumOfWorkers)
+    -w      Set working directory (default: $fWorkingDir)
+
+Example:
+    $scriptName -M
+    $scriptName -m FGT_VM64_KVM -j4 -b
+    $scriptName -m FGT_VM64_KVM -j4 -b -c
+    $scriptName -b -c
+    $scriptName -bc
+    $scriptName -j4 -b
+    $scriptName -h
+
+_EOF
+    exit
+}
+
+[[ $# -eq 0 ]] && usage
+
+# Parse the options
+while getopts "hm:w:cj:bCaM" opt; do
+    case $opt in
+        h)
+            usage
+            exit 0
+            ;;
+        m)
+            fMode=$OPTARG
+            fMake=true
+            ;;
+        w)
+            fWorkingDir=$OPTARG
+            fMake=true
+            ;;
+        C)
+            fRunConfigure=true
+            fMake=true
+            ;;
+        c)
+            fGitClean=true
+            fMake=true
+            ;;
+        j)
+            fNumOfWorkers=$OPTARG
+            fMake=true
+            ;;
+        b)
+            fUseBear=true
+            fMake=true
+            ;;
+        M)
+            fMake=true
+            ;;
+        ?)
+            echo "$userNotation Invalid option: -$OPTARG" >&2
+            exit 1
+            ;;
+    esac
+done
+
+# Shift to process non-option arguments. New $1, $2, ..., $@
+shift $((OPTIND - 1))
+if [[ $# -gt 0 ]]; then
+    echo "$userNotation Illegal non-option arguments: $@"
+    exit
+fi
+
+# Check the working directory
+if [[ -x "$(command -v realpath)" ]]; then
+    fWorkingDir=$(realpath $fWorkingDir)
+fi
+if [[ ! -d "$fWorkingDir" ]]; then
+    echo "$userNotation Directory $fWorkingDir not found"
+    exit 1
+fi
+
+echo "$userNotation Set run Configure flag to $fRunConfigure"
+echo "$userNotation Set working directory to $fWorkingDir"
+echo "$userNotation Set build mode to $fMode"
+echo "$userNotation Set number of workers to $fNumOfWorkers"
+echo "$userNotation Use bear to generate compile_commands.json"
+
+# Clean the working directory if specified
+if [[ "$fGitClean" == true ]]; then
+    cd $fWorkingDir
+    echo "$userNotation Running git clean -xdf ..."
+    git clean -xdf
+    if [[ $? -ne 0 ]]; then
+        echo "$userNotation Failed to run git clean -xdf"
+        exit 1
+    fi
+fi
+
+expectPath=$(command -v expect)
+if [[ -z "$expectPath" ]]; then
+    echo "$userNotation Command expect not found"
+    exit 1
+fi
+
+# Step 1: Run Configure
+if [[ "$fRunConfigure" == true ]]; then
+    echo "$userNotation Running Configure ..."
+    echo "$userNotation Running nopasswd_to_config [mode:]$fMode [working_directory:]$fWorkingDir"
+    expect -f $pathOfNoPasswdToConfig $fMode $fWorkingDir
+
+    if [[ $? -ne 0 ]]; then
+        echo "$userNotation Failed to run $pathOfNoPasswdToConfig"
+        exit 1
+    fi
+fi
+
+if [[ "$fMake" == false ]]; then
+    exit 0
+fi
+
+# Step 2: Run make jobs
+jsonFile=compile_commands.json
+jsonPath=$fWorkingDir/$jsonFile
+
+cd $fWorkingDir
+makeCommand="make -j$fNumOfWorkers image.out"
+if [[ "$fUseBear" == true ]]; then
+    bearPath=$(command -v bear)
+    if [[ -z "$bearPath" ]]; then
+        echo "$userNotation Command bear not found, please install it first"
+        echo "$userNotation sudo apt install bear libear -y"
+        exit 1
+    fi
+    pathOfLibear=$(locate libear.so | grep -m 1 libear.so)
+    if [[ "$pathOfLibear" != "" ]]; then
+        bear="bear -l $pathOfLibear"
+    else
+        bear="bear -l /usr/lib/x86_64-linux-gnu/bear/libear.so"
+    fi
+    makeCommand="$bear $makeCommand"
+fi
+
+# Check if the compile_commands.json exists and is not writable
+if [[ -f "$jsonPath" && ! -w "$jsonPath" ]]; then
+    echo "$userNotation Detected $jsonPath is not writable, making it writable"
+    chmod +w "$jsonPath"
+    if [[ $? -ne 0 ]]; then
+        echo "$userNotation Failed to make $jsonPath writable"
+        exit 1
+    fi
+fi
+
+echo "$userNotation Running building commands: $makeCommand"
+eval "$makeCommand"
+
+if [[ $? -ne 0 ]]; then
+    echo "$userNotation Build projects failed"
+    exit 1
+fi
+
+# Step 3: Remove the write privilege of compile_commands.json
+if [[ -f "$jsonPath" ]]; then
+    # remove the write privilege of the file
+    chmod -w $jsonPath
+fi
+
+# check if the privilege has been changed
+if [[ -w "$jsonPath" ]]; then
+    echo "$userNotation Failed to remove the write privilege of $jsonPath"
+    exit 1
+else
+    echo "$userNotation Build projects successfully"
+fi

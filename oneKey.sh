@@ -1,13 +1,14 @@
 #!/bin/bash
 # Misc Info
-mainWd=$(cd $(dirname $0); pwd)
-trackedFilesDir=$mainWd/track-files
-templateFilesDir=$mainWd/template
-vimColorsDir=$mainWd/vim-colors
-ftntToolsDir=$mainWd/ftnt-tools
-completionDirSRC=$mainWd/completion-files
+scriptName=$(basename $0)
+workingDir=$(cd $(dirname $0); pwd)
+trackedFilesDir=$workingDir/track-files
+templateFilesDir=$workingDir/template
+vimColorsDir=$workingDir/vim-colors
+ftntToolsDir=$workingDir/ftnt-tools
+completionDirSRC=$workingDir/completion-files
 completionDirDst=$HOME/.bash_completion.d
-downloadDir=$mainWd/Downloads
+downloadDir=$workingDir/Downloads
 catBanner="---------------------------------------------------"
 catBanner=$(echo "$catBanner" | sed 's/------/------ /g')
 beautifyGap1="-> "
@@ -24,19 +25,21 @@ checkSudoFlag=false
 
 usage() {
     cat << _EOF
-Usage: ./$0 [OPTIONS]
-Examples:
-    ./$0 -i            # Install (link)
-    ./$0 -iu           # Install (link), force update
-    ./$0 -iuH          # Hard install (not just link), force update
-    ./$0 -h            # Print this help message
-
+Usage: ./$scriptName [iuchH]
 Options:
-    -i, --install       Install
-    -u, --update        Force update
-    -c, --check         Check sudo privilege
-    -h, --help          Print this help message
-    -H, --hard-install  Hard install (not just link)
+    -h, --help                      Print this help message
+    -i, --install                   Make soft link
+    -H, --hard-install              Hard install
+        # Two options that may be used together with -i or -H
+        -c, --check                 Check sudo privilege
+        -u, --update                Force update
+
+Examples:
+    ./$scriptName -i
+    ./$scriptName -ic
+    ./$scriptName -iu
+    ./$scriptName -iuH
+    ./$scriptName -h
 
 _EOF
 }
@@ -609,7 +612,7 @@ while getopts "uhicH" opt; do
             linkFlag=false
             ;;
         ?)
-            echo "Invalid option: -$OPTARG" >&2
+            echo "$userNotation Invalid option: -$OPTARG" >&2
             ;;
     esac
 done
@@ -617,8 +620,8 @@ done
 # Shift to process non-option arguments. New $1, $2, ..., $@
 shift $((OPTIND - 1))
 if [ $# -gt 0 ]; then
-    echo "Illegal non-option arguments: $@"
-    exit
+    echo "$userNotation Illegal non-option arguments: $@"
+    exit 1
 fi
 
 [ "$installFlag" == "true" ] && main

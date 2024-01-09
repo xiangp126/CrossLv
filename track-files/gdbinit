@@ -5,9 +5,9 @@ layout src
 
 set tui active-border-mode normal
 set style function foreground magenta
-set style function intensity dim
+set style function intensity normal
 set style filename foreground red
-set style filename intensity dim
+set style filename intensity normal
 set logging file ~/.gdb.log
 set print pretty on
 set pagination off
