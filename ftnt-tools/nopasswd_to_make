@@ -6,31 +6,35 @@ fWorkingDir=$(pwd)
 fUseBear=false
 fRunConfigure=false
 fGitClean=false
-fMake=false
+fNeedBuild=false
 # Variables
 scriptName=$(basename $0)
 scriptWd=$(dirname $0)
 pathOfNoPasswdToConfig=$scriptWd/nopasswd_to_config
+compileCommandsFile=compile_commands.json
+gitExcludeFile=$compileCommandsFile
 userNotation="@@@@"
 
 usage() {
     cat << _EOF
-Usage: $scriptName [- mode] [-w working_dir] [-j num_of_workers] [-bcCah]
+Usage: $scriptName [- mode] [-w working_dir] [-j num_of_workers] [-bBcCah]
 Options:
     -h      Print this help message
-    -M      Run Configure and make accepting the default values (default: $fMake)
     -C      Run Configure (default: $fRunConfigure)
-    -c      Run "git clean -xdf" before building (default: $fGitClean)
-    -b      Use Bear to generate compile_commands.json (default: $fUseBear)
-    -m      Set build mode (default: $fMode)
+    -B      Run build commands (set automatically if any of the [bmjw] options is set)
+    -a      Equivalent to -CB
+    -c      Clean the repo (default: $fGitClean)
+    -b      Use Bear to generate $compileCommandsFile (default: $fUseBear)
+    -m      Set build target (default: $fMode)
     -j      Set the number of workers (default: $fNumOfWorkers)
     -w      Set working directory (default: $fWorkingDir)
 
 Example:
-    $scriptName -M
-    $scriptName -m FGT_VM64_KVM -j4 -b
-    $scriptName -m FGT_VM64_KVM -j4 -b -c
-    $scriptName -b -c
+    $scriptName -C  // Only run Configure
+    $scriptName -B  // Only run build commands
+    $scriptName -a  // Run Configure and build commands
+    $scriptName -m FGT_VM64_KVM -j4 -bC
+    $scriptName -m FGT_VM64_KVM -j4 -bc
     $scriptName -bc
     $scriptName -j4 -b
     $scriptName -h
@@ -42,7 +46,7 @@ _EOF
 [[ $# -eq 0 ]] && usage
 
 # Parse the options
-while getopts "hm:w:cj:bCaM" opt; do
+while getopts "hm:w:j:cbCBa" opt; do
     case $opt in
         h)
             usage
@@ -50,30 +54,33 @@ while getopts "hm:w:cj:bCaM" opt; do
             ;;
         m)
             fMode=$OPTARG
-            fMake=true
+            fNeedBuild=true
             ;;
         w)
             fWorkingDir=$OPTARG
-            fMake=true
-            ;;
-        C)
-            fRunConfigure=true
-            fMake=true
-            ;;
-        c)
-            fGitClean=true
-            fMake=true
+            fNeedBuild=true
             ;;
         j)
             fNumOfWorkers=$OPTARG
-            fMake=true
+            fNeedBuild=true
             ;;
         b)
             fUseBear=true
-            fMake=true
+            fNeedBuild=true
             ;;
-        M)
-            fMake=true
+        C)
+            fRunConfigure=true
+            ;;
+        c)
+            # git clean will exclude the compile_commands.json
+            fGitClean=true
+            ;;
+        B)
+            fNeedBuild=true
+            ;;
+        a)
+            fRunConfigure=true
+            fNeedBuild=true
             ;;
         ?)
             echo "$userNotation Invalid option: -$OPTARG" >&2
@@ -107,8 +114,9 @@ echo "$userNotation Use bear to generate compile_commands.json"
 # Clean the working directory if specified
 if [[ "$fGitClean" == true ]]; then
     cd $fWorkingDir
-    echo "$userNotation Running git clean -xdf ..."
-    git clean -xdf
+    gitCleanCmd="git clean -xdf --exclude=$gitExcludeFile"
+    echo "$userNotation Running $gitCleanCmd ..."
+    eval "$gitCleanCmd"
     if [[ $? -ne 0 ]]; then
         echo "$userNotation Failed to run git clean -xdf"
         exit 1
@@ -133,12 +141,12 @@ if [[ "$fRunConfigure" == true ]]; then
     fi
 fi
 
-if [[ "$fMake" == false ]]; then
+if [[ "$fNeedBuild" == false ]]; then
     exit 0
 fi
 
-# Step 2: Run make jobs
-jsonFile=compile_commands.json
+# Step 2: Run build commands
+jsonFile=$compileCommandsFile
 jsonPath=$fWorkingDir/$jsonFile
 
 cd $fWorkingDir
@@ -159,34 +167,35 @@ if [[ "$fUseBear" == true ]]; then
     makeCommand="$bear $makeCommand"
 fi
 
-# Check if the compile_commands.json exists and is not writable
+# Check if the compile_commands.json is writable
 if [[ -f "$jsonPath" && ! -w "$jsonPath" ]]; then
-    echo "$userNotation Detected $jsonPath is not writable, making it writable"
-    chmod +w "$jsonPath"
+    echo "$userNotation Detected $jsonPath is read-only"
+    # echo "$userNotation Add write privilege to $jsonPath"
+    # chmod +w "$jsonPath"
+    # if [[ $? -ne 0 ]]; then
+    #     echo "$userNotation Failed to add write privilege to $jsonPath"
+    #     exit 1
+    # fi
+fi
+
+if [[  "$fNeedBuild" == true ]]; then
+    echo "$userNotation Running build commands: $makeCommand"
+    eval "$makeCommand"
     if [[ $? -ne 0 ]]; then
-        echo "$userNotation Failed to make $jsonPath writable"
+        echo "$userNotation Build projects failed"
         exit 1
     fi
 fi
 
-echo "$userNotation Running building commands: $makeCommand"
-eval "$makeCommand"
-
-if [[ $? -ne 0 ]]; then
-    echo "$userNotation Build projects failed"
-    exit 1
-fi
-
 # Step 3: Remove the write privilege of compile_commands.json
-if [[ -f "$jsonPath" ]]; then
-    # remove the write privilege of the file
+if [[ -f "$jsonPath" && -w "$jsonPath" ]]; then
+    echo "$userNotation $jsonPath is writable"
+    echo "$userNotation Remove the write privilege of $jsonPath"
     chmod -w $jsonPath
+    if [[ $? -ne 0 ]]; then
+        echo "$userNotation Failed to remove the write privilege of $jsonPath"
+        exit 1
+    fi
 fi
 
-# check if the privilege has been changed
-if [[ -w "$jsonPath" ]]; then
-    echo "$userNotation Failed to remove the write privilege of $jsonPath"
-    exit 1
-else
-    echo "$userNotation Build projects successfully"
-fi
+echo "$userNotation Build projects successfully"
