@@ -11,27 +11,30 @@ fNeedBuild=false
 scriptName=$(basename $0)
 scriptWd=$(dirname $0)
 pathOfNoPasswdToConfig=$scriptWd/nopasswd_to_config
-compileCommandsFile=compile_commands.json
-gitExcludeFile=$compileCommandsFile
+# Git
+gitExcludePattern1="compile_commands.json"
+gitExcludePattern2="\*.code-workspace"
+gitExcludeList="$gitExcludePattern1 $gitExcludePattern2"
+# Misc
 userNotation="@@@@"
 
 usage() {
     cat << _EOF
-Usage: $scriptName [- mode] [-w working_dir] [-j num_of_workers] [-bBcCah]
+Usage: $scriptName [-m mode] [-w working_dir] [-j num_of_workers] [-bcCoah]
 Options:
     -h      Print this help message
     -C      Run Configure (default: $fRunConfigure)
-    -B      Run build commands (set automatically if any of the [bmjw] options is set)
-    -a      Equivalent to -CB
+    -o      Run build commands (set automatically if any of the [bmjw] options is set)
+    -a      Equivalent to -Co
     -c      Clean the repo (default: $fGitClean)
     -b      Use Bear to generate $compileCommandsFile (default: $fUseBear)
-    -m      Set build target (default: $fMode)
+    -m      Set build target (default: $fMode, auto detect FGT_VM64_KVM and FPX_KVM)
     -j      Set the number of workers (default: $fNumOfWorkers)
     -w      Set working directory (default: $fWorkingDir)
 
 Example:
     $scriptName -C  // Only run Configure
-    $scriptName -B  // Only run build commands
+    $scriptName -o  // Only run build commands
     $scriptName -a  // Run Configure and build commands
     $scriptName -m FGT_VM64_KVM -j4 -bC
     $scriptName -m FGT_VM64_KVM -j4 -bc
@@ -46,7 +49,7 @@ _EOF
 [[ $# -eq 0 ]] && usage
 
 # Parse the options
-while getopts "hm:w:j:cbCBa" opt; do
+while getopts "hm:w:j:cCboa" opt; do
     case $opt in
         h)
             usage
@@ -75,7 +78,7 @@ while getopts "hm:w:j:cbCBa" opt; do
             # git clean will exclude the compile_commands.json
             fGitClean=true
             ;;
-        B)
+        o)
             fNeedBuild=true
             ;;
         a)
@@ -105,21 +108,30 @@ if [[ ! -d "$fWorkingDir" ]]; then
     exit 1
 fi
 
-echo "$userNotation Set run Configure flag to $fRunConfigure"
 echo "$userNotation Set working directory to $fWorkingDir"
 echo "$userNotation Set build mode to $fMode"
 echo "$userNotation Set number of workers to $fNumOfWorkers"
-echo "$userNotation Use bear to generate compile_commands.json"
+if [[ "$fUseBear" == true ]]; then
+    echo "$userNotation Use bear to generate compile_commands.json"
+fi
 
-# Clean the working directory if specified
+# Clean the working directory
 if [[ "$fGitClean" == true ]]; then
     cd $fWorkingDir
-    gitCleanCmd="git clean -xdf --exclude=$gitExcludeFile"
-    echo "$userNotation Running $gitCleanCmd ..."
+    gitExcludePattern=""
+    for patt in $gitExcludeList; do
+        gitExcludePattern+="--exclude=$patt "
+    done
+
+    gitCleanCmd="git clean -xdf $gitExcludePattern"
+    echo "$userNotation Cleaning the working directory ..."
+    echo "$userNotation Running: $gitCleanCmd"
     eval "$gitCleanCmd"
     if [[ $? -ne 0 ]]; then
-        echo "$userNotation Failed to run git clean -xdf"
+        echo "$userNotation Failed to clean the working directory"
         exit 1
+    else
+        echo "$userNotation Cleaned the working directory successfully"
     fi
 fi
 
@@ -198,4 +210,4 @@ if [[ -f "$jsonPath" && -w "$jsonPath" ]]; then
     fi
 fi
 
-echo "$userNotation Build projects successfully"
+echo "$userNotation Congurations! You have built projects successfully."

@@ -28,11 +28,11 @@ usage() {
 Usage: ./$scriptName [iuchH]
 Options:
     -h, --help                      Print this help message
-    -i, --install                   Make soft link
-    -H, --hard-install              Hard install
-        # Two options that may be used together with -i or -H
-        -c, --check                 Check sudo privilege
-        -u, --update                Force update
+    -i, --install                   Create symbolic links
+    -H, --hard-install              Perform a hard installation
+        # Two options that can be used in conjunction with -i or -H
+        -c, --check                 Check sudo privileges
+        -u, --update                Force an update
 
 Examples:
     ./$scriptName -i

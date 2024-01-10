@@ -21,9 +21,9 @@ if {![file exists $script_location]} {
 # Define the directory containing your Git repositories
 user_notation="@@@@"
 repos=(
-    "$HOME/myGit/fos"
+    "/data/fos"
     "/data/fos2"
-    "/data/fortiproxy"
+    "data/fpx"
     "/data/sandbox/fos_repro"
     "/data/sandbox/fpx_repro"
 )

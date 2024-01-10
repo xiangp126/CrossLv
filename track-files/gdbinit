@@ -14,7 +14,7 @@ set pagination off
 set tui tab-width 8
 set tui compact-source
 set disassembly-flavor intel
-winheight cmd +6
+winheight src -8
 fs cmd
 set logging off
 set trace-commands on
