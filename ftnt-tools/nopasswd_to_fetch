@@ -23,7 +23,7 @@ user_notation="@@@@"
 repos=(
     "/data/fos"
     "/data/fos2"
-    "data/fpx"
+    "/data/fpx"
     "/data/sandbox/fos_repro"
     "/data/sandbox/fpx_repro"
 )

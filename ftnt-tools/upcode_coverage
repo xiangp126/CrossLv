@@ -1,8 +1,9 @@
 #!/bin/bash
 
+scriptName=$(basename $0)
 if [[ "$#" < 1 ]]; then
-    echo "Usage: $0 <commit_path>"
-    echo "Example: $0 . "
+    echo "Usage: $scriptName <commit_path>"
+    echo "Example: $scriptName ."
     exit 1
 fi
 
