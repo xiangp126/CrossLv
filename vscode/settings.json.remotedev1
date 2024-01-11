@@ -1,0 +1,17 @@
+{
+    "editor.inlayHints.enabled": "off",
+    "clangd.arguments": [
+        "--log=verbose",
+        "--pretty",
+        "--background-index",
+        "-j=16",
+        "--all-scopes-completion",
+        "--completion-style=detailed",
+        "--header-insertion=iwyu",
+        "--header-insertion-decorators",
+        "--clang-tidy",
+        "--clang-tidy-checks=performance-*,portability-*,readability-*,modernize-*",
+        "--pch-storage=disk",
+    ],
+    "clangd.checkUpdates": false,
+}

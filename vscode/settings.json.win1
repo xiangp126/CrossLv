@@ -1,0 +1,66 @@
+{
+    "files.autoSave": "afterDelay",
+    "[html]": {
+        "editor.defaultFormatter": "vscode.html-language-features"
+    },
+    "workbench.statusBar.visible": true,
+    "[javascript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "editor.accessibilityPageSize": 18,
+    "editor.fontFamily": "Monaco",
+    "[python]": {
+        "editor.wordBasedSuggestions": "off",
+        "editor.formatOnType": true,
+    },
+    "editor.suggest.snippetsPreventQuickSuggestions": false,
+    "git.openRepositoryInParentFolders": "never",
+    "github.copilot.enable": {
+        "*": true,
+        "plaintext": true,
+        "markdown": true,
+        "scminput": false,
+        "c": true,
+        "shellscript": true,
+        "jsonc": true,
+        "powershell": true
+    },
+    "remote.SSH.remotePlatform": {
+        "remotedev": "linux",
+        "remoteclient1": "linux"
+    },
+    "telemetry.telemetryLevel": "off",
+    "terminal.integrated.enableMultiLinePasteWarning": false,
+    "editor.accessibilitySupport": "off",
+    "editor.indentSize": "tabSize",
+    "files.watcherExclude": {
+        "**/.venv/**": true
+    },
+    "editor.fontSize": 16,
+    "terminal.integrated.fontSize": 17,
+    "update.enableWindowsBackgroundUpdates": false,
+    "terminal.integrated.copyOnSelection": true,
+    "window.autoDetectColorScheme": true,
+    "workbench.colorCustomizations": {
+        "terminal.foreground": "#b7b7b7",
+        "terminal.background": "#1a1a1a"
+    },
+    "debug.console.acceptSuggestionOnEnter": "on",
+    "debug.console.fontFamily": "Monaco",
+    "terminal.integrated.tabFocusMode": false,
+    "extensions.autoCheckUpdates": false,
+    "update.mode": "manual",
+    "git.detectSubmodulesLimit": 40,
+    "chat.editor.fontSize": 16,
+    "gitlens.graph.minimap.enabled": false,
+    "editor.largeFileOptimizations": false,
+    "workbench.editor.empty.hint": "hidden",
+    "gitlens.graph.allowMultiple": false,
+    "gitlens.graph.pageItemLimit": 100,
+    "gitlens.graph.searchItemLimit": 50,
+    "gitlens.graph.defaultItemLimit": 5,
+    "diffEditor.ignoreTrimWhitespace": false,
+    "gitlens.views.commitDetails.files.layout": "tree",
+    "workbench.editor.tabSizing": "shrink",
+    "workbench.editor.wrapTabs": true,
+}
