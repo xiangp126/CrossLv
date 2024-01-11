@@ -251,7 +251,7 @@ linkVsCodeCodeCmd() {
 $catBanner
 Link vscode code command to /bin/code
 _EOF
-    vscodeCodePath=$(find $HOME/.vscode-server/ -type f -name code -executable)
+    vscodeCodePath=$(find $HOME/.vscode-server/ -type f -name code -executable 2>/dev/null)
 
     if [ -L /bin/code ] && [ $(readlink /bin/code) == "$vscodeCodePath" ]; then
         # echo "$beautifyGap1 code is already linked to $vscodeCodePath, skip"
