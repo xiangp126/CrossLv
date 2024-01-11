@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 # Misc Info
 scriptName=$(basename $0)
 workingDir=$(cd $(dirname $0); pwd)
