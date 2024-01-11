@@ -1,4 +1,4 @@
-#!/bin/bash
+!/bin/bash
 # Misc Info
 scriptName=$(basename $0)
 workingDir=$(cd $(dirname $0); pwd)
@@ -136,7 +136,7 @@ _EOF
     brew install "${prerequisitesForMac[@]}"
 }
 
-relinkBatToBatcat() {
+linkBatToBatcat() {
     cat << _EOF
 $catBanner
 Relink bat to batcat
@@ -218,7 +218,7 @@ _EOF
     sudo ln -sf $HOME/.fzf/bin/fzf /usr/local/bin/fzf
 }
 
-relinkFdToFdfind() {
+linkFdToFdfind() {
     cat << _EOF
 $catBanner
 Relink fd to fdfind
@@ -232,7 +232,7 @@ _EOF
     sudo ln -s $(which fdfind) $fdLinkLocation
 }
 
-relinkShToBash() {
+linkShToBash() {
     cat << _EOF
 $catBanner
 Relink sh to bash
@@ -245,6 +245,24 @@ _EOF
     # link sh to bash
     sudo ln -sf /bin/bash /bin/sh
 }
+
+linkVsCodeCodeCmd() {
+    cat << _EOF
+$catBanner
+Link vscode code command to /bin/code
+_EOF
+    vscodeCodePath=$(find $HOME/.vscode-server/ -type f -name code -executable)
+
+    if [ -L /bin/code ] && [ $(readlink /bin/code) == "$vscodeCodePath" ]; then
+        # echo "$beautifyGap1 code is already linked to $vscodeCodePath, skip"
+        echo "$beautifyGap1 code is already well linked, skip"
+        return
+    fi
+
+    sudo ln -sf $vscodeCodePath /bin/code
+}
+
+# updateVSCODE_IPC_HOOK_CLI TODO:
 
 installSolarizedColorScheme() {
     cat << _EOF
@@ -558,9 +576,10 @@ mainInstallProcedure() {
         installVimPlugs
         installLatestFzf # This should be after installVimPlugs
         # Post-Installation, currentlu only enabled for ubuntu
-        relinkShToBash
-        relinkBatToBatcat
-        relinkFdToFdfind
+        linkShToBash
+        linkBatToBatcat
+        linkFdToFdfind
+        linkVsCodeCodeCmd
         setTimeZone
         changeTMOUTToWritable
     elif [ "$platform" == "mac" ]; then

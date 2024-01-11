@@ -210,4 +210,4 @@ if [[ -f "$jsonPath" && -w "$jsonPath" ]]; then
     fi
 fi
 
-echo "$userNotation Congurations! You have built projects successfully."
+echo "$userNotation Congratulations! You have built projects successfully."

@@ -185,7 +185,12 @@ if [[ "`which fd 2> /dev/null`" != '' ]]; then
 fi
 export LINES=100
 export FZF_TMUX_HEIGHT=50%
-export FZF_DEFAULT_OPTS='--layout=reverse --inline-info --color=fg+:247'
+# fzfHistoryFile="$HOME/.fzf-history"
+# if [[ ! -f "$fzfHistoryFile" ]]; then
+#     touch $fzfHistoryFile
+# fi
+# export FZF_DEFAULT_OPTS="--layout=reverse --inline-info --color=fg+:247 --history='$HOME/.fzf-history'"
+export FZF_DEFAULT_OPTS="--layout=reverse --inline-info --color=fg+:247"
 # Use * as the trigger sequence instead of the default ** followed by a TAB
 export FZF_COMPLETION_TRIGGER='\'
 # Options to fzf command
