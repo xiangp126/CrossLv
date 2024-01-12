@@ -12,7 +12,8 @@ scriptName=$(basename $0)
 scriptWd=$(dirname $0)
 pathOfNoPasswdToConfig=$scriptWd/nopasswd_to_config
 # Git
-gitExcludePattern1="compile_commands.json"
+compileCommandsFile="compile_commands.json"
+gitExcludePattern1=$compileCommandsFile
 gitExcludePattern2="\*.code-workspace"
 gitExcludeList="$gitExcludePattern1 $gitExcludePattern2"
 # Misc

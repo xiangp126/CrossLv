@@ -1,5 +1,4 @@
 #!/bin/bash
-
 username=$(whoami)
 username=corsair
 hostname=$(hostname)
@@ -15,6 +14,7 @@ fi
 fgt1_ip="192.168.101.1"
 fgt2_ip="192.168.103.1"
 fpx1_ip="192.168.103.2"
+fpx1_ip="192.168.103.3"
 host_router_ip="172.16.67.1"
 host_br1_ip="192.168.101.254"
 host_br2_ip="192.168.102.254"
@@ -36,6 +36,9 @@ case "$1" in
     "fpx1")
         new_gateway="$fpx1_ip"
         ;;
+    "fpx2")
+        new_gateway="$fpx2_ip"
+        ;;
     "fgt1")
         new_gateway="$fgt1_ip"
         ;;
@@ -44,14 +47,15 @@ case "$1" in
         ;;
     "")
         echo "Usage: $0
-             < host_br1 | host_br2 | host_br3 | host_router | fpx1 | fgt1 | fgt2 >"
-        echo "host_br1 -> $host_br1_ip"
-        echo "host_br2 -> $host_br2_ip"
-        echo "host_br3 -> $host_br3_ip"
-        echo "host_router -> $host_router_ip"
-        echo "fgt1 -> $fgt1_ip"
-        echo "fgt2 -> $fgt2_ip"
-        echo "fpx1 -> $fpx1_ip"
+             < host_br1 | host_br2 | host_br3 | host_router | fpx1 | fpx2 | fgt1 | fgt2 >"
+        echo "host_br1: $host_br1_ip"
+        echo "host_br2: $host_br2_ip"
+        echo "host_br3: $host_br3_ip"
+        echo "host_router : $host_router_ip"
+        echo "fgt1: $fgt1_ip"
+        echo "fgt2: $fgt2_ip"
+        echo "fpx1: $fpx1_ip"
+        echo "fpx2: $fpx2_ip"
         exit 1
         ;;
     *)
