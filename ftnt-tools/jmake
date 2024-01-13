@@ -30,7 +30,7 @@ Options:
     -c      Clean the repo (default: $fGitClean)
     -b      Use Bear to generate $compileCommandsFile (default: $fUseBear)
     -m      Set build target (default: $fMode, auto detect FGT_VM64_KVM and FPX_KVM)
-    -j      Set the number of workers (default: $fNumOfWorkers)
+    -j      Set the number of jobs (default: $fNumOfWorkers)
     -w      Set working directory (default: $fWorkingDir)
 
 Example:
@@ -111,7 +111,7 @@ fi
 
 echo "$userNotation Set working directory to $fWorkingDir"
 echo "$userNotation Set build mode to $fMode"
-echo "$userNotation Set number of workers to $fNumOfWorkers"
+echo "$userNotation Set number of jobs to $fNumOfWorkers"
 if [[ "$fUseBear" == true ]]; then
     echo "$userNotation Use bear to generate compile_commands.json"
 fi
