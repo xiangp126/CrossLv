@@ -1,0 +1,15 @@
+#!/bin/bash
+
+[[ -n $1 ]] && cd "$1"
+
+export FZF_DEFAULT_COMMAND="rg --column --line-number --no-heading --color=always -- ''"
+selected=$(
+  fzf \
+    --ansi \
+    --delimiter : \
+    --bind "f12:execute-silent:(code -g $PWD/{1..3})" \
+    --preview-window 'up,60%,border-bottom,+{2}+3/3,~3' \
+    --preview 'bat --color=always --highlight-line={2} {1} | cut -d":" -f1,2,3'
+)
+
+[[ -n $selected ]] && code -g "$PWD"/"$selected"

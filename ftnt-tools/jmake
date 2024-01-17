@@ -175,7 +175,13 @@ if [[ "$fUseBear" == true ]]; then
     if [[ "$pathOfLibear" != "" ]]; then
         bear="bear -l $pathOfLibear"
     else
-        bear="bear -l /usr/lib/x86_64-linux-gnu/bear/libear.so"
+        local defaultLiBearPath="/usr/lib/x86_64-linux-gnu/bear/libear.so"
+        if [[ ! -f "$defaultLiBearPath" ]]; then
+            echo "$userNotation libear.so not found, please install it first"
+            echo "$userNotation sudo apt install libear -y"
+            exit 1
+        fi
+        bear="bear -l $defaultLiBearPath"
     fi
     makeCommand="$bear $makeCommand"
 fi

@@ -11,11 +11,11 @@ if [[ "$username" != "corsair" || ! "$hostname" =~ ^client[0-9]+$ ]]; then
     exit 1
 fi
 
+host_router_ip="172.16.67.1"
 fgt1_ip="192.168.101.1"
 fgt2_ip="192.168.103.1"
 fpx1_ip="192.168.103.2"
 fpx2_ip="192.168.103.3"
-host_router_ip="172.16.67.1"
 host_br1_ip="192.168.101.254"
 host_br2_ip="192.168.102.254"
 host_br3_ip="192.168.103.254"

@@ -5,6 +5,10 @@ vm_list=$(sudo virsh list --all --name)
 
 # Loop through the list of VMs
 for vm in $vm_list; do
+    # Skip fos3 and fpx2
+    if [[ "$vm" == "fos3" || "$vm" == "fpx2" ]]; then
+        continue
+    fi
     # Check if the VM is running
     if sudo virsh domstate "$vm" | grep -q "running"; then
         echo "VM '$vm' is already running."

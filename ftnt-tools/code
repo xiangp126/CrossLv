@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Wrapper for vscode code command
+function fcode() {
+    # Unable to connect to VS Code server: Error in request - ENOENT /run/user/1000/vscode-ipc-*.sock
+    # https://github.com/microsoft/vscode-remote-release/issues/6997#issue-1319650016
+    # https://github.com/microsoft/vscode-remote-release/issues/6362#issuecomment-1046458477
+    vscode_code_path=$(find $HOME/.vscode-server/ -type f -name code -executable)
+    if [[ -z $vscode_code_path ]]
+    then
+        echo "vscode code command not found";
+        exit 1
+    fi
+    # sorts them by modification time with the newest first
+    new_IPC_HOOK=$(ls -t /run/user/$UID/vscode-ipc-*.sock | head -1)
+    # new_IPC_HOOK=$(lsof | grep $UID/vscode-ipc | awk '{print $(NF-1)}' | head -n 1);
+
+    export VSCODE_IPC_HOOK_CLI=$new_IPC_HOOK
+    $vscode_code_path $@
+}
+
+fcode $@

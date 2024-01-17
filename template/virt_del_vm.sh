@@ -37,7 +37,7 @@ virsh undefine "$vm_name"
 if [ -n "$disk_image" ]; then
     # Delete the VM's disk image
     echo "Deleting disk image: $disk_image"
-    rm -f "$disk_image"
+    sudo rm -f "$disk_image"
 fi
 
 echo "VM '$vm_name' and its associated disk image have been deleted."

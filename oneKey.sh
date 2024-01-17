@@ -246,24 +246,6 @@ _EOF
     sudo ln -sf /bin/bash /bin/sh
 }
 
-linkVsCodeCodeCmd() {
-    cat << _EOF
-$catBanner
-Link vscode code command to /bin/code
-_EOF
-    vscodeCodePath=$(find $HOME/.vscode-server/ -type f -name code -executable 2>/dev/null)
-
-    if [ -L /bin/code ] && [ $(readlink /bin/code) == "$vscodeCodePath" ]; then
-        # echo "$beautifyGap1 code is already linked to $vscodeCodePath, skip"
-        echo "$beautifyGap1 code is already well linked, skip"
-        return
-    fi
-
-    sudo ln -sf $vscodeCodePath /bin/code
-}
-
-# updateVSCODE_IPC_HOOK_CLI TODO:
-
 installSolarizedColorScheme() {
     cat << _EOF
 Install Solarized Color Scheme for VIM
@@ -579,7 +561,6 @@ mainInstallProcedure() {
         linkShToBash
         linkBatToBatcat
         linkFdToFdfind
-        linkVsCodeCodeCmd
         setTimeZone
         changeTMOUTToWritable
     elif [ "$platform" == "mac" ]; then
