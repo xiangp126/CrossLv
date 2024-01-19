@@ -64,6 +64,10 @@ _EOF
                 echo "$beautifyGap1 We currently do not support CentOS."
                 exit
                 ;;
+            "raspbian")
+                platform=ubuntu
+                echo "$beautifyGap1 The current platform is raspbian."
+                ;;
             *)
                 echo "$beautifyGap1 The current platform is not Ubuntu or CentOS."
                 echo "$beautifyGap1 We currently do not support this platform."
