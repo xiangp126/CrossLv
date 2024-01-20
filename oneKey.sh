@@ -14,14 +14,16 @@ catBanner=$(echo "$catBanner" | sed 's/------/------ /g')
 beautifyGap1="-> "
 beautifyGap2="   "
 beautifyGap3="♣  "
-# ubuntu is the default platform
-platform=ubuntu
+# ubuntu is the default OS type
+osType=ubuntu
+osCategory=debian
 # Flags
 usageFlag=false
 forceUpdateFlag=false
 installFlag=false
 linkFlag=true
 checkSudoFlag=false
+toolsFlag=false
 
 usage() {
     cat << _EOF
@@ -30,12 +32,16 @@ Options:
     -h, --help                      Print this help message
     -i, --install                   Create symbolic links
     -H, --hard-install              Perform a hard installation
-        # Two options that can be used in conjunction with -i or -H
+        -t, --tools                 Link tools into $HOME/.usr/bin
         -c, --check                 Check sudo privileges
         -u, --update                Force an update
 
+Recommdned:
+    ./$scriptName -i
+
 Examples:
     ./$scriptName -i
+    ./$scriptName -it
     ./$scriptName -ic
     ./$scriptName -iu
     ./$scriptName -iuH
@@ -44,10 +50,47 @@ Examples:
 _EOF
 }
 
-checkPlatform() {
+[ $# -eq 0 ] && usage
+# If '-i' need an argument, like '-i hard' then you should use 'i:' with getopts
+# Exp: while 'getopts "fhi:" opt; do' Notice the colon on the right side of i
+while getopts "uhicHt" opt; do
+    # opt is the option, like 'i' or 'h'
+    case $opt in
+        u)
+            forceUpdateFlag=true
+            ;;
+        h)
+            usage
+            exit
+            ;;
+        i)
+            installFlag=true
+            ;;
+        t)
+            toolsFlag=true
+            ;;
+        c)
+            checkSudoFlag=true
+            ;;
+        H)  # Hard install
+            linkFlag=false
+            ;;
+        ?)
+            echo "$userNotation Invalid option: -$OPTARG" >&2
+            ;;
+    esac
+done
+
+# Shift to process non-option arguments. New $1, $2, ..., $@
+shift $((OPTIND - 1))
+if [ $# -gt 0 ]; then
+    echo "$userNotation Illegal non-option arguments: $@"
+    exit 1
+fi
+checkOSType() {
 cat << _EOF
 $catBanner
-Check platform
+Check OS platform
 _EOF
     if [[ -f /etc/os-release ]]; then
         local os_name
@@ -55,36 +98,39 @@ _EOF
 
         case "$os_name" in
             "ubuntu")
-                platform=ubuntu
-                echo "$beautifyGap1 The current platform is Ubuntu."
+                osType=ubuntu
+                osCategory=debian
+                echo "$beautifyGap1 The current OS type is Ubuntu."
                 ;;
             "centos")
-                platform=centos
-                echo "$beautifyGap1 The current platform is CentOS."
+                osType=centos
+                osCategory=redhat
+                echo "$beautifyGap1 The current OS type is CentOS."
                 echo "$beautifyGap1 We currently do not support CentOS."
                 exit
                 ;;
             "raspbian")
-                platform=ubuntu
-                echo "$beautifyGap1 The current platform is raspbian."
+                osType=raspbian
+                osCategory=debian
+                echo "$beautifyGap1 The current OS type is raspbian."
                 ;;
             *)
-                echo "$beautifyGap1 The current platform is not Ubuntu or CentOS."
-                echo "$beautifyGap1 We currently do not support this platform."
+                echo "$beautifyGap1 We currently do not support this OS type."
                 exit
                 ;;
         esac
     elif [[ $(uname) == "Darwin" ]]; then
-        platform=mac
-        echo "The current platform is macOS (Mac)."
+        osType=mac
+        osCategory=mac
+        echo "The current OS type is macOS (Mac)."
     else
-        echo "The platform is not supported or could not be determined."
-        echo "We currently do not support this platform."
+        echo "The OS type is not supported or could not be determined."
+        echo "We currently do not support this OS type."
         exit
     fi
 }
 
-installPrerequisitesForUbuntu() {
+installPrerequisitesForDebian() {
     prerequisitesForUbuntu=(
         # Level 1
         tmux
@@ -120,6 +166,11 @@ _EOF
 
     sudo apt-get update
     sudo apt-get install -y "${prerequisitesForUbuntu[@]}"
+    # if ostype is raspbian, then install locate and updadb
+    if [ "$osType" == "raspbian" ]; then
+        sudo apt-get install -y locate
+        sudo updatedb
+    fi
 }
 
 installPrequesitesForMac() {
@@ -227,13 +278,18 @@ linkFdToFdfind() {
 $catBanner
 Relink fd to fdfind
 _EOF
-    fdLinkLocation=/usr/local/bin/fd
-    if [ -L $fdLinkLocation ]; then
+    if [ ! -x "$(command -v fdfind)" ]; then
+        echo "$beautifyGap1 fdfind is not installed, skip"
+        return
+    fi
+
+    fdLinkLocation=$HOME/.usr/bin/fd
+    if [ -L $fdLinkLocation ] && [ $(readlink $fdLinkLocation) == $(which fdfind) ]; then
         echo "$beautifyGap1 fd link already exists, skip"
         return
     fi
 
-    sudo ln -s $(which fdfind) $fdLinkLocation
+    sudo ln -sf $(which fdfind) $fdLinkLocation
 }
 
 linkShToBash() {
@@ -542,11 +598,11 @@ printMessage() {
 }
 
 mainInstallProcedure() {
-    if [ "$platform" == "ubuntu" ]; then
-        echo "$beautifyGap1 Processing Ubuntu..."
+    if [ "$osCategory" == "debian" ]; then
+        echo "$beautifyGap1 Processing $osType ..."
         # Pre-Installation
         [ "$checkSudoFlag" == "true" ] && checkSudoPrivilege
-        [ "$forceUpdateFlag" == "true" ] && installPrerequisitesForUbuntu
+        [ "$forceUpdateFlag" == "true" ] && installPrerequisitesForDebian
         # In-Installation
         if [ "$linkFlag" == "true" ]; then
             linkTrackedFiles
@@ -555,8 +611,8 @@ mainInstallProcedure() {
         fi
         linkCompletionFiles
         linkVimColors
-        linkFtntTools
-        linkTemplateFiles
+        [ "$toolsFlag" == "true" ] && linkFtntTools
+        [ "$toolsFlag" == "true" ] && linkTemplateFiles
         followUpTrackExceptions
         # Vim plugins & fzf
         installVimPlugs
@@ -567,8 +623,8 @@ mainInstallProcedure() {
         linkFdToFdfind
         setTimeZone
         changeTMOUTToWritable
-    elif [ "$platform" == "mac" ]; then
-        echo "$beautifyGap1 Processing MacOS..."
+    elif [ "$osCategory" == "mac" ]; then
+        echo "$beautifyGap1 Processing $osType ..."
         # Pre-Installation, currently disabled for MacOS
         # [ "$checkSudoFlag" == "true" ] && checkSudoPrivilege
         # [ "$forceUpdateFlag" == "true" ] && installPrequesitesForMac
@@ -586,46 +642,10 @@ mainInstallProcedure() {
 }
 
 main() {
-    checkPlatform
+    checkOSType
     mainInstallProcedure
     printMessage
 }
 
-# Parse options
-[ $# -eq 0 ] && usage
-# if '-i' need an argument, like '-i hard' then you should use
-# while 'getopts "fhi:" opt; do'
-# There should be a colon after i
-while getopts "uhicH" opt; do
-    # opt is the option, like 'i' or 'h'
-    case $opt in
-        u)
-            forceUpdateFlag=true
-            ;;
-        h)
-            usage
-            exit
-            ;;
-        i)
-            installFlag=true
-            ;;
-        c)
-            checkSudoFlag=true
-            ;;
-        H)  # Hard install
-            linkFlag=false
-            ;;
-        ?)
-            echo "$userNotation Invalid option: -$OPTARG" >&2
-            ;;
-    esac
-done
-
-# Shift to process non-option arguments. New $1, $2, ..., $@
-shift $((OPTIND - 1))
-if [ $# -gt 0 ]; then
-    echo "$userNotation Illegal non-option arguments: $@"
-    exit 1
-fi
 
 [ "$installFlag" == "true" ] && main
