@@ -191,30 +191,6 @@ _EOF
     brew install "${prerequisitesForMac[@]}"
 }
 
-linkBatToBatcat() {
-    cat << _EOF
-$catBanner
-Relink bat to batcat
-_EOF
-    # check if batcat is installed
-    if [ ! -x "$(command -v batcat)" ]; then
-        echo "$beautifyGap1 batcat is not installed, skip"
-        return
-    fi
-
-    batLinkedPath=$HOME/.usr/bin/bat
-    # check if bat is already linked to batcat
-    if [ -L $batLinkedPath ] && [ $(readlink $batLinkedPath) == $(which batcat) ]; then
-        echo "$beautifyGap1 bat is already linked to batcat, skip"
-        return
-    fi
-
-    if [ ! -d $HOME/.usr/bin ]; then
-        mkdir -p $HOME/.usr/bin
-    fi
-    sudo ln -sf $(which batcat) $batLinkedPath
-}
-
 setTimeZone() {
     # set timezone to vancouver, on ubuntu
     cat << _EOF
@@ -273,6 +249,30 @@ _EOF
     sudo ln -sf $HOME/.fzf/bin/fzf /usr/local/bin/fzf
 }
 
+linkBatToBatcat() {
+    cat << _EOF
+$catBanner
+Relink bat to batcat
+_EOF
+    # check if batcat is installed
+    if [ ! -x "$(command -v batcat)" ]; then
+        echo "$beautifyGap1 batcat is not installed, skip"
+        return
+    fi
+
+    batLinkedPath=$HOME/.usr/bin/bat
+    # check if bat is already linked to batcat
+    if [ -L $batLinkedPath ] && [ $(readlink $batLinkedPath) == $(which batcat) ]; then
+        echo "$beautifyGap1 bat is already linked to batcat, skip"
+        return
+    fi
+
+    if [ ! -d $HOME/.usr/bin ]; then
+        mkdir -p $HOME/.usr/bin
+    fi
+    ln -sf $(which batcat) $batLinkedPath
+}
+
 linkFdToFdfind() {
     cat << _EOF
 $catBanner
@@ -289,7 +289,7 @@ _EOF
         return
     fi
 
-    sudo ln -sf $(which fdfind) $fdLinkLocation
+    ln -sf $(which fdfind) $fdLinkLocation
 }
 
 linkShToBash() {
