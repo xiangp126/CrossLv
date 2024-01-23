@@ -148,11 +148,24 @@ installPrerequisitesForDebian() {
         dos2unix
         # Level 3
         net-tools
-        texinfo
         libvirt-clients
         bash-completion
-        build-essential
         openssh-server
+        libssl-dev
+        # Build tools
+        build-essential
+        texinfo
+        libisl-dev
+        libgmp-dev
+        libncurses-dev
+        python3-dev
+        source-highlight
+        libsource-highlight-dev
+        libmpfr-dev
+        libtool
+        autoconf
+        gettext
+        autopoint
         # clangd
         clangd
         bear
