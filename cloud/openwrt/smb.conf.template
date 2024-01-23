@@ -1,0 +1,33 @@
+[global]
+        netbios name = Gargoyle
+        interfaces = lo br-lan br-wan
+        server string = Gargoyle via OpenWRT
+        workgroup = WORKGROUP
+        bind interfaces only = yes
+        deadtime = 30
+        enable core files = no
+        invalid users = root
+        local master = no
+        map to guest = Bad User
+        max protocol = SMB2
+        min receivefile size = 16384
+        passdb backend = smbpasswd
+        security = user
+        smb passwd file = /etc/samba/smbpasswd
+        use sendfile = yes
+
+[DTM]
+        path = /mnt/DTM
+        valid users = pi
+        read only = no
+        guest ok = no
+        create mask = 775
+        directory mask = 775
+
+[STM]
+        path = /mnt/STM
+        valid users = pi
+        read only = no
+        guest ok = no
+        create mask = 775
+        directory mask = 775

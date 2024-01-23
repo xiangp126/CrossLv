@@ -1,0 +1,28 @@
+# /etc/config/fstab
+config global
+        option anon_swap '0'
+        option anon_mount '0'
+        option auto_swap '1'
+        option auto_mount '1'
+        option delay_root '5'
+        option check_fs '0'
+
+config mount
+        option target '/mnt/DTM'
+        option uuid '4c039663-9278-4253-8a71-3f2a837e598b'
+        option enabled '1'
+        option fstype 'ext4'
+        option options 'rw,sync'
+        option enabled_fsck '0'
+        option uid '1000'
+        option gid '1000'
+
+config mount
+        option target '/mnt/STM'
+        option uuid 'd6884ed9-dd48-4e02-8b38-f6eb47220fae'
+        option enabled '1'
+        option fstype 'ext4'
+        option options 'rw,sync'
+        option enabled_fsck '0'
+        option uid '1000'
+        option gid '1000'
