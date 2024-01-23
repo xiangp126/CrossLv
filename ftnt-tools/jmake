@@ -145,7 +145,7 @@ fi
 # Step 1: Run Configure
 if [[ "$fRunConfigure" == true ]]; then
     echo "$userNotation Running Configure ..."
-    echo "$userNotation Running nopasswd_to_config [mode:]$fMode [working_directory:]$fWorkingDir"
+    echo "$userNotation Running nopasswd_to_config (mode:$fMode, wd:$fWorkingDir)"
     expect -f $pathOfNoPasswdToConfig $fMode $fWorkingDir
 
     if [[ $? -ne 0 ]]; then

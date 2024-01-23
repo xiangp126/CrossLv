@@ -41,7 +41,8 @@ set i 0
 set timeout 2
 while { $i < 3 } {
     # Spawn the SSH process
-    spawn ssh -p $port $user@$fgt_dev
+    # spawn ssh -p $port $user@$fgt_dev
+    spawn ssh admin@$fgt_dev
     set process_id $spawn_id
     expect {
         "yes/no" {
