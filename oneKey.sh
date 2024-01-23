@@ -138,6 +138,7 @@ installPrerequisitesForDebian() {
         fd-find
         ripgrep
         universal-ctags
+        openssl
         # Level 2
         gdb
         bat
@@ -166,8 +167,8 @@ installPrerequisitesForDebian() {
         autoconf
         gettext
         autopoint
+        # For llvm
         # clangd
-        clangd
         bear
         libear
     )
@@ -181,7 +182,7 @@ _EOF
     sudo apt-get install -y "${prerequisitesForUbuntu[@]}"
     # if ostype is raspbian, then install locate and updadb
     if [ "$osType" == "raspbian" ]; then
-        sudo apt-get install -y locate
+        sudo apt-get install -y mlocate
         sudo updatedb
     fi
 }
