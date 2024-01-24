@@ -1,25 +1,25 @@
 [user]
-	name = Peter X
-	email = hi.pxiang@gmail.com
+    name = Peter X
+    email = hi.pxiang@gmail.com
 [core]
-	excludesfile = ~/.gitignore
-	editor = vim
+    excludesfile = ~/.gitignore
+    editor = vim
 [help]
-	autocorrect = 1
+    autocorrect = 1
 [clean]
-	requireForce = false
+    requireForce = false
 [alias]
-	st = status
-	ad = add
-	df = diff
-	lgg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)'
-	cm = commit -v
-	co = checkout
-	cmm = commit -v -m
-	dfc = diff --cached
-	dfs = diff --stat
-	br = branch
+    st = status
+    ad = add
+    df = diff
+    lgg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)'
+    cm = commit -v
+    co = checkout
+    cmm = commit -v -m
+    dfc = diff --cached
+    dfs = diff --stat
+    br = branch
 [color]
-	ui = auto
+    ui = auto
 [http]
     sslverify = false
