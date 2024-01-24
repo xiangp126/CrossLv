@@ -14,4 +14,6 @@
         "--pch-storage=disk",
     ],
     "clangd.checkUpdates": false,
+    "editor.tabSize": 8,
+    "editor.insertSpaces": false,
 }

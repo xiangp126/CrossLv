@@ -63,4 +63,5 @@
     "gitlens.views.commitDetails.files.layout": "tree",
     "workbench.editor.tabSizing": "shrink",
     "workbench.editor.wrapTabs": true,
+    "path-intellisense.showHiddenFiles": true,
 }
