@@ -139,27 +139,29 @@ installPrerequisitesForDebian() {
         ripgrep
         universal-ctags
         openssl
-        # Level 2
+        libssl-dev
         gdb
         bat
+        # Level 2
         curl
+        libcurl4
+        libcurl4-openssl-dev
+        dos2unix
         expect
         sshfs
         shellcheck
-        dos2unix
-        # Level 3
+        mlocate
         net-tools
-        libvirt-clients
         bash-completion
         openssh-server
-        libssl-dev
-        # Build tools
+        python3-dev
+        # Level 3
         build-essential
+        libvirt-clients
         texinfo
         libisl-dev
         libgmp-dev
         libncurses-dev
-        python3-dev
         source-highlight
         libsource-highlight-dev
         libmpfr-dev
@@ -180,11 +182,7 @@ _EOF
 
     sudo apt-get update
     sudo apt-get install -y "${prerequisitesForUbuntu[@]}"
-    # if ostype is raspbian, then install locate and updadb
-    if [ "$osType" == "raspbian" ]; then
-        sudo apt-get install -y mlocate
-        sudo updatedb
-    fi
+    sudo updatedb
 }
 
 installPrequesitesForMac() {

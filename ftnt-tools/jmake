@@ -5,8 +5,9 @@ fNumOfWorkers=$(nproc)
 fWorkingDir=$(pwd)
 fUseBear=false
 fRunConfigure=false
-fGitClean=false
 fNeedBuild=false
+fGitClean=false
+fRemoveCompileCommandsJson=false
 # Variables
 scriptName=$(basename $0)
 scriptWd=$(dirname $0)
@@ -18,10 +19,11 @@ gitExcludePattern2="\*.code-workspace"
 gitExcludeList="$gitExcludePattern1 $gitExcludePattern2"
 # Misc
 userNotation="@@@@"
+subUserNotation="@@@@ >"
 
 usage() {
     cat << _EOF
-Usage: $scriptName [-m mode] [-w working_dir] [-j num_of_workers] [-bcCoah]
+Usage: $scriptName [-m mode] [-w working_dir] [-j num_of_workers] [-bcCoahf]
 Options:
     -h      Print this help message
     -C      Run Configure (default: $fRunConfigure)
@@ -32,6 +34,7 @@ Options:
     -m      Set build target (default: $fMode, auto detect FGT_VM64_KVM and FPX_KVM)
     -j      Set the number of jobs (default: $fNumOfWorkers)
     -w      Set working directory (default: $fWorkingDir)
+    -f      Remove $compileCommandsFile (default: $fRemoveCompileCommandsJson)
 
 Example:
     $scriptName -C  // Only run Configure
@@ -50,7 +53,7 @@ _EOF
 [[ $# -eq 0 ]] && usage
 
 # Parse the options
-while getopts "hm:w:j:cCboa" opt; do
+while getopts "hm:w:j:cCboaf" opt; do
     case $opt in
         h)
             usage
@@ -76,8 +79,11 @@ while getopts "hm:w:j:cCboa" opt; do
             fRunConfigure=true
             ;;
         c)
-            # git clean will exclude the compile_commands.json
+            # Ignore compile_commands.json by default
             fGitClean=true
+            ;;
+        f)
+            fRemoveCompileCommandsJson=true
             ;;
         o)
             fNeedBuild=true
@@ -118,21 +124,30 @@ fi
 
 # Clean the working directory
 if [[ "$fGitClean" == true ]]; then
+    echo "$userNotation Cleaning the working directory ..."
     cd $fWorkingDir
     gitExcludePattern=""
     for patt in $gitExcludeList; do
+        if [[ "$fRemoveCompileCommandsJson" == true ]]; then
+            if [[ "$patt" == "$compileCommandsFile" ]]; then
+                echo "$subUserNotation Will remove $compileCommandsFile"
+                continue
+            fi
+        fi
+        echo "$subUserNotation Exclude $patt"
         gitExcludePattern+="--exclude=$patt "
     done
 
     gitCleanCmd="git clean -xdf $gitExcludePattern"
-    echo "$userNotation Cleaning the working directory ..."
-    echo "$userNotation Running: $gitCleanCmd"
+    echo "$subUserNotation Running: $gitCleanCmd"
+
+    sleep 1
     eval "$gitCleanCmd"
     if [[ $? -ne 0 ]]; then
         echo "$userNotation Failed to clean the working directory"
         exit 1
     else
-        echo "$userNotation Cleaned the working directory successfully"
+        echo "$subUserNotation Cleaned the working directory successfully"
     fi
 fi
 
@@ -145,7 +160,8 @@ fi
 # Step 1: Run Configure
 if [[ "$fRunConfigure" == true ]]; then
     echo "$userNotation Running Configure ..."
-    echo "$userNotation Running nopasswd_to_config (mode:$fMode, wd:$fWorkingDir)"
+    echo "$subUserNotation Running nopasswd_to_config (mode:$fMode, wd:$fWorkingDir)"
+    sleep 1
     expect -f $pathOfNoPasswdToConfig $fMode $fWorkingDir
 
     if [[ $? -ne 0 ]]; then
@@ -197,10 +213,26 @@ if [[ -f "$jsonPath" && ! -w "$jsonPath" ]]; then
     # fi
 fi
 
-if [[  "$fNeedBuild" == true ]]; then
-    echo "$userNotation Running build commands: $makeCommand"
-    eval "$makeCommand"
-    if [[ $? -ne 0 ]]; then
+attempt=1
+maxAttempt=5
+if [[ "$fNeedBuild" == true ]]; then
+
+    while [[ $attempt -le $maxAttempt ]]; do
+        echo "$userNotation Running build commands: $makeCommand"
+        echo "$subUserNotation Attempt $attempt/$maxAttempt"
+        # [[ $attempt -gt 1 ]] && sleep 2
+        sleep 2
+
+        eval "$makeCommand"
+        eval_status=$?
+        if [[ $eval_status -eq 0 ]]; then
+            break
+        else
+            attempt=$((attempt + 1))
+        fi
+    done
+
+    if [[ $eval_status -ne 0 ]]; then
         echo "$userNotation Build projects failed"
         exit 1
     fi
