@@ -14,8 +14,10 @@ fi
 host_router_ip="172.16.67.1"
 fgt1_ip="192.168.101.1"
 fgt2_ip="192.168.103.1"
+fgt3_ip="192.168.103.4"
 fpx1_ip="192.168.103.2"
 fpx2_ip="192.168.103.3"
+fpx3_ip="192.168.103.5"
 host_br1_ip="192.168.101.254"
 host_br2_ip="192.168.102.254"
 host_br3_ip="192.168.103.254"
@@ -39,23 +41,33 @@ case "$1" in
     "fpx2")
         new_gateway="$fpx2_ip"
         ;;
+    "fpx3")
+        new_gateway="$fpx3_ip"
+        ;;
     "fgt1")
         new_gateway="$fgt1_ip"
         ;;
     "fgt2")
         new_gateway="$fgt2_ip"
         ;;
+    "fgt3")
+        new_gateway="$fgt3_ip"
+        ;;
     "")
-        echo "Usage: $0
-             < host_br1 | host_br2 | host_br3 | host_router | fpx1 | fpx2 | fgt1 | fgt2 >"
+        echo "Usage: $(basename $0) <gateway_name>"
+        echo "Example: $(basename $0) fpx1"
+        echo "Available gateways:"
+        echo "-------------------"
         echo "host_br1: $host_br1_ip"
         echo "host_br2: $host_br2_ip"
         echo "host_br3: $host_br3_ip"
         echo "host_router : $host_router_ip"
         echo "fgt1: $fgt1_ip"
         echo "fgt2: $fgt2_ip"
+        echo "fgt3: $fgt3_ip"
         echo "fpx1: $fpx1_ip"
         echo "fpx2: $fpx2_ip"
+        echo "fpx3: $fpx3_ip"
         exit 1
         ;;
     *)
