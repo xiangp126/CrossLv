@@ -21,7 +21,7 @@
         valid users = pi
         read only = no
         guest ok = no
-        create mask = 775
+        create mask = 664
         directory mask = 775
 
 [STM]
@@ -29,7 +29,7 @@
         valid users = pi
         read only = no
         guest ok = no
-        create mask = 775
+        create mask = 664
         directory mask = 775
 
 ######### Dynamic written config options #########
