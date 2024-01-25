@@ -2,9 +2,13 @@
 import os
 import sys
 import subprocess
+import getopt
 
-def verify_exe_file(exe_file_path):
-    print("@@@@ Verifying", exe_file_path)
+def verify_exe_file():
+    print(f"{user_notation} Verifying", exe_file_path)
+    if not os.path.exists(exe_file_path):
+        print("Error: {} does not exist".format(exe_file_path))
+        sys.exit(1)
     # -nx: prevents GDB from reading the .gdbinit initialization file.
     # cmd = ['gdb', exe_file_path, '-q', '-batch', '-nx', '-ex', 'quit']
     cmd = ['gdb', exe_file_path, '-q', '-batch', '-ex', 'quit']
@@ -14,7 +18,7 @@ def verify_exe_file(exe_file_path):
         print(e)
         sys.exit(1)
 
-def start_decoding(pointer, exe_file_path):
+def start_decoding(pointer, f):
     cmd = ['gdb', exe_file_path, '-q', '-batch', '-nx', '-ex', 'list *' + pointer, '-ex', 'quit']
     try:
         result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -26,21 +30,30 @@ def start_decoding(pointer, exe_file_path):
         # Split the output into lines
         lines = result.stdout.split('\n')
 
-        # Print the first and middle lines
+        # Print the first and middle lines if the verbose flag is set
         if lines:
             first_line = lines[0]
             middle_line_index = len(lines) // 2
             middle_line = lines[middle_line_index]
 
-            print(first_line)
-            # print(middle_line)
+            combined_line=f"{first_line}"
+            if verbose_flag:
+                combined_line = f"{first_line}\n{middle_line}"
+            print(combined_line)
+            if write_flag:
+                f.write(f"{combined_line}\n")
+                f.flush()
     else:
-        print("Error running GDB command:")
+        print(f"{user_notation} Error running GDB command:")
         print(result.stderr)
 
-def read_crash_file(crash_file_path):
-    print("@@@@ Reading", crash_file_path)
-    with open(crash_file_path, "r") as f:
+def read_crash_file():
+    # print(f"{user_notation} Reading", crash_log_path)
+    print(f"{user_notation} Reading", crash_log_path)
+    if not os.path.exists(crash_log_path):
+        print(f"{user_notation} Error: '{crash_log_path}' does not exist")
+        sys.exit(1)
+    with open(crash_log_path, "r") as f:
         return f.readlines()
 
 # Function to check if a line contains a function pointer
@@ -52,26 +65,83 @@ def extract_func_pointer(line):
                 return s[1:-1]
     return ""
 
+def print_help(script_name, exe_file_path, crash_log_path):
+    print(f"0.1.0\n")
+    print(f"Usage: {script_name} [OPTIONS]")
+    print("\nOptions:")
+    print("  -e, --exe <exe_file_path>    Path to the executable file (default: {})".format(exe_file_path))
+    print("  -c, --crash <crash_log_path> Path to the crash log file (default: {})".format(crash_log_path))
+    print("  -o, --output <output_path>   Path to the crash decode output file (default: {})".format(crash_decode_output))
+    print("  -w, --write                  Enable write mode")
+    print("  -v, --verbose                Enable verbose mode")
+    print("  -h, --help                   Display this help message")
+    print("\nExample:")
+    print(f"  {script_name} -e {exe_file_path} -c {crash_log_path} -o {crash_decode_output} -w -v\n")
+
 def main():
-    if len(sys.argv) != 3:
-        print("Usage: {} <exe_file_path> <crash_file_path>".format(sys.argv[0]))
-        print("Example: {} ./sysinit/init ./crash.log".format(sys.argv[0]))
+    script_name = os.path.basename(sys.argv[0])
+    global user_notation, exe_file_path, crash_log_path, crash_decode_output, write_flag, verbose_flag
+    user_notation = "@@@@"
+    exe_file_path = "./sysinit/init"
+    crash_log_path = "~/.crash/crash.log"
+    crash_decode_output = "~/.crash/crash_decode.output"
+    write_flag = False
+    verbose_flag = False
+
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "he:c:o:wv", ["help", "exe=", "crash=", "output=", "write", "verbose"])
+    except getopt.GetoptError as err:
+        print(err)
         sys.exit(1)
 
-    exe_file_path = sys.argv[1]
-    crash_file_path = sys.argv[2]
+    for opt, arg in opts:
+        if opt in ("-h", "--help"):
+            print_help(script_name, exe_file_path, crash_log_path)
+            sys.exit(0)
+        elif opt in ("-e", "--exe"):
+            exe_file_path = arg
+        elif opt in ("-c", "--crash"):
+            crash_log_path = arg
+        elif opt in ("-o", "--output"):
+            crash_decode_output = arg
+        elif opt in ("-w", "--write"):
+            write_flag = True
+        elif opt in ("-v", "--verbose"):
+            verbose_flag = True
 
-    verify_exe_file(exe_file_path)
-    crash_lines = read_crash_file(crash_file_path)
-    print("@@@@ Start Decoding ...")
-    for line in crash_lines:
-        # Check if the line contains a function pointer
-        pointer = extract_func_pointer(line)
-        if pointer != "":
-            start_decoding(pointer, exe_file_path)
-        else:
-            # Print the line as is if it doesn't contain a function pointer
-            print(line.strip())
+    # expanduser() expands '~' to the user's home directory
+    exe_file_path = os.path.expanduser(exe_file_path)
+    crash_log_path = os.path.expanduser(crash_log_path)
+    crash_decode_output = os.path.expanduser(crash_decode_output)
+
+    print(f"{user_notation} Printing Arguments:")
+    print(f"write_flag:", write_flag)
+    print(f"verbose_flag:", verbose_flag)
+    print(f"exe_file_path:", exe_file_path)
+    print(f"crash_log_path:", crash_log_path)
+    print(f"crash_decode_output:", crash_decode_output)
+
+    verify_exe_file()
+    crash_lines = read_crash_file()
+
+    file = open(crash_decode_output, 'w+')
+    file.close()
+
+    print(f"{user_notation} Start Decoding ...")
+    with open(crash_decode_output, "w") as f:
+        for line in crash_lines:
+            # Check if the line contains a function pointer
+            pointer = extract_func_pointer(line)
+            if pointer != "":
+                start_decoding(pointer, f)
+            else:
+                # Print the line as is if it doesn't contain a function pointer
+                print(line.strip())
+                if write_flag:
+                    f.write(line)
+                    f.flush()
+
+    print(f"{user_notation} Done Decoding. The output is saved in", crash_decode_output)
 
 # Entry point for the script
 if __name__ == "__main__":
