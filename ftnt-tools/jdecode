@@ -124,24 +124,28 @@ def main():
     verify_exe_file()
     crash_lines = read_crash_file()
 
-    file = open(crash_decode_output, 'w+')
-    file.close()
+    f = None
+    if write_flag:
+        # 'w+' will create the file if it doesn't exist
+        f = open(crash_decode_output, 'w+')
+        f.close()
+        f = open(crash_decode_output, 'a')
 
     print(f"{user_notation} Start Decoding ...")
-    with open(crash_decode_output, "w") as f:
-        for line in crash_lines:
-            # Check if the line contains a function pointer
-            pointer = extract_func_pointer(line)
-            if pointer != "":
-                start_decoding(pointer, f)
-            else:
-                # Print the line as is if it doesn't contain a function pointer
-                print(line.strip())
-                if write_flag:
-                    f.write(line)
-                    f.flush()
+    for line in crash_lines:
+        # Check if the line contains a function pointer
+        pointer = extract_func_pointer(line)
+        if pointer != "":
+            start_decoding(pointer, f)
+        else:
+            # Print the line as is if it doesn't contain a function pointer
+            print(line.strip())
+            if write_flag:
+                f.write(line)
+                f.flush()
 
     if write_flag:
+        f.close()
         print(f"{user_notation} Done Decoding. The output is saved in", crash_decode_output)
     else:
         print(f"{user_notation} Congratulations! The crashlog has been decoded successfully.")
