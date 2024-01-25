@@ -141,7 +141,10 @@ def main():
                     f.write(line)
                     f.flush()
 
-    print(f"{user_notation} Done Decoding. The output is saved in", crash_decode_output)
+    if write_flag:
+        print(f"{user_notation} Done Decoding. The output is saved in", crash_decode_output)
+    else:
+        print(f"{user_notation} Congratulations! The crashlog has been decoded successfully.")
 
 # Entry point for the script
 if __name__ == "__main__":
