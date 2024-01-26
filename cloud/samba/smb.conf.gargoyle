@@ -1,5 +1,5 @@
 [global]
-	netbios name = OpenWrt
+	netbios name = Gargoyle
 	interfaces = lo br-lan
 	server string = This is a Samba Server
 	workgroup = WORKGROUP
@@ -23,8 +23,16 @@
 	fake oplocks = Yes
 	use sendfile = Yes
 
-[SWORD]
-	path = /mnt/sword
+[DTM]
+	path = /mnt/DTM
+	valid users = pi
+	read only = no
+	guest ok = no
+	create mask = 664
+	directory mask = 775
+
+[STM]
+	path = /mnt/STM
 	valid users = pi
 	read only = no
 	guest ok = no
