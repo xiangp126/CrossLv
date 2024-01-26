@@ -9,6 +9,7 @@
 	invalid users = root
 	local master = no
 	map to guest = Bad User
+	min protocol = SMB2
 	max protocol = SMB3
 	# Disable encryption for smb3
 	smb encrypt = off
@@ -16,8 +17,8 @@
 	security = user
 	smb passwd file = /etc/samba/smbpasswd
 	load printers = no
-	# Do not set any socket options, or sending a file will get stuck in calculating the time.
-	# socket options = TCP_NODELAY SO_RCVBUF SO_KEEPALIVE
+	# Do not set any other socket options, or sending a file will get stuck in calculating the time.
+	socket options = SO_KEEPALIVE
 	max xmit = 131072
 	min receivefile size = 131072
 	fake oplocks = Yes
@@ -38,3 +39,7 @@
 	guest ok = no
 	create mask = 664
 	directory mask = 775
+
+######### Dynamic written config options #########
+	disable netbios = yes
+	smb ports = 445
