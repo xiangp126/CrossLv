@@ -1,7 +1,3 @@
-proc            /proc           proc    defaults          0       0
-PARTUUID=8e61cdc9-01  /boot/firmware  vfat    defaults          0       2
-PARTUUID=8e61cdc9-02  /               ext4    defaults,noatime  0       1
-# a swapfile is not a swap partition, no line here
-#   use  dphys-swapfile swap[on|off]  for that
-#   change User and uid/gid accordingly
-//192.168.10.100/aria2 /home/User/aria2Downloads cifs credentials=/home/User/.smbcredentials,uid=1000,gid=1000 0 0
+# use 'id pi' to get the uid and gid of user pi. Say here the uid is 1001
+# mount -t cifs -o username=pi,uid=1001,gid=1001 //192.168.10.1/STM /mnt/STM
+//192.168.10.1/STM /mnt/STM cifs credentials=/home/pi/.smbcredentials,uid=1001,gid=1001 0 0
