@@ -61,8 +61,6 @@ alias 7zP='7z a -mhe=on -p'
 alias 7zA='7z a'
 alias 7zX='7z x'
 alias tmux='tmux -u'
-alias jdown='yt-dlp '
-alias jdown-auto-sub='yt-dlp --write-auto-subs --sub-langs en '
 # alias aria2c-yt='yt-dlp --external-downloader aria2c --external-downloader-args "-x 16 -s 16" --output "%(title)s.%(ext)s"'
 # Dump the raw packet data
 alias rawdump="tcpdump -s 0 -U -n -w -"
@@ -88,6 +86,7 @@ alias cdb='__cd $HOME/.usr/bin'
 alias cdg='__cd $HOME/myGit'
 alias cdf='__cd $HOME/myGit/fos'
 alias cdv='__cd $HOME/myGit/crosslv'
+alias cda='__cd /Volumes/SWORD/Aria2/'
 
 # print entry names without quoting
 export QUOTING_STYLE=literal
