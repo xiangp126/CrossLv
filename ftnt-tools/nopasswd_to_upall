@@ -139,7 +139,7 @@ proc common_expect_block {fa_pattern} {
 
 set fa_pattern "2fa_verify"
 set pattern_found false
-set timeout 180
+set timeout -1
 spawn bash $script_location
 common_expect_block $fa_pattern
 if {$pattern_found == false} {
