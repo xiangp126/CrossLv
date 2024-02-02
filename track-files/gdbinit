@@ -19,6 +19,7 @@ fs cmd
 set logging off
 set trace-commands on
 set logging on
+set can-use-hw-watchpoints 1
 
 # Do not remove the trailing space
 set prompt (gdb) 

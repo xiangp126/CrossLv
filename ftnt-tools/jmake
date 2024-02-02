@@ -19,7 +19,7 @@ gitExcludePattern2="\*.code-workspace"
 gitExcludeList="$gitExcludePattern1 $gitExcludePattern2"
 # Misc
 userNotation="@@@@"
-subUserNotation="@@@@ >"
+subUserNotation="@@@@ @"
 
 usage() {
     cat << _EOF
