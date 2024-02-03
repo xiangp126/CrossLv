@@ -19,4 +19,4 @@ function fcode() {
     $vscode_code_path $@
 }
 
-fcode $@
+fcode -g $@
