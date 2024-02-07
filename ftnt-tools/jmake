@@ -3,6 +3,7 @@
 fMode=FGT_VM64_KVM
 fNumOfWorkers=$(nproc)
 fWorkingDir=$(pwd)
+fMaxAttempt=3
 fUseBear=false
 fRunConfigure=false
 fNeedBuild=false
@@ -23,18 +24,21 @@ subUserNotation="@@@@ @"
 
 usage() {
     cat << _EOF
-Usage: $scriptName [-m mode] [-w working_dir] [-j num_of_workers] [-bcCoahf]
+jmake 0.0.1
+
+Usage: $scriptName [-m mode] [-w working_dir] [-j num_of_workers] [-T max_attempt] [-bcCoahf]
 Options:
-    -h      Print this help message
-    -C      Run Configure (default: $fRunConfigure)
-    -o      Run build commands (set automatically if any of the [bmjw] options is set)
+    -C      Run Configure by calling expect scripts (default: $fRunConfigure)
+    -o      Run build commands (set automatically if any of the [bmjwT] options is set)
     -a      Equivalent to -Co
+    -T      Set the maximum number of attempts (default: $fMaxAttempt)
     -c      Clean the repo (default: $fGitClean)
     -b      Use Bear to generate $compileCommandsFile (default: $fUseBear)
-    -m      Set build target (default: $fMode, auto detect FGT_VM64_KVM and FPX_KVM)
+    -m      Set build target/mode (default: $fMode, auto detect FGT_VM64_KVM and FPX_KVM)
     -j      Set the number of jobs (default: $fNumOfWorkers)
     -w      Set working directory (default: $fWorkingDir)
     -f      Remove $compileCommandsFile (default: $fRemoveCompileCommandsJson)
+    -h      Print this help message
 
 Example:
     $scriptName -C  // Only run Configure
@@ -53,7 +57,7 @@ _EOF
 [[ $# -eq 0 ]] && usage
 
 # Parse the options
-while getopts "hm:w:j:cCboaf" opt; do
+while getopts "hm:w:j:cCboafT:" opt; do
     case $opt in
         h)
             usage
@@ -69,6 +73,10 @@ while getopts "hm:w:j:cCboaf" opt; do
             ;;
         j)
             fNumOfWorkers=$OPTARG
+            fNeedBuild=true
+            ;;
+        T)
+            fMaxAttempt=$OPTARG
             fNeedBuild=true
             ;;
         b)
@@ -214,7 +222,7 @@ if [[ -f "$jsonPath" && ! -w "$jsonPath" ]]; then
 fi
 
 attempt=1
-maxAttempt=5
+maxAttempt=$fMaxAttempt
 if [[ "$fNeedBuild" == true ]]; then
 
     while [[ $attempt -le $maxAttempt ]]; do
@@ -233,7 +241,8 @@ if [[ "$fNeedBuild" == true ]]; then
     done
 
     if [[ $eval_status -ne 0 ]]; then
-        echo "$userNotation Build projects failed"
+        echo "$userNotation Build projects failed."
+        echo "$subUserNotation Suggest to clean the working directory and try again."
         exit 1
     fi
 fi
