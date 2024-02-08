@@ -7,13 +7,14 @@
         "-j=16",
         "--all-scopes-completion",
         "--completion-style=detailed",
+        "--cross-file-rename",
         "--header-insertion=iwyu",
         "--header-insertion-decorators",
         "--clang-tidy",
-        "--clang-tidy-checks=performance-*,portability-*,readability-*,modernize-*",
+        "--clang-tidy-checks=cppcoreguidelines-*,performance-*,bugprone-*,portability-*,modernize-*,google-*",
         "--pch-storage=disk",
     ],
-    "clangd.checkUpdates": false,
+    "clangd.checkUpdates": true,
     "editor.tabSize": 8,
     "editor.insertSpaces": false,
     "files.exclude": {
@@ -36,4 +37,5 @@
     "gitlens.views.patchDetails.avatars": false,
     "gitlens.views.commitDetails.avatars": false,
     "gitlens.views.commits.avatars": false,
+    "gitlens.defaultGravatarsStyle": "mp",
 }
