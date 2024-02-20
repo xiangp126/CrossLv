@@ -48,6 +48,7 @@ Example:
     $scriptName -m FGT_VM64_KVM -j4 -bc
     $scriptName -bc
     $scriptName -j4 -b
+    $scriptName -T1
     $scriptName -h
 
 _EOF
