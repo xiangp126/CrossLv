@@ -76,7 +76,9 @@ def print_help(script_name, exe_file_path, crash_log_path):
     print("  -v, --verbose                Enable verbose mode")
     print("  -h, --help                   Display this help message")
     print("\nExample:")
-    print(f"  {script_name} -e {exe_file_path} -c {crash_log_path} -o {crash_decode_output} -w -v\n")
+    print(f"  {script_name} -e {exe_file_path} -c {crash_log_path} -o {crash_decode_output} -w -v")
+    print(f"  {script_name} -w -v")
+    print(f"  {script_name} -v\n")
 
 def main():
     script_name = os.path.basename(sys.argv[0])
@@ -84,7 +86,7 @@ def main():
     user_notation = "@@@@"
     exe_file_path = "./sysinit/init"
     crash_log_path = "~/.crash/crash.log"
-    crash_decode_output = "~/.crash/crash_decode.output"
+    crash_decode_output = "~/.crash/crash_decoded.txt"
     write_flag = False
     verbose_flag = False
 
