@@ -15,27 +15,13 @@ source "$script_directory/$header_exp"
 # Set a custom timeout value in seconds (e.g., 180 seconds)
 set custom_timeout 180
 
-# set mode "FGT_601F"
-set mode "FGT_VM64_KVM"
-
-# Set the working directory to the current directory
-set working_dir [exec pwd]
-
-# Check if an argument is provided and set mode accordingly
-if {$argc == 1} {
-    set provided_mode [lindex $argv 0]
-    if {$provided_mode eq "fpx"} {
-        set mode FPX_KVM
-    } elseif {$provided_mode eq "fgt"} {
-        set mode FGT_VM64_KVM
+# If specified, the first argument is the working directory, and the second argument is the mode
+if {$argc < 2} {
+    if {$argc == 1} {
+        set working_dir [lindex $argv 0]
     } else {
-        set mode $provided_mode
+        set working_dir [exec pwd]
     }
-} else {
-    if {$argc > 1} {
-        set working_dir [lindex $argv 1]
-    }
-
     # Check if the directory name contains "fos"
     if {[string match -nocase "*fos*" $working_dir] || [string match -nocase "*fortios*" $working_dir]} {
         set mode "FGT_VM64_KVM"
@@ -48,6 +34,10 @@ if {$argc == 1} {
             exit 1
         }
     }
+} else {
+    # If the mode is specified, use it
+    set working_dir [lindex $argv 0]
+    set mode [lindex $argv 1]
 }
 
 # Spawn your target script or command using the "mode" variable

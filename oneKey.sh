@@ -87,48 +87,6 @@ if [ $# -gt 0 ]; then
     echo "$userNotation Illegal non-option arguments: $@"
     exit 1
 fi
-checkOSType() {
-cat << _EOF
-$catBanner
-Check OS platform
-_EOF
-    if [[ -f /etc/os-release ]]; then
-        local os_name
-        os_name=$(awk -F= '/^ID=/{print $2}' /etc/os-release)
-
-        case "$os_name" in
-            "ubuntu")
-                osType=ubuntu
-                osCategory=debian
-                echo "$beautifyGap1 The current OS type is Ubuntu."
-                ;;
-            "centos")
-                osType=centos
-                osCategory=redhat
-                echo "$beautifyGap1 The current OS type is CentOS."
-                echo "$beautifyGap1 We currently do not support CentOS."
-                exit
-                ;;
-            "raspbian")
-                osType=raspbian
-                osCategory=debian
-                echo "$beautifyGap1 The current OS type is raspbian."
-                ;;
-            *)
-                echo "$beautifyGap1 We currently do not support this OS type."
-                exit
-                ;;
-        esac
-    elif [[ $(uname) == "Darwin" ]]; then
-        osType=mac
-        osCategory=mac
-        echo "The current OS type is macOS (Mac)."
-    else
-        echo "The OS type is not supported or could not be determined."
-        echo "We currently do not support this OS type."
-        exit
-    fi
-}
 
 installPrerequisitesForDebian() {
     prerequisitesForUbuntu=(
@@ -173,8 +131,15 @@ installPrerequisitesForDebian() {
         # clangd
         bear
         libear
+        # TigerVNC
+        gdm3
+        ubuntu-desktop
+        xfce4
+        xfce4-goodies
+        tigervnc-standalone-server
+        tigervnc-xorg-extension
+        tigervnc-viewer
     )
-
     cat << _EOF
 $catBanner
 Installing prerequisites for Ubuntu
@@ -183,6 +148,49 @@ _EOF
     sudo apt-get update
     sudo apt-get install -y "${prerequisitesForUbuntu[@]}"
     sudo updatedb
+}
+
+checkOSType() {
+cat << _EOF
+$catBanner
+Check OS platform
+_EOF
+    if [[ -f /etc/os-release ]]; then
+        local os_name
+        os_name=$(awk -F= '/^ID=/{print $2}' /etc/os-release)
+
+        case "$os_name" in
+            "ubuntu")
+                osType=ubuntu
+                osCategory=debian
+                echo "$beautifyGap1 The current OS type is Ubuntu."
+                ;;
+            "centos")
+                osType=centos
+                osCategory=redhat
+                echo "$beautifyGap1 The current OS type is CentOS."
+                echo "$beautifyGap1 We currently do not support CentOS."
+                exit
+                ;;
+            "raspbian")
+                osType=raspbian
+                osCategory=debian
+                echo "$beautifyGap1 The current OS type is raspbian."
+                ;;
+            *)
+                echo "$beautifyGap1 We currently do not support this OS type."
+                exit
+                ;;
+        esac
+    elif [[ $(uname) == "Darwin" ]]; then
+        osType=mac
+        osCategory=mac
+        echo "The current OS type is macOS (Mac)."
+    else
+        echo "The OS type is not supported or could not be determined."
+        echo "We currently do not support this OS type."
+        exit
+    fi
 }
 
 installPrequesitesForMac() {

@@ -183,19 +183,18 @@ if [[ "`which fd 2> /dev/null`" != '' ]]; then
 fi
 export LINES=100
 export FZF_TMUX_HEIGHT=50%
-export FZF_DEFAULT_OPTS="--layout=reverse --inline-info --color=fg+:247"
+export FZF_DEFAULT_OPTS="--layout=reverse --inline-info --color=fg+:247 --multi"
 # Use * as the trigger sequence instead of the default **. Followed by a TAB
 export FZF_COMPLETION_TRIGGER='\'
 # Options to fzf command
 export FZF_COMPLETION_OPTS='+c -x'
 
 # Mapping capslock to esc
-pathOfsetxkbmap=`which setxkbmap 2> /dev/null`
-if [[ "$pathOfsetxkbmap" != "" && "$DISPLAY" != "" ]]; then
-    setxkbmap -option caps:escape
-fi
+# pathOfsetxkbmap=`which setxkbmap 2> /dev/null`
+# if [[ "$pathOfsetxkbmap" != "" && "$DISPLAY" != "" ]]; then
+#     setxkbmap -option caps:escape
+# fi
 
-# Test if command 'tmux' exist.
 if command -v tmux &>/dev/null; then
     sessions=$(tmux list-sessions 2>/dev/null)
     if [[ -n "$sessions" ]]; then

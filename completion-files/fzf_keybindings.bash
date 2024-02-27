@@ -11,6 +11,8 @@
 # - $FZF_ALT_C_COMMAND
 # - $FZF_ALT_C_OPTS
 
+[[ $- =~ i ]] || return 0
+
 # Key bindings
 # ------------
 __fzf_select__() {
@@ -26,8 +28,6 @@ __fzf_select__() {
       printf '%q ' "$item"  # escape special chars
     done
 }
-
-if [[ $- =~ i ]]; then
 
 __fzfcmd() {
   [[ -n "${TMUX_PANE-}" ]] && { [[ "${FZF_TMUX:-0}" != 0 ]] || [[ -n "${FZF_TMUX_OPTS-}" ]]; } &&
@@ -73,6 +73,8 @@ bind -m vi-command '"\C-z": emacs-editing-mode'
 bind -m vi-insert '"\C-z": emacs-editing-mode'
 bind -m emacs-standard '"\C-z": vi-editing-mode'
 
+# $ echo ${BASH_VERSINFO[@]}
+# 5 0 17 1 release x86_64-pc-linux-gnu
 if (( BASH_VERSINFO[0] < 4 )); then
   # CTRL-T - Paste the selected file path into the command line
   bind -m emacs-standard '"\C-t": " \C-b\C-k \C-u`__fzf_select__`\e\C-e\er\C-a\C-y\C-h\C-e\e \C-y\ey\C-x\C-x\C-f"'
@@ -109,5 +111,3 @@ fi
 bind -m emacs-standard '"\ex": " \C-b\C-k \C-u`__fzf_cd__`\e\C-e\er\C-m\C-y\C-h\e \C-y\ey\C-x\C-x\C-d"'
 bind -m vi-command '"\ex": "\C-z\e-\C-z"'
 bind -m vi-insert '"\ex": "\C-z\e-\C-z"'
-
-fi
