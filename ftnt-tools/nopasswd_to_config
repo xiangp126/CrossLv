@@ -37,7 +37,7 @@ if {$argc == 1} {
     }
 
     # Check if the directory name contains "fos"
-    if {[string match -nocase "*fos*" $working_dir]} {
+    if {[string match -nocase "*fos*" $working_dir] || [string match -nocase "*fortios*" $working_dir]} {
         set mode "FGT_VM64_KVM"
     } else {
         # Check if the directory name contains "fpx" or "proxy"

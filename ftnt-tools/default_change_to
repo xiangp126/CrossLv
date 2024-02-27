@@ -68,6 +68,9 @@ case "$1" in
         echo "fpx1: $fpx1_ip"
         echo "fpx2: $fpx2_ip"
         echo "fpx3: $fpx3_ip"
+
+        # show the default route
+        ip route
         exit 1
         ;;
     *)
