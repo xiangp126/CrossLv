@@ -56,8 +56,7 @@ case "$1" in
     "")
         echo "Usage: $(basename $0) <gateway_name>"
         echo "Example: $(basename $0) fpx1"
-        echo "Available gateways:"
-        echo "-------------------"
+        echo "------------------->"
         echo "host_br1: $host_br1_ip"
         echo "host_br2: $host_br2_ip"
         echo "host_br3: $host_br3_ip"
@@ -69,7 +68,7 @@ case "$1" in
         echo "fpx2: $fpx2_ip"
         echo "fpx3: $fpx3_ip"
 
-        # show the default route
+        echo "------------------->"
         ip route
         exit 1
         ;;
