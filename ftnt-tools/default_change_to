@@ -1,8 +1,6 @@
 #!/bin/bash
 username=$(whoami)
-username=corsair
 hostname=$(hostname)
-hostname=client2
 # In Bash, =~ is used for regular expression matching
 if [[ "$username" != "corsair" || ! "$hostname" =~ ^client[0-9]+$ ]]; then
     echo "Username: $username"
@@ -56,20 +54,20 @@ case "$1" in
     "")
         echo "Usage: $(basename $0) <gateway_name>"
         echo "Example: $(basename $0) fpx1"
-        echo "------------------->"
-        echo "host_br1: $host_br1_ip"
-        echo "host_br2: $host_br2_ip"
-        echo "host_br3: $host_br3_ip"
-        echo "host_router : $host_router_ip"
+        echo "----------------------->"
         echo "fgt1: $fgt1_ip"
         echo "fgt2: $fgt2_ip"
         echo "fgt3: $fgt3_ip"
         echo "fpx1: $fpx1_ip"
         echo "fpx2: $fpx2_ip"
         echo "fpx3: $fpx3_ip"
+        echo "host_br1: $host_br1_ip"
+        echo "host_br2: $host_br2_ip"
+        echo "host_br3: $host_br3_ip"
+        echo "host_router:  $host_router_ip"
 
-        echo "------------------->"
-        ip route
+        echo "<-----------------------"
+        ip route show default
         exit 1
         ;;
     *)
