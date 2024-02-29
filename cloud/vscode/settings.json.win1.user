@@ -3,7 +3,6 @@
     "[html]": {
         "editor.defaultFormatter": "vscode.html-language-features"
     },
-    "workbench.statusBar.visible": true,
     "[javascript]": {
         "editor.defaultFormatter": "vscode.typescript-language-features"
     },
@@ -58,7 +57,6 @@
     "gitlens.graph.pageItemLimit": 100,
     "gitlens.graph.searchItemLimit": 50,
     "gitlens.graph.defaultItemLimit": 5,
-    "diffEditor.ignoreTrimWhitespace": false,
     "workbench.editor.tabSizing": "shrink",
     "workbench.editor.wrapTabs": true,
     "gitlens.views.searchAndCompare.files.layout": "tree",
@@ -66,7 +64,6 @@
     "gitlens.plusFeatures.enabled": false,
     "extensions.autoUpdate": false,
     "gitlens.views.fileHistory.avatars": false,
-    "workbench.sideBar.location": "right",
     "gitlens.views.commitDetails.autolinks.enabled": false,
     "gitlens.views.commitDetails.pullRequests.enabled": false,
     "gitlens.views.commitDetails.files.layout": "tree",
@@ -85,4 +82,9 @@
     "gitlens.views.workspaces.avatars": false,
     "gitlens.views.patchDetails.avatars": false,
     "gitlens.blame.avatars": false,
+    "gitlens.defaultGravatarsStyle": "mp",
+    "settingsSync.keybindingsPerPlatform": false,
+    "diffEditor.ignoreTrimWhitespace": false,
+    "window.confirmBeforeClose": "always",
+    "remote.autoForwardPorts": false,
 }

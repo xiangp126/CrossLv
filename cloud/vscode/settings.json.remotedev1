@@ -18,9 +18,6 @@
     "clangd.checkUpdates": true,
     "editor.tabSize": 8,
     "editor.insertSpaces": false,
-    "files.exclude": {
-        "**/data/sandbox": true
-    },
     "gitlens.plusFeatures.enabled": false,
     "gitlens.graph.avatars": false,
     "gitlens.blame.avatars": false,
@@ -39,4 +36,5 @@
     "gitlens.views.commitDetails.avatars": false,
     "gitlens.views.commits.avatars": false,
     "gitlens.defaultGravatarsStyle": "mp",
+    "remote.autoForwardPorts": false,
 }
