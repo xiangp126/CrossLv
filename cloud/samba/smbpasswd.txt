@@ -2,5 +2,11 @@
 # $USER is the current user of the system
 sudo smbpasswd -a $USER
 
-# Exp: sudo smbpasswd -a pi
+# Exp: Add a samba user pi and set a password to it
+sudo smbpasswd -a pi
 # New SMB password:
+
+# Check the samba version
+dpkg -l samba
+
+# smb.conf is under /etc/samba/
