@@ -1,6 +1,6 @@
 [global]
 	netbios name = OpenWrt
-	interfaces = lo br-lan
+	interfaces = br-lan
 	server string = This is a Samba Server
 	workgroup = WORKGROUP
 	bind interfaces only = yes
@@ -9,7 +9,7 @@
 	invalid users = root
 	local master = no
 	map to guest = Bad User
-	min protocol = SMB2
+	min protocol = SMB3
 	max protocol = SMB3
 	# Disable encryption for smb3
 	smb encrypt = off
@@ -23,6 +23,8 @@
 	min receivefile size = 131072
 	fake oplocks = Yes
 	use sendfile = Yes
+	disable netbios = yes
+	smb ports = 445
 
 [SWORD]
 	path = /mnt/sword
@@ -31,7 +33,3 @@
 	guest ok = no
 	create mask = 664
 	directory mask = 775
-
-######### Dynamic written config options #########
-	disable netbios = yes
-	smb ports = 445
