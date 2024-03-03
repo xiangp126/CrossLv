@@ -83,6 +83,7 @@ alias cdt='__cd $HOME/Test'
 alias cds='__cd /opt/src'
 alias cdd='__cd /data'
 alias cdb='__cd $HOME/.usr/bin'
+alias cdB='__cd /data/bugzilla'
 alias cdg='__cd $HOME/myGit'
 alias cdf='__cd $HOME/myGit/fos'
 alias cdv='__cd $HOME/myGit/crosslv'
@@ -94,6 +95,7 @@ export QUOTING_STYLE=literal
 export BAT_THEME=TwoDark
 
 # Useful local variables.
+# For wireshark to decode SSL/TLS traffic
 export SSLKEYLOGFILE=~/.ssl-keys.log
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8

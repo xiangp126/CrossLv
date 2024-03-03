@@ -1,0 +1,6 @@
+# Add a samba user and set a password to it
+# $USER is the current user of the system
+sudo smbpasswd -a $USER
+
+# Exp: sudo smbpasswd -a pi
+# New SMB password:

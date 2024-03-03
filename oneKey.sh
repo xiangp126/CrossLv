@@ -139,6 +139,8 @@ installPrerequisitesForDebian() {
         tigervnc-standalone-server
         tigervnc-xorg-extension
         tigervnc-viewer
+        # samba
+        # smbclient
     )
     cat << _EOF
 $catBanner
