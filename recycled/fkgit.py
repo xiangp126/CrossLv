@@ -241,7 +241,6 @@ def commit(message):
     treeHash = writeTree()
     parent = getLocalMasterHash()
 
-    # 'corsair <xiangp126@sjtu.edu.cn>'
     author = 'Annoymous'
     email = 'jokers@sjtu.edu.cn'
     try:

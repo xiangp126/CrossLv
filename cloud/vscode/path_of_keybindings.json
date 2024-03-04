@@ -1,0 +1,5 @@
+Windows: %APPDATA%\Code\User\
+	=> C:/Users/User1/AppData/Roaming/Code/User/keybindings.json
+
+Linux: $HOME/.config/Code/User/
+macOS: $HOME/Library/Application Support/Code/User/

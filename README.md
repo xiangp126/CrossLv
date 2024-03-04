@@ -10,7 +10,7 @@ Options:
     -h, --help                      Print this help message
     -i, --install                   Create symbolic links
     -H, --hard-install              Perform a hard installation
-        -t, --tools                 Link tools into /home/xiangp/.usr/bin
+        -t, --tools                 Link tools into /home/$USER/.usr/bin
         -c, --check                 Check sudo privileges
         -u, --update                Force an update
 

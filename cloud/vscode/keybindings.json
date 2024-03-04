@@ -1,0 +1,393 @@
+// Place your key bindings in this file to override the defaultsauto[]
+[
+    {
+        "key": "ctrl+numpad_add ctrl+numpad_subtract",
+        "command": "workbench.action.terminal.paste",
+        "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
+    },
+    {
+        "key": "ctrl+v",
+        "command": "-workbench.action.terminal.paste",
+        "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
+    },
+    {
+        "key": "ctrl+shift+f",
+        "command": "workbench.action.quickOpen"
+    },
+    {
+        "key": "ctrl+e",
+        "command": "-workbench.action.quickOpen"
+    },
+    {
+        "key": "ctrl+numpad6 ctrl+numpad5",
+        "command": "extension.vim_ctrl+f",
+        "when": "editorTextFocus && vim.active && vim.use<C-f> && !inDebugRepl && vim.mode != 'Insert'"
+    },
+    {
+        "key": "ctrl+f",
+        "command": "-extension.vim_ctrl+f",
+        "when": "editorTextFocus && vim.active && vim.use<C-f> && !inDebugRepl && vim.mode != 'Insert'"
+    },
+    {
+        "key": "ctrl+l",
+        "command": "workbench.action.gotoLine"
+    },
+    {
+        "key": "ctrl+g",
+        "command": "-workbench.action.gotoLine"
+},
+{
+	"key": "ctrl+numpad1",
+	"command": "workbench.action.focusFirstEditorGroup"
+},
+{
+	"key": "ctrl+1",
+	"command": "-workbench.action.focusFirstEditorGroup"
+},
+{
+	"key": "ctrl+numpad0",
+	"command": "-workbench.action.zoomReset"
+},
+{
+	"key": "ctrl+`",
+	"command": "workbench.action.terminal.toggleTerminal",
+	"when": "terminal.active"
+},
+{
+	"key": "ctrl+`",
+	"command": "-workbench.action.terminal.toggleTerminal",
+	"when": "terminal.active"
+},
+{
+	"key": "ctrl+numpad0",
+	"command": "workbench.action.terminal.toggleTerminal",
+	"when": "terminal.active"
+},
+{
+	"key": "ctrl+1",
+	"command": "workbench.action.focusFirstEditorGroup"
+},
+{
+	"key": "ctrl+r",
+	"command": "-workbench.action.reloadWindow",
+	"when": "isDevelopment"
+},
+{
+	"key": "ctrl+r",
+	"command": "-workbench.action.openRecent"
+},
+{
+	"key": "ctrl+r",
+	"command": "-python.refreshTensorBoard",
+	"when": "python.hasActiveTensorBoardSession"
+},
+{
+	"key": "ctrl+r",
+	"command": "-workbench.action.terminal.runRecentCommand",
+	"when": "accessibilityModeEnabled && terminalFocus && terminalHasBeenCreated || accessibilityModeEnabled && terminalFocus && terminalProcessSupported"
+},
+{
+	"key": "ctrl+r",
+	"command": "-extension.vim_ctrl+r",
+	"when": "editorTextFocus && vim.active && vim.use<C-r> && !inDebugRepl"
+},
+{
+	"key": "ctrl+r",
+	"command": "-workbench.action.quickOpenNavigateNextInRecentFilesPicker",
+	"when": "inQuickOpen && inRecentFilesPicker"
+},
+{
+	"key": "alt+c",
+	"command": "-workbench.action.terminal.toggleFindCaseSensitive",
+	"when": "terminalFindFocused && terminalHasBeenCreated || terminalFindFocused && terminalProcessSupported || terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
+},
+{
+	"key": "ctrl+; ctrl+r",
+	"command": "-testing.refreshTests",
+	"when": "testing.canRefresh"
+},
+{
+	"key": "ctrl+r",
+	"command": "extension.vim_ctrl+r"
+},
+{
+	"key": "f8",
+	"command": "-editor.action.marker.nextInFiles",
+	"when": "editorFocus"
+},
+{
+	"key": "ctrl+m",
+	"command": "-editor.action.toggleTabFocusMode"
+},
+{
+	"key": "f1",
+	"command": "-workbench.action.showCommands"
+},
+{
+	"key": "f1",
+	"command": "workbench.action.showCommands"
+},
+{
+	"key": "f6",
+	"command": "-workbench.action.focusNextPart"
+},
+{
+	"key": "shift+f6",
+	"command": "-workbench.action.focusPreviousPart"
+},
+{
+	"key": "ctrl+p",
+	"command": "-workbench.action.quickOpenNavigateNextInFilePicker",
+	"when": "inFilesPicker && inQuickOpen"
+},
+{
+	"key": "ctrl+p",
+	"command": "-extension.vim_ctrl+p",
+	"when": "editorTextFocus && vim.active && vim.use<C-p> && !inDebugRepl || vim.active && vim.use<C-p> && !inDebugRepl && vim.mode == 'CommandlineInProgress' || vim.active && vim.use<C-p> && !inDebugRepl && vim.mode == 'SearchInProgressMode'"
+},
+{
+	"key": "ctrl+shift+f",
+	"command": "-workbench.action.findInFiles"
+},
+{
+	"key": "ctrl+p",
+	"command": "-workbench.action.quickOpen"
+},
+{
+	"key": "ctrl+shift+o",
+	"command": "workbench.action.gotoSymbol"
+},
+{
+	"key": "ctrl+shift+o",
+	"command": "-workbench.action.gotoSymbol"
+},
+{
+	"key": "ctrl+shift+o",
+	"command": "-workbench.action.terminal.navigateAccessibleBuffer",
+	"when": "terminalAccessibleBufferFocus && terminalHasBeenCreated || terminalAccessibleBufferFocus && terminalProcessSupported"
+},
+{
+	"key": "ctrl+shift+o",
+	"command": "-workbench.action.terminal.openDetectedLink",
+	"when": "terminalFocus && terminalHasBeenCreated"
+},
+{
+	"key": "ctrl+l",
+	"command": "-expandLineSelection",
+	"when": "textInputFocus"
+},
+{
+	"key": "ctrl+l",
+	"command": "-workbench.action.chat.clear",
+	"when": "hasChatProvider && inChat"
+},
+{
+	"key": "ctrl+g",
+	"command": "-workbench.action.terminal.goToRecentDirectory",
+	"when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
+},
+{
+	"key": "ctrl+shift+d",
+	"command": "-workbench.view.debug",
+	"when": "viewContainer.workbench.view.debug.enabled"
+},
+{
+	"key": "ctrl+t",
+	"command": "-extension.vim_ctrl+t",
+	"when": "editorTextFocus && vim.active && vim.use<C-t> && !inDebugRepl"
+},
+{
+	"key": "ctrl+t",
+	"command": "-workbench.action.showAllSymbols"
+},
+{
+	"key": "ctrl+k ctrl+q",
+	"command": "-workbench.action.navigateToLastEditLocation"
+},
+{
+	"key": "alt+0",
+	"command": "-workbench.action.lastEditorInGroup"
+},
+{
+	"key": "ctrl+f4",
+	"command": "-workbench.action.closeActiveEditor"
+},
+{
+	"key": "ctrl+q",
+	"command": "-workbench.action.quickOpenNavigateNextInViewPicker",
+	"when": "inQuickOpen && inViewsPicker"
+},
+{
+	"key": "ctrl+q",
+	"command": "-extension.vim_winCtrlQ",
+	"when": "editorTextFocus && vim.active && vim.use<C-q> && !inDebugRepl"
+},
+{
+	"key": "ctrl+q",
+	"command": "-workbench.action.quickOpenView"
+},
+{
+	"key": "ctrl+shift+q",
+	"command": "-workbench.action.quickOpenNavigatePreviousInViewPicker",
+	"when": "inQuickOpen && inViewsPicker"
+},
+{
+	"key": "ctrl+w",
+	"command": "-workbench.action.terminal.killEditor",
+	"when": "terminalEditorFocus && terminalFocus && terminalHasBeenCreated && resourceScheme == 'vscode-terminal' || terminalEditorFocus && terminalFocus && terminalProcessSupported && resourceScheme == 'vscode-terminal'"
+},
+{
+	"key": "ctrl+q",
+	"command": "workbench.action.closeActiveEditor"
+},
+{
+	"key": "ctrl+w",
+	"command": "-workbench.action.closeActiveEditor"
+},
+{
+	"key": "ctrl+shift+v",
+	"command": "-markdown.showPreview",
+	"when": "!notebookEditorFocused && editorLangId == 'markdown'"
+},
+{
+	"key": "ctrl+shift+v",
+	"command": "-notebook.cell.pasteAbove",
+	"when": "notebookEditorFocused && !inputFocus"
+},
+{
+	"key": "ctrl+alt+left",
+	"command": "-workbench.action.moveEditorToPreviousGroup"
+},
+{
+	"key": "ctrl+alt+right",
+	"command": "-workbench.action.moveEditorToNextGroup"
+},
+{
+	"key": "ctrl+alt+right",
+	"command": "workbench.action.nextEditor"
+},
+{
+	"key": "ctrl+pagedown",
+	"command": "-workbench.action.nextEditor"
+},
+{
+	"key": "ctrl+alt+left",
+	"command": "workbench.action.previousEditor"
+},
+{
+	"key": "ctrl+pageup",
+	"command": "-workbench.action.previousEditor"
+},
+{
+	"key": "ctrl+shift+x",
+	"command": "-workbench.view.extensions",
+	"when": "viewContainer.workbench.view.extensions.enabled"
+},
+{
+	"key": "ctrl+shift+x",
+	"command": "workbench.action.toggleMaximizedPanel"
+},
+{
+	"key": "ctrl+shift+r",
+	"command": "fzf-quick-open.runFzfSearchProjectRoot"
+},
+{
+	"key": "ctrl+shift+f11",
+	"command": "workbench.action.toggleFullScreen",
+	"when": "!isIOS"
+},
+{
+	"key": "f11",
+	"command": "-workbench.action.toggleFullScreen",
+	"when": "!isIOS"
+},
+{
+	"key": "f11",
+	"command": "editor.action.goToTypeDefinition"
+},
+{
+	"key": "alt+f11",
+	"command": "editor.action.peekTypeDefinition"
+},
+{
+	"key": "ctrl+pageup",
+	"command": "workbench.action.openPreviousRecentlyUsedEditor"
+},
+{
+	"key": "ctrl+pagedown",
+	"command": "workbench.action.openNextRecentlyUsedEditor"
+},
+{
+	"key": "ctrl+alt+c",
+	"command": "bookmarks.clearFromAllFiles"
+},
+{
+	"key": "ctrl+shift+g shift+s",
+	"command": "gitlens.diffLineWithPrevious",
+	"when": "editorTextFocus && config.gitlens.keymap == 'chorded' && gitlens:activeFileStatus =~ /tracked/"
+},
+{
+	"key": "ctrl+shift+g shift+,",
+	"command": "-gitlens.diffLineWithPrevious",
+	"when": "editorTextFocus && config.gitlens.keymap == 'chorded' && gitlens:activeFileStatus =~ /tracked/"
+},
+{
+	"key": "ctrl+alt+numpad1",
+	"command": "workbench.action.toggleSidebarVisibility"
+},
+{
+	"key": "ctrl+b",
+	"command": "-workbench.action.toggleSidebarVisibility"
+},
+{
+	"key": "ctrl+alt+numpad2",
+	"command": "workbench.action.toggleAuxiliaryBar"
+},
+{
+	"key": "ctrl+alt+b",
+	"command": "-workbench.action.toggleAuxiliaryBar"
+},
+{
+	"key": "ctrl+shift+g c",
+	"command": "-gitlens.showQuickCommitFileDetails",
+	"when": "editorTextFocus && !gitlens:disabled && config.gitlens.keymap == 'chorded'"
+},
+{
+	"key": "ctrl+alt+,",
+	"command": "workbench.action.openSettings"
+},
+{
+	"key": "ctrl+,",
+	"command": "-workbench.action.openSettings"
+},
+{
+	"key": "ctrl+shift+,",
+	"command": "gitlens.diffWithPrevious",
+	"when": "editorTextFocus && !isInDiffEditor && config.gitlens.keymap == 'chorded' && gitlens:activeFileStatus =~ /tracked/"
+},
+{
+	"key": "ctrl+shift+g ,",
+	"command": "-gitlens.diffWithPrevious",
+	"when": "editorTextFocus && !isInDiffEditor && config.gitlens.keymap == 'chorded' && gitlens:activeFileStatus =~ /tracked/"
+},
+{
+	"key": "ctrl+alt+pagedown",
+	"command": "workbench.action.terminal.focusNext",
+	"when": "terminalFocus && terminalHasBeenCreated && !terminalEditorFocus || terminalFocus && terminalProcessSupported && !terminalEditorFocus"
+},
+{
+	"key": "ctrl+pagedown",
+	"command": "-workbench.action.terminal.focusNext",
+	"when": "terminalFocus && terminalHasBeenCreated && !terminalEditorFocus || terminalFocus && terminalProcessSupported && !terminalEditorFocus"
+},
+{
+	"key": "ctrl+alt+pageup",
+	"command": "workbench.action.terminal.focusPrevious",
+	"when": "terminalFocus && terminalHasBeenCreated && !terminalEditorFocus || terminalFocus && terminalProcessSupported && !terminalEditorFocus"
+},
+{
+	"key": "ctrl+pageup",
+	"command": "-workbench.action.terminal.focusPrevious",
+	"when": "terminalFocus && terminalHasBeenCreated && !terminalEditorFocus || terminalFocus && terminalProcessSupported && !terminalEditorFocus"
+}
+]

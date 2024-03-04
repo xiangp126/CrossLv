@@ -1,6 +1,5 @@
 #!/bin/bash
-# COPYRIGHT BY PENG, 2017. XIANGP126@SJTU.EDU.CN.
-# where is shell executed
+
 startDir=`pwd`
 # main work directory, not influenced by start dir
 mainWd=$(cd $(dirname $0); pwd)

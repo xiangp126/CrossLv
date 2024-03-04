@@ -33,4 +33,3 @@
 	guest ok = no
 	create mask = 664
 	directory mask = 775
-
