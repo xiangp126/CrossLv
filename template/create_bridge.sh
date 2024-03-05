@@ -27,7 +27,7 @@ bridge_exists() {
 }
 
 # Create bridges
-create_bridge "br1" "192.168.101.254/24"
+# create_bridge "br1" "192.168.101.254/24"
 create_bridge "br2" "192.168.102.254/24"
 create_bridge "br3" "192.168.103.254/24"
 create_bridge "br4" "192.168.104.254/24"

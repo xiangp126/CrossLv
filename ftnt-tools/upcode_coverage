@@ -8,23 +8,32 @@ if [[ "$#" < 1 ]]; then
 fi
 
 # set the destination directory
-destination_dir=~/Public
-diff_name="diff"
+destination_dir=/data/bugzilla
+diff_name="u.diff"
 
 # get the source directory from the argument
 source_dir=$1
+if [ ! -d $source_dir ]; then
+    echo "Error: $source_dir does not exist or is not a directory"
+    exit 1
+fi
 cd $source_dir
+if [ ! -d .git ]; then
+    echo "Error: $source_dir is not a git repository"
+    exit 1
+fi
 
-# Run git diff and save the output to a file named "diff" in the destination directory
+if [ ! -d $destination_dir ]; then
+    echo "Error: $destination_dir does not exist or is not a directory"
+    exit 1
+fi
+
 git diff HEAD~1 HEAD > "$destination_dir/$diff_name"
-
-# Copy "fgtcoveragebuild.tar.xz" to the destination directory
 cp fgtcoveragebuild.tar.xz "$destination_dir/"
 if [ $? -ne 0 ]; then
     echo "Error: Failed to copy fgtcoveragebuild.tar.xz to $destination_dir"
     exit 1
 fi
-
 cp image.out "$destination_dir/"
 if [ $? -ne 0 ]; then
     echo "Error: Failed to copy image.out to $destination_dir"
