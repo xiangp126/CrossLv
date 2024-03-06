@@ -22,3 +22,9 @@ fi
 
 # start all vms
 start_all_vms
+
+# start OpenGrok
+if command -v callIndexer &> /dev/null
+then
+    callIndexer -s
+fi

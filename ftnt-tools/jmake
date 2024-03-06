@@ -171,7 +171,7 @@ fi
 # Step 1: Run Configure
 if [[ "$fRunConfigure" == true ]]; then
     echo "$userNotation Running Configure ..."
-    echo "$subUserNotation Running nopasswd_to_config (WD:$fWorkingDir, MODE:$fMode)"
+    echo "$subUserNotation Running nopasswd_to_config (Wd:$fWorkingDir, Mode:$fMode)"
     sleep 1
 
     if [[ "$fModeSpecified" == true ]]; then

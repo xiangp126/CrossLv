@@ -21,10 +21,13 @@ shopt -s checkwinsize
 # match all files and zero or more directories and subdirectories.
 # shopt -s globstar
 
-# bash command prompt
-export PS1="\u@${HOSTNAME:0:10}:\W\$ "
+# export PS1="\u@${HOSTNAME:0:10}:\W\$ "
+# Bash provides an environment variable called PROMPT_COMMAND.
+# The contents of this variable are executed as a regular Bash command just before Bash displays a prompt.
+PROMPT_COMMAND='pwd2=$(sed -e "s:$HOME:~:" -e "s:\(\.\?[^/]\)[^/]*/:\1/:g" <<< $PWD)'
+PS1='\u:${pwd2}\$ '
 
-# Let <C-S> work in Vim.
+# Disable XON/XOFF software flow control to make <C-S> work in Vim.
 stty -ixon
 
 # Below is my own configuration.
