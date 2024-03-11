@@ -1,5 +1,15 @@
-Windows: %APPDATA%\Code\User\
-	=> C:/Users/User1/AppData/Roaming/Code/User/keybindings.json
+settings.json & keybindings.json
+I'd like to use one set of keybindings for all platforms.
 
-Linux: $HOME/.config/Code/User/
-macOS: $HOME/Library/Application Support/Code/User/
+- Windows: %APPDATA%\Code\User\
+    => C:/Users/User1/AppData/Roaming/Code/User/keybindings.json
+    => C:/Users/User1/AppData/Roaming/Code/User/settings.json
+
+- Linux:
+    => $HOME/.config/Code/User/keybindings.json
+    => $HOME/.config/Code/User/settings.json
+
+- macOS:
+    => $HOME/Library/Application Support/Code/User/keybindings.json
+    => $HOME/Library/Application Support/Code/User/settings.json
+

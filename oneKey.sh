@@ -134,6 +134,7 @@ installPrerequisitesForDebian() {
         # TigerVNC
         gdm3
         ubuntu-desktop
+        gnome-keyring
         xfce4
         xfce4-goodies
         tigervnc-standalone-server
