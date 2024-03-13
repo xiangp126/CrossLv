@@ -26,6 +26,7 @@ repos=(
     "/data/fpx"
     "/data/sandbox/fos_repro"
     "/data/sandbox/fpx_repro"
+    "/data/sandbox/fortios-ci"
 )
 
 # Function to update a Git repository
@@ -50,11 +51,14 @@ update_git_repo() {
         git fetch origin main
         echo "$user_notation Fetching branches: 7.0"
         git fetch origin 7.0
-        # git rebase may involve checkout, so not using it here
-        # git rebase origin/7.0 7.0
         echo "$user_notation Fetching branches: 7.2"
         git fetch origin 7.2
-        # git rebase origin/7.2 7.2
+        # FPX does not have 7.4 branch currently. Mar.11 2024
+        # git ls-remote --exit-code --quiet --heads origin 7.4
+        git ls-remote --exit-code --quiet --heads origin 7.4
+        if [ $? -eq 0 ]; then
+            git fetch origin 7.4
+        fi
     else
         echo "$user_notation Not a Git repository: $repo_path"
     fi

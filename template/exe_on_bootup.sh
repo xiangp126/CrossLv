@@ -1,14 +1,22 @@
 #!/bin/bash
 set -x
 
+echo "Setting up bridge"
 cd $HOME/Templates
-# setup bridge
 ./create_bridge.sh
 
+echo "Setting up vscode max user watches"
 ./vscode_max_user_watches.sh
 
-# setup vnc server
+echo "Setting up VNC server"
+# How to adjust the resolution of a VNC session?
+# Say your local resolution is 1920x1080(width x height)
+# and you may need to set the VNC resolution to around 2060x1080 to fit your screen
+# How to adjust?
+# Keep the height of the resolution the same, and only change the width
+# Start by adjusting the width from 1080 to 2060 or more, and choose the one that best fits your screen.
 vncPort=5909
+vnc_resolution=2060x1080
 if lsof -i :$vncPort | grep --quiet LISTEN
 then
     set +x
@@ -17,13 +25,14 @@ then
     set -x
 else
     cd $HOME/.vnc
-    vncserver :9
+    # vncserver :9
+    vncserver :9 -geometry $vnc_resolution
 fi
 
-# start all vms
+echo "Starting all vms"
 start_all_vms
 
-# start OpenGrok
+echo "Starting OpenGrok"
 if command -v callIndexer &> /dev/null
 then
     callIndexer -s

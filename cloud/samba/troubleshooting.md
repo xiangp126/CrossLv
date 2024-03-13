@@ -1,18 +1,8 @@
-# Add a samba user and set a password to it
-# $USER is the current user of the system
-sudo smbpasswd -a $USER
-
-# Exp: Add a samba user pi and set a password to it
-sudo smbpasswd -a pi
-# New SMB password:
-
-# Check the samba version
-dpkg -l samba
-
-# smb.conf is under /etc/samba/
-
 # Troubleshooting
 https://stackoverflow.com/questions/24933661/multiple-connections-to-a-server-or-shared-resource-by-the-same-user-using-more
+
 Multiple connections to a server or shared resource by the same user, using more than one user name, are not allowed
 
+```bash
 C:\> net stop workstation
+```

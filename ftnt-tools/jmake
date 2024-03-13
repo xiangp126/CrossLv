@@ -1,5 +1,6 @@
 #!/bin/bash
 # Flags
+# FGT_VM64 for VMWARE, FGT_VM64_KVM for KVM
 fMode=FGT_VM64_KVM
 fModeSpecified=false
 fNumOfWorkers=$(nproc)
@@ -131,6 +132,9 @@ echo "$userNotation Set build mode to $fMode"
 echo "$userNotation Set number of jobs to $fNumOfWorkers"
 if [[ "$fUseBear" == true ]]; then
     echo "$userNotation Use bear to generate compile_commands.json"
+    if [[ "$RemoveCompileCommandsJson" == true ]]; then
+        echo "$userNotation Will remove compile_commands.json if exists"
+    fi
 fi
 
 # Clean the working directory
@@ -141,7 +145,7 @@ if [[ "$fGitClean" == true ]]; then
     for patt in $gitExcludeList; do
         if [[ "$fRemoveCompileCommandsJson" == true ]]; then
             if [[ "$patt" == "$compileCommandsFile" ]]; then
-                echo "$subUserNotation Will remove $compileCommandsFile"
+                echo "$subUserNotation Will remove $compileCommandsFile if exists"
                 continue
             fi
         fi
@@ -218,15 +222,17 @@ if [[ "$fUseBear" == true ]]; then
     makeCommand="$bear $makeCommand"
 fi
 
-# Check if the compile_commands.json is writable
+# Check if compile_commands.json is writable
 if [[ -f "$jsonPath" && ! -w "$jsonPath" ]]; then
     echo "$userNotation Detected $jsonPath is read-only"
-    # echo "$userNotation Add write privilege to $jsonPath"
-    # chmod +w "$jsonPath"
-    # if [[ $? -ne 0 ]]; then
-    #     echo "$userNotation Failed to add write privilege to $jsonPath"
-    #     exit 1
-    # fi
+    if [[ "$fRemoveCompileCommandsJson" == true ]]; then
+        echo "$userNotation Remove $jsonPath"
+        rm -f $jsonPath
+        if [[ $? -ne 0 ]]; then
+            echo "$userNotation Failed to remove $jsonPath"
+            exit 1
+        fi
+    fi
 fi
 
 attempt=1
