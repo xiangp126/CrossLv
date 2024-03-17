@@ -427,7 +427,8 @@ _EOF
     done
     echo
 
-    local backupDir=$HOME/Public/env.bak
+    # backup the existing files to $HOME/Public/.env.bak
+    local backupDir=$HOME/Public/.env.bak
     if [ ! -d $backupDir ]; then
         mkdir -p $backupDir
     fi

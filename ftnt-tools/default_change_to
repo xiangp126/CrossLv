@@ -1,95 +1,71 @@
 #!/bin/bash
+
+user_notation="@@@@"
+banner="---------------------------------"
 username=$(whoami)
 hostname=$(hostname)
 # In Bash, =~ is used for regular expression matching
-if [[ "$username" != "corsair" || ! "$hostname" =~ ^client[0-9]+$ ]]; then
-    echo "Username: $username"
-    echo "Hostname: $hostname"
-    echo "This script is only for client VMs and the username corsair"
+if [[ "$username" != "corsair" || ! "$hostname" =~ ^client[0-9]+$ || "$OSTYPE" != "linux-gnu" ]]; then
+    echo "$user_notation Username: $username"
+    echo "$user_notation Hostname: $hostname"
+    echo "$user_notation OSTYPE: $OSTYPE"
+    echo "$user_notation This script is only for client VMs and the username corsair and the os platform to be Linux"
     exit 1
 fi
 
-host_router_ip="172.16.67.1"
-fgt1_ip="192.168.103.6"
-fgt2_ip="192.168.103.1"
-fgt3_ip="192.168.103.4"
-fpx1_ip="192.168.103.2"
-fpx2_ip="192.168.103.3"
-fpx3_ip="192.168.103.5"
-host_br1_ip="192.168.101.254"
-host_br2_ip="192.168.102.254"
-host_br3_ip="192.168.103.254"
+declare -A gateway_ips=(
+    ["fgt1"]="192.168.103.6"
+    ["fgt2"]="192.168.103.1"
+    ["fgt3"]="192.168.103.4"
+    ["fpx1"]="192.168.103.2"
+    ["fpx2"]="192.168.103.3"
+    ["fpx3"]="192.168.103.5"
+    ["host_br1"]="192.168.101.254"
+    ["host_br2"]="192.168.102.254"
+    ["host_br3"]="192.168.103.254"
+    ["host_router"]="172.16.67.1"
+)
 
-case "$1" in
-    "host_br1")
-        new_gateway="$host_br1_ip"
-        ;;
-    "host_br2")
-        new_gateway="$host_br2_ip"
-        ;;
-    "host_br3")
-        new_gateway="$host_br3_ip"
-        ;;
-    "host_router")
-        new_gateway="$host_router_ip"
-        ;;
-    "fpx1")
-        new_gateway="$fpx1_ip"
-        ;;
-    "fpx2")
-        new_gateway="$fpx2_ip"
-        ;;
-    "fpx3")
-        new_gateway="$fpx3_ip"
-        ;;
-    "fgt1")
-        new_gateway="$fgt1_ip"
-        ;;
-    "fgt2")
-        new_gateway="$fgt2_ip"
-        ;;
-    "fgt3")
-        new_gateway="$fgt3_ip"
-        ;;
-    "")
-        echo "Usage: $(basename $0) <gateway_name>"
-        echo "Example: $(basename $0) fpx1"
-        echo "----------------------->"
-        echo "fgt1: $fgt1_ip"
-        echo "fgt2: $fgt2_ip"
-        echo "fgt3: $fgt3_ip"
-        echo "fpx1: $fpx1_ip"
-        echo "fpx2: $fpx2_ip"
-        echo "fpx3: $fpx3_ip"
-        echo "host_br1: $host_br1_ip"
-        echo "host_br2: $host_br2_ip"
-        echo "host_br3: $host_br3_ip"
-        echo "host_router:  $host_router_ip"
+help() {
+    # Extract keys into a separate array and sort them
+    sorted_keys=($(for key in "${!gateway_ips[@]}"; do echo "$key"; done | sort))
+    echo "Usage: $(basename "$0") <gateway_name>, e.g., $(basename "$0") fpx1"
+    echo $banner
+    echo "AVAILABLE GATEWAYS TO PICK FROM"
+    echo $banner
+    for gateway_name in "${sorted_keys[@]}"; do
+        echo "$gateway_name => ${gateway_ips[$gateway_name]}"
+    done
+    echo "$user_notation $current_default"
+    exit 1
+}
 
-        echo "<-----------------------"
-        ip route show default
-        exit 1
-        ;;
-    *)
-        new_gateway="$1"
-        ;;
-esac
-
-# Check the current default route
+current_default=$(ip route show default)
 current_gateway=$(ip route show default | awk '/default/ {print $3}')
 
-# Compare the current gateway with the new gateway
+if [[ -z $1 ]]; then
+    help
+else
+    new_gateway=${gateway_ips[$1]}
+    if [[ -z $new_gateway ]]; then
+        echo "$user_notation Error: Gateway name not found"
+        exit 1
+    fi
+fi
+
+echo "$user_notation Changing the default route to $new_gateway"
+
 if [ "$current_gateway" = "$new_gateway" ]; then
-    echo "The default route is already set to $new_gateway"
+    echo "$user_notation The default route is already set to $new_gateway"
     exit 0
 fi
 
 # Change the default route
-echo "sudo ip route replace default via $new_gateway"
+echo "$user_notation sudo ip route replace default via $new_gateway"
 sudo ip route replace default via "$new_gateway"
 if [ $? -ne 0 ]; then
     echo "Failed to change the default route"
     exit 1
 fi
-echo "Default route has been changed successfully"
-ip route
+echo "$user_notation Default route has been changed successfully"
+ip route show default

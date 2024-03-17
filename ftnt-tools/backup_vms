@@ -12,7 +12,7 @@ fi
 # timestamp=$(date +"%Y%m%d%H%M%S")
 
 # List all running VMs and store them in an array
-vms=($(virsh list --name))
+vms=($(virsh list --all --name))
 
 # Loop through the running VMs and create backups
 for vm in "${vms[@]}"; do
