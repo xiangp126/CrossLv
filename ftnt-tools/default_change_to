@@ -3,6 +3,7 @@
 user_notation="@@@@"
 banner="---------------------------------"
 banner2="------------CURRENT--------------"
+banner3="--------------NOW----------------"
 username=$(whoami)
 hostname=$(hostname)
 # In Bash, =~ is used for regular expression matching
@@ -70,4 +71,5 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 echo "$user_notation Default route has been changed successfully"
+echo $banner3
 ip route show default
