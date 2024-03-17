@@ -2,6 +2,7 @@
 
 user_notation="@@@@"
 banner="---------------------------------"
+banner2="------------CURRENT--------------"
 username=$(whoami)
 hostname=$(hostname)
 # In Bash, =~ is used for regular expression matching
@@ -10,7 +11,7 @@ if [[ "$username" != "corsair" || ! "$hostname" =~ ^client[0-9]+$ || "$OSTYPE" !
     echo "$user_notation Hostname: $hostname"
     echo "$user_notation OSTYPE: $OSTYPE"
     echo "$user_notation This script is only for client VMs and the username corsair and the os platform to be Linux"
-    exit 1
+    # exit 1
 fi
 
 declare -A gateway_ips=(
@@ -36,6 +37,7 @@ help() {
     for gateway_name in "${sorted_keys[@]}"; do
         echo "$gateway_name => ${gateway_ips[$gateway_name]}"
     done
+    echo $banner2
     echo "$user_notation $current_default"
     exit 1
 }
