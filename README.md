@@ -28,8 +28,8 @@ Examples:
 $ bash oneKey.sh -ic
 ```
 
-### Demo
-![](./res/persistlv.gif)
+<!-- ### Demo -->
+<!-- ![](./res/persistlv.gif) -->
 
 Please Note: The script will also relink /bin/sh to /bin/bash on Ubuntu.
 
