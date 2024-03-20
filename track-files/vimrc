@@ -130,6 +130,9 @@ nmap <leader>6 :buffer6<CR>
 nmap <leader>7 :buffer7<CR>
 nmap <leader>8 :buffer8<CR>
 nmap <leader>9 :buffer9<CR>
+nmap <leader>a :buffer10<CR>
+nmap <leader>b :buffer11<CR>
+nmap <leader>c :buffer12<CR>
 nmap <leader>d :bdelete
 " Jump to previous/next buffer
 nmap <leader>- <C-O><CR>

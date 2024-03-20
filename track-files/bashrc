@@ -76,21 +76,23 @@ function __cd () {
         cd "$1"
     fi
 }
+alias cdg='__cd $HOME/myGit'
+alias cdf='__cd $HOME/myGit/fos'
+alias cdv='__cd $HOME/myGit/crosslv'
+alias cdb='__cd $HOME/.usr/bin'
+alias cdt='__cd $HOME/test'
+alias cdT='__cd $HOME/Templates'
 alias cdD='__cd $HOME/Downloads'
 alias cdU='__cd $HOME/Uploads'
 alias cdP='__cd $HOME/Public'
 alias cdR='__cd $HOME/Recycled'
-alias cdL='__cd $HOME/Logs'
-alias cdT='__cd $HOME/Templates'
-alias cdt='__cd $HOME/Test'
-alias cds='__cd /opt/src'
 alias cdd='__cd /data'
-alias cdb='__cd $HOME/.usr/bin'
 alias cdB='__cd /data/bugzilla'
-alias cdg='__cd $HOME/myGit'
-alias cdf='__cd $HOME/myGit/fos'
-alias cdv='__cd $HOME/myGit/crosslv'
-alias cda='__cd /Volumes/SWORD/Aria2/'
+alias cdL='__cd /data/bugzilla'
+# alias cdL='__cd /data/logs'
+alias cdo='__cd /opt'
+alias cds='__cd /opt/src'
+alias cdn='__cd /opt/nginx'
 
 # print entry names without quoting
 export QUOTING_STYLE=literal
