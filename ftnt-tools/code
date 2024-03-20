@@ -8,12 +8,21 @@ function fcode() {
     vscode_code_path=$(find $HOME/.vscode-server/ -type f -name code -executable)
     if [[ -z $vscode_code_path ]]
     then
-        echo "vscode code command not found";
+        echo "Error: vscode code command not found";
         exit 1
     fi
-    # sorts them by modification time with the newest first
-    new_IPC_HOOK=$(ls -t /run/user/$UID/vscode-ipc-*.sock | head -1)
-    # new_IPC_HOOK=$(lsof | grep $UID/vscode-ipc | awk '{print $(NF-1)}' | head -n 1);
+
+    find_path="/run/user/$UID"
+    # List all the vscode-ipc-*.sock files and get the latest one
+    new_IPC_HOOK=$(ls -t ${find_path}/vscode-ipc-*.sock | head -1)
+    if [[ -z $new_IPC_HOOK ]]
+    then
+        echo "Error: vscode-ipc-*.sock file not found";
+        exit 1
+    fi
+
+    # Remove all the vscode-ipc-*.sock files except the latest one
+    # find /run/user/$UID -maxdepth 1 -type s -name "vscode-ipc-*" ! -wholename $new_IPC_HOOK -exec rm {} +
 
     export VSCODE_IPC_HOOK_CLI=$new_IPC_HOOK
     $vscode_code_path $@

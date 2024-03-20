@@ -35,7 +35,6 @@
     "files.watcherExclude": {
         "**/.venv/**": true
     },
-    "editor.fontSize": 16,
     "terminal.integrated.fontSize": 17,
     "update.enableWindowsBackgroundUpdates": false,
     "terminal.integrated.copyOnSelection": true,
@@ -62,7 +61,7 @@
     "gitlens.views.searchAndCompare.files.layout": "tree",
     "gitlens.views.commits.avatars": false,
     "gitlens.plusFeatures.enabled": false,
-    "extensions.autoUpdate": false,
+    "extensions.autoUpdate": "onlySelectedExtensions",
     "gitlens.views.fileHistory.avatars": false,
     "gitlens.views.commitDetails.autolinks.enabled": false,
     "gitlens.views.commitDetails.pullRequests.enabled": false,
@@ -87,4 +86,9 @@
     "diffEditor.ignoreTrimWhitespace": false,
     "window.confirmBeforeClose": "always",
     "remote.autoForwardPorts": false,
+    "markdown-preview-enhanced.previewTheme": "night.css",
+    "gitlens.gitCommands.avatars": false,
+    "markdown-preview-enhanced.revealjsTheme": "none.css",
+    "markdown-preview-enhanced.codeBlockTheme": "auto.css",
+    "editor.fontSize": 16,
 }

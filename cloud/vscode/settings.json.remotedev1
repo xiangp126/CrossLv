@@ -15,6 +15,7 @@
         "--clang-tidy-checks=cppcoreguidelines-*,performance-*,bugprone-*,portability-*,modernize-*,google-*",
         "--pch-storage=disk",
     ],
+    "clangd.path": "/home/xiangp/.vscode-server/data/User/globalStorage/llvm-vs-code-extensions.vscode-clangd/install/17.0.3/clangd_17.0.3/bin/clangd",
     "clangd.checkUpdates": true,
     "editor.tabSize": 8,
     "editor.insertSpaces": false,
@@ -37,4 +38,10 @@
     "gitlens.views.commits.avatars": false,
     "gitlens.defaultGravatarsStyle": "mp",
     "remote.autoForwardPorts": false,
+    "gitlens.gitCommands.avatars": false,
+    "files.exclude": {
+        "**/devops": true,
+        "**/Downloads": true,
+        "**/fortipkg": true
+    },
 }
