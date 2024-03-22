@@ -93,6 +93,7 @@ alias cdL='__cd /data/bugzilla'
 alias cdo='__cd /opt'
 alias cds='__cd /opt/src'
 alias cdn='__cd /opt/nginx'
+alias cdN='__cd /usr/local/nginx'
 
 # print entry names without quoting
 export QUOTING_STYLE=literal

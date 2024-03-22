@@ -44,4 +44,5 @@
         "**/Downloads": true,
         "**/fortipkg": true
     },
+    "files.autoGuessEncoding": true,
 }

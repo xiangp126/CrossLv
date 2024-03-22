@@ -91,4 +91,6 @@
     "markdown-preview-enhanced.revealjsTheme": "none.css",
     "markdown-preview-enhanced.codeBlockTheme": "auto.css",
     "editor.fontSize": 16,
+    "files.autoGuessEncoding": true,
+    "C_Cpp.intelliSenseEngine": "disabled",
 }
