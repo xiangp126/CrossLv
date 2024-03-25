@@ -20,6 +20,7 @@ set logging off
 set trace-commands on
 set logging on
 set can-use-hw-watchpoints 1
+set follow-fork-mode child
 
 # Do not remove the trailing space
 set prompt (gdb) 

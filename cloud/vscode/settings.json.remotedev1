@@ -4,7 +4,7 @@
         "--log=verbose",
         "--pretty",
         "--background-index",
-        "-j=16",
+        "-j=18",
         "--all-scopes-completion",
         "--completion-style=detailed",
         "--cross-file-rename",

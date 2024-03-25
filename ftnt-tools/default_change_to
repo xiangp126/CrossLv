@@ -31,7 +31,8 @@ declare -A gateway_ips=(
 help() {
     # Extract keys into a separate array and sort them
     sorted_keys=($(for key in "${!gateway_ips[@]}"; do echo "$key"; done | sort))
-    echo "Usage: $(basename "$0") <gateway_name>, e.g., $(basename "$0") fpx1"
+    echo "Usage: $(basename "$0") <gateway_name>"
+    echo "Exp: $(basename "$0") fpx1"
     echo $banner
     echo "AVAILABLE GATEWAYS TO PICK FROM"
     echo $banner

@@ -82,7 +82,6 @@
     "gitlens.views.patchDetails.avatars": false,
     "gitlens.blame.avatars": false,
     "gitlens.defaultGravatarsStyle": "mp",
-    "settingsSync.keybindingsPerPlatform": false,
     "diffEditor.ignoreTrimWhitespace": false,
     "window.confirmBeforeClose": "always",
     "remote.autoForwardPorts": false,
@@ -90,7 +89,8 @@
     "gitlens.gitCommands.avatars": false,
     "markdown-preview-enhanced.revealjsTheme": "none.css",
     "markdown-preview-enhanced.codeBlockTheme": "auto.css",
-    "editor.fontSize": 16,
     "files.autoGuessEncoding": true,
     "C_Cpp.intelliSenseEngine": "disabled",
+    "editor.fontSize": 16,
+    "settingsSync.keybindingsPerPlatform": false,
 }
