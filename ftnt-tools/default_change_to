@@ -26,24 +26,26 @@ for key in "${!gateway_ips[@]}"; do
     reverse_gateway_ips["${gateway_ips[$key]}"]=$key
 done
 
+# for key in "${!reverse_gateway_ips[@]}"; do
+#     echo "$key => ${reverse_gateway_ips[$key]}"
+# done
+
 help() {
     # Extract keys into a separate array and sort them
     sorted_keys=($(for key in "${!gateway_ips[@]}"; do echo "$key"; done | sort))
-    echo "Usage: $(basename "$0") <gateway_name>"
-    echo "Exp: $(basename "$0") fpx1"
+    echo "Usage: $(basename "$0") <fpx1>"
     echo $banner
     echo "AVAILABLE GATEWAYS TO PICK FROM"
     echo $banner
     for gateway_name in "${sorted_keys[@]}"; do
-        echo "$gateway_name => ${gateway_ips[$gateway_name]}"
+        echo "[$gateway_name == ${gateway_ips[$gateway_name]}]"
     done
     echo $banner2
-    echo "$user_notation $current_default"
+    echo "$user_notation default via $current_gw_ip(${reverse_gateway_ips[$current_gw_ip]}) dev $device"
     exit 1
 }
 
-current_default=$(ip route show default)
-current_gateway=$(ip route show default | awk '/default/ {print $3}')
+read -r current_gw_ip device <<< $(ip route show default | awk '/default/ {print $3, $5}')
 
 # In Bash, =~ is used for regular expression matching
 if [[ "$username" != "corsair" || ! "$hostname" =~ ^client[0-9]+$ || "$OSTYPE" != "linux-gnu" ]]; then
@@ -57,30 +59,32 @@ fi
 if [[ -z $1 ]]; then
     help
 else
-    new_gateway=${gateway_ips[$1]}
-    if [[ -z $new_gateway ]]; then
+    new_gateway_ip=${gateway_ips[$1]}
+    if [[ -z $new_gateway_ip ]]; then
         echo "$user_notation Error: Gateway name not found"
         exit 1
     fi
 fi
 
-echo "$user_notation Changing the default route to $new_gateway"
+echo "$user_notation Changing the default gateway to $new_gateway_ip"
 
-if [ "$current_gateway" = "$new_gateway" ]; then
-    echo "$user_notation The default route is already set to $new_gateway"
+if [ "$current_gw_ip" = "$new_gateway_ip" ]; then
+    echo "$user_notation The default gateway is already set to $new_gateway_ip(${reverse_gateway_ips[$new_gateway_ip]})"
     exit 0
 fi
 
-# Change the default route
-echo "$user_notation sudo ip route replace default via $new_gateway"
-sudo ip route replace default via "$new_gateway"
+# Change the default gateway
+echo "$user_notation sudo ip route replace default via $new_gateway_ip"
+sudo ip route replace default via "$new_gateway_ip"
 if [ $? -ne 0 ]; then
-    echo "Failed to change the default route"
+    echo "Failed to change the default gateway"
     exit 1
 fi
-echo "$user_notation Default route has been changed successfully"
-echo $banner3
+
 # ip route show default
 # @@@@ default via 172.16.67.1 dev enp0s31f6 proto static metric 100
-default_gw_ip=$(ip route show default | awk '/default/ {print $3}')
-echo "$user_notation default via 172.16.67.1($reverse_gateway_ips[$default_gw_ip]) dev enp0s31f6"
+echo "$user_notation Default gateway has been changed successfully"
+read -r new_gateway_ip device <<< $(ip route show default | awk '/default/ {print $3, $5}')
+echo $banner3
+echo "$user_notation default via $new_gateway_ip(${reverse_gateway_ips[$new_gateway_ip]}) dev $device"
+
