@@ -58,6 +58,7 @@ while getopts "uhicHt" opt; do
     case $opt in
         u)
             forceUpdateFlag=true
+            installFlag=true
             ;;
         h)
             usage
@@ -90,7 +91,7 @@ fi
 
 installPrerequisitesForDebian() {
     prerequisitesForUbuntu=(
-        # Level 1
+        ## Basic tools
         tmux
         rsync
         fd-find
@@ -100,7 +101,6 @@ installPrerequisitesForDebian() {
         libssl-dev
         gdb
         bat
-        # Level 2
         curl
         libcurl4
         libcurl4-openssl-dev
@@ -113,7 +113,7 @@ installPrerequisitesForDebian() {
         bash-completion
         openssh-server
         python3-dev
-        # Level 3
+        ## build essentials
         build-essential
         libvirt-clients
         texinfo
@@ -127,11 +127,10 @@ installPrerequisitesForDebian() {
         autoconf
         gettext
         autopoint
-        # For llvm
-        # clangd
+        ## llvm & clangd
         bear
         libear
-        # TigerVNC
+        ## TigerVNC
         gdm3
         ubuntu-desktop
         gnome-keyring
@@ -142,6 +141,13 @@ installPrerequisitesForDebian() {
         tigervnc-viewer
         # samba
         # smbclient
+        ## hyperscan
+        cmake
+        libboost-all-dev
+        ragel
+        sqlite3
+        libsqlite3-dev
+        libpcap-dev
     )
     cat << _EOF
 $catBanner

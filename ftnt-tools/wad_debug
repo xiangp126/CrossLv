@@ -1,12 +1,16 @@
 #!/usr/bin/expect -f
 
-# check if an argument is provided, argc must > 1
-if {$argc > 0} {
-    set fgt_dev [lindex $argv 0]
-} else {
-    puts "Usage: $argv0 <Device name or IP address>"
+if {$argc == 0} {
+    puts "Usage: $argv0 <Device name or IP address> <Process Type>"
     puts "Example: $argv0 fgt1"
+    puts "Example: $argv0 fgt1 algo"
     exit 1
+}
+
+set fgt_dev [lindex $argv 0]
+set proc_type [lindex $argv 1]
+if {$argc == 1} {
+    set proc_type "worker"
 }
 
 # Function to check if the parameter is a valid IPv3 address
@@ -83,7 +87,7 @@ set output $expect_out(buffer)
 # Search for the line with "type=worker" and extract the PID
 set worker_pid ""
 foreach line [split $output "\n"] {
-    if {[string match "*type=worker*" $line]} {
+    if {[string match "*type=$proc_type*" $line]} {
         # Extract the PID from the line
         set regex {pid=(\d+)}
         if {[regexp $regex $line match worker_pid]} {

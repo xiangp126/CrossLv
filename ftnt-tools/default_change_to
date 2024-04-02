@@ -6,14 +6,6 @@ banner2="------------CURRENT--------------"
 banner3="--------------NOW----------------"
 username=$(whoami)
 hostname=$(hostname)
-# In Bash, =~ is used for regular expression matching
-if [[ "$username" != "corsair" || ! "$hostname" =~ ^client[0-9]+$ || "$OSTYPE" != "linux-gnu" ]]; then
-    echo "$user_notation Username: $username"
-    echo "$user_notation Hostname: $hostname"
-    echo "$user_notation OSTYPE: $OSTYPE"
-    echo "$user_notation This script is only for client VMs and the username corsair and the os platform to be Linux"
-    # exit 1
-fi
 
 declare -A gateway_ips=(
     ["fgt1"]="192.168.103.6"
@@ -27,6 +19,12 @@ declare -A gateway_ips=(
     ["host_br3"]="192.168.103.254"
     ["host_router"]="172.16.67.1"
 )
+
+# To have bidirectional mapping between the keys and values.
+declare -A reverse_gateway_ips
+for key in "${!gateway_ips[@]}"; do
+    reverse_gateway_ips["${gateway_ips[$key]}"]=$key
+done
 
 help() {
     # Extract keys into a separate array and sort them
@@ -46,6 +44,15 @@ help() {
 
 current_default=$(ip route show default)
 current_gateway=$(ip route show default | awk '/default/ {print $3}')
+
+# In Bash, =~ is used for regular expression matching
+if [[ "$username" != "corsair" || ! "$hostname" =~ ^client[0-9]+$ || "$OSTYPE" != "linux-gnu" ]]; then
+    echo "$user_notation Username: $username"
+    echo "$user_notation Hostname: $hostname"
+    echo "$user_notation OSTYPE: $OSTYPE"
+    echo "$user_notation This script is only for client VMs and the username corsair and the os platform to be Linux"
+    help
+fi
 
 if [[ -z $1 ]]; then
     help
@@ -73,4 +80,7 @@ if [ $? -ne 0 ]; then
 fi
 echo "$user_notation Default route has been changed successfully"
 echo $banner3
-ip route show default
+# ip route show default
+# @@@@ default via 172.16.67.1 dev enp0s31f6 proto static metric 100
+default_gw_ip=$(ip route show default | awk '/default/ {print $3}')
+echo "$user_notation default via 172.16.67.1($reverse_gateway_ips[$default_gw_ip]) dev enp0s31f6"

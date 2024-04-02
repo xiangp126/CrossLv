@@ -1,6 +1,6 @@
 #!/bin/bash
 
-file_path=$HOME/Public/uCopy.txt
+file_path="/data/bugzilla/crash.txt"
 
 if [ -f $file_path ]; then
     # Empty the file

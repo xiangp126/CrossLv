@@ -86,6 +86,7 @@ while getopts "hm:w:j:cCboafT:" opt; do
         b)
             fUseBear=true
             fNeedBuild=true
+            fRemoveCompileCommandsJson=true
             ;;
         C)
             fRunConfigure=true
@@ -93,6 +94,8 @@ while getopts "hm:w:j:cCboafT:" opt; do
         c)
             # Ignore compile_commands.json by default
             fGitClean=true
+            # If -c is set, run configure by default
+            fRunConfigure=true
             ;;
         f)
             fRemoveCompileCommandsJson=true

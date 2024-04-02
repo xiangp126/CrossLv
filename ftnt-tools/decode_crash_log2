@@ -72,13 +72,13 @@ def do_job(exe_file_path, crash_content, output):
                 print(line)
 
 def main():
-    if len(sys.argv) != 3:
-        print("Usage: python3 script.py <exe_file_path> <crash_file_path>")
-        sys.exit(1)
-
     output = []
-    exe_file_path = sys.argv[1]
-    crash_file_path = sys.argv[2]
+    crash_file_path = os.path.expanduser("~") + "/.crash/crash.log"
+    exe_file_path = "./sysinit/init"
+    if len(sys.argv) >= 2:
+        exe_file_path = sys.argv[1]
+        if len(sys.argv) == 3:
+            crash_file_path = sys.argv[2]
 
     verify_exe_file(exe_file_path)
     crash_content = read_crash_file(crash_file_path)
