@@ -1,19 +1,28 @@
 #!/usr/bin/expect -f
 
+set listen_port "444"
+set proc_type "worker"
+
 if {$argc == 0} {
-    puts "Usage: $argv0 <Device name or IP address> <Process Type>"
+    puts "Usage: $argv0 <Device name or IP address> <Process Type> <listen port>"
     puts "Example: $argv0 fgt1"
     puts "Example: $argv0 fgt1 algo"
+    puts "Example: $argv0 fgt1 algo 9229"
     exit 1
 }
 
 set fgt_dev [lindex $argv 0]
 set proc_type [lindex $argv 1]
-if {$argc == 1} {
+set listen_port [lindex $argv 2]
+
+if {$listen_port == ""} {
+    set listen_port 444
+}
+if {$proc_type == ""} {
     set proc_type "worker"
 }
 
-# Function to check if the parameter is a valid IPv3 address
+# Function to check if the parameter is a valid IPv4 address
 proc is_valid_ipv4 {ip} {
     if {[regexp {^(\d{0,3}\.){3}\d{1,3}$} $ip]} {
         set octets [split $ip .]
@@ -119,7 +128,7 @@ expect $shell_prompt
 
 # start gdbserver
 set timeout -1
-send "gdbserver 0.0.0.0:444 --attach $worker_pid\r"
+send "gdbserver 0.0.0.0:$listen_port --attach $worker_pid\r"
 
 # \x03 is used to send a Ctrl-C signal when the trap detects the SIGINT (Ctrl-C) signal.
 trap {

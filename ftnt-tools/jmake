@@ -69,6 +69,7 @@ while getopts "hm:w:j:cCboafT:" opt; do
         m)
             fMode=$OPTARG
             fModeSpecified=true
+            fRunConfigure=true
             fNeedBuild=true
             ;;
         w)

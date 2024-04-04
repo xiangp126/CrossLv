@@ -1,0 +1,26 @@
+#!/bin/bash
+
+if [ -z "$1" ]; then
+    echo "Usage: frg <search term>"
+    exit 1
+fi
+
+result=$(rg --color=always --line-number --no-heading "$@" |
+  fzf --ansi \
+      --color 'hl:-1:underline,hl+:-1:underline:reverse' \
+      --delimiter ':' \
+      --preview "bat --color=always {1} --theme='TwoDark' --highlight-line {2}" \
+      --preview-window 'up,60%,border-bottom,+{2}+3/3,~3')
+
+file="${result%%:*}"
+linenumber=$(echo "${result}" | cut -d: -f2)
+
+EDITOR="vim"
+if [ ! -z "$file" ]; then
+    if [ -x "$(command -v code)" ]; then
+        EDITOR="code"
+        $EDITOR "$file":"$linenumber"
+    else
+        $EDITOR +"${linenumber}" "$file"
+    fi
+fi
