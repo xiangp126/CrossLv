@@ -602,6 +602,13 @@ _EOF
         return
     fi
 
+    if grep -q "^readonly TMOUT" /etc/profile; then
+        echo "$beautifyGap1 TMOUT is readonly in /etc/profile, change it to writable"
+    else
+        echo "$beautifyGap1 TMOUT is already writable in /etc/profile, skip"
+        return
+    fi
+
     sudo sed -i 's/^readonly TMOUT/# readonly TMOUT/g' /etc/profile
     if [ $? -eq 0 ]; then
         echo "$beautifyGap1 Success!"
