@@ -68,6 +68,7 @@ alias youtube-dl='yt-dlp --external-downloader aria2c --external-downloader-args
 # Dump the raw packet data
 alias rawdump="tcpdump -s 0 -U -n -w -"
 alias rsync='rsync -azPv'
+alias jrr='jrg'
 # pathOfLibear=$(locate libear.so | grep -m 1 libear.so)
 alias bear='bear -l /usr/lib/x86_64-linux-gnu/bear/libear.so'
 # alias to change directory

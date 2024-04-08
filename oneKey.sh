@@ -68,6 +68,7 @@ while getopts "uhicHt" opt; do
             installFlag=true
             ;;
         t)
+            installFlag=true
             toolsFlag=true
             ;;
         c)
