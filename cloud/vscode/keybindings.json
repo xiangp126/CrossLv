@@ -314,16 +314,6 @@
 	"command": "bookmarks.clearFromAllFiles"
 },
 {
-	"key": "ctrl+shift+g shift+s",
-	"command": "gitlens.diffLineWithPrevious",
-	"when": "editorTextFocus && config.gitlens.keymap == 'chorded' && gitlens:activeFileStatus =~ /tracked/"
-},
-{
-	"key": "ctrl+shift+g shift+,",
-	"command": "-gitlens.diffLineWithPrevious",
-	"when": "editorTextFocus && config.gitlens.keymap == 'chorded' && gitlens:activeFileStatus =~ /tracked/"
-},
-{
 	"key": "ctrl+alt+numpad1",
 	"command": "workbench.action.toggleSidebarVisibility"
 },
@@ -351,16 +341,6 @@
 {
 	"key": "ctrl+,",
 	"command": "-workbench.action.openSettings"
-},
-{
-	"key": "ctrl+shift+,",
-	"command": "gitlens.diffWithPrevious",
-	"when": "editorTextFocus && !isInDiffEditor && config.gitlens.keymap == 'chorded' && gitlens:activeFileStatus =~ /tracked/"
-},
-{
-	"key": "ctrl+shift+g ,",
-	"command": "-gitlens.diffWithPrevious",
-	"when": "editorTextFocus && !isInDiffEditor && config.gitlens.keymap == 'chorded' && gitlens:activeFileStatus =~ /tracked/"
 },
 {
 	"key": "ctrl+alt+pagedown",
@@ -454,5 +434,81 @@
 	"key": "ctrl+shift+\\",
 	"command": "-editor.action.jumpToBracket",
 	"when": "editorTextFocus"
+},
+{
+	"key": "ctrl+shift+,",
+	"command": "gitlens.diffLineWithPrevious",
+	"when": "editorTextFocus && config.gitlens.keymap == 'chorded' && gitlens:activeFileStatus =~ /tracked/"
+},
+{
+	"key": "alt+f7",
+	"command": "editor.showCallHierarchy",
+	"when": "editorHasCallHierarchyProvider && editorTextFocus && !inReferenceSearchEditor"
+},
+{
+	"key": "f7",
+	"command": "references-view.showCallHierarchy",
+	"when": "editorHasCallHierarchyProvider"
+},
+{
+	"key": "ctrl+shift+d",
+	"command": "editor.action.revealDeclaration"
+},
+{
+	"key": "alt+left",
+	"command": "-workbench.action.quickInputBack",
+	"when": "inQuickOpen"
+},
+{
+	"key": "alt+right",
+	"command": "-gitlens.key.alt+right",
+	"when": "gitlens:key:alt+right"
+},
+{
+	"key": "alt+left",
+	"command": "-gitlens.key.alt+left",
+	"when": "gitlens:key:alt+left"
+},
+{
+	"key": "ctrl+shift+f",
+	"command": "-workbench.view.search",
+	"when": "workbench.view.search.active && neverMatch =~ /doesNotMatch/"
+},
+{
+	"key": "ctrl+alt+f",
+	"command": "workbench.view.search"
+},
+{
+	"key": "alt+c",
+	"command": "-toggleSearchEditorCaseSensitive",
+	"when": "inSearchEditor && searchInputBoxFocus"
+},
+{
+	"key": "alt+c",
+	"command": "-workbench.action.terminal.toggleFindCaseSensitive",
+	"when": "terminalFindFocused && terminalHasBeenCreated || terminalFindFocused && terminalProcessSupported || terminalFocusInAny && terminalHasBeenCreated || terminalFocusInAny && terminalProcessSupported"
+},
+{
+	"key": "ctrl+right",
+	"command": "cursorWordRight"
+},
+{
+	"key": "ctrl+right",
+	"command": "-cursorWordEndRight",
+	"when": "textInputFocus && !accessibilityModeEnabled"
+},
+{
+	"key": "ctrl+shift+right",
+	"command": "cursorWordRightSelect"
+},
+{
+	"key": "ctrl+shift+right",
+	"command": "-cursorWordEndRightSelect",
+	"when": "textInputFocus && !accessibilityModeEnabled"
+},
+{
+	"key": "enter",
+	"command": "-editor.action.nextMatchFindAction",
+	"when": "editorFocus && findInputFocussed"
 }
 ]

@@ -41,7 +41,8 @@
     "window.autoDetectColorScheme": true,
     "workbench.colorCustomizations": {
         "terminal.foreground": "#b7b7b7",
-        "terminal.background": "#1a1a1a"
+        "terminal.background": "#1a1a1a",
+        "tab.activeBorderTop": "#989c9a",
     },
     "debug.console.acceptSuggestionOnEnter": "on",
     "debug.console.fontFamily": "Monaco",

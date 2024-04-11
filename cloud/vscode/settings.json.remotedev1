@@ -40,6 +40,7 @@
     "remote.autoForwardPorts": false,
     "gitlens.gitCommands.avatars": false,
     "files.exclude": {
+        "**/.vscode-server": true,
         "**/devops": true,
         "**/Downloads": true,
         "**/fortipkg": true
