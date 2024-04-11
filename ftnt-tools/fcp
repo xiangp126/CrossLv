@@ -5,10 +5,18 @@ file_path="/data/bugzilla/crash.txt"
 if [ -f $file_path ]; then
     # Empty the file
     truncate -s 0 "$file_path"
+else
+    touch $file_path
+    if [ $? -ne 0 ]; then
+        echo "Error: Unable to open file $file_path"
+        exit 1
+    fi
 fi
 
-# vim -c "set paste" +"normal! gg" $file_path
-vim -c "set paste" $file_path
+# Open the file in vim and enter insert mode
+vim -c "set paste" -c "startinsert" $file_path
+
+exit 0
 
 # check if the content of the file is not empty
 if [ -s $file_path ]; then

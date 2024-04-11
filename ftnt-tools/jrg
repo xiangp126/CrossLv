@@ -5,15 +5,23 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-result=$(rg --smart-case --color=ansi \
+query="$@"
+query_removed_escapes=$(echo "$query" | sed 's/\\//g')
+result=$(rg --smart-case \
+            --color=ansi \
             --colors 'match:fg:204,51,153' --colors 'match:style:bold' \
-            --line-number --no-heading "$@" |
-  fzf --ansi \
-      --color 'hl:-1:underline,hl+:-1:underline:reverse' \
-      --delimiter ':' \
-      --preview "bat --color=always {1} --theme='TwoDark' --highlight-line {2}" \
-      --preview-window 'right,50%,border-bottom,+{2}+3/3,~3' \
-      --query "$@")
+            --line-number --no-heading "$query" |
+        fzf --ansi \
+            --color 'hl:-1:underline,hl+:-1:underline:reverse' \
+            --delimiter ':' \
+            --preview "bat --color=always {1} --theme='TwoDark' --highlight-line {2}" \
+            --preview-window 'top,60%,border-bottom,+{2}+3/3,~3' \
+            --cycle \
+            --query "$query_removed_escapes")
+
+if [ -z "$result" ]; then
+    exit 1
+fi
 
 file="${result%%:*}"
 linenumber=$(echo "${result}" | cut -d: -f2)
