@@ -5,16 +5,20 @@ fMode=FGT_VM64_KVM
 fModeSpecified=false
 fNumOfWorkers=$(nproc)
 fWorkingDir=$(pwd)
-fMaxAttempt=3
+fMaxBuildAttempt=3
 fUseBear=false
 fRunConfigure=false
 fNeedBuild=false
 fGitClean=false
 fRemoveCompileCommandsJson=false
+fSyncTarget=false
+fSyncUsername="admin"
+fSyncPassword="password"
 # Variables
 scriptName=$(basename $0)
 scriptWd=$(dirname $0)
 pathOfNoPasswdToConfig=$scriptWd/nopasswd_to_config
+imageOut="image.out"
 # Git
 compileCommandsFile="compile_commands.json"
 gitExcludePattern1=$compileCommandsFile
@@ -26,20 +30,23 @@ subUserNotation="@@@@ @"
 
 usage() {
     cat << _EOF
-jmake 0.0.1
+jmake 0.2.0
 
 Usage: $scriptName [-m mode] [-w working_dir] [-j num_of_workers] [-T max_attempt] [-bcCoahf]
 Options:
     -C      Run Configure by calling expect scripts (default: $fRunConfigure)
     -o      Run build commands (set automatically if any of the [bmjwT] options is set)
     -a      Equivalent to -Co
-    -T      Set the maximum number of attempts (default: $fMaxAttempt)
+    -T      Set the maximum number of attempts (default: $fMaxBuildAttempt)
     -c      Clean the repo (default: $fGitClean)
     -b      Use Bear to generate $compileCommandsFile (default: $fUseBear)
     -m      Set build target/mode (default: $fMode, auto detect FGT_VM64_KVM and FPX_KVM)
     -j      Set the number of jobs (default: $fNumOfWorkers)
     -w      Set working directory (default: $fWorkingDir)
     -f      Remove $compileCommandsFile (default: $fRemoveCompileCommandsJson)
+    -s      Sync $imageOut to the target machine
+    -u      Set the username for sync command
+    -p      Set the password for sync command
     -h      Print this help message
 
 Example:
@@ -51,6 +58,7 @@ Example:
     $scriptName -bc
     $scriptName -j4 -b
     $scriptName -T1
+    $scriptName -T1 -s fgt1 -p "password" -u "admin"
     $scriptName -h
 
 _EOF
@@ -60,7 +68,7 @@ _EOF
 [[ $# -eq 0 ]] && usage
 
 # Parse the options
-while getopts "hm:w:j:cCboafT:" opt; do
+while getopts "hm:w:j:cCboafT:s:p:u:" opt; do
     case $opt in
         h)
             usage
@@ -81,7 +89,7 @@ while getopts "hm:w:j:cCboafT:" opt; do
             fNeedBuild=true
             ;;
         T)
-            fMaxAttempt=$OPTARG
+            fMaxBuildAttempt=$OPTARG
             fNeedBuild=true
             ;;
         b)
@@ -100,6 +108,15 @@ while getopts "hm:w:j:cCboafT:" opt; do
             ;;
         f)
             fRemoveCompileCommandsJson=true
+            ;;
+        s)
+            fSyncTarget=$OPTARG
+            ;;
+        u)
+            fSyncUsername=$OPTARG
+            ;;
+        p)
+            fSyncPassword=$OPTARG
             ;;
         o)
             fNeedBuild=true
@@ -133,12 +150,18 @@ fi
 
 echo "$userNotation Set working directory to $fWorkingDir"
 echo "$userNotation Set build mode to $fMode"
-echo "$userNotation Set number of jobs to $fNumOfWorkers"
+echo "$userNotation Set number of concurrent jobs to $fNumOfWorkers"
 if [[ "$fUseBear" == true ]]; then
     echo "$userNotation Use bear to generate compile_commands.json"
     if [[ "$RemoveCompileCommandsJson" == true ]]; then
         echo "$userNotation Will remove compile_commands.json if exists"
     fi
+fi
+
+if [[ "$fSyncTarget" != false ]]; then
+    echo "$userNotation Scheduled to sync image.out to $fSyncTarget after build"
+    echo "$subUserNotation Set scp username to $fSyncUsername"
+    echo "$subUserNotation Set scp password to $fSyncPassword"
 fi
 
 # Clean the working directory
@@ -194,58 +217,58 @@ if [[ "$fRunConfigure" == true ]]; then
     fi
 fi
 
-if [[ "$fNeedBuild" == false ]]; then
-    exit 0
-fi
-
 # Step 2: Run build commands
-jsonFile=$compileCommandsFile
-jsonPath=$fWorkingDir/$jsonFile
+if [[ "$fNeedBuild" != false ]]; then
+    # Make make command
+    cd $fWorkingDir
+    makeCommand="make -j$fNumOfWorkers $imageOut"
 
-cd $fWorkingDir
-makeCommand="make -j$fNumOfWorkers image.out"
-if [[ "$fUseBear" == true ]]; then
-    bearPath=$(command -v bear)
-    if [[ -z "$bearPath" ]]; then
-        echo "$userNotation Command bear not found, please install it first"
-        echo "$userNotation sudo apt install bear libear -y"
-        exit 1
-    fi
-    pathOfLibear=$(locate libear.so | grep -m 1 libear.so)
-    if [[ "$pathOfLibear" != "" ]]; then
-        bear="bear -l $pathOfLibear"
-    else
-        local defaultLiBearPath="/usr/lib/x86_64-linux-gnu/bear/libear.so"
-        if [[ ! -f "$defaultLiBearPath" ]]; then
-            echo "$userNotation libear.so not found, please install it first"
-            echo "$userNotation sudo apt install libear -y"
+    # Use Bear to generate compile_commands.json
+    if [[ "$fUseBear" == true ]]; then
+        bearPath=$(command -v bear)
+        if [[ -z "$bearPath" ]]; then
+            echo "$userNotation Command bear not found, please install it first"
+            echo "$userNotation sudo apt install bear libear -y"
             exit 1
         fi
-        bear="bear -l $defaultLiBearPath"
+        pathOfLibear=$(locate libear.so | grep -m 1 libear.so)
+        if [[ "$pathOfLibear" != "" ]]; then
+            bear="bear -l $pathOfLibear"
+        else
+            local defaultLiBearPath="/usr/lib/x86_64-linux-gnu/bear/libear.so"
+            if [[ ! -f "$defaultLiBearPath" ]]; then
+                echo "$userNotation libear.so not found, please install it first"
+                echo "$userNotation sudo apt install libear -y"
+                exit 1
+            fi
+            bear="bear -l $defaultLiBearPath"
+        fi
+        makeCommand="$bear $makeCommand"
     fi
-    makeCommand="$bear $makeCommand"
-fi
 
-# Check if compile_commands.json is writable
-if [[ -f "$jsonPath" && ! -w "$jsonPath" ]]; then
-    echo "$userNotation Detected $jsonPath is read-only"
-    if [[ "$fRemoveCompileCommandsJson" == true ]]; then
-        echo "$userNotation Remove $jsonPath"
-        rm -f $jsonPath
-        if [[ $? -ne 0 ]]; then
-            echo "$userNotation Failed to remove $jsonPath"
-            exit 1
+    # Check if the existing compile_commands.json is writable
+    jsonFile=$compileCommandsFile
+    jsonPath=$fWorkingDir/$jsonFile
+    if [[ -f "$jsonPath" && ! -w "$jsonPath" ]]; then
+        echo "$userNotation Detected $jsonPath is read-only"
+        if [[ "$fRemoveCompileCommandsJson" == true ]]; then
+            echo "$subUserNotation Remove $jsonPath"
+            rm -f $jsonPath
+            if [[ $? -ne 0 ]]; then
+                echo "$subUserNotation Failed to remove $jsonPath"
+                exit 1
+            fi
+        else
+            echo "$subUserNotation Just keep $jsonPath as it is"
         fi
     fi
-fi
 
-attempt=1
-maxAttempt=$fMaxAttempt
-if [[ "$fNeedBuild" == true ]]; then
-
+    # Loop to build the projects
+    attempt=1
+    maxAttempt=$fMaxBuildAttempt
     while [[ $attempt -le $maxAttempt ]]; do
         echo "$userNotation Running build commands: $makeCommand"
-        echo "$subUserNotation Attempt $attempt/$maxAttempt"
+        echo "$subUserNotation Build attempt $attempt/$maxAttempt"
         # [[ $attempt -gt 1 ]] && sleep 2
         sleep 2
 
@@ -263,17 +286,129 @@ if [[ "$fNeedBuild" == true ]]; then
         echo "$subUserNotation Suggest to clean the working directory and try again."
         exit 1
     fi
-fi
 
-# Step 3: Remove the write privilege of compile_commands.json
-if [[ -f "$jsonPath" && -w "$jsonPath" ]]; then
-    echo "$userNotation $jsonPath is writable"
-    echo "$userNotation Remove the write privilege of $jsonPath"
-    chmod -w $jsonPath
-    if [[ $? -ne 0 ]]; then
-        echo "$userNotation Failed to remove the write privilege of $jsonPath"
-        exit 1
+    # Remove the write privilege of compile_commands.json
+    if [[ -f "$jsonPath" && -w "$jsonPath" ]]; then
+        echo "$userNotation $jsonPath is writable"
+        echo "$userNotation Remove the write privilege of $jsonPath"
+        chmod -w $jsonPath
+        if [[ $? -ne 0 ]]; then
+            echo "$userNotation Failed to remove the write privilege of $jsonPath"
+            exit 1
+        fi
     fi
+
+    echo "$userNotation Congratulations! You have built projects successfully."
 fi
 
-echo "$userNotation Congratulations! You have built projects successfully."
+if [[ "$fSyncTarget" != false ]]; then
+    imageOutFile=$(find "$fWorkingDir" -name image.out)
+    echo "$userNotation Syncing $imageOutFile to $fSyncTarget"
+
+    maxSyncRetries=5
+    ESUCCESS=0
+    EMAXTRIES=$(($maxSyncRetries + 1))
+    ETIMEOUT=$(($maxSyncRetries + 10))
+    EFAILED=$((ETIMEOUT + 1))
+    # In Expect tcl, \$i will keep as $i in the spawned shell
+    expect -c "
+        # Set the initial values
+        set defaultTimeout 15
+        set adjustTimeout 0
+        set waitBeforeRetry 10
+
+        # Loop to sync the image.out
+        for {set i 1} {\$i <= $maxSyncRetries} {incr i} {
+            send_user \"$subUserNotation Sync attempt \$i/$maxSyncRetries\n\"
+            spawn -noecho scp $imageOutFile ${fSyncUsername}@${fSyncTarget}:/fgt-image
+            if {\$adjustTimeout != 0} {
+                set timeout \$adjustTimeout
+            } else {
+                set timeout \$defaultTimeout
+            }
+
+            expect {
+                \"*assword:\" {
+                    send \"$fSyncPassword\r\"
+                    exp_continue
+                }
+                \"yes/no\" {
+                    send \"yes\r\"
+                    exp_continue
+                }
+                \"Host key verification failed.\" {
+                    send_user \"$subUserNotation Host key verification failed. Updating known_hosts file...\n\"
+                    system \"ssh-keygen -R $fSyncTarget\"
+                    send_user \"$subUserNotation Host key removed from known_hosts file.\n\"
+                    send_user \"$subUserNotation Retrying SCP immediately...\n\"
+                    continue
+                }
+                -re {Connection refused|No route to host} {
+                    set adjustTimeout -1
+                    send_user \"$subUserNotation Waiting for \$waitBeforeRetry seconds before retrying...\n\"
+                    sleep \$waitBeforeRetry
+                    # Exponential backoff
+                    set waitBeforeRetry [expr {\$waitBeforeRetry * 2}]
+                    continue
+                }
+                timeout {
+                    send_user \"$subUserNotation Timeout. Exiting...\n\"
+                    exit $ETIMEOUT
+                }
+                eof {
+                    exit $ESUCCESS
+                }
+            }
+        }
+        exit \$i
+    "
+    retValue=$?
+    echo "$subUserNotation Sync return value: $retValue"
+    case $retValue in
+        0)
+            echo "$userNotation Congratulations! You have synced $imageOut to $fSyncTarget successfully."
+            exit 0
+            ;;
+        $EMAXTRIES)
+            echo "$userNotation Failed to sync $imageOut to $fSyncTarget after $maxSyncRetries attempts"
+            exit $EMAXTRIES
+            ;;
+        $ETIMEOUT)
+            echo "$userNotation Timeout to sync $imageOut to $fSyncTarget"
+            exit $ETIMEOUT
+            ;;
+        *)
+            echo "$userNotation Failed to sync $imageOut to $fSyncTarget"
+            exit $EFAILED
+            ;;
+    esac
+fi
+
+# Here is the real expect script
+#expect -c '                                                                                                      [30/48592]
+#      for {set i 1} {$i <= 5} {incr i} {
+#          set timeout 10
+#          send_user "@@@@ @ Attempt $i/5\n"
+#
+#          spawn -noecho scp /data/fos2/image.out admin@fgt1:/fgt-image
+#          expect {
+#              "*assword:" {
+#                  send "password\r"
+#                  exp_continue
+#              }
+#              "yes/no" {
+#                  send "yes\r"
+#                  exp_continue
+#              }
+#              "Host key verification failed." {
+#                  send_user "@@@@ @ Host key verification failed. Updating known_hosts file...\n"
+#                  system "ssh-keygen -R fgt1"
+#                  send_user "@@@@ @ Host key removed from known_hosts file. Retrying SCP...\n"
+#                  continue
+#              }
+#              eof {
+#                  break
+#              }
+#          }
+#      }
+#  '
