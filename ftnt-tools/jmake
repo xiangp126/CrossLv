@@ -351,19 +351,31 @@ if [[ "$fSyncTarget" != false ]]; then
                     set waitBeforeRetry [expr {\$waitBeforeRetry * 2}]
                     continue
                 }
+                \"501-Permission Denied\" {
+                    send_user \"$subUserNotation Permission Denied. Exiting...\n\"
+                    exit $EFAILED
+                }
+                \"check image error\" {
+                    send_user \"$subUserNotation Check image error. Exiting...\n\"
+                    # exp_continue
+                    exit $EFAILED
+                }
                 timeout {
                     send_user \"$subUserNotation Timeout. Exiting...\n\"
                     exit $ETIMEOUT
                 }
                 eof {
+                    send_user \"$subUserNotation Reaching EOF.\n\"
                     exit $ESUCCESS
                 }
             }
         }
         exit \$i
     "
+
     retValue=$?
-    echo "$subUserNotation Sync return value: $retValue"
+    [[ $retValue -ne 0 ]] && echo "$subUserNotation Sync return value: $retValue"
+
     case $retValue in
         0)
             echo "$userNotation Congratulations! You have synced $imageOut to $fSyncTarget successfully."
