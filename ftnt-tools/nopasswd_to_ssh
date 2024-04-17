@@ -27,7 +27,7 @@ for {set i 1} {$i <= $max_iterations} {incr i} {
             send "yes\r"
             exp_continue
         }
-        "password: " {
+        -re {[Pp]assword} {
             send "fos\r"
             exp_continue
         }
@@ -58,5 +58,5 @@ expect $fgt_prompt
 # Now you can add additional commands or interactions as needed
 # For example, you can automate further commands here
 
-# End the Expect script
+# Interact with the device
 interact

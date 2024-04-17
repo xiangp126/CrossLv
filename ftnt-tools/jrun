@@ -1,0 +1,91 @@
+#!/bin/bash
+
+scriptName=$(basename $0)
+session_id="log"
+window_id="1"
+pane_id="1"
+command_file="/data/bugzilla/commands.txt"
+
+usage() {
+    cat << _EOF
+jrun 0.0.0
+
+Usage: $scriptName [-s session_id] [-w window_id] [-p pane_id] [-f command_file]
+
+Options:
+    -s      Set session ID (default: $session_id)
+    -w      Set window ID (default: $window_id)
+    -p      Set pane ID (default: $pane_id)
+    -f      Specify command file (default: $command_file)
+    -h      Print this help message
+
+Examples:
+    $scriptName -s log -w 9 -p 0
+    $scriptName -s log -w 9 -p 0 -f my_commands.txt
+
+_EOF
+    exit
+}
+
+[[ $# -eq 0 ]] && usage
+
+# Parse options
+while getopts "s:w:p:f:h" opt; do
+    case $opt in
+        s)
+            session_id="$OPTARG"
+            ;;
+        w)
+            window_id="$OPTARG"
+            ;;
+        p)
+            pane_id="$OPTARG"
+            ;;
+        f)
+            command_file="$OPTARG"
+            ;;
+        h)
+            usage
+            ;;
+        ?)
+            echo "Invalid option: -$OPTARG" >&2
+            exit 1
+            ;;
+    esac
+done
+
+# Shift to process non-option arguments. New $1, $2, ..., $@
+shift $((OPTIND - 1))
+if [[ $# -gt 0 ]]; then
+    echo "$userNotation Illegal non-option arguments: $@"
+    exit
+fi
+
+if [[ ! -f "$command_file" ]]; then
+    echo "Command file '$command_file' not found."
+    exit 1
+fi
+
+# Read commands from file line by line
+while IFS= read -r command; do
+	# echo "Original command: $command"
+
+	# The sed command has three parts:
+	# 1. Remove characters to the left of the symbol '#'
+	# 2. Remove leading spaces
+	# 3. Remove lines starting with '//'
+	cleaned_command=$(sed 's/.*#//; s/^[[:space:]]*//; /^\/\//d' <<< "$command")
+	# echo "Cleaned command: $cleaned_command"
+
+    if [[ -z "$cleaned_command" ]]; then
+        continue
+    fi
+
+    tmux send-keys -t "$session_id:$window_id.$pane_id" "$cleaned_command"
+	if [[ $? -ne 0 ]]; then
+		echo "Failed to send command: $cleaned_command"
+		exit 1
+	fi
+    # tmux send key: ctrl + d
+    # tmux send-keys -t "$session_id:$window_id.$pane_id" C-d
+done < "$command_file"

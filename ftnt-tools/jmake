@@ -28,6 +28,10 @@ gitExcludeList="$gitExcludePattern1 $gitExcludePattern2"
 userNotation="@@@@"
 subUserNotation="@@@@ @"
 
+getCurrentTime() {
+    echo $(date +"%m/%d/%Y %H:%M:%S")
+}
+
 usage() {
     cat << _EOF
 jmake 0.2.0
@@ -70,10 +74,6 @@ _EOF
 # Parse the options
 while getopts "hm:w:j:cCboafT:s:p:u:" opt; do
     case $opt in
-        h)
-            usage
-            exit 0
-            ;;
         m)
             fMode=$OPTARG
             fModeSpecified=true
@@ -124,6 +124,10 @@ while getopts "hm:w:j:cCboafT:s:p:u:" opt; do
         a)
             fRunConfigure=true
             fNeedBuild=true
+            ;;
+        h)
+            usage
+            exit 0
             ;;
         ?)
             echo "$userNotation Invalid option: -$OPTARG" >&2
@@ -298,7 +302,7 @@ if [[ "$fNeedBuild" != false ]]; then
         fi
     fi
 
-    echo "$userNotation Congratulations! You have built projects successfully."
+    echo "$userNotation Congratulations! You have built projects successfully at $(getCurrentTime)."
 fi
 
 if [[ "$fSyncTarget" != false ]]; then
@@ -378,7 +382,7 @@ if [[ "$fSyncTarget" != false ]]; then
 
     case $retValue in
         0)
-            echo "$userNotation Congratulations! You have synced $imageOut to $fSyncTarget successfully."
+            echo "$userNotation Congratulations! You have synced $imageOut to $fSyncTarget successfully at $(getCurrentTime)."
             exit 0
             ;;
         $EMAXTRIES)
