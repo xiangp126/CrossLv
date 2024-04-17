@@ -66,26 +66,33 @@ if [[ ! -f "$command_file" ]]; then
     exit 1
 fi
 
+# The following method will cache the entire file in memory before processing it.
+# So if the file will be modified during the processing, this method is not suitable.
+# while IFS= read -r command; do
+# 	echo "Original command: $command"
+# done < "$command_file"
+
 # Read commands from file line by line
-while IFS= read -r command; do
-	# echo "Original command: $command"
+tail -n +1 "$command_file" | while IFS= read -r command; do
+	echo "Original command: $command"
 
 	# The sed command has three parts:
-	# 1. Remove characters to the left of the symbol '#'
-	# 2. Remove leading spaces
-	# 3. Remove lines starting with '//'
-	cleaned_command=$(sed 's/.*#//; s/^[[:space:]]*//; /^\/\//d' <<< "$command")
-	# echo "Cleaned command: $cleaned_command"
+	# 1. Remove comments starting with //.
+	# 2. Remove everything before the first colon or hash.
+	# 3. Remove leading spaces.
+	# In Bash, the <<< operator is used for here-strings.
+	# Here-strings are a way to pass a string as input to a command.
+	cleaned_command=$(sed '/^[[:space:]]*\/\//d; s/.*[:#]//; s/^[[:space:]]*//' <<< "$command")
 
     if [[ -z "$cleaned_command" ]]; then
+        echo "Cleaned command: Empty"
         continue
     fi
+	echo "Cleaned command: $cleaned_command"
 
-    tmux send-keys -t "$session_id:$window_id.$pane_id" "$cleaned_command"
+    tmux send-keys -t "$session_id:$window_id.$pane_id" "$cleaned_command" Enter
 	if [[ $? -ne 0 ]]; then
 		echo "Failed to send command: $cleaned_command"
 		exit 1
 	fi
-    # tmux send key: ctrl + d
-    # tmux send-keys -t "$session_id:$window_id.$pane_id" C-d
-done < "$command_file"
+done
