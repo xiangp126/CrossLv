@@ -373,16 +373,6 @@
 	"when": "editorFocus"
 },
 {
-	"key": "f3",
-	"command": "editor.action.nextSelectionMatchFindAction",
-	"when": "editorFocus"
-},
-{
-	"key": "ctrl+f3",
-	"command": "-editor.action.nextSelectionMatchFindAction",
-	"when": "editorFocus"
-},
-{
 	"key": "shift+f3",
 	"command": "editor.action.previousSelectionMatchFindAction",
 	"when": "editorFocus"
@@ -399,11 +389,6 @@
 {
 	"key": "ctrl+alt+right",
 	"command": "workbench.action.nextEditor"
-},
-{
-	"key": "ctrl+f3",
-	"command": "closeFindWidget",
-	"when": "editorFocus && findWidgetVisible && !isComposing"
 },
 {
 	"key": "ctrl+\\",
@@ -507,8 +492,16 @@
 	"when": "textInputFocus && !accessibilityModeEnabled"
 },
 {
-	"key": "enter",
-	"command": "-editor.action.nextMatchFindAction",
-	"when": "editorFocus && findInputFocussed"
+	"key": "ctrl+alt+m",
+	"command": "gitlens.diffLineWithWorking"
+},
+{
+	"key": "ctrl+alt+p",
+	"command": "gitlens.diffLineWithPrevious",
+	"when": "editorTextFocus && config.gitlens.keymap == 'chorded' && gitlens:activeFileStatus =~ /tracked/"
+},
+{
+	"key": "f3",
+	"command": "actions.findWithSelection"
 }
 ]

@@ -4,7 +4,9 @@ scriptName=$(basename $0)
 session_id="log"
 window_id="1"
 pane_id="1"
+user_notation="@@@@"
 command_file="/data/bugzilla/commands.txt"
+tmux_prefix="C-x"
 
 usage() {
     cat << _EOF
@@ -21,7 +23,11 @@ Options:
 
 Examples:
     $scriptName -s log -w 9 -p 0
-    $scriptName -s log -w 9 -p 0 -f my_commands.txt
+    $scriptName -s log -w 9 -p 0 -f commands.txt
+
+Tips:
+    Type $tmux_prefix, then q to view the pane number within the tmux window.
+    Type $tmux_prefix, then s to view the session name in tmux.
 
 _EOF
     exit
@@ -48,7 +54,7 @@ while getopts "s:w:p:f:h" opt; do
             usage
             ;;
         ?)
-            echo "Invalid option: -$OPTARG" >&2
+            echo "$user_notation Invalid option: -$OPTARG" >&2
             exit 1
             ;;
     esac
@@ -57,12 +63,12 @@ done
 # Shift to process non-option arguments. New $1, $2, ..., $@
 shift $((OPTIND - 1))
 if [[ $# -gt 0 ]]; then
-    echo "$userNotation Illegal non-option arguments: $@"
+    echo "$user_notation Illegal non-option arguments: $@"
     exit
 fi
 
 if [[ ! -f "$command_file" ]]; then
-    echo "Command file '$command_file' not found."
+    echo "$user_notation Command file '$command_file' not found."
     exit 1
 fi
 
@@ -74,25 +80,27 @@ fi
 
 # Read commands from file line by line
 tail -n +1 "$command_file" | while IFS= read -r command; do
-	echo "Original command: $command"
+	# echo "$user_notation Original command: $command"
 
-	# The sed command has three parts:
-	# 1. Remove comments starting with //.
-	# 2. Remove everything before the first colon or hash.
-	# 3. Remove leading spaces.
 	# In Bash, the <<< operator is used for here-strings.
 	# Here-strings are a way to pass a string as input to a command.
+
+	# The sed command consists of three components:
+	# 1. Eliminates comments that begin with //, accounting for possible leading spaces.
+	# 2. Deletes everything preceding the first colon (:) or hash (#) encountered.
+	# 3. Clears any leading spaces that remain after the previous operations.
 	cleaned_command=$(sed '/^[[:space:]]*\/\//d; s/.*[:#]//; s/^[[:space:]]*//' <<< "$command")
 
     if [[ -z "$cleaned_command" ]]; then
-        echo "Cleaned command: Empty"
+        # echo "$user_notation Cleaned command: Empty"
         continue
     fi
-	echo "Cleaned command: $cleaned_command"
+	# echo "$user_notation Original command: $command"
+	echo "$user_notation Cleaned command: $cleaned_command"
 
-    tmux send-keys -t "$session_id:$window_id.$pane_id" "$cleaned_command" Enter
+    tmux send-keys -t "$session_id:$window_id.$pane_id" "$cleaned_command"
 	if [[ $? -ne 0 ]]; then
-		echo "Failed to send command: $cleaned_command"
+		echo "$user_notation Failed to send command: $cleaned_command"
 		exit 1
 	fi
 done
