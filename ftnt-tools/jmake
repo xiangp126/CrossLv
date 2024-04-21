@@ -1,7 +1,13 @@
 #!/bin/bash
-# Flags
-# FGT_VM64 for VMWARE, FGT_VM64_KVM for KVM
-fMode=FGT_VM64_KVM
+
+# Variables
+scriptName=$(basename $0)
+scriptWd=$(dirname $0)
+pathOfNoPasswdToConfig=$scriptWd/nopasswd_to_config
+ftntBuildTarget="image.out"
+
+# Build flags
+fMode=FGT_VM64_KVM  # FGT_VM64 for VMWARE, FGT_VM64_KVM for KVM
 fModeSpecified=false
 fNumOfWorkers=$(nproc)
 fWorkingDir=$(pwd)
@@ -11,22 +17,25 @@ fRunConfigure=false
 fNeedBuild=false
 fGitClean=false
 fRemoveCompileCommandsJson=false
+# The build target
+fBuildTarget="$ftntBuildTarget"
+# The source file to sync
+fSyncFile=$fBuildTarget
+# The sync target machine
 fSyncTarget=false
 fSyncUsername="admin"
 fSyncPassword="password"
-# Variables
-scriptName=$(basename $0)
-scriptWd=$(dirname $0)
-pathOfNoPasswdToConfig=$scriptWd/nopasswd_to_config
-imageOut="image.out"
-# Git
+
+# Git associated variables
 compileCommandsFile="compile_commands.json"
 gitExcludePattern1=$compileCommandsFile
 gitExcludePattern2="\*.code-workspace"
 gitExcludeList="$gitExcludePattern1 $gitExcludePattern2"
-# Misc
+
+# Pretty print
 userNotation="@@@@"
 subUserNotation="@@@@ @"
+separator="----------------------------------------------------------------"
 
 getCurrentTime() {
     echo $(date +"%m/%d/%Y %H:%M:%S")
@@ -36,21 +45,28 @@ usage() {
     cat << _EOF
 jmake 0.2.0
 
-Usage: $scriptName [-m mode] [-w working_dir] [-j num_of_workers] [-T max_attempt] [-bcCoahf]
+Usage: $scriptName [options]
+       $scriptName [-m mode] [-w working_dir] [-j num_of_workers] [-T max_attempt]
+             [-s sync_target] [-S sync_file] [-u username] [-p password]
+             [-B build_target]
+             [-bcCoahf]
+
 Options:
-    -C      Run Configure by calling expect scripts (default: $fRunConfigure)
+    -c      Clean the repo (default: $fGitClean)
+    -C      Run Configure intelligently (default: $fRunConfigure)
     -o      Run build commands (set automatically if any of the [bmjwT] options is set)
     -a      Equivalent to -Co
     -T      Set the maximum number of attempts (default: $fMaxBuildAttempt)
-    -c      Clean the repo (default: $fGitClean)
     -b      Use Bear to generate $compileCommandsFile (default: $fUseBear)
-    -m      Set build target/mode (default: $fMode, auto detect FGT_VM64_KVM and FPX_KVM)
+    -B      Set the build target (default: $fBuildTarget)
+    -m      Set the build mode (default: $fMode, auto detect FGT_VM64_KVM and FPX_KVM)
     -j      Set the number of jobs (default: $fNumOfWorkers)
     -w      Set working directory (default: $fWorkingDir)
     -f      Remove $compileCommandsFile (default: $fRemoveCompileCommandsJson)
-    -s      Sync $imageOut to the target machine
-    -u      Set the username for sync command
-    -p      Set the password for sync command
+    -s      Sync the source file spcified by -S to the target machine.
+    -S      Set the source file to sync (default: $fSyncFile)
+    -u      Set the username for sync command (default: $fSyncUsername)
+    -p      Set the password for sync command (default: $fSyncPassword)
     -h      Print this help message
 
 Example:
@@ -63,6 +79,7 @@ Example:
     $scriptName -j4 -b
     $scriptName -T1
     $scriptName -T1 -s fgt1 -p "password" -u "admin"
+    $scriptName -T1 -s fgt1 -p "password" -u "admin" -S FGT_VM64_KVM-v7-build1662.out
     $scriptName -h
 
 _EOF
@@ -72,7 +89,7 @@ _EOF
 [[ $# -eq 0 ]] && usage
 
 # Parse the options
-while getopts "hm:w:j:cCboafT:s:p:u:" opt; do
+while getopts "hm:w:j:cCbB:oafT:s:S:p:u:" opt; do
     case $opt in
         m)
             fMode=$OPTARG
@@ -94,8 +111,12 @@ while getopts "hm:w:j:cCboafT:s:p:u:" opt; do
             ;;
         b)
             fUseBear=true
-            fNeedBuild=true
             fRemoveCompileCommandsJson=true
+            fNeedBuild=true
+            ;;
+        B)
+            fBuildTarget=$OPTARG
+            fNeedBuild=true
             ;;
         C)
             fRunConfigure=true
@@ -111,6 +132,9 @@ while getopts "hm:w:j:cCboafT:s:p:u:" opt; do
             ;;
         s)
             fSyncTarget=$OPTARG
+            ;;
+        S)
+            fSyncFile=$OPTARG
             ;;
         u)
             fSyncUsername=$OPTARG
@@ -145,33 +169,35 @@ fi
 
 # Check the working directory
 if [[ -x "$(command -v realpath)" ]]; then
-    fWorkingDir=$(realpath $fWorkingDir)
+    fWorkingDir=$(realpath "$fWorkingDir")
 fi
 if [[ ! -d "$fWorkingDir" ]]; then
     echo "$userNotation Directory $fWorkingDir not found"
     exit 1
 fi
 
+echo "$separator"
 echo "$userNotation Set working directory to $fWorkingDir"
+echo "$userNotation Set build target to $fBuildTarget"
 echo "$userNotation Set build mode to $fMode"
-echo "$userNotation Set number of concurrent jobs to $fNumOfWorkers"
+echo "$userNotation Set number of concurrent build jobs to $fNumOfWorkers"
 if [[ "$fUseBear" == true ]]; then
     echo "$userNotation Use bear to generate compile_commands.json"
-    if [[ "$RemoveCompileCommandsJson" == true ]]; then
+    if [[ "$fRemoveCompileCommandsJson" == true ]]; then
         echo "$userNotation Will remove compile_commands.json if exists"
     fi
 fi
 
 if [[ "$fSyncTarget" != false ]]; then
-    echo "$userNotation Scheduled to sync image.out to $fSyncTarget after build"
-    echo "$subUserNotation Set scp username to $fSyncUsername"
-    echo "$subUserNotation Set scp password to $fSyncPassword"
+    echo "$userNotation Scheduled to sync $fSyncFile to $fSyncTarget"
+    echo "$subUserNotation with username $fSyncUsername and password $fSyncPassword"
 fi
+echo "$separator"
 
 # Clean the working directory
 if [[ "$fGitClean" == true ]]; then
     echo "$userNotation Cleaning the working directory ..."
-    cd $fWorkingDir
+    cd "$fWorkingDir" || exit
     gitExcludePattern=""
     for patt in $gitExcludeList; do
         if [[ "$fRemoveCompileCommandsJson" == true ]]; then
@@ -210,9 +236,9 @@ if [[ "$fRunConfigure" == true ]]; then
     sleep 1
 
     if [[ "$fModeSpecified" == true ]]; then
-        $expectPath -f $pathOfNoPasswdToConfig $fWorkingDir $fMode
+        $expectPath -f "$pathOfNoPasswdToConfig" "$fWorkingDir" "$fMode"
     else
-        $expectPath -f $pathOfNoPasswdToConfig $fWorkingDir
+        $expectPath -f "$pathOfNoPasswdToConfig" "$fWorkingDir"
     fi
 
     if [[ $? -ne 0 ]]; then
@@ -224,8 +250,8 @@ fi
 # Step 2: Run build commands
 if [[ "$fNeedBuild" != false ]]; then
     # Make make command
-    cd $fWorkingDir
-    makeCommand="make -j$fNumOfWorkers $imageOut"
+    cd "$fWorkingDir" || exit
+    makeCommand="make -j$fNumOfWorkers $fBuildTarget"
 
     # Use Bear to generate compile_commands.json
     if [[ "$fUseBear" == true ]]; then
@@ -239,7 +265,7 @@ if [[ "$fNeedBuild" != false ]]; then
         if [[ "$pathOfLibear" != "" ]]; then
             bear="bear -l $pathOfLibear"
         else
-            local defaultLiBearPath="/usr/lib/x86_64-linux-gnu/bear/libear.so"
+            defaultLiBearPath="/usr/lib/x86_64-linux-gnu/bear/libear.so"
             if [[ ! -f "$defaultLiBearPath" ]]; then
                 echo "$userNotation libear.so not found, please install it first"
                 echo "$userNotation sudo apt install libear -y"
@@ -257,7 +283,7 @@ if [[ "$fNeedBuild" != false ]]; then
         echo "$userNotation Detected $jsonPath is read-only"
         if [[ "$fRemoveCompileCommandsJson" == true ]]; then
             echo "$subUserNotation Remove $jsonPath"
-            rm -f $jsonPath
+            rm -f "$jsonPath"
             if [[ $? -ne 0 ]]; then
                 echo "$subUserNotation Failed to remove $jsonPath"
                 exit 1
@@ -295,7 +321,7 @@ if [[ "$fNeedBuild" != false ]]; then
     if [[ -f "$jsonPath" && -w "$jsonPath" ]]; then
         echo "$userNotation $jsonPath is writable"
         echo "$userNotation Remove the write privilege of $jsonPath"
-        chmod -w $jsonPath
+        chmod -w "$jsonPath"
         if [[ $? -ne 0 ]]; then
             echo "$userNotation Failed to remove the write privilege of $jsonPath"
             exit 1
@@ -305,9 +331,45 @@ if [[ "$fNeedBuild" != false ]]; then
     echo "$userNotation Congratulations! You have built projects successfully at $(getCurrentTime)."
 fi
 
+# Here is the real expect script
+#expect -c '                                                                                                      [30/48592]
+#      for {set i 1} {$i <= 5} {incr i} {
+#          set timeout 10
+#          send_user "@@@@ @ Attempt $i/5\n"
+#
+#          spawn -noecho scp /data/fos2/image.out admin@fgt1:/fgt-image
+#          expect {
+#              "*assword:" {
+#                  send "password\r"
+#                  exp_continue
+#              }
+#              "yes/no" {
+#                  send "yes\r"
+#                  exp_continue
+#              }
+#              "Host key verification failed." {
+#                  send_user "@@@@ @ Host key verification failed. Updating known_hosts file...\n"
+#                  system "ssh-keygen -R fgt1"
+#                  send_user "@@@@ @ Host key removed from known_hosts file. Retrying SCP...\n"
+#                  continue
+#              }
+#              eof {
+#                  break
+#              }
+#          }
+#      }
+#  '
+
+# Step 3: Sync the sync_file to the target machine
 if [[ "$fSyncTarget" != false ]]; then
-    imageOutFile=$(find "$fWorkingDir" -name image.out)
-    echo "$userNotation Syncing $imageOutFile to $fSyncTarget"
+    syncFiles=($(find "$fWorkingDir" -name "$fSyncFile"))
+    if [[ ${#syncFiles[@]} -eq 0 ]]; then
+        echo "$userNotation $fSyncFile not found in $fWorkingDir"
+        exit 1
+    fi
+    # Only sync the first file found
+    syncFile="${syncFiles[0]}"
+    echo "$userNotation Syncing $syncFile to $fSyncTarget"
 
     maxSyncRetries=5
     ESUCCESS=0
@@ -321,10 +383,10 @@ if [[ "$fSyncTarget" != false ]]; then
         set adjustTimeout 0
         set waitBeforeRetry 10
 
-        # Loop to sync the image.out
+        # Loop to sync the file
         for {set i 1} {\$i <= $maxSyncRetries} {incr i} {
             send_user \"$subUserNotation Sync attempt \$i/$maxSyncRetries\n\"
-            spawn -noecho scp $imageOutFile ${fSyncUsername}@${fSyncTarget}:/fgt-image
+            spawn -noecho scp $syncFile ${fSyncUsername}@${fSyncTarget}:/fgt-image
             if {\$adjustTimeout != 0} {
                 set timeout \$adjustTimeout
             } else {
@@ -382,49 +444,20 @@ if [[ "$fSyncTarget" != false ]]; then
 
     case $retValue in
         0)
-            echo "$userNotation Congratulations! You have synced $imageOut to $fSyncTarget successfully at $(getCurrentTime)."
+            echo "$userNotation You have synced $fSyncFile to $fSyncTarget successfully at $(getCurrentTime)."
             exit 0
             ;;
         $EMAXTRIES)
-            echo "$userNotation Failed to sync $imageOut to $fSyncTarget after $maxSyncRetries attempts"
+            echo "$userNotation Failed to sync $fSyncFile to $fSyncTarget after $maxSyncRetries attempts"
             exit $EMAXTRIES
             ;;
         $ETIMEOUT)
-            echo "$userNotation Timeout to sync $imageOut to $fSyncTarget"
+            echo "$userNotation Timeout to sync $fSyncFile to $fSyncTarget"
             exit $ETIMEOUT
             ;;
         *)
-            echo "$userNotation Failed to sync $imageOut to $fSyncTarget"
+            echo "$userNotation Failed to sync $fSyncFile to $fSyncTarget"
             exit $EFAILED
             ;;
     esac
 fi
-
-# Here is the real expect script
-#expect -c '                                                                                                      [30/48592]
-#      for {set i 1} {$i <= 5} {incr i} {
-#          set timeout 10
-#          send_user "@@@@ @ Attempt $i/5\n"
-#
-#          spawn -noecho scp /data/fos2/image.out admin@fgt1:/fgt-image
-#          expect {
-#              "*assword:" {
-#                  send "password\r"
-#                  exp_continue
-#              }
-#              "yes/no" {
-#                  send "yes\r"
-#                  exp_continue
-#              }
-#              "Host key verification failed." {
-#                  send_user "@@@@ @ Host key verification failed. Updating known_hosts file...\n"
-#                  system "ssh-keygen -R fgt1"
-#                  send_user "@@@@ @ Host key removed from known_hosts file. Retrying SCP...\n"
-#                  continue
-#              }
-#              eof {
-#                  break
-#              }
-#          }
-#      }
-#  '
