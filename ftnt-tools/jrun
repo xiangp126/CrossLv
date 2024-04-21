@@ -5,6 +5,7 @@ session_id="log"
 window_id="1"
 pane_id="1"
 user_notation="@@@@"
+# It's a dos file, with CRLF(^M) line endings.
 command_file="/data/bugzilla/commands.txt"
 tmux_prefix="C-x"
 

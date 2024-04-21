@@ -282,7 +282,7 @@ if [[ "$fNeedBuild" != false ]]; then
     if [[ -f "$jsonPath" && ! -w "$jsonPath" ]]; then
         echo "$userNotation Detected $jsonPath is read-only"
         if [[ "$fRemoveCompileCommandsJson" == true ]]; then
-            echo "$subUserNotation Remove $jsonPath"
+            echo "$subUserNotation Removing $jsonPath"
             rm -f "$jsonPath"
             if [[ $? -ne 0 ]]; then
                 echo "$subUserNotation Failed to remove $jsonPath"
