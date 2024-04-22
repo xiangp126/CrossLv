@@ -1,16 +1,25 @@
 #!/bin/bash
 
+if [ ! -f ~/.gdbinit ]; then
+    echo "No ~/.gdbinit file found"
+    exit 2
+fi
+commandPrefix=""
+
 gdbLogFile=$(eval echo "$(grep -oP '(?<=set logging file ).*' ~/.gdbinit)")
+if [ -n "$1" ]; then
+    gdbLogFile="/root/.gdb.log"
+    commandPrefix="sudo"
+fi
 
 if [ ! -f "$gdbLogFile" ]; then
-    # if not exist, create it
-    touch "$gdbLogFile"
+    $commandPrefix touch "$gdbLogFile"
 fi
 
 if ! command -v bat &> /dev/null
 then
-    tail -f "$gdbLogFile"
+    $commandPrefix tail -f "$gdbLogFile"
     exit
 fi
 
-tail -f "$gdbLogFile" | bat --paging=never -p --color=always -l c
+$commandPrefix tail -f "$gdbLogFile" | bat --paging=never -p --color=always -l c
