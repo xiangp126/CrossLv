@@ -1,7 +1,49 @@
 #!/bin/bash
 
-if [ -z "$1" ]; then
-    echo "Usage: frg <search term>"
+scriptName=$(basename $0)
+userNotation="@@@@"
+fUseVim=false
+EDITOR="code"
+
+usage() {
+    cat << _EOF_
+$scriptName v0.0
+
+Usage: $scriptName [-v] <search term>
+
+Options:
+    -v: open the file in vim (default is code)
+
+Example: $scriptName "search term"
+         $scriptName -v "search term"
+
+Notice: The search term must be the last argument!
+
+_EOF_
+    exit 1
+}
+
+[[ $# -eq 0 ]] && usage
+
+# parse the arguments, -v is for vim, -c is for code
+while getopts "hv" opt; do
+    case ${opt} in
+        v)
+            fUseVim=true
+            ;;
+        h)
+            usage
+            ;;
+        \?)
+            echo "Invalid option: $OPTARG" 1>&2
+            exit 1
+            ;;
+    esac
+done
+
+shift $((OPTIND -1))
+if [ $# -eq 0 ]; then
+    echo "$userNotation No search term provided"
     exit 1
 fi
 
@@ -20,18 +62,21 @@ result=$(rg --smart-case \
             --query "$query_removed_escapes")
 
 if [ -z "$result" ]; then
+    echo "$userNotation No match found for: $query"
     exit 1
 fi
 
 file="${result%%:*}"
 linenumber=$(echo "${result}" | cut -d: -f2)
 
-EDITOR="vim"
-if [ ! -z "$file" ]; then
-    if [ -x "$(command -v code)" ]; then
-        EDITOR="code"
-        $EDITOR "$file":"$linenumber"
-    else
-        $EDITOR +"${linenumber}" "$file"
-    fi
+if [ "$fUseVim" = true ]; then
+    EDITOR="vim"
+    $EDITOR +"${linenumber}" "$file"
+    exit 0
 fi
+
+if ! command -v $EDITOR &> /dev/null; then
+    echo "$userNotation $EDITOR is not installed"
+    exit 1
+fi
+$EDITOR "$file":"$linenumber"
