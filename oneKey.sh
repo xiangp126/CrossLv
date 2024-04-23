@@ -336,27 +336,6 @@ _EOF
     sudo ln -sf /bin/bash /bin/sh
 }
 
-installSolarizedColorScheme() {
-    cat << _EOF
-Install Solarized Color Scheme for VIM
-_EOF
-    if [ -f ~/.vim/colors/solarized.vim ]; then
-        echo "$beautifyGap1 solarized.vim already exists, skip"
-        return
-    fi
-
-    if [ ! -d ~/.vim/colors ]; then
-        mkdir -p ~/.vim/colors
-    fi
-
-    solarizedSrc=$HOME/.vim/bundle/vim-colors-solarized/colors/solarized.vim
-    if [ ! -f $solarizedSrc ]; then
-        echo "$beautifyGap2 solarized.vim not found, skip"
-        exit
-    fi
-    cp  $solarizedSrc $HOME/.vim/colors/
-}
-
 installVimPlugs (){
     cat << _EOF
 $catBanner
@@ -368,28 +347,26 @@ _EOF
         exit
     fi
 
-    if [ -d ~/.vim/autoload ]; then
-        vim +PlugInstall +PlugUpdate +qall
-        installSolarizedColorScheme
-        return
-    fi
+    # if [ -d ~/.vim/autoload ]; then
+    #     vim +PlugInstall +PlugUpdate +qall
+    #     return
+    # fi
 
     # use the `--insecure`` option to avoid certificate check
     curl --insecure -fLo ~/.vim/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
     # Comment out the line in .vimrc starts with colorscheme
-    if grep -q "colorscheme" ~/.vimrc; then
-        sed -i 's/^colorscheme/\" colorscheme/g' ~/.vimrc
-    fi
+    # if grep -q "colorscheme" ~/.vimrc; then
+    #     sed -i 's/^colorscheme/\" colorscheme/g' ~/.vimrc
+    # fi
 
     vim +PlugInstall +PlugUpdate +qall
-    installSolarizedColorScheme
 
     # Uncomment the line in .vimrc starts with colorscheme
-    if grep -q "\" colorscheme" ~/.vimrc; then
-        sed -i 's/^\" colorscheme/colorscheme/g' ~/.vimrc
-    fi
+    # if grep -q "\" colorscheme" ~/.vimrc; then
+    #     sed -i 's/^\" colorscheme/colorscheme/g' ~/.vimrc
+    # fi
 }
 
 installTrackedFiles() {
