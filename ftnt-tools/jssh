@@ -39,6 +39,8 @@ for {set i 1} {$i <= $max_iterations} {incr i} {
             continue
         }
         eof {
+            puts "Reached EOF. Exiting..."
+            exit 1
         }
         timeout {
             # Handle timeout actions, such as error handling

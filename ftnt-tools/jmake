@@ -7,7 +7,7 @@ pathOfNoPasswdToConfig=$scriptWd/nopasswd_to_config
 ftntBuildTarget="image.out"
 
 # Build flags
-fMode=FGT_VM64_KVM  # FGT_VM64 for VMWARE, FGT_VM64_KVM for KVM
+fMode=FGT_VM64_KVM  # FOS: FGT_VM64 for VMWARE, FGT_VM64_KVM for KVM
 fModeSpecified=false
 fNumOfWorkers=$(nproc)
 fWorkingDir=$(pwd)
@@ -379,7 +379,7 @@ if [[ "$fSyncTarget" != false ]]; then
     # In Expect tcl, \$i will keep as $i in the spawned shell
     expect -c "
         # Set the initial values
-        set defaultTimeout 15
+        set defaultTimeout 120
         set adjustTimeout 0
         set waitBeforeRetry 10
 

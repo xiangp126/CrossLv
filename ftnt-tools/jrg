@@ -9,13 +9,13 @@ usage() {
     cat << _EOF_
 $scriptName v0.0
 
-Usage: $scriptName [-v] <search term>
+Usage: $scriptName [-m] <search term>
 
 Options:
     -v: open the file in vim (default is code)
 
 Example: $scriptName "search term"
-         $scriptName -v "search term"
+         $scriptName -m "search term"
 
 Notice: The search term must be the last argument!
 
@@ -26,9 +26,9 @@ _EOF_
 [[ $# -eq 0 ]] && usage
 
 # parse the arguments, -v is for vim, -c is for code
-while getopts "hv" opt; do
+while getopts "hm" opt; do
     case ${opt} in
-        v)
+        m)
             fUseVim=true
             ;;
         h)

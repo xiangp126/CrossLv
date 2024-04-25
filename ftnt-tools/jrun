@@ -29,6 +29,8 @@ Examples:
 Tips:
     Type $tmux_prefix, then q to view the pane number within the tmux window.
     Type $tmux_prefix, then s to view the session name in tmux.
+    use // to comment out a line in the command file.
+    use ! to omit the rest of the commands in the command file.
 
 _EOF
     exit
@@ -92,14 +94,24 @@ tail -n +1 "$command_file" | while IFS= read -r command; do
 	# 3. Clears any leading spaces that remain after the previous operations.
 	cleaned_command=$(sed '/^[[:space:]]*\/\//d; s/.*[:#]//; s/^[[:space:]]*//' <<< "$command")
 
+	# If the cleaned command starts with an exclamation mark, exit
+    if [[ ${cleaned_command:0:1} == "!" ]]; then
+        exit 0
+    fi
+
     if [[ -z "$cleaned_command" ]]; then
         # echo "$user_notation Cleaned command: Empty"
         continue
     fi
+
 	# echo "$user_notation Original command: $command"
 	echo "$user_notation Cleaned command: $cleaned_command"
 
+    # Because there's a '\r\n' ending in each command already,
+    # We don't need to add an 'Enter' at the end of the send-keys command anymore.
+    # tmux send-keys -t "$session_id:$window_id.$pane_id" "$cleaned_command" Enter
     tmux send-keys -t "$session_id:$window_id.$pane_id" "$cleaned_command"
+
 	if [[ $? -ne 0 ]]; then
 		echo "$user_notation Failed to send command: $cleaned_command"
 		exit 1
