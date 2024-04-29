@@ -83,7 +83,7 @@ Example:
     $scriptName -h
 
 _EOF
-    exit
+    exit 0
 }
 
 [[ $# -eq 0 ]] && usage
@@ -151,7 +151,6 @@ while getopts "hm:w:j:cCbB:oafT:s:S:p:u:" opt; do
             ;;
         h)
             usage
-            exit 0
             ;;
         ?)
             echo "$userNotation Invalid option: -$OPTARG" >&2

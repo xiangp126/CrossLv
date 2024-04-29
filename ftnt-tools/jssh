@@ -1,64 +1,108 @@
-#!/usr/bin/expect
+#!/bin/bash
 
-if {$argc < 1} {
-    puts "Usage: $argv0 <fgt2> \[password\]"
-    puts "Example: $argv0 fgt2"
+scriptName=$(basename $0)
+user_notation="@@@@"
+password=""
+login_user="admin"
+fgt_name="fgt1"
+max_iterations=2
+
+usage() {
+cat << _EOF
+
+usage:
+    $scriptName [-p password] [-u user] fgt_name/fgt_ip
+    -> fgt_name/fgt_ip must be the last argument
+
+Options:
+    -p password     Password to use for login. Default is "$password"
+    -u user         User to use for login. Default is "$login_user"
+
+    fgt_name        Name or IP address of the Fortigate device to connect to. Default is "$fgt_name"
+
+Example:
+    $scriptName -p 123 -u admin fgt1
+    $scriptName -p 123 -u admin 172.16.67.181
+    $scriptName -p 123 172.16.67.181
+
+_EOF
+    exit 0
+}
+
+# Parse command-line options
+while getopts "p:u:h" opt; do
+    case ${opt} in
+        p)
+            password=$OPTARG
+            ;;
+        u)
+            login_user=$OPTARG
+            ;;
+        h)
+            usage
+            ;;
+        ?)
+            echo "$userNotation Invalid option: -$OPTARG" >&2
+            exit 1
+            ;;
+    esac
+done
+
+shift $((OPTIND -1))
+
+if [ -z "$1" ]; then
+    echo "No Fortigate name provided"
     exit 1
-}
+else
+    fgt_name=$1
+fi
 
-# Check if the password argument is provided
-if {$argc > 1} {
-    set password [lindex $argv 1]
-} else {
-    set password "fos"
-}
-set user "admin"
-set user_notation "@@@@"
-set fgt_prompt "# "
-set fgt_name [lindex $argv 0]
-set max_iterations 2
+expect -c "
+    set fgt_prompt \"# \"
 
-for {set i 1} {$i <= $max_iterations} {incr i} {
-    # ssh -o StrictHostKeyChecking=no $fgt_name
-    spawn -noecho ssh $user@$fgt_name
+    for {set i 1} {\$i <= $max_iterations} {incr i} {
+        # ssh -o StrictHostKeyChecking=no $fgt_name
+        # send_user \"$subUserNotation Sync attempt \$i/$max_iterations\n\"
+        spawn -noecho ssh $login_user@$fgt_name
 
-    expect {
-        {yes/no} {
-            send "yes\r"
-            exp_continue
-        }
-        -re {[Pp]assword} {
-            send "fos\r"
-            exp_continue
-        }
-        "Host key verification failed." {
-            send_user "$user_notation Host key verification failed. Updating known_hosts file...\n"
-            system "ssh-keygen -R $fgt_name"
-            send_user "$user_notation Host key removed from known_hosts file.\n"
-            send_user "$user_notation Retrying SSH immediately...\n"
-            continue
-        }
-        eof {
-            puts "Reached EOF. Exiting..."
-            exit 1
-        }
-        timeout {
-            # Handle timeout actions, such as error handling
-            puts "Timed out waiting for a response."
-            exit 1
-        }
-        $fgt_prompt {
-            puts "$user_notation Successfully connected to $fgt_name"
-            break
+        expect {
+            {yes/no} {
+                send \"yes\r\"
+                exp_continue
+            }
+            -re {[Pp]assword} {
+                send \"$password\r\"
+                exp_continue
+            }
+            \"Host key verification failed.\" {
+                send_user \"$user_notation Host key verification failed. Updating known_hosts file...\n\"
+                system \"ssh-keygen -R $fgt_name\"
+                send_user \"$user_notation Host key removed from known_hosts file.\n\"
+                send_user \"$user_notation Retrying SSH immediately...\n\"
+                continue
+            }
+            eof {
+                puts \"Reached EOF. Exiting...\"
+                exit 1
+            }
+            timeout {
+                # Handle timeout actions, such as error handling
+                puts \"Timed out waiting for a response.\"
+                exit 1
+            }
+            \$fgt_prompt {
+                puts \"$user_notation Successfully connected to $fgt_name\"
+                break
+            }
         }
     }
-}
 
-send "\r"
-expect $fgt_prompt
+    send \"\r\"
+    expect \$fgt_prompt
 
-# Now you can add additional commands or interactions as needed
-# For example, you can automate further commands here
+    # Now you can add additional commands or interactions as needed
+    # For example, you can automate further commands here
 
-# Interact with the device
-interact
+    # Interact with the device
+    interact
+"
