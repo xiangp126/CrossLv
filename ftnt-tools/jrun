@@ -6,7 +6,7 @@ window_id="1"
 pane_id="1"
 user_notation="@@@@"
 # It's a dos file, with CRLF(^M) line endings.
-command_file="/data/bugzilla/commands.txt"
+command_file="/data/bugzilla/commands.c"
 tmux_prefix="C-x"
 
 usage() {

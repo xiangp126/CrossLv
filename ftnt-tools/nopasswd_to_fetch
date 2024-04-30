@@ -24,6 +24,7 @@ repos=(
     "/data/fos"
     "/data/fos2"
     "/data/fpx"
+    "/data/fpx2"
     "/data/sandbox/fos_repro"
     "/data/sandbox/fpx_repro"
     "/data/sandbox/fortios-ci"

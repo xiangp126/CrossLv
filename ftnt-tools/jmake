@@ -49,13 +49,12 @@ Usage: $scriptName [options]
        $scriptName [-m mode] [-w working_dir] [-j num_of_workers] [-T max_attempt]
              [-s sync_target] [-S sync_file] [-u username] [-p password]
              [-B build_target]
-             [-bcCoahf]
+             [-bcCohf]
 
 Options:
     -c      Clean the repo (default: $fGitClean)
     -C      Run Configure intelligently (default: $fRunConfigure)
     -o      Run build commands (set automatically if any of the [bmjwT] options is set)
-    -a      Equivalent to -Co
     -T      Set the maximum number of attempts (default: $fMaxBuildAttempt)
     -b      Use Bear to generate $compileCommandsFile (default: $fUseBear)
     -B      Set the build target (default: $fBuildTarget)
@@ -72,7 +71,6 @@ Options:
 Example:
     $scriptName -C  // Only run Configure
     $scriptName -o  // Only run build commands
-    $scriptName -a  // Run Configure and build commands
     $scriptName -m FGT_VM64_KVM -j4 -bC
     $scriptName -m FGT_VM64_KVM -j4 -bc
     $scriptName -bc
@@ -89,12 +87,11 @@ _EOF
 [[ $# -eq 0 ]] && usage
 
 # Parse the options
-while getopts "hm:w:j:cCbB:oafT:s:S:p:u:" opt; do
+while getopts "hm:w:j:cCbB:ofT:s:S:p:u:" opt; do
     case $opt in
         m)
             fMode=$OPTARG
             fModeSpecified=true
-            fRunConfigure=true
             fNeedBuild=true
             ;;
         w)
@@ -124,8 +121,6 @@ while getopts "hm:w:j:cCbB:oafT:s:S:p:u:" opt; do
         c)
             # Ignore compile_commands.json by default
             fGitClean=true
-            # If -c is set, run configure by default
-            fRunConfigure=true
             ;;
         f)
             fRemoveCompileCommandsJson=true
@@ -145,10 +140,6 @@ while getopts "hm:w:j:cCbB:oafT:s:S:p:u:" opt; do
         o)
             fNeedBuild=true
             ;;
-        a)
-            fRunConfigure=true
-            fNeedBuild=true
-            ;;
         h)
             usage
             ;;
@@ -164,6 +155,11 @@ shift $((OPTIND - 1))
 if [[ $# -gt 0 ]]; then
     echo "$userNotation Illegal non-option arguments: $@"
     exit
+fi
+
+# If fNeedBuild is set, then set fRunConfigure to true as well
+if [[ "$fNeedBuild" == true ]]; then
+    fRunConfigure=true
 fi
 
 # Check the working directory
@@ -189,7 +185,7 @@ fi
 
 if [[ "$fSyncTarget" != false ]]; then
     echo "$userNotation Scheduled to sync $fSyncFile to $fSyncTarget"
-    echo "$subUserNotation with username $fSyncUsername and password $fSyncPassword"
+    echo "$subUserNotation with username ($fSyncUsername) and password ($fSyncPassword)"
 fi
 echo "$separator"
 
