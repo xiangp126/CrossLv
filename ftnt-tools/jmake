@@ -185,7 +185,7 @@ fi
 
 if [[ "$fSyncTarget" != false ]]; then
     echo "$userNotation Scheduled to sync $fSyncFile to $fSyncTarget"
-    echo "$subUserNotation with username ($fSyncUsername) and password ($fSyncPassword)"
+    echo "$subUserNotation username ($fSyncUsername) and password ($fSyncPassword)"
 fi
 echo "$separator"
 
