@@ -501,7 +501,16 @@
 	"when": "editorTextFocus && config.gitlens.keymap == 'chorded' && gitlens:activeFileStatus =~ /tracked/"
 },
 {
+	"key": "ctrl+f",
+	"command": "-actions.find",
+	"when": "editorFocus || editorIsOpen"
+},
+{
+	"key": "ctrl+f",
+	"command": "actions.find"
+},
+{
 	"key": "f3",
-	"command": "actions.findWithSelection"
+	"command": "actions.find"
 }
 ]

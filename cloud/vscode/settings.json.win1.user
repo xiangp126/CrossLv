@@ -29,20 +29,122 @@
         "remoteclient1": "linux"
     },
     "telemetry.telemetryLevel": "off",
-    "terminal.integrated.enableMultiLinePasteWarning": false,
+    "terminal.integrated.enableMultiLinePasteWarning": "never",
     "editor.accessibilitySupport": "off",
     "editor.indentSize": "tabSize",
     "files.watcherExclude": {
-        "**/.venv/**": true
+        "**/.venv/**": true,
+        "**/.vscode-server": true
     },
     "terminal.integrated.fontSize": 17,
     "update.enableWindowsBackgroundUpdates": false,
     "terminal.integrated.copyOnSelection": true,
     "window.autoDetectColorScheme": true,
     "workbench.colorCustomizations": {
-        "terminal.foreground": "#b7b7b7",
+        // "terminal.foreground": "#b7b7b7",
+        "terminal.foreground": "#adadad",
         "terminal.background": "#1a1a1a",
         "tab.activeBorderTop": "#989c9a",
+        "terminal.ansiBrightYellow": "#c8a417",
+        "terminal.ansiYellow": "#c8a417"
+    },
+    "editor.tokenColorCustomizations": {
+        // Setting -> Inspect Editor Tokens and Scopes
+        "textMateRules": [
+            {
+                "scope": "support.type.property-name",
+                "settings": {
+                    // "foreground": "#9CDCFE",
+                    "foreground": "#89c2e2",
+                },
+            },
+            {
+                "scope": "variable.other.enummember",
+                "settings": {
+                    // "foreground": "#4FC1FF",
+                    "foreground": "#55b6eb",
+                },
+            },
+            {
+                "scope": "variable.parameter",
+                "settings": {
+                    // "foreground": "#9CDCFE",
+                    "foreground": "#86bbd7",
+                },
+            },
+            {
+                "scope": "variable.other.property",
+                "settings": {
+                    // "foreground": "#9CDCFE",
+                    "foreground": "#bfbdbd",
+                },
+            },
+            {
+                "scope": "variable.other.readwrite",
+                "settings": {
+                    // "foreground": "#9CDCFE",
+                    "foreground": "#bfbdbd",
+                },
+            },
+            {
+                "scope": "entity.name.function",
+                "settings": {
+                    // "foreground": "#DCDCAA",
+                    // "foreground": "#da76da",
+                    // "foreground": "#b5cea8",
+                    "foreground": "#d8967b",
+                },
+            },
+            {
+                "scope": "string.quoted.double",
+                "settings": {
+                    // "foreground": "#CE9178",
+                    "foreground": "#bfbf9f",
+                },
+            },
+            {
+                "scope": "support.function",
+                "settings": {
+                    // "foreground": "#DCDCAA",
+                    "foreground": "#c6c683",
+                    // "fontStyle": "bold"
+                },
+            },
+            {
+                "scope": "entity.name.type.class",
+                "settings": {
+                    // "foreground": "#4EC9B0",
+                    "foreground": "#48b6a0",
+                },
+            },
+            {
+                "scope": "punctuation.section.parameters",
+                "settings": {
+                    "foreground": "#e19595",
+                }
+            },
+            {
+                "scope": "variable.other.normal",
+                "settings": {
+                    // "foreground": "#9CDCFE",
+                    "foreground": "#89c8ea",
+                },
+            },
+            {
+                "scope": "keyword.control",
+                "settings": {
+                    // "foreground": "#C586C0",
+                    "foreground": "#dd90d7",
+                },
+            },
+            {
+                "scope": "variable.other.assignment",
+                "settings": {
+                    // "foreground": "#9CDCFE",
+                    "foreground": "#93cfef",
+                },
+            }
+        ]
     },
     "debug.console.acceptSuggestionOnEnter": "on",
     "debug.console.fontFamily": "Monaco",
@@ -94,4 +196,7 @@
     "C_Cpp.intelliSenseEngine": "disabled",
     "editor.fontSize": 16,
     "settingsSync.keybindingsPerPlatform": false,
+    "files.exclude": {
+        "**/.vscode-server": true
+    },
 }
