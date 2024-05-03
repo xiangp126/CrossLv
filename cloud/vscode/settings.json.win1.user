@@ -45,8 +45,10 @@
         "terminal.foreground": "#adadad",
         "terminal.background": "#1a1a1a",
         "tab.activeBorderTop": "#989c9a",
-        "terminal.ansiBrightYellow": "#c8a417",
-        "terminal.ansiYellow": "#c8a417"
+        "terminal.ansiBrightYellow": "#d3ae18",
+        "terminal.ansiYellow": "#d3ae18",
+        "terminal.ansiBrightRed": "#d71a1a",
+        "terminal.ansiGreen": "#1db9c4"
     },
     "editor.tokenColorCustomizations": {
         // Setting -> Inspect Editor Tokens and Scopes
@@ -69,7 +71,7 @@
                 "scope": "variable.parameter",
                 "settings": {
                     // "foreground": "#9CDCFE",
-                    "foreground": "#86bbd7",
+                    "foreground": "#9dcae1",
                 },
             },
             {
@@ -87,11 +89,23 @@
                 },
             },
             {
+                "scope": "source.c",
+                "settings": {
+                    // "foreground": "#9CDCFE",
+                    "foreground": "#bbbbbb",
+                },
+            },
+            {
+                "scope": "constant.numeric.decimal.c",
+                "settings": {
+                    // "foreground": "#b5cea8",
+                    "foreground": "#a6c497",
+                },
+            },
+            {
                 "scope": "entity.name.function",
                 "settings": {
                     // "foreground": "#DCDCAA",
-                    // "foreground": "#da76da",
-                    // "foreground": "#b5cea8",
                     "foreground": "#d8967b",
                 },
             },
@@ -143,7 +157,7 @@
                     // "foreground": "#9CDCFE",
                     "foreground": "#93cfef",
                 },
-            }
+            },
         ]
     },
     "debug.console.acceptSuggestionOnEnter": "on",

@@ -137,7 +137,7 @@ hi rubysymbol guifg=#7697d6 guibg=NONE guisp=NONE gui=NONE ctermfg=110 ctermbg=N
 hi rubycontrol guifg=#7597c6 guibg=NONE guisp=NONE gui=NONE ctermfg=110 ctermbg=NONE cterm=NONE
 hi rubyidentifier guifg=#c6b6fe guibg=NONE guisp=NONE gui=NONE ctermfg=147 ctermbg=NONE cterm=NONE
 
-" ---- PENG modify
+" ---- Self modify
 hi LineNr term=underline ctermfg=59 ctermbg=NONE
 hi normal ctermfg=249 ctermbg=NONE cterm=NONE
 hi Function ctermfg=137 guifg=#fad07a
@@ -159,6 +159,6 @@ hi Label ctermfg=132 ctermbg=None
 hi Repeat ctermfg=137 ctermbg=None term=None
 " ------------------ leaderf use ------------------
 hi CursorLineNr ctermfg=130 term=underline
-" hi Comment ctermfg=Grey guifg=green
+hi Comment ctermfg=102 guifg=green
 " ------------- visual mode selection --------------------
 " hi Visual ctermfg=Grey ctermbg=237 term=Bold
