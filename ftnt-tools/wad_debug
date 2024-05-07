@@ -40,7 +40,7 @@ proc is_valid_ipv4 {ip} {
 }
 
 # check if the parameter is a valid IPv4 address or a FortiGate name
-if {$fgt_dev ni {"fgt1" "fgt2" "fpx1"}} {
+if {$fgt_dev ni {"fgt1" "fgt2" "fpx1" "fpx3"}} {
     if {![is_valid_ipv4 $fgt_dev]} {
         puts "Invalid FortiGate name or IP address: $fgt_dev"
         exit 1

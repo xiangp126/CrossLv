@@ -185,7 +185,7 @@ fi
 
 if [[ "$fSyncTarget" != false ]]; then
     echo "$userNotation Scheduled to sync $fSyncFile to $fSyncTarget"
-    echo "$subUserNotation username ($fSyncUsername) and password ($fSyncPassword)"
+    echo "$subUserNotation USER ($fSyncUsername) and PWD ($fSyncPassword)"
 fi
 echo "$separator"
 
@@ -419,6 +419,10 @@ if [[ "$fSyncTarget" != false ]]; then
                 \"check image error\" {
                     send_user \"$subUserNotation Check image error. Exiting...\n\"
                     # exp_continue
+                    exit $EFAILED
+                }
+                \"lost connection\" {
+                    send_user \"$subUserNotation Lost connection. Exiting...\n\"
                     exit $EFAILED
                 }
                 timeout {
