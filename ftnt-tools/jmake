@@ -371,7 +371,9 @@ if [[ "$fSyncTarget" != false ]]; then
     EMAXTRIES=$(($maxSyncRetries + 1))
     ETIMEOUT=$(($maxSyncRetries + 10))
     EFAILED=$((ETIMEOUT + 1))
-    # In Expect tcl, \$i will keep as $i in the spawned shell
+    # If not use escape for $i, it will be replaced by the value of $i, since it is in the bash environment.
+    # But \$i will keep as $i in the expect script generated.
+    # expect -d -c "
     expect -c "
         # Set the initial values
         set defaultTimeout 120

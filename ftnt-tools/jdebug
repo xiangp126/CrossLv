@@ -162,16 +162,16 @@ expect -c "
     }
 
     send \"\r\"
-    expect $fPrompt
+    expect \"$fPrompt\"
 
     send \"diagnose debug reset\r\"
-    expect $fPrompt
+    expect \"$fPrompt\"
 
     # send \"diagnose wad debug enable all\r\"
-    # expect $fPrompt
+    # expect \"$fPrompt\"
 
     # send \"diagnose sys scanunit debug all\r\"
-    # expect $fPrompt
+    # expect \"$fPrompt\"
 
     set shell_prompt \"/ # \"
     send \"sys sh\r\"
