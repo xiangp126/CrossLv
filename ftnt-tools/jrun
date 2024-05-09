@@ -23,8 +23,8 @@ Options:
     -h      Print this help message
 
 Examples:
-    $scriptName -s log -w 9 -p 0
-    $scriptName -s log -w 9 -p 0 -f commands.txt
+    $scriptName -s log -w 8 -p 1
+    $scriptName -s log -w 8 -p 1 -f $command_file
 
 Tips:
     Type $tmux_prefix, then q to view the pane number within the tmux window.
