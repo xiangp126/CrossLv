@@ -12,7 +12,7 @@ cat << _EOF
 
 usage:
     $scriptName [-p password] [-u user] fgt_name/fgt_ip
-    -> fgt_name/fgt_ip must be the last argument
+    ---> fgt_name/fgt_ip must be the last argument
 
 Options:
     -p password     Password to use for login. Default is "$password"
