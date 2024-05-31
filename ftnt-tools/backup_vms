@@ -14,6 +14,11 @@ fi
 # List all running VMs and store them in an array
 vms=($(virsh list --all --name))
 
+if [ -n "$1" ]; then
+    echo "Backing up specified VM: $1"
+    vms=("$1")
+fi
+
 # Loop through the running VMs and create backups
 for vm in "${vms[@]}"; do
     echo "Backing up VM: $vm"

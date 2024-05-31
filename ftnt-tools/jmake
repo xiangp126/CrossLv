@@ -62,13 +62,14 @@ Options:
     -j      Set the number of jobs (default: $fNumOfWorkers)
     -w      Set working directory (default: $fWorkingDir)
     -f      Remove $compileCommandsFile (default: $fRemoveCompileCommandsJson)
-    -s      Sync the source file spcified by -S to the target machine.
+    -s      Set the target machine (default: $fSyncTarget) to sync the source file specified by -S
     -S      Set the source file to sync (default: $fSyncFile)
     -u      Set the username for sync command (default: $fSyncUsername)
     -p      Set the password for sync command (default: $fSyncPassword)
     -h      Print this help message
 
 Example:
+    $scriptName -h
     $scriptName -C  // Only run Configure
     $scriptName -o  // Only run build commands
     $scriptName -m FGT_VM64_KVM -j4 -bC
@@ -78,7 +79,7 @@ Example:
     $scriptName -T1
     $scriptName -T1 -s fgt1 -p "password" -u "admin"
     $scriptName -T1 -s fgt1 -p "password" -u "admin" -S FGT_VM64_KVM-v7-build1662.out
-    $scriptName -h
+    $scriptName -s fgt1 -S FGT_VM64_KVM-v7-build1662.out
 
 _EOF
     exit 0
