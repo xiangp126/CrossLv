@@ -81,12 +81,15 @@ expect -c "
                 send_user \"$user_notation Retrying SSH immediately...\n\"
                 continue
             }
+            \"Connection refused\" {
+                send_user \"$user_notation Connection refused. Exiting...\n\"
+                exit 1
+            }
             eof {
                 puts \"Reached EOF. Exiting...\"
                 exit 1
             }
             timeout {
-                # Handle timeout actions, such as error handling
                 puts \"Timed out waiting for a response.\"
                 exit 1
             }
