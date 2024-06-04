@@ -45,10 +45,12 @@
         "terminal.foreground": "#adadad",
         "terminal.background": "#1a1a1a",
         "tab.activeBorderTop": "#989c9a",
-        "terminal.ansiBrightYellow": "#d3ae18",
-        "terminal.ansiYellow": "#d3ae18",
-        "terminal.ansiBrightRed": "#d71a1a",
-        "terminal.ansiGreen": "#1db9c4"
+        "terminal.ansiBrightYellow": "#b49414",
+        "terminal.ansiYellow": "#d5b227",
+        "terminal.ansiBrightRed": "#c52121",
+        "terminal.ansiRed": "#c52121",
+        "terminal.ansiBrightGreen": "#12aaaf",
+        "terminal.ansiGreen": "#16afba"
     },
     "editor.tokenColorCustomizations": {
         // Setting -> Inspect Editor Tokens and Scopes
@@ -68,6 +70,13 @@
                 },
             },
             {
+                "scope": "variable.other.constant",
+                "settings": {
+                    // "foreground": "#4FC1FF",
+                    "foreground": "#58b1e2",
+                },
+            },
+            {
                 "scope": "variable.parameter",
                 "settings": {
                     // "foreground": "#9CDCFE",
@@ -79,13 +88,71 @@
                 "settings": {
                     // "foreground": "#9CDCFE",
                     "foreground": "#bfbdbd",
+                    // "foreground": "#abc3cf",
                 },
             },
             {
                 "scope": "variable.other.readwrite",
                 "settings": {
                     // "foreground": "#9CDCFE",
-                    "foreground": "#bfbdbd",
+                    "foreground": "#b7b7b7",
+                },
+            },
+            {
+                "scope": "punctuation.separator.pointer-access.c",
+                "settings": {
+                    // "foreground": "#BBBBBB",
+                    "foreground": "#c16060",
+                },
+            },
+            {
+                "scope": "punctuation.separator.dot-access.c",
+                "settings": {
+                    // "foreground": "#BBBBBB",
+                    "foreground": "#d46e6e",
+                },
+            },
+            {
+                "scope": "meta.block.c",
+                "settings": {
+                    // "foreground": "#BBBBBB",
+                    "foreground": "#df7a7a",
+                },
+            },
+            {
+                "scope": "variable.other.object.access.c",
+                "settings": {
+                    // "foreground": "#9CDCFE",
+                    "foreground": "#abd1e5",
+                },
+            },
+            {
+                "scope": "variable.other.member.c",
+                "settings": {
+                    // "foreground": "#9CDCFE",
+                    "foreground": "#abd1e5",
+                },
+            },
+            {
+                "scope": "support.variable.property",
+                "settings": {
+                    // "foreground": "#9CDCFE",
+                    "foreground": "#abd0e4",
+                },
+            },
+            {
+                "scope": "keyword.operator",
+                "settings": {
+                    // "foreground": "#d4d4d4",
+                    // "foreground": "#c16060",
+                    "foreground": "#cacaca",
+                },
+            },
+            {
+                "scope": "variable.other.constant.property",
+                "settings": {
+                    // "foreground": "#4FC1FF",
+                    "foreground": "#48b2eb",
                 },
             },
             {
@@ -110,10 +177,17 @@
                 },
             },
             {
+                "scope": "support.function",
+                "settings": {
+                    // "foreground": "#c6c683",
+                    "foreground": "#d8967b",
+                },
+            },
+            {
                 "scope": "string.quoted.double",
                 "settings": {
-                    // "foreground": "#CE9178",
-                    "foreground": "#bfbf9f",
+                    "foreground": "#CE9178",
+                    // "foreground": "#ad8187",
                 },
             },
             {

@@ -16,7 +16,7 @@ fUseBear=false
 fRunConfigure=false
 fNeedBuild=false
 fGitClean=false
-fRemoveCompileCommandsJson=false
+fRMCompileCommandsJson=false
 # The build target
 fBuildTarget="$ftntBuildTarget"
 # The source file to sync
@@ -36,6 +36,7 @@ gitExcludeList="$gitExcludePattern1 $gitExcludePattern2"
 userNotation="@@@@"
 subUserNotation="@@@@ @"
 separator="----------------------------------------------------------------"
+separator2="---------------------------------------->"
 
 getCurrentTime() {
     echo $(date +"%m/%d/%Y %H:%M:%S")
@@ -55,13 +56,13 @@ Options:
     -c      Clean the repo (default: $fGitClean)
     -C      Run Configure intelligently (default: $fRunConfigure)
     -o      Run build commands (set automatically if any of the [bmjwT] options is set)
-    -T      Set the maximum number of attempts (default: $fMaxBuildAttempt)
+    -T      Set the maximum number of build attempts (default: $fMaxBuildAttempt)
     -b      Use Bear to generate $compileCommandsFile (default: $fUseBear)
     -B      Set the build target (default: $fBuildTarget)
     -m      Set the build mode (default: $fMode, auto detect FGT_VM64_KVM and FPX_KVM)
     -j      Set the number of jobs (default: $fNumOfWorkers)
     -w      Set working directory (default: $fWorkingDir)
-    -f      Remove $compileCommandsFile (default: $fRemoveCompileCommandsJson)
+    -f      Remove $compileCommandsFile (default: $fRMCompileCommandsJson)
     -s      Set the target machine (default: $fSyncTarget) to sync the source file specified by -S
     -S      Set the source file to sync (default: $fSyncFile)
     -u      Set the username for sync command (default: $fSyncUsername)
@@ -109,7 +110,7 @@ while getopts "hm:w:j:cCbB:ofT:s:S:p:u:" opt; do
             ;;
         b)
             fUseBear=true
-            fRemoveCompileCommandsJson=true
+            fRMCompileCommandsJson=true
             fNeedBuild=true
             ;;
         B)
@@ -124,7 +125,7 @@ while getopts "hm:w:j:cCbB:ofT:s:S:p:u:" opt; do
             fGitClean=true
             ;;
         f)
-            fRemoveCompileCommandsJson=true
+            fRMCompileCommandsJson=true
             ;;
         s)
             fSyncTarget=$OPTARG
@@ -173,22 +174,26 @@ if [[ ! -d "$fWorkingDir" ]]; then
 fi
 
 echo "$separator"
-echo "$userNotation Set working directory to $fWorkingDir"
-echo "$userNotation Set build target to $fBuildTarget"
-echo "$userNotation Set build mode to $fMode"
-echo "$userNotation Set number of concurrent build jobs to $fNumOfWorkers"
-if [[ "$fUseBear" == true ]]; then
-    echo "$userNotation Use bear to generate compile_commands.json"
-    if [[ "$fRemoveCompileCommandsJson" == true ]]; then
-        echo "$userNotation Will remove compile_commands.json if exists"
-    fi
-fi
+echo "$userNotation [w] Set working directory to $fWorkingDir"
+echo "$userNotation [B] Set build target to $fBuildTarget"
+echo "$userNotation [m] Set build mode to $fMode"
+echo "$userNotation [j] Set number of concurrent build jobs to $fNumOfWorkers"
+echo "$userNotation [T] Set the maximum number of build attempts to $fMaxBuildAttempt"
+echo "$separator2"
 
+[[ "$fGitClean" == true ]] && echo "$userNotation [c] Will Clean the repo"
+[[ "$fRunConfigure" == true ]] && echo "$userNotation [C] Will re-run Configure"
+[[ "$fNeedBuild" == true ]] && echo "$userNotation [o] Will re-build the project"
+[[ "$fUseBear" == true ]] && echo "$userNotation [b] Use bear to generate compile_commands.json"
+[[ "$fRMCompileCommandsJson" == true ]] && echo "$userNotation [f] Will remove $compileCommandsFile if exists"
 if [[ "$fSyncTarget" != false ]]; then
-    echo "$userNotation Scheduled to sync $fSyncFile to $fSyncTarget"
-    echo "$subUserNotation USER ($fSyncUsername) and PWD ($fSyncPassword)"
+    echo "$userNotation [s] Scheduled to sync $fSyncFile to $fSyncTarget"
+    echo "$userNotation [S] SYNC_FILE ($fSyncFile)"
+    echo "$userNotation [u] USER ($fSyncUsername)"
+    echo "$userNotation [p] PWD ($fSyncPassword)"
 fi
 echo "$separator"
+sleep 1
 
 # Clean the working directory
 if [[ "$fGitClean" == true ]]; then
@@ -196,9 +201,9 @@ if [[ "$fGitClean" == true ]]; then
     cd "$fWorkingDir" || exit
     gitExcludePattern=""
     for patt in $gitExcludeList; do
-        if [[ "$fRemoveCompileCommandsJson" == true ]]; then
+        if [[ "$fRMCompileCommandsJson" == true ]]; then
             if [[ "$patt" == "$compileCommandsFile" ]]; then
-                echo "$subUserNotation Will remove $compileCommandsFile if exists"
+                # Do not add it to the exclude list
                 continue
             fi
         fi
@@ -277,7 +282,7 @@ if [[ "$fNeedBuild" != false ]]; then
     jsonPath=$fWorkingDir/$jsonFile
     if [[ -f "$jsonPath" && ! -w "$jsonPath" ]]; then
         echo "$userNotation Detected $jsonPath is read-only"
-        if [[ "$fRemoveCompileCommandsJson" == true ]]; then
+        if [[ "$fRMCompileCommandsJson" == true ]]; then
             echo "$subUserNotation Removing $jsonPath"
             rm -f "$jsonPath"
             if [[ $? -ne 0 ]]; then
