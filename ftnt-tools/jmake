@@ -11,7 +11,7 @@ fMode=FGT_VM64_KVM  # FOS: FGT_VM64 for VMWARE, FGT_VM64_KVM for KVM
 fModeSpecified=false
 fNumOfWorkers=$(nproc)
 fWorkingDir=$(pwd)
-fMaxBuildAttempt=3
+fMaxBuildAttempt=2
 fUseBear=false
 fRunConfigure=false
 fNeedBuild=false
@@ -193,7 +193,7 @@ if [[ "$fSyncTarget" != false ]]; then
     echo "$userNotation [p] PWD ($fSyncPassword)"
 fi
 echo "$separator"
-sleep 1
+sleep 0.5
 
 # Clean the working directory
 if [[ "$fGitClean" == true ]]; then
