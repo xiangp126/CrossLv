@@ -19,7 +19,10 @@
     dfc = diff --cached
     dfs = diff --stat
     br = branch
-[color]
-    ui = auto
 [http]
     sslverify = false
+# git config color.diff.meta blue
+[color "diff"]
+    ui = auto
+    meta = blue
+    new = magenta

@@ -193,7 +193,7 @@ if [[ "$fSyncTarget" != false ]]; then
     echo "$userNotation [p] PWD ($fSyncPassword)"
 fi
 echo "$separator"
-sleep 0.5
+sleep 0.1
 
 # Clean the working directory
 if [[ "$fGitClean" == true ]]; then
@@ -452,7 +452,15 @@ if [[ "$fSyncTarget" != false ]]; then
     case $retValue in
         0)
             echo "$userNotation You have synced $fSyncFile to $fSyncTarget successfully at $(getCurrentTime)."
-            exit 0
+            echo "$userNotation Login to the server and wait for it to reboot ..."
+            jssh "$fSyncTarget"
+            if [[ $? -ne 0 ]]; then
+                echo "$subUserNotation Please check the server status manually."
+                exit 1
+            else
+                echo "$subUserNotation Connection to fpx1 closed at $(getCurrentTime)."
+                exit 0
+            fi
             ;;
         $EMAXTRIES)
             echo "$userNotation Failed to sync $fSyncFile to $fSyncTarget after $maxSyncRetries attempts"
