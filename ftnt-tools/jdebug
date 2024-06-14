@@ -193,3 +193,29 @@ expect -c "
     log_user 1
     expect \$shell_prompt
 "
+
+# Process [0]: WAD manager type=manager(0) pid=1014 diagnosis=yes.
+# Process [1]: type=worker(2) index=0 pid=18369 state=running
+#               diagnosis=no debug=enable valgrind=supported/disabled
+# Process [2]: type=algo(3) index=0 pid=1061 state=running
+#               diagnosis=no debug=enable valgrind=unsupported/disabled
+# Process [3]: type=informer(4) index=0 pid=1051 state=running
+#               diagnosis=no debug=enable valgrind=unsupported/disabled
+# Process [4]: type=user-info(5) index=0 pid=1052 state=running
+#               diagnosis=no debug=enable valgrind=supported/disabled
+# Process [5]: type=dev-vuln(6) index=0 pid=1053 state=running
+#               diagnosis=no debug=enable valgrind=supported/disabled
+# Process [6]: type=cert-inspection(9) index=0 pid=1054 state=running
+#               diagnosis=no debug=enable valgrind=unsupported/disabled
+# Process [7]: type=YouTube-filter-cache-service(10) index=0 pid=1055 state=running
+#               diagnosis=no debug=enable valgrind=unsupported/disabled
+# Process [8]: type=debug(12) index=0 pid=1056 state=running
+#               diagnosis=no debug=enable valgrind=unsupported/disabled
+# Process [9]: type=config-notify(13) index=0 pid=1057 state=running
+#               diagnosis=no debug=enable valgrind=unsupported/disabled
+# Process [10]: type=tls-fgpt-service(14) index=0 pid=1058 state=running
+#               diagnosis=no debug=enable valgrind=unsupported/disabled
+# Process [11]: type=ia-cache(15) index=0 pid=1059 state=running
+#               diagnosis=no debug=enable valgrind=unsupported/disabled
+# Process [12]: type=isolator(16) index=0 pid=1060 state=running
+#               diagnosis=no debug=enable valgrind=unsupported/disabled

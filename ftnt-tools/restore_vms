@@ -23,7 +23,7 @@ max_loop_cnt=2
 
 vm_status=$(virsh list --all | grep "$vm_name" | awk '{print $3}')
 if [ "$vm_status" == "running" ]; then
-    echo "VM $vm_name is running, shutdown it now."
+    echo "VM $vm_name is running; shut it down forcely now."
     virsh shutdown "$vm_name"
 
     # wait for the VM to shutdown

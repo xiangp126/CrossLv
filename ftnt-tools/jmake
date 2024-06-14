@@ -193,7 +193,7 @@ if [[ "$fSyncTarget" != false ]]; then
     echo "$userNotation [p] PWD ($fSyncPassword)"
 fi
 echo "$separator"
-sleep 0.1
+# sleep 0.1
 
 # Clean the working directory
 if [[ "$fGitClean" == true ]]; then
@@ -453,7 +453,7 @@ if [[ "$fSyncTarget" != false ]]; then
         0)
             echo "$userNotation You have synced $fSyncFile to $fSyncTarget successfully at $(getCurrentTime)."
             echo "$userNotation Login to the server and wait for it to reboot ..."
-            jssh "$fSyncTarget"
+            jssh -u "$fSyncUsername" -p "$fSyncPassword" "$fSyncTarget"
             if [[ $? -ne 0 ]]; then
                 echo "$subUserNotation Please check the server status manually."
                 exit 1

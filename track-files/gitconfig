@@ -24,5 +24,5 @@
 # git config color.diff.meta blue
 [color "diff"]
     ui = auto
-    meta = blue
+    # meta = blue
     new = magenta
