@@ -21,8 +21,11 @@ function fcode() {
         exit 1
     fi
 
-    # Remove all the vscode-ipc-*.sock files except the latest one
-    # find /run/user/$UID -maxdepth 1 -type s -name "vscode-ipc-*" ! -wholename $new_IPC_HOOK -exec rm {} +
+    # find /run/user/$UID -maxdepth 1 -type s -name "vscode-ipc-*" ! -wholename $new_IPC_HOOK -exec ls {} +
+    # Remove vscode-ipc-*.sock files except the latest one
+    find /run/user/$UID -maxdepth 1 -type s -name "vscode-ipc-*" ! -wholename $new_IPC_HOOK -delete
+    # Remove vscode-git-*.sock files
+    find /run/user/$UID -maxdepth 1 -type s -name "vscode-git-*.sock" -delete
 
     export VSCODE_IPC_HOOK_CLI=$new_IPC_HOOK
     $vscode_code_path $@
