@@ -1,6 +1,6 @@
 #!/bin/bash
 
-scriptName=$(basename $0)
+script_name=$(basename $0)
 user_notation="@@@@"
 password=""
 login_user="admin"
@@ -11,32 +11,35 @@ usage() {
 cat << _EOF
 
 usage:
-    $scriptName [-p password] [-u user] fgt_name/fgt_ip
-    ---> fgt_name/fgt_ip must be the last argument
+    $script_name [-p password] [-u user] [-t fgt_name/fgt_ip]
 
 Options:
-    -p password     Password to use for login. Default is "$password"
-    -u user         User to use for login. Default is "$login_user"
-
-    fgt_name        Name or IP address of the Fortigate device to connect to. Default is "$fgt_name"
+    -u user             User to use for login. Default is "$login_user"
+    -p password         Password to use for login. Default is "$password"
+    -t fgt_name/fgt_ip  The device to connect to. Default is "$fgt_name"
 
 Example:
-    $scriptName -p 123 -u admin fgt1
-    $scriptName -p 123 -u admin 172.16.67.181
-    $scriptName -p 123 172.16.67.181
+    $script_name -p 123 -u admin -t fgt1
+    $script_name -p 123 -u admin -t 172.16.67.181
+    $script_name -p 123 -t 172.16.67.181
 
 _EOF
     exit 0
 }
 
+[[ $# -eq 0 ]] && usage
+
 # Parse command-line options
-while getopts "p:u:h" opt; do
+while getopts "p:u:t:h" opt; do
     case ${opt} in
         p)
             password=$OPTARG
             ;;
         u)
             login_user=$OPTARG
+            ;;
+        t)
+            fgt_name=$OPTARG
             ;;
         h)
             usage
@@ -48,13 +51,11 @@ while getopts "p:u:h" opt; do
     esac
 done
 
-shift $((OPTIND -1))
-
-if [ -z "$1" ]; then
-    echo "No Fortigate name provided"
-    exit 1
-else
-    fgt_name=$1
+# Shift to process non-option arguments. New $1, $2, ..., $@
+shift $((OPTIND - 1))
+if [[ $# -gt 0 ]]; then
+    echo "$user_notation Illegal non-option arguments: $@"
+    exit
 fi
 
 expect -c "
