@@ -55,7 +55,10 @@ if [ "$file_owner" != "libvirt-qemu" ]; then
 fi
 
 echo "Restore complete for VM: $vm_name"
-echo "# Restart libvirtd service if needed."
-echo "# sudo systemctl restart libvirtd"
+# echo "# Restart libvirtd service if needed."
+# echo "# sudo systemctl restart libvirtd"
 
 # sudo systemctl restart libvirtd
+
+echo "Restart VM $vm_name"
+virsh start "$vm_name"
