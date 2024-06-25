@@ -6,7 +6,7 @@ fTarget="fgt1"
 fWorkerType="worker"
 fSSHConnPort=22
 fGDBServerListenPort=444
-fMaxAttempt=3
+fMaxAttempt=2
 fUsername="admin"
 fPassword="password"
 fPrompt="# "
@@ -91,7 +91,7 @@ echo "$userNotation Set GDB Server Listen Port to: $fGDBServerListenPort"
 echo "$userNotation Set Maximum Attempt to: $fMaxAttempt"
 echo "$userNotation Set Username to: $fUsername"
 echo "$userNotation Set Password to: $fPassword"
-echo "$subUserNotation Connecting to $fTarget..."
+echo "$userNotation Connecting to $fTarget..."
 echo $separator
 
 # expect -d -c "
@@ -100,7 +100,7 @@ expect -c "
     set i 0
     set timeout 2
 
-    while { \$i < 3 } {
+    while { \$i < $fMaxAttempt } {
         spawn -noecho ssh -p $fSSHConnPort $fUsername@$fTarget
 
         set process_id \$spawn_id
@@ -123,15 +123,17 @@ expect -c "
                 break
             }
             timeout {
-                puts \"$userNotation Timeout when connecting to $fTarget\"
+                puts \"$subUserNotation Timeout when connecting to $fTarget\"
                 close \$process_id
-                if {\$i == 2} {
-                    exit 1
-                }
                 incr i
                 continue
             }
         }
+    }
+
+    if {\$i == $fMaxAttempt} {
+        puts \"$userNotation Failed to connect to $fTarget\"
+        exit 1
     }
 
     set timeout 10

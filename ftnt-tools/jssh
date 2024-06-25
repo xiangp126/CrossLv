@@ -4,7 +4,9 @@ script_name=$(basename $0)
 user_notation="@@@@"
 password=""
 login_user="admin"
-fgt_prompt="# "
+fgt_prompt_root="# "
+fgt_prompt_user="$ "
+fgt_prompt=""
 fgt_name="fgt1"
 max_iterations=2
 
@@ -13,12 +15,12 @@ cat << _EOF
 jssh 0.0
 
 usage:
-    $script_name [-p password] [-u user] [-t fgt_name/fgt_ip]
+    $script_name [-p password] [-u user] -P [fgt_prompt] [-t fgt_name/fgt_ip]
 
 Options:
     -u user             User to use for login. Default is "$login_user"
     -p password         Password to use for login. Default is "$password"
-    -P prompt           Prompt to expect. Default is "$fgt_prompt"
+    -P fgt_prompt       Prompt to expect. Default is "$fgt_prompt"
     -t fgt_name/fgt_ip  The device to connect to. Default is "$fgt_name"
 
 Example:
@@ -66,6 +68,7 @@ fi
 
 # expect -d -c "
 expect -c "
+    set timeout 2
     for {set i 1} {\$i <= $max_iterations} {incr i} {
         # ssh -o StrictHostKeyChecking=no $fgt_name
         # send_user \"Sync attempt \$i/$max_iterations\n\"
@@ -92,26 +95,25 @@ expect -c "
                 exit 1
             }
             eof {
-                puts \"Reached EOF. Exiting...\"
+                send_user \"$user_notation Reached EOF. Exiting...\n\"
                 exit 1
             }
             timeout {
-                puts \"Timed out waiting for a response.\"
+                send_user \"$user_notation Timed out waiting for a response. Have you specified the SSH Prompt?\n\"
                 exit 1
             }
-            \"$fgt_prompt\" {
-                puts \"$user_notation Successfully connected to $fgt_name\"
+            \"$fgt_prompt_root\" {
+                send_user \"$user_notation Successfully connected to $fgt_name\n\"
+                break
+            }
+            \"$fgt_prompt_user\" {
+                send_user \"$user_notation Successfully connected to $fgt_name\n\"
                 break
             }
         }
     }
 
     send \"\r\"
-    expect \"$fgt_prompt\"
-
-    # Now you can add additional commands or interactions as needed
-    # For example, you can automate further commands here
-
     # Interact with the device
     interact
 "
