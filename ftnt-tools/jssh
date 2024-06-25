@@ -20,7 +20,7 @@ usage:
 Options:
     -u user             User to use for login. Default is "$login_user"
     -p password         Password to use for login. Default is "$password"
-    -P fgt_prompt       Prompt to expect. Default is "$fgt_prompt"
+    -P fgt_prompt       Prompt to expect(Currently not used). Default is "$fgt_prompt_root" or "$fgt_prompt_user".
     -t fgt_name/fgt_ip  The device to connect to. Default is "$fgt_name"
 
 Example:
