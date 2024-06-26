@@ -453,7 +453,7 @@ if [[ "$fSyncTarget" != false ]]; then
         0)
             echo "$userNotation You have synced $fSyncFile to $fSyncTarget successfully at $(getCurrentTime)."
             echo "$userNotation Login to the server and wait for it to reboot ..."
-            jssh -u "$fSyncUsername" -p "$fSyncPassword" "$fSyncTarget"
+            jssh -u "$fSyncUsername" -p "$fSyncPassword" -t "$fSyncTarget"
             if [[ $? -ne 0 ]]; then
                 echo "$subUserNotation Please check the server status manually."
                 exit 1
