@@ -87,4 +87,3 @@ echo "$user_notation Default gateway has been changed successfully"
 read -r new_gateway_ip device <<< $(ip route show default | awk '/default/ {print $3, $5}')
 echo $banner3
 echo "$user_notation default via $new_gateway_ip(${reverse_gateway_ips[$new_gateway_ip]}) dev $device"
-

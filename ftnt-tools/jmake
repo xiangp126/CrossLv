@@ -407,6 +407,7 @@ if [[ "$fSyncTarget" != false ]]; then
                 }
                 \"Host key verification failed.\" {
                     send_user \"$subUserNotation Host key verification failed. Updating known_hosts file...\n\"
+                    send_user \"$subUserNotation Executing: ssh-keygen -R $fSyncTarget\n\"
                     system \"ssh-keygen -R $fSyncTarget\"
                     send_user \"$subUserNotation Host key removed from known_hosts file.\n\"
                     send_user \"$subUserNotation Retrying SCP immediately...\n\"
