@@ -1,7 +1,12 @@
 #!/bin/bash
 
+# First of all, set wad worker count to 1 to make life easier.
+# FPX # config system global
+# FPX (global) # set wad-worker-count 1
+# FPX (global) # end
+
 # Variables
-scriptName=$(basename $0)
+scriptName=$(basename "$0")
 fTarget="fgt1"
 fWorkerType="worker"
 fSSHConnPort=22

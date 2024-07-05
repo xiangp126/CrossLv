@@ -90,12 +90,16 @@ expect -c "
                 send_user \"$user_notation Retrying SSH immediately...\n\"
                 continue
             }
+            \"Permission denied\" {
+                send_user \"$user_notation Permission denied. Have you specified the login credentials?\n\"
+                exit 1
+            }
             \"Connection refused\" {
-                send_user \"$user_notation Connection refused. Exiting...\n\"
+                send_user \"$user_notation Connection refused. Action aborted.\n\"
                 exit 1
             }
             eof {
-                send_user \"$user_notation Reached EOF. Exiting...\n\"
+                send_user \"$user_notation Reached EOF. Program ended.\n\"
                 exit 1
             }
             timeout {
