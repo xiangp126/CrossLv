@@ -22,6 +22,7 @@ fBuildTarget="$ftntBuildTarget"
 # The source file to sync
 fSyncFile=$fBuildTarget
 # The sync target machine
+fSyncPort=22
 fSyncTarget=false
 fSyncUsername="admin"
 fSyncPassword="password"
@@ -48,7 +49,7 @@ jmake 0.2.0
 
 Usage: $scriptName [options]
        $scriptName [-m mode] [-w working_dir] [-j num_of_workers] [-T max_attempt]
-             [-s sync_target] [-S sync_file] [-u username] [-p password]
+             [-s sync_target] [-S sync_file] [-P sync_port] [-u username] [-p password]
              [-B build_target]
              [-bcCohf]
 
@@ -65,22 +66,22 @@ Options:
     -f      Remove $compileCommandsFile (default: $fRMCompileCommandsJson)
     -s      Set the target machine (default: $fSyncTarget) to sync the source file specified by -S
     -S      Set the source file to sync (default: $fSyncFile)
+    -P      Set the ssh port for sync command (default: $fSyncPort)
     -u      Set the username for sync command (default: $fSyncUsername)
     -p      Set the password for sync command (default: $fSyncPassword)
     -h      Print this help message
 
 Example:
-    $scriptName -h
-    $scriptName -C  // Only run Configure
-    $scriptName -o  // Only run build commands
-    $scriptName -m FGT_VM64_KVM -j4 -bC
-    $scriptName -m FGT_VM64_KVM -j4 -bc
-    $scriptName -bc
-    $scriptName -j4 -b
+    $scriptName -C // Only run Configure
+    $scriptName -o // Only build the project
+    $scriptName -c // Only clean the repo
     $scriptName -T1
-    $scriptName -T1 -s fgt1 -p "password" -u "admin"
-    $scriptName -T1 -s fgt1 -p "password" -u "admin" -S FGT_VM64_KVM-v7-build1662.out
-    $scriptName -s fgt1 -S FGT_VM64_KVM-v7-build1662.out
+    $scriptName -m FGT_VM64_KVM -c
+    $scriptName -m FGT_VM64_KVM -j4 -b
+    $scriptName -T1 -s fgt1 -u "admin" -p "password" # build and sync image.out to fgt1
+    $scriptName -T1 -s fgt1 -S FGT_VM64_KVM-v7-build1662.out -u "admin" -p "password"
+    $scriptName -s fgt1 -S FGT_VM64_KVM-v7-build1662.out -P 22
+    $scriptName -h
 
 _EOF
     exit 0
@@ -89,7 +90,7 @@ _EOF
 [[ $# -eq 0 ]] && usage
 
 # Parse the options
-while getopts "hm:w:j:cCbB:ofT:s:S:p:u:" opt; do
+while getopts "hm:w:j:cCbB:ofT:s:S:P:p:u:" opt; do
     case $opt in
         m)
             fMode=$OPTARG
@@ -132,6 +133,9 @@ while getopts "hm:w:j:cCbB:ofT:s:S:p:u:" opt; do
             ;;
         S)
             fSyncFile=$OPTARG
+            ;;
+        P)
+            fSyncPort=$OPTARG
             ;;
         u)
             fSyncUsername=$OPTARG
@@ -389,7 +393,7 @@ if [[ "$fSyncTarget" != false ]]; then
         # Loop to sync the file
         for {set i 1} {\$i <= $maxSyncRetries} {incr i} {
             send_user \"$subUserNotation Sync attempt \$i/$maxSyncRetries\n\"
-            spawn -noecho scp $syncFile ${fSyncUsername}@${fSyncTarget}:/fgt-image
+            spawn -noecho scp -P $fSyncPort $syncFile ${fSyncUsername}@${fSyncTarget}:/fgt-image
             if {\$adjustTimeout != 0} {
                 set timeout \$adjustTimeout
             } else {
@@ -397,12 +401,16 @@ if [[ "$fSyncTarget" != false ]]; then
             }
 
             expect {
-                \"*assword:\" {
-                    send \"$fSyncPassword\r\"
+                \"bad port\" {
+                    send_user \"$subUserNotation Bad port. Connecting aborted.\n\"
+                    exit $EFAILED
+                }
+                {yes/no} {
+                    send \"yes\r\"
                     exp_continue
                 }
-                \"yes/no\" {
-                    send \"yes\r\"
+                -re {[Pp]assword} {
+                    send \"$fSyncPassword\r\"
                     exp_continue
                 }
                 \"Host key verification failed.\" {
@@ -422,20 +430,20 @@ if [[ "$fSyncTarget" != false ]]; then
                     continue
                 }
                 \"501-Permission Denied\" {
-                    send_user \"$subUserNotation Permission Denied. Exiting...\n\"
+                    send_user \"$subUserNotation Permission Denied. Please enable admin-scp under 'config system global'.\n\"
                     exit $EFAILED
                 }
                 \"check image error\" {
-                    send_user \"$subUserNotation Check image error. Exiting...\n\"
+                    send_user \"$subUserNotation Check image error. Action aborted.\n\"
                     # exp_continue
                     exit $EFAILED
                 }
                 \"lost connection\" {
-                    send_user \"$subUserNotation Lost connection. Exiting...\n\"
+                    send_user \"$subUserNotation Lost connection. Action aborted.\n\"
                     exit $EFAILED
                 }
                 timeout {
-                    send_user \"$subUserNotation Timeout. Exiting...\n\"
+                    send_user \"$subUserNotation Timeout. Action aborted.\n\"
                     exit $ETIMEOUT
                 }
                 eof {
@@ -454,7 +462,7 @@ if [[ "$fSyncTarget" != false ]]; then
         0)
             echo "$userNotation You have synced $fSyncFile to $fSyncTarget successfully at $(getCurrentTime)."
             echo "$userNotation Login to the server and wait for it to reboot ..."
-            jssh -u "$fSyncUsername" -p "$fSyncPassword" -t "$fSyncTarget"
+            jssh -P "$fSyncPort" -u "$fSyncUsername" -p "$fSyncPassword" -t "$fSyncTarget"
             if [[ $? -ne 0 ]]; then
                 echo "$subUserNotation Please check the server status manually."
                 exit 1

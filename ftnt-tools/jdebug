@@ -5,16 +5,22 @@
 # FPX (global) # set wad-worker-count 1
 # FPX (global) # end
 
+# SSH local forwarding
+# -N Do not execute a remote command. This is useful for just forwarding ports.
+# Local(127.0.0.1) -> Jump server(172.18.20.226) -> Remote(10.40.1.101)
+# ssh -N -L 127.0.0.1:8888:10.40.1.101:22 test@172.18.20.226
+
 # Variables
 scriptName=$(basename "$0")
 fTarget="fgt1"
 fWorkerType="worker"
 fSSHConnPort=22
-fGDBServerListenPort=444
-fMaxAttempt=2
 fUsername="admin"
 fPassword="password"
+fVdom="false"
 fPrompt="# "
+fGDBServerListenPort=444
+fMaxAttempt=2
 # Pretty print
 userNotation="@@@@"
 subUserNotation="@@@@ @"
@@ -26,22 +32,24 @@ jdebug 0.0.0
 
 Usage: $scriptName [options]
        $scriptName [-t target] [-w worker_type] [-P gdbserver_listen_port] [-T max_attempt]
-              [-u username] [-p password] [-s ssh_conn_port] [-h]
+              [-u username] [-p password] [-P ssh_conn_port] [-h]
 
 Options:
     -t      Target device name or IP address(default: $fTarget)
-    -w      Worker type(default: $fWorkerType)
-    -s      SSH connection port(default: $fSSHConnPort)
-    -P      GDB Server listen port(default: $fGDBServerListenPort)
-    -T      Maximum attempt(default: $fMaxAttempt)
+    -P      SSH connection port(default: $fSSHConnPort)
     -u      Username(default: $fUsername)
     -p      Password(default: $fPassword)
+    -w      Worker type(default: $fWorkerType)
+    -d      GDB Server listen port(default: $fGDBServerListenPort)
+    -V      The device has vdom(default: $fVdom)
+    -T      Maximum attempt(default: $fMaxAttempt)
     -h      Print this help message
 
 Example:
     $scriptName -t fgt1
-    $scriptName -t fgt1 -w algo -P 9229
-    $scriptName -t fgt1 -w algo -P 9229 -u "admin" -p "123"
+    $scriptName -t fgt1 -P 22
+    $scriptName -t fgt1 -w algo -d 9229
+    $scriptName -t fgt1 -w algo -d 9229 -u "admin" -p "123"
     $scriptName -h
 
 _EOF
@@ -51,7 +59,7 @@ _EOF
 [[ $# -eq 0 ]] && usage
 
 # Parse the options
-while getopts "t:w:P:u:p:h" opt; do
+while getopts "t:w:d:T:u:p:P:Vh" opt; do
     case $opt in
         t)
             fTarget=$OPTARG
@@ -59,17 +67,23 @@ while getopts "t:w:P:u:p:h" opt; do
         w)
             fWorkerType=$OPTARG
             ;;
-        P)
+        d)
             fGDBServerListenPort=$OPTARG
             ;;
         T)
             fMaxAttempt=$OPTARG
+            ;;
+        P)
+            fSSHConnPort=$OPTARG
             ;;
         u)
             fUsername=$OPTARG
             ;;
         p)
             fPassword=$OPTARG
+            ;;
+        V)
+            fVdom="true"
             ;;
         h)
             usage
@@ -92,10 +106,10 @@ echo $separator
 echo "$userNotation Set Target Device to: $fTarget"
 echo "$userNotation Set Worker Type to: $fWorkerType"
 echo "$userNotation Set SSH Connection Port to: $fSSHConnPort"
-echo "$userNotation Set GDB Server Listen Port to: $fGDBServerListenPort"
-echo "$userNotation Set Maximum Attempt to: $fMaxAttempt"
 echo "$userNotation Set Username to: $fUsername"
 echo "$userNotation Set Password to: $fPassword"
+echo "$userNotation Set GDB Server Listen Port to: $fGDBServerListenPort"
+echo "$userNotation Set Maximum Attempt to: $fMaxAttempt"
 echo "$userNotation Connecting to $fTarget..."
 echo $separator
 
@@ -104,6 +118,7 @@ expect -c "
     # Set your SSH credentials
     set i 0
     set timeout 2
+    set has_vdom $fVdom
 
     while { \$i < $fMaxAttempt } {
         spawn -noecho ssh -p $fSSHConnPort $fUsername@$fTarget
@@ -143,8 +158,20 @@ expect -c "
 
     set timeout 10
     expect \"$fPrompt\"
+    if {\$has_vdom == \"true\"} {
+        send \"config global\r\"
+        expect \"$fPrompt\"
+    }
     send \"diagnose debug reset\r\"
-    expect \"$fPrompt\"
+    expect {
+        \"Unknown action\" {
+            send_user \"$userNotation Command fail. Please retry with -V if the device has VDOM.\n\"
+            exit 1
+        }
+        \"$fPrompt\" {
+            # Do nothing, just continue
+        }
+    }
     send \"diagnose debug enable\r\"
     expect \"$fPrompt\"
     send \"diagnose test application wad 1000\r\"
@@ -180,9 +207,16 @@ expect -c "
     # send \"diagnose sys scanunit debug all\r\"
     # expect \"$fPrompt\"
 
-    set shell_prompt \"/ # \"
     send \"sys sh\r\"
-    expect \$shell_prompt
+    expect {
+        \"Unknown action\" {
+            send_user \"$userNotation No Shell supported. Please check the image version.\n\"
+            exit 1
+        }
+        \"$fPrompt\" {
+            # Do nothing, just continue
+        }
+    }
 
     # start gdbserver
     set timeout -1
@@ -192,13 +226,14 @@ expect -c "
     trap {
         # Disable console logging. The output may contain multiple blank lines starts with '/ # '.
         log_user 0
-        puts \"\n$userNotation Detected CTRL+C, sending SIGINT to gdbserver as well.\"
+        send_user \"\n$userNotation Captured CTRL+C; sending SIGINT to gdbserver too.\n\"
         send \x03
+        send_user \"$userNotation Debugging session ended.\n\"
     } SIGINT
 
     # interact
     log_user 1
-    expect \$shell_prompt
+    expect \"$fPrompt\"
 "
 
 # Process [0]: WAD manager type=manager(0) pid=1014 diagnosis=yes.

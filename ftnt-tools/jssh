@@ -1,32 +1,42 @@
 #!/bin/bash
 
+# SSH local forwarding
+# -N Do not execute a remote command. This is useful for just forwarding ports.
+# Local(127.0.0.1) -> Jump server(172.18.20.226) -> Remote(10.40.1.101)
+# ssh -N -L 127.0.0.1:8888:10.40.1.101:22 test@172.18.20.226
+
+# Variables
 script_name=$(basename $0)
-user_notation="@@@@"
-password=""
+ssh_port=22
 login_user="admin"
-fgt_prompt_root="# "
-fgt_prompt_user="$ "
-fgt_prompt=""
-fgt_name="fgt1"
+password=""
+fgt_expect_root="# "
+fgt_expect_user="$ "
+fgt_expect=$fgt_expect_user
+fgt_target="fgt1"
 max_iterations=2
+# Print Pretty
+user_notation="@@@@"
+separator="----------------------------------------------------------------"
 
 usage() {
 cat << _EOF
 jssh 0.0
 
 usage:
-    $script_name [-p password] [-u user] -P [fgt_prompt] [-t fgt_name/fgt_ip]
+    $script_name [-P ssh_port] [-u user] [-p password] [-E fgt_expect] -t fgt_target/fgt_ip
 
 Options:
+    -P ssh_port         SSH port to use. Default is "$ssh_port"
     -u user             User to use for login. Default is "$login_user"
     -p password         Password to use for login. Default is "$password"
-    -P fgt_prompt       Prompt to expect(Currently not used). Default is "$fgt_prompt_root" or "$fgt_prompt_user".
-    -t fgt_name/fgt_ip  The device to connect to. Default is "$fgt_name"
+    -E fgt_expect       Except prompt to expect(other than "$fgt_expect_root"). Default is "$fgt_expect_user".
+    -t fgt_target/fgt_ip  The device to connect to. Default is "$fgt_target"
 
 Example:
-    $script_name -p 123 -u admin -t fgt1
-    $script_name -p 123 -u admin -t 172.16.67.181
-    $script_name -p 123 -t 172.16.67.181
+    $script_name -t fpx1
+    $script_name -u admin -p 123 -t fgt1 -p 22
+    $script_name -u admin -p 123 -t 172.16.67.181
 
 _EOF
     exit 0
@@ -35,7 +45,7 @@ _EOF
 [[ $# -eq 0 ]] && usage
 
 # Parse command-line options
-while getopts "p:u:t:P:h" opt; do
+while getopts "p:u:t:P:E:h" opt; do
     case ${opt} in
         p)
             password=$OPTARG
@@ -44,10 +54,13 @@ while getopts "p:u:t:P:h" opt; do
             login_user=$OPTARG
             ;;
         t)
-            fgt_name=$OPTARG
+            fgt_target=$OPTARG
+            ;;
+        E)
+            fgt_expect=$OPTARG
             ;;
         P)
-            fgt_prompt=$OPTARG
+            ssh_port=$OPTARG
             ;;
         h)
             usage
@@ -66,13 +79,21 @@ if [[ $# -gt 0 ]]; then
     exit
 fi
 
+echo $separator
+echo "$user_notation Set Target Device to: $fgt_target"
+echo "$user_notation Set SSH Connection Port to: $ssh_port"
+echo "$user_notation Set Username to: $login_user"
+echo "$user_notation Set Password to: $password"
+echo "$user_notation Connecting to $fgt_target..."
+echo $separator
+
 # expect -d -c "
 expect -c "
-    set timeout 2
+    set timeout 5
     for {set i 1} {\$i <= $max_iterations} {incr i} {
-        # ssh -o StrictHostKeyChecking=no $fgt_name
+        # ssh -o StrictHostKeyChecking=no $fgt_target
         # send_user \"Sync attempt \$i/$max_iterations\n\"
-        spawn -noecho ssh $login_user@$fgt_name
+        spawn -noecho ssh -p $ssh_port $login_user@$fgt_target
 
         expect {
             {yes/no} {
@@ -85,7 +106,7 @@ expect -c "
             }
             \"Host key verification failed.\" {
                 send_user \"$user_notation Host key verification failed. Updating known_hosts file...\n\"
-                system \"ssh-keygen -R $fgt_name\"
+                system \"ssh-keygen -R $fgt_target\"
                 send_user \"$user_notation Host key removed from known_hosts file.\n\"
                 send_user \"$user_notation Retrying SSH immediately...\n\"
                 continue
@@ -103,15 +124,15 @@ expect -c "
                 exit 1
             }
             timeout {
-                send_user \"$user_notation Timed out waiting for a response. Have you specified the SSH Prompt?\n\"
+                send_user \"$user_notation Timed out waiting for a response.\n\"
                 exit 1
             }
-            \"$fgt_prompt_root\" {
-                send_user \"$user_notation Successfully connected to $fgt_name\n\"
+            \"$fgt_expect_root\" {
+                send_user \"$user_notation Successfully connected to $fgt_target\n\"
                 break
             }
-            \"$fgt_prompt_user\" {
-                send_user \"$user_notation Successfully connected to $fgt_name\n\"
+            \"$fgt_expect\" {
+                send_user \"$user_notation Successfully connected to $fgt_target\n\"
                 break
             }
         }
