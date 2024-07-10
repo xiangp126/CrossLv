@@ -467,7 +467,7 @@ if [[ "$fSyncTarget" != false ]]; then
                 echo "$subUserNotation Please check the server status manually."
                 exit 1
             else
-                echo "$subUserNotation Connection to fpx1 closed at $(getCurrentTime)."
+                echo "$subUserNotation Connection to $fSyncTarget closed at $(getCurrentTime)."
                 exit 0
             fi
             ;;
