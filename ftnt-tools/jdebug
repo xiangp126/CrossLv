@@ -1,14 +1,24 @@
 #!/bin/bash
 
-# First of all, set wad worker count to 1 to make life easier.
+# Recommend to set wad worker count to 1 to make life easier.
 # FPX # config system global
 # FPX (global) # set wad-worker-count 1
 # FPX (global) # end
 
-# SSH local forwarding
+# SSH Local Forwarding
+# -L [bind_address:]port:host:hostport
 # -N Do not execute a remote command. This is useful for just forwarding ports.
-# Local(127.0.0.1) -> Jump server(172.18.20.226) -> Remote(10.40.1.101)
-# ssh -N -L 127.0.0.1:8888:10.40.1.101:22 test@172.18.20.226
+# Topology: Local(127.0.0.1) -> Jump server(172.18.20.226) -> Remote(10.40.1.101)
+# $ ssh -N -L 127.0.0.1:8888:10.40.1.101:22 test@172.18.20.226
+# test@172.18.20.226's password:
+#
+# $ netstat -tulnp | grep -i 8888
+# tcp        0      0 127.0.0.1:8888          0.0.0.0:*               LISTEN      1208750/ssh
+#
+# and then
+# $ ssh -l admin -p 8888 localhost
+# or use
+# $ jssh -t localhost -P 8888
 
 # Variables
 scriptName=$(basename "$0")
@@ -20,7 +30,7 @@ fPassword="password"
 fVdom="false"
 fPrompt="# "
 fGDBServerListenPort=444
-fMaxAttempt=2
+fMaxAttempts=2
 # Pretty print
 userNotation="@@@@"
 subUserNotation="@@@@ @"
@@ -31,7 +41,7 @@ usage() {
 jdebug 0.0.0
 
 Usage: $scriptName [options]
-       $scriptName [-t target] [-w worker_type] [-P gdbserver_listen_port] [-T max_attempt]
+       $scriptName [-t target] [-w worker_type] [-P gdbserver_listen_port] [-T max_attempts]
               [-u username] [-p password] [-P ssh_conn_port] [-h]
 
 Options:
@@ -42,7 +52,7 @@ Options:
     -w      Worker type(default: $fWorkerType)
     -d      GDB Server listen port(default: $fGDBServerListenPort)
     -V      The device has vdom(default: $fVdom)
-    -T      Maximum attempt(default: $fMaxAttempt)
+    -T      Maximum attempt(default: $fMaxAttempts)
     -h      Print this help message
 
 Example:
@@ -71,7 +81,7 @@ while getopts "t:w:d:T:u:p:P:Vh" opt; do
             fGDBServerListenPort=$OPTARG
             ;;
         T)
-            fMaxAttempt=$OPTARG
+            fMaxAttempts=$OPTARG
             ;;
         P)
             fSSHConnPort=$OPTARG
@@ -102,14 +112,16 @@ if [[ $# -gt 0 ]]; then
     exit
 fi
 
+fSearchPatt="type=.*$fWorkerType"
 echo $separator
 echo "$userNotation Set Target Device to: $fTarget"
 echo "$userNotation Set Worker Type to: $fWorkerType"
+echo "$userNotation Set Search Pattern to: $fSearchPatt"
+echo "$userNotation Set GDB Server Listen Port to: $fGDBServerListenPort"
 echo "$userNotation Set SSH Connection Port to: $fSSHConnPort"
 echo "$userNotation Set Username to: $fUsername"
 echo "$userNotation Set Password to: $fPassword"
-echo "$userNotation Set GDB Server Listen Port to: $fGDBServerListenPort"
-echo "$userNotation Set Maximum Attempt to: $fMaxAttempt"
+echo "$userNotation Set Maximum Attempts to: $fMaxAttempts"
 echo "$userNotation Connecting to $fTarget..."
 echo $separator
 
@@ -120,7 +132,7 @@ expect -c "
     set timeout 2
     set has_vdom $fVdom
 
-    while { \$i < $fMaxAttempt } {
+    while { \$i < $fMaxAttempts } {
         spawn -noecho ssh -p $fSSHConnPort $fUsername@$fTarget
 
         set process_id \$spawn_id
@@ -134,7 +146,7 @@ expect -c "
                 break
             }
             \"Connection refused\" {
-                # puts \"Connection refused when connecting to $fTarget\"
+                # send_user \"Connection refused when connecting to $fTarget\n\"
                 exit 1
             }
             # $fPrompt must be quoted.
@@ -143,16 +155,21 @@ expect -c "
                 break
             }
             timeout {
-                puts \"$subUserNotation Timeout when connecting to $fTarget\"
+                send_user \"$subUserNotation Timeout when connecting to $fTarget\n\"
                 close \$process_id
                 incr i
                 continue
             }
+            eof {
+                send_user \"$subUserNotation Reached EOF. Program ended.\n\"
+                send_user \"$subUserNotation Please check if $fTarget is a correct device name.\n\"
+                exit 1
+            }
         }
     }
 
-    if {\$i == $fMaxAttempt} {
-        puts \"$userNotation Failed to connect to $fTarget\"
+    if {\$i == $fMaxAttempts} {
+        send_user \"$userNotation Failed to connect to $fTarget\"
         exit 1
     }
 
@@ -180,20 +197,41 @@ expect -c "
 
     # Search for the line with \"type=worker\" and extract the PID
     set worker_pid \"\"
+    set worker_pids {}
+
+    # Define the pattern to match
+    set search_patt $fSearchPatt
+    # send_user \"$userNotation Searching for \$search_patt\n\"
+
     foreach line [split \$output \"\n\"] {
-        if {[string match \"*type=$fWorkerType*\" \$line]} {
+            if {[regexp \$search_patt \$line]} {
             # Extract the PID from the line
-            set regex {pid=(\d+)}
-            if {[regexp \$regex \$line match worker_pid]} {
-                break
+            set pid_regex {pid=(\d+)}
+            if {[regexp \$pid_regex \$line match worker_pid]} {
+                # Add the matched PID to the list. lappend: list append.
+                lappend worker_pids \$worker_pid
             }
         }
     }
 
-    if {\$worker_pid == \"\"} {
-        puts \"$userNotation Could not find worker PID\"
+    if {[llength \$worker_pids] > 1} {
+        if {[string match \"*work*\" $fWorkerType]} {
+            send_user \"\n$userNotation Multiple worker PIDs found: \$worker_pids\n\"
+            send_user {$userNotation Recommend to set wad worker count to 1 to make life easier.
+$userNotation FPX # config system global
+$userNotation FPX (global) # set wad-worker-count 1
+$userNotation FPX (global) # end
+            }
+        } else {
+            send_user \"\n$userNotation Multiple $fWorkerType PIDs found: \$worker_pids.\n\"
+            send_user \"$userNotation Please check if the input type: $fWorkerType is correct.\n\"
+        }
+    } elseif {[llength \$worker_pids] < 1} {
+        send_user \"$userNotation Could not find $fWorkerType type PID.\n\"
         exit 1
     }
+
+    set worker_pid [lindex \$worker_pids 0]
 
     send \"\r\"
     expect \"$fPrompt\"
@@ -226,9 +264,9 @@ expect -c "
     trap {
         # Disable console logging. The output may contain multiple blank lines starts with '/ # '.
         log_user 0
-        send_user \"\n$userNotation Captured CTRL+C; sending SIGINT to gdbserver too.\n\"
+        send_user \"\n$userNotation CTRL+C captured; sending SIGINT to gdbserver as well.\n\"
         send \x03
-        send_user \"$userNotation Debugging session ended.\n\"
+        send_user \"$userNotation Debugging session terminated.\n\"
     } SIGINT
 
     # interact

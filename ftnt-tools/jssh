@@ -1,22 +1,32 @@
 #!/bin/bash
 
-# SSH local forwarding
+# SSH Local Forwarding
+# -L [bind_address:]port:host:hostport
 # -N Do not execute a remote command. This is useful for just forwarding ports.
-# Local(127.0.0.1) -> Jump server(172.18.20.226) -> Remote(10.40.1.101)
-# ssh -N -L 127.0.0.1:8888:10.40.1.101:22 test@172.18.20.226
+# Topology: Local(127.0.0.1) -> Jump server(172.18.20.226) -> Remote(10.40.1.101)
+# $ ssh -N -L 127.0.0.1:8888:10.40.1.101:22 test@172.18.20.226
+# test@172.18.20.226's password:
+#
+# $ netstat -tulnp | grep -i 8888
+# tcp        0      0 127.0.0.1:8888          0.0.0.0:*               LISTEN      1208750/ssh
+#
+# and then
+# $ ssh -l admin -p 8888 localhost
+# or use
+# $ jssh -t localhost -P 8888
 
 # Variables
-script_name=$(basename $0)
-ssh_port=22
-login_user="admin"
-password=""
-fgt_expect_root="# "
-fgt_expect_user="$ "
-fgt_expect=$fgt_expect_user
-fgt_target="fgt1"
-max_iterations=2
+scriptName=$(basename $0)
+sshPort=22
+loginUser="admin"
+password="password"
+fgtExpectRoot="# "
+fgtExpectUser="$ "
+fgtExpect=$fgtExpectUser
+fgtTarget="fgt1"
+maxAttempts=2
 # Print Pretty
-user_notation="@@@@"
+userNotation="@@@@"
 separator="----------------------------------------------------------------"
 
 usage() {
@@ -24,19 +34,19 @@ cat << _EOF
 jssh 0.0
 
 usage:
-    $script_name [-P ssh_port] [-u user] [-p password] [-E fgt_expect] -t fgt_target/fgt_ip
+    $scriptName [-P sshPort] [-u user] [-p password] [-E fgtExpect] -t fgtTarget/fgtIP
 
 Options:
-    -P ssh_port         SSH port to use. Default is "$ssh_port"
-    -u user             User to use for login. Default is "$login_user"
+    -P sshPort         SSH port to use. Default is "$sshPort"
+    -u user             User to use for login. Default is "$loginUser"
     -p password         Password to use for login. Default is "$password"
-    -E fgt_expect       Except prompt to expect(other than "$fgt_expect_root"). Default is "$fgt_expect_user".
-    -t fgt_target/fgt_ip  The device to connect to. Default is "$fgt_target"
+    -E fgtExpect       Except prompt to expect(other than "$fgtExpectRoot"). Default is "$fgtExpectUser".
+    -t fgtTarget/fgtIP  The device to connect to. Default is "$fgtTarget"
 
 Example:
-    $script_name -t fpx1
-    $script_name -u admin -p 123 -t fgt1 -p 22
-    $script_name -u admin -p 123 -t 172.16.67.181
+    $scriptName -t fpx1
+    $scriptName -u admin -p 123 -t fgt1 -p 22
+    $scriptName -u admin -p 123 -t 172.16.67.181
 
 _EOF
     exit 0
@@ -51,22 +61,22 @@ while getopts "p:u:t:P:E:h" opt; do
             password=$OPTARG
             ;;
         u)
-            login_user=$OPTARG
+            loginUser=$OPTARG
             ;;
         t)
-            fgt_target=$OPTARG
+            fgtTarget=$OPTARG
             ;;
         E)
-            fgt_expect=$OPTARG
+            fgtExpect=$OPTARG
             ;;
         P)
-            ssh_port=$OPTARG
+            sshPort=$OPTARG
             ;;
         h)
             usage
             ;;
         ?)
-            echo "$user_notation Invalid option: -$OPTARG" >&2
+            echo "$userNotation Invalid option: -$OPTARG" >&2
             exit 1
             ;;
     esac
@@ -75,26 +85,28 @@ done
 # Shift to process non-option arguments. New $1, $2, ..., $@
 shift $((OPTIND - 1))
 if [[ $# -gt 0 ]]; then
-    echo "$user_notation Illegal non-option arguments: $@"
+    echo "$userNotation Illegal non-option arguments: $@"
     exit
 fi
 
 echo $separator
-echo "$user_notation Set Target Device to: $fgt_target"
-echo "$user_notation Set SSH Connection Port to: $ssh_port"
-echo "$user_notation Set Username to: $login_user"
-echo "$user_notation Set Password to: $password"
-echo "$user_notation Connecting to $fgt_target..."
+echo "$userNotation Set Target Device to: $fgtTarget"
+echo "$userNotation Set SSH Connection Port to: $sshPort"
+echo "$userNotation Set Username to: $loginUser"
+echo "$userNotation Set Password to: $password"
+echo "$userNotation Set Maximum Attempts to: $maxAttempts"
+echo "$userNotation Connecting to $fgtTarget..."
 echo $separator
 
 # expect -d -c "
 expect -c "
     set timeout 5
-    for {set i 1} {\$i <= $max_iterations} {incr i} {
-        # ssh -o StrictHostKeyChecking=no $fgt_target
-        # send_user \"Sync attempt \$i/$max_iterations\n\"
-        spawn -noecho ssh -p $ssh_port $login_user@$fgt_target
+    for {set i 1} {\$i <= $maxAttempts} {incr i} {
+        # ssh -o StrictHostKeyChecking=no $fgtTarget
+        # send_user \"Sync attempt \$i/$maxAttempts\n\"
+        spawn -noecho ssh -p $sshPort $loginUser@$fgtTarget
 
+        set process_id \$spawn_id
         expect {
             {yes/no} {
                 send \"yes\r\"
@@ -105,38 +117,45 @@ expect -c "
                 exp_continue
             }
             \"Host key verification failed.\" {
-                send_user \"$user_notation Host key verification failed. Updating known_hosts file...\n\"
-                system \"ssh-keygen -R $fgt_target\"
-                send_user \"$user_notation Host key removed from known_hosts file.\n\"
-                send_user \"$user_notation Retrying SSH immediately...\n\"
+                send_user \"$userNotation Host key verification failed. Updating known_hosts file...\n\"
+                system \"ssh-keygen -R $fgtTarget\"
+                send_user \"$userNotation Host key removed from known_hosts file.\n\"
+                send_user \"$userNotation Retrying SSH immediately...\n\"
                 continue
             }
             \"Permission denied\" {
-                send_user \"$user_notation Permission denied. Have you specified the login credentials?\n\"
+                send_user \"$userNotation Permission denied. Have you specified the login credentials?\n\"
                 exit 1
             }
             \"Connection refused\" {
-                send_user \"$user_notation Connection refused. Action aborted.\n\"
+                send_user \"$userNotation Connection refused. Action aborted.\n\"
                 exit 1
             }
-            eof {
-                send_user \"$user_notation Reached EOF. Program ended.\n\"
-                exit 1
+            \"$fgtExpectRoot\" {
+                break
+            }
+            \"$fgtExpect\" {
+                break
             }
             timeout {
-                send_user \"$user_notation Timed out waiting for a response.\n\"
+                send_user \"$userNotation Timed out waiting for a response.\n\"
+                close \$process_id
+                incr i
+                continue
+            }
+            eof {
+                send_user \"$userNotation Reached EOF. Program ended.\n\"
                 exit 1
-            }
-            \"$fgt_expect_root\" {
-                break
-            }
-            \"$fgt_expect\" {
-                break
             }
         }
     }
 
-    send_user \"$user_notation Successfully connected to $fgt_target.\"
+    if {\$i == $maxAttempts} {
+        send_user \"$userNotation Failed to connect to $fgtTarget\"
+        exit 1
+    }
+
+    send_user \"$userNotation Successfully connected to $fgtTarget.\"
     send \"\r\"
     # Interact with the device
     interact
