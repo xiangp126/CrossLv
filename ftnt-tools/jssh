@@ -128,16 +128,15 @@ expect -c "
                 exit 1
             }
             \"$fgt_expect_root\" {
-                send_user \"$user_notation Successfully connected to $fgt_target\n\"
                 break
             }
             \"$fgt_expect\" {
-                send_user \"$user_notation Successfully connected to $fgt_target\n\"
                 break
             }
         }
     }
 
+    send_user \"$user_notation Successfully connected to $fgt_target.\"
     send \"\r\"
     # Interact with the device
     interact
