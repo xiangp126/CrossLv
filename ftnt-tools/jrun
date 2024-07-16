@@ -105,7 +105,7 @@ tail -n +1 "$command_file" | while IFS= read -r command; do
     fi
 
 	# echo "$user_notation Original command: $command"
-	echo "$user_notation Cleaned command: $cleaned_command"
+	echo "$user_notation Sending: $cleaned_command"
 
     # Because there's a '\r\n' ending in each command already,
     # We don't need to add an 'Enter' at the end of the send-keys command anymore.
