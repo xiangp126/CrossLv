@@ -20,7 +20,7 @@
 scriptName=$(basename $0)
 fSSHPort=22
 fLoginUser="admin"
-fPasswd="fPasswd"
+fPasswd="password"
 fExpectRoot="# "
 fExpectUser="$ "
 fExpect=$fExpectUser
@@ -112,29 +112,27 @@ expect -c "
         spawn -noecho ssh -p $fSSHPort $fLoginUser@$fTarget
 
         set process_id \$spawn_id
+        set passwd_prompt_cnt 0
         expect {
             {yes/no} {
                 send \"yes\r\"
                 exp_continue
             }
             -re {[Pp]assword} {
+                incr passwd_prompt_cnt
+                if {\$passwd_prompt_cnt > 1} {
+                    send_user \"\n$userNotation Permission denied. Have you specified the login credentials?\n\"
+                    exit 1
+                }
                 send \"$fPasswd\r\"
                 exp_continue
             }
-            \"Host key verification failed.\" {
+            {Host key verification failed.} {
                 send_user \"$userNotation Host key verification failed. Updating known_hosts file...\n\"
                 system \"ssh-keygen -R $fTarget\"
                 send_user \"$userNotation Host key removed from known_hosts file.\n\"
                 send_user \"$userNotation Retrying SSH immediately...\n\"
                 continue
-            }
-            \"Permission denied\" {
-                send_user \"$userNotation Permission denied. Have you specified the login credentials?\n\"
-                exit 1
-            }
-            \"Connection refused\" {
-                send_user \"$userNotation Connection refused. Action aborted.\n\"
-                exit 1
             }
             \"$fExpectRoot\" {
                 break
