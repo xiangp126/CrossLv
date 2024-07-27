@@ -100,18 +100,21 @@ echo "$userNotation Set SSH Connection Port to: $fSSHPort"
 echo "$userNotation Set Username to: $fLoginUser"
 echo "$userNotation Set Password to: $fPasswd"
 echo "$userNotation Set Maximum Attempts to: $fMaxAttempts"
-echo "$userNotation Connecting to $fTarget..."
+echo "$userNotation Connecting to $fTarget ..."
 echo $separator
 
 # expect -d -c "
 expect -c "
-    set timeout 5
-    for {set i 1} {\$i <= $fMaxAttempts} {incr i} {
+    set timeout 3
+    set i 1
+    while {\$i <= $fMaxAttempts} {
         # ssh -o StrictHostKeyChecking=no $fTarget
-        # send_user \"Sync attempt \$i/$fMaxAttempts\n\"
+        if {\$i > 1} {
+            send_user \"$userNotation Login attempt \$i/$fMaxAttempts\n\"
+        }
         spawn -noecho ssh -p $fSSHPort $fLoginUser@$fTarget
 
-        set process_id \$spawn_id
+        set session_id \$spawn_id
         set passwd_prompt_cnt 0
         expect {
             {yes/no} {
@@ -132,7 +135,13 @@ expect -c "
                 system \"ssh-keygen -R $fTarget\"
                 send_user \"$userNotation Host key removed from known_hosts file.\n\"
                 send_user \"$userNotation Retrying SSH immediately...\n\"
+                close \$session_id
+                incr i
                 continue
+            }
+            {No route to host} {
+                send_user \"$userNotation No route to host. Exiting...\n\"
+                exit 1
             }
             \"$fExpectRoot\" {
                 break
@@ -142,7 +151,7 @@ expect -c "
             }
             timeout {
                 send_user \"$userNotation Timed out waiting for a response.\n\"
-                close \$process_id
+                close \$session_id
                 incr i
                 continue
             }
@@ -153,8 +162,8 @@ expect -c "
         }
     }
 
-    if {\$i == $fMaxAttempts} {
-        send_user \"$userNotation Failed to connect to $fTarget\"
+    if {\$i > $fMaxAttempts} {
+        send_user \"$userNotation Failed to connect to $fTarget.\n\"
         exit 1
     }
 
