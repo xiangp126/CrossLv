@@ -8,7 +8,7 @@ current_window=$(tmux display-message -p '#I')
 
 for win in $windows; do
     tmux select-window -t "$win"
-    sleep 0.2
+    # sleep 0.2
 
     # Resize the current window to maximum size
     tmux resize-window -A

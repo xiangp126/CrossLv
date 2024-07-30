@@ -37,7 +37,6 @@ gitExcludeList="$gitExcludePattern1 $gitExcludePattern2"
 userNotation="@@@@"
 subUserNotation="@@@@ @"
 separator="----------------------------------------------------------------"
-separator2="---------------------------------------->"
 
 getCurrentTime() {
     echo $(date +"%m/%d/%Y %H:%M:%S")
@@ -183,7 +182,6 @@ echo "$userNotation [B] Set build target to $fBuildTarget"
 echo "$userNotation [m] Set build mode to $fMode"
 echo "$userNotation [j] Set number of concurrent build jobs to $fNumOfWorkers"
 echo "$userNotation [T] Set the maximum number of build attempts to $fMaxBuildAttempt"
-echo "$separator2"
 
 [[ "$fGitClean" == true ]] && echo "$userNotation [c] Will Clean the repo"
 [[ "$fRunConfigure" == true ]] && echo "$userNotation [C] Will re-run Configure"
