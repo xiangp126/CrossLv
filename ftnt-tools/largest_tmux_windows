@@ -1,26 +1,84 @@
 #!/bin/bash
 
-# Get the list of all windows in the current session
-windows=$(tmux list-windows -F '#{window_index}')
+# Default to updating the current session
+all_sessions=false
+user_notation="@@@@"
 
-# Record the index of the current window where the script is executed
-current_window=$(tmux display-message -p '#I')
+usage() {
+    scriptName=$(basename "$0")
+    cat << _EOF
+Usage: $scriptName [options]
+       $scriptName [-a] [-h]
 
-for win in $windows; do
-    tmux select-window -t "$win"
-    # sleep 0.2
+Options:
+    -a      Apply changes to all windows in all sessions (default: $all_sessions)
+    -h      Print this help message
 
-    # Resize the current window to maximum size
-    tmux resize-window -A
+Example:
+    $scriptName     // Update all windows only in the current session
+    $scriptName -a  // Update all windows in all sessions
+    $scriptName -h  // Print this help message
 
-    # Get the list of all panes in the current window
-    # panes=$(tmux list-panes -F '#{pane_id}')
+_EOF
+    exit 0
+}
 
-    # for pane in $panes; do
-    #     tmux select-pane -t "$pane"
-    #     tmux resize-pane -Z  # Toggle zoom for the current pane
-    # done
+# Parse command-line options
+while getopts ":ah" opt; do
+    case ${opt} in
+        a )
+            all_sessions=false
+            ;;
+        h )
+            usage
+            ;;
+        \? )
+            echo "$user_notation Invalid option: -$OPTARG" 1>&2
+            ;;
+    esac
 done
 
-# Switch back to the original window where the script started
-tmux select-window -t "$current_window"
+# Shift to process non-option arguments. New $1, $2, ..., $@
+shift $((OPTIND - 1))
+if [[ $# -gt 0 ]]; then
+    echo "$user_notation Illegal non-option arguments: $@"
+    exit
+fi
+
+# Function to maximize all windows in a session
+maximize_windows_in_session() {
+    local session="$1"
+
+    # Switch to the session
+    tmux switch-client -t "$session"
+
+    # Get the list of all windows in the session
+    windows=$(tmux list-windows -t "$session" -F '#{window_index}')
+
+    for win in $windows; do
+        # Switch to the window
+        tmux select-window -t "$session:$win"
+        # Resize the current window to maximum size
+        tmux resize-window -A
+    done
+}
+
+# Record the current session and window
+current_window=$(tmux display-message -p '#I')
+current_session=$(tmux display-message -p '#S')
+
+if [ "$all_sessions" = true ]; then
+    # Update all windows in all sessions
+    sessions=$(tmux list-sessions -F '#{session_name}')
+    for session in $sessions; do
+        maximize_windows_in_session "$session"
+        sleep 2
+    done
+else
+    # Update all windows only in the current session
+    maximize_windows_in_session "$current_session"
+fi
+
+# Switch back to the original session and window
+tmux switch-client -t "$current_session"
+tmux select-window -t "$current_session:$current_window"

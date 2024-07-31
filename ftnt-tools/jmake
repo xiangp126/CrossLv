@@ -458,8 +458,8 @@ if [[ "$fSyncTarget" != false ]]; then
 
     case $retValue in
         0)
-            echo "$userNotation You have synced $fSyncFile to $fSyncTarget successfully at $(getCurrentTime)."
-            echo "$userNotation Login to the server and wait for it to reboot ..."
+            echo "$subUserNotation You have synced $fSyncFile to $fSyncTarget successfully at $(getCurrentTime)."
+            echo "$subUserNotation Login to the server and wait for it to reboot ..."
             jssh -P "$fSyncPort" -u "$fSyncUsername" -p "$fSyncPassword" -t "$fSyncTarget"
             if [[ $? -ne 0 ]]; then
                 echo "$subUserNotation Please check the server status manually."
@@ -470,15 +470,15 @@ if [[ "$fSyncTarget" != false ]]; then
             fi
             ;;
         $EMAXTRIES)
-            echo "$userNotation Failed to sync $fSyncFile to $fSyncTarget after $maxSyncRetries attempts"
+            echo "$subUserNotation Failed to sync $fSyncFile to $fSyncTarget after $maxSyncRetries attempts"
             exit $EMAXTRIES
             ;;
         $ETIMEOUT)
-            echo "$userNotation Timeout to sync $fSyncFile to $fSyncTarget"
+            echo "$subUserNotation Timeout to sync $fSyncFile to $fSyncTarget"
             exit $ETIMEOUT
             ;;
         *)
-            echo "$userNotation Failed to sync $fSyncFile to $fSyncTarget"
+            echo "$subUserNotation Failed to sync $fSyncFile to $fSyncTarget"
             exit $EFAILED
             ;;
     esac
