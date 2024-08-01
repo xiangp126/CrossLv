@@ -139,6 +139,7 @@ expect -c "
     # Set your SSH credentials
     set i 1
     set timeout 3
+    set has_vdom 0
 
     while {\$i <= $fMaxAttempts} {
         # ssh -o StrictHostKeyChecking=no $fTarget
@@ -178,7 +179,6 @@ expect -c "
             }
             # $fPrompt must be quoted.
             \"$fPrompt\" {
-                send \"\r\"
                 break
             }
             timeout {
@@ -201,11 +201,11 @@ expect -c "
     }
 
     if {$fWADWorkerCnt >= 0} {
-        expect \"$fPrompt\"
         send \"config system global\r\"
         expect {
             {Command fail.} {
                 # The device has VDOM
+                set has_vdom 1
                 expect \"$fPrompt\"
                 send \"config global\r\"
                 expect \"$fPrompt\"
@@ -223,10 +223,28 @@ expect -c "
         send \"set wad-worker-count $fWADWorkerCnt\r\"
         expect \"$fPrompt\"
         send \"end\r\"
+        expect \"$fPrompt\"
+        send \"end\r\"
+        expect \"$fPrompt\"
+
+        set wait_time 5
+        send_user \"$userNotation Wait for \$wait_time seconds to apply the configuration.\n\"
+        for {set j 0} {\$j < \$wait_time * 2} {incr j} {
+            send_user \"====\"
+        }
+        send_user \"\n\"
+        for {set i 0} {\$i < \$wait_time * 2} {incr i} {
+            send_user \"====\"
+            after 500
+        }
+        send \"\r\"
+        expect \"$fPrompt\"
     }
 
-    set timeout 10
-    expect \"$fPrompt\"
+    if {\$has_vdom} {
+        send \"config global\r\"
+        expect \"$fPrompt\"
+    }
     send \"diagnose debug reset\r\"
     expect {
         {Command fail.} {
@@ -277,10 +295,10 @@ expect -c "
 $subUserNotation FPX # config system global
 $subUserNotation FPX (global) # set wad-worker-count 1
 $subUserNotation FPX (global) # end
-$userNotation Or retry the same command with -N 1
+$userNotation Or retry the same command with -N1
             }
         } else {
-            send_user \"\n$userNotation Multiple $fWorkerType PIDs found: \$worker_pids.\n\"
+            send_user \"\n$userNotation Multiple $fWorkerType PIDs found: \$worker_pids.\"
             send_user \"\n$userNotation Please check if the input type: $fWorkerType is correct.\n\"
         }
     } elseif {\$worker_cnt == 1} {
@@ -297,12 +315,6 @@ $userNotation Or retry the same command with -N 1
 
     send \"diagnose debug reset\r\"
     expect \"$fPrompt\"
-
-    # send \"diagnose wad debug enable all\r\"
-    # expect \"$fPrompt\"
-
-    # send \"diagnose sys scanunit debug all\r\"
-    # expect \"$fPrompt\"
 
     send \"sys sh\r\"
     expect {
