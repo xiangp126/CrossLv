@@ -27,9 +27,10 @@ fWorkerType="worker"
 fSSHConnPort=22
 fUsername="admin"
 fPassword="password"
-fVdom="false"
 fPrompt="# "
 fGDBServerListenPort=444
+fWADWorkerKeep=-1
+fWADWorkerCnt=$fWADWorkerKeep # 0: unlimited, 1: 1 worker, -1: keep the original value
 fMaxAttempts=2
 # Pretty print
 userNotation="@@@@"
@@ -38,28 +39,30 @@ separator="----------------------------------------------------------------"
 
 usage() {
     cat << _EOF
-jdebug 0.0.0
+jdebug 0.0.1
 
 Usage: $scriptName [options]
        $scriptName [-t target] [-w worker_type] [-P gdbserver_listen_port] [-T max_attempts]
-              [-u username] [-p password] [-P ssh_conn_port] [-h]
+              [-u/-l username] [-p password] [-P ssh_conn_port] [-h]
 
 Options:
     -t      Target device name or IP address(default: $fTarget)
-    -P      SSH connection port(default: $fSSHConnPort)
-    -u      Username(default: $fUsername)
-    -p      Password(default: $fPassword)
     -w      Worker type(default: $fWorkerType)
     -d      GDB Server listen port(default: $fGDBServerListenPort)
-    -V      The device has vdom(default: $fVdom)
+    -l/-u   Username(default: $fUsername)
+    -p      Password(default: $fPassword)
+    -P      SSH connection port(default: $fSSHConnPort)
+    -N      Set wad worker count(default: $fWADWorkerCnt)
+            0: unlimited, 1: 1 worker to make life easier, -1: keep the original value
     -T      Maximum attempt(default: $fMaxAttempts)
     -h      Print this help message
 
 Example:
     $scriptName -t fgt1
     $scriptName -t fgt1 -P 22
+    $scriptName -t fgt1 -p "123" -N1
     $scriptName -t fgt1 -w algo -d 9229
-    $scriptName -t fgt1 -w algo -d 9229 -u "admin" -p "123"
+    $scriptName -t fgt1 -w algo -d 9229 -l "admin" -p "123"
     $scriptName -h
 
 _EOF
@@ -69,7 +72,7 @@ _EOF
 [[ $# -eq 0 ]] && usage
 
 # Parse the options
-while getopts "t:w:d:T:u:p:P:Vh" opt; do
+while getopts "t:w:d:T:l:u:p:P:N:h" opt; do
     case $opt in
         t)
             fTarget=$OPTARG
@@ -86,14 +89,17 @@ while getopts "t:w:d:T:u:p:P:Vh" opt; do
         P)
             fSSHConnPort=$OPTARG
             ;;
+        l)
+            fUsername=$OPTARG
+            ;;
         u)
             fUsername=$OPTARG
             ;;
         p)
             fPassword=$OPTARG
             ;;
-        V)
-            fVdom="true"
+        N)
+            fWADWorkerCnt=$OPTARG
             ;;
         h)
             usage
@@ -114,40 +120,61 @@ fi
 
 fSearchPatt="type=.*$fWorkerType"
 echo $separator
-echo "$userNotation Set Target Device to: $fTarget"
-echo "$userNotation Set Worker Type to: $fWorkerType"
-echo "$userNotation Set Search Pattern to: $fSearchPatt"
-echo "$userNotation Set GDB Server Listen Port to: $fGDBServerListenPort"
-echo "$userNotation Set SSH Connection Port to: $fSSHConnPort"
-echo "$userNotation Set Username to: $fUsername"
-echo "$userNotation Set Password to: $fPassword"
-echo "$userNotation Set Maximum Attempts to: $fMaxAttempts"
-echo "$userNotation Connecting to $fTarget..."
+echo "$userNotation [t]Set Target Device to: $fTarget"
+echo "$userNotation [w]Set Worker Type to: $fWorkerType(Search Pattern: $fSearchPatt)"
+echo "$userNotation [d]Set GDB Server Listen Port to: $fGDBServerListenPort"
+echo "$userNotation [P]Set SSH Connection Port to: $fSSHConnPort"
+echo "$userNotation [l]Set Username to: $fUsername"
+echo "$userNotation [p]Set Password to: $fPassword"
+echo "$userNotation [T]Set Maximum Attempts to: $fMaxAttempts"
+# if $wadWorkerCnt is larger or equal to 0, then print the message.
+if [ "$fWADWorkerCnt" -ge 0 ]; then
+    echo "$userNotation [N]Set WAD Worker Count to: $fWADWorkerCnt"
+fi
+echo "$userNotation Connecting to $fTarget ..."
 echo $separator
 
 # expect -d -c "
 expect -c "
     # Set your SSH credentials
-    set i 0
-    set timeout 2
-    set has_vdom $fVdom
+    set i 1
+    set timeout 3
 
-    while { \$i < $fMaxAttempts } {
+    while {\$i <= $fMaxAttempts} {
+        # ssh -o StrictHostKeyChecking=no $fTarget
+        if {\$i > 1} {
+            send_user \"$userNotation Login attempt \$i/$fMaxAttempts\n\"
+        }
         spawn -noecho ssh -p $fSSHConnPort $fUsername@$fTarget
 
-        set process_id \$spawn_id
+        set session_id \$spawn_id
+        set passwd_prompt_cnt 0
         expect {
-            \"yes/no\" {
+            {yes/no} {
                 send \"yes\r\"
-                break
+                exp_continue
             }
-            \"password:\" {
+            -re {[Pp]assword} {
+                incr passwd_prompt_cnt
+                if {\$passwd_prompt_cnt > 1} {
+                    send_user \"\n$userNotation Permission denied. Please specified the login credentials.\n\"
+                    exit 1
+                }
                 send \"$fPassword\r\"
-                break
+                exp_continue
             }
             \"Connection refused\" {
                 # send_user \"Connection refused when connecting to $fTarget\n\"
                 exit 1
+            }
+            {Host key verification failed.} {
+                send_user \"$userNotation Host key verification failed. Updating known_hosts file...\n\"
+                system \"ssh-keygen -R $fTarget\"
+                send_user \"$userNotation Host key removed from known_hosts file.\n\"
+                send_user \"$userNotation Retrying SSH immediately...\n\"
+                close \$session_id
+                incr i
+                continue
             }
             # $fPrompt must be quoted.
             \"$fPrompt\" {
@@ -156,7 +183,7 @@ expect -c "
             }
             timeout {
                 send_user \"$subUserNotation Timeout when connecting to $fTarget\n\"
-                close \$process_id
+                close \$session_id
                 incr i
                 continue
             }
@@ -168,25 +195,52 @@ expect -c "
         }
     }
 
-    if {\$i == $fMaxAttempts} {
+    if {\$i > $fMaxAttempts} {
         send_user \"$userNotation Failed to connect to $fTarget\"
         exit 1
     }
 
+    if {$fWADWorkerCnt >= 0} {
+        expect \"$fPrompt\"
+        send \"config system global\r\"
+        expect {
+            {Command fail.} {
+                # The device has VDOM
+                expect \"$fPrompt\"
+                send \"config global\r\"
+                expect \"$fPrompt\"
+                send \"config system global\r\"
+                exp_continue
+            }
+            \"$fPrompt\" {
+                # Do nothing, just continue
+            }
+            timeout {
+                send_user \"$userNotation Timeout when resetting debug.\r\"
+                exit 1
+            }
+        }
+        send \"set wad-worker-count $fWADWorkerCnt\r\"
+        expect \"$fPrompt\"
+        send \"end\r\"
+    }
+
     set timeout 10
     expect \"$fPrompt\"
-    if {\$has_vdom == \"true\"} {
-        send \"config global\r\"
-        expect \"$fPrompt\"
-    }
     send \"diagnose debug reset\r\"
     expect {
-        \"Unknown action\" {
-            send_user \"$userNotation Command fail. Please retry with -V if the device has VDOM.\n\"
-            exit 1
+        {Command fail.} {
+            # The device has VDOM
+            expect \"$fPrompt\"
+            send \"config global\r\"
+            exp_continue
         }
         \"$fPrompt\" {
             # Do nothing, just continue
+        }
+        timeout {
+            send_user \"$userNotation Timeout when resetting debug.\r\"
+            exit 1
         }
     }
     send \"diagnose debug enable\r\"
@@ -197,6 +251,7 @@ expect -c "
 
     # Search for the line with \"type=worker\" and extract the PID
     set worker_pid \"\"
+    set worker_cnt 0
     set worker_pids {}
 
     # Define the pattern to match
@@ -210,24 +265,28 @@ expect -c "
             if {[regexp \$pid_regex \$line match worker_pid]} {
                 # Add the matched PID to the list. lappend: list append.
                 lappend worker_pids \$worker_pid
+                incr worker_cnt
             }
         }
     }
 
-    if {[llength \$worker_pids] > 1} {
+    if {\$worker_cnt > 1} {
         if {[string match \"*work*\" $fWorkerType]} {
-            send_user \"\n$userNotation Multiple worker PIDs found: \$worker_pids\n\"
+            send_user \"\n$userNotation Warning: \$worker_cnt $fWorkerType PIDs found:\n\$worker_pids\n\"
             send_user {$userNotation Recommend to set wad worker count to 1 to make life easier.
-$userNotation FPX # config system global
-$userNotation FPX (global) # set wad-worker-count 1
-$userNotation FPX (global) # end
+$subUserNotation FPX # config system global
+$subUserNotation FPX (global) # set wad-worker-count 1
+$subUserNotation FPX (global) # end
+$userNotation Or retry the same command with -N 1
             }
         } else {
             send_user \"\n$userNotation Multiple $fWorkerType PIDs found: \$worker_pids.\n\"
-            send_user \"$userNotation Please check if the input type: $fWorkerType is correct.\n\"
+            send_user \"\n$userNotation Please check if the input type: $fWorkerType is correct.\n\"
         }
-    } elseif {[llength \$worker_pids] < 1} {
-        send_user \"$userNotation Could not find $fWorkerType type PID.\n\"
+    } elseif {\$worker_cnt == 1} {
+        send_user \"\n$userNotation Found $fWorkerType type PID: \$worker_pids\n\"
+    } else {
+        send_user \"\n$userNotation Could not find $fWorkerType type PID.\n\"
         exit 1
     }
 

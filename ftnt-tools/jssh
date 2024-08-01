@@ -35,15 +35,14 @@ cat << _EOF
 jssh 0.1
 
 usage:
-    $scriptName [-l user] [-p passwd] [-P ssh_port] [-E expect] -t target_ip
+    $scriptName [-l/-u user] [-p passwd] [-P ssh_port] [-E expect] -t target_ip
 
 Options:
-    -P fSSHPort        SSH port to use. Default is "$fSSHPort"
-    -l fLoginUser      User to use for login. Default is "$fLoginUser"
-    -u fLoginUser      User to use for login. Default is "$fLoginUser"
-    -p fPasswd         Password to use for login. Default is "$fPasswd"
-    -E fExpect         Except prompt to expect(other than "$fExpectRoot"). Default is "$fExpectUser".
-    -t fTarget(IP)     The device to connect to. Default is "$fTarget"
+    -P      fSSHPort     SSH port to use. Default is "$fSSHPort"
+    -l/-u   fLoginUser   User to use for login. Default is "$fLoginUser"
+    -p      fPasswd      Password to use for login. Default is "$fPasswd"
+    -E      fExpect      Except prompt to expect(other than "$fExpectRoot"). Default is "$fExpectUser".
+    -t      fTarget(IP)  The device to connect to. Default is "$fTarget"
 
 Example:
     $scriptName -t fpx1
@@ -105,8 +104,10 @@ echo $separator
 
 # expect -d -c "
 expect -c "
-    set timeout 3
+    # Set your SSH credentials
     set i 1
+    set timeout 3
+
     while {\$i <= $fMaxAttempts} {
         # ssh -o StrictHostKeyChecking=no $fTarget
         if {\$i > 1} {
@@ -124,7 +125,7 @@ expect -c "
             -re {[Pp]assword} {
                 incr passwd_prompt_cnt
                 if {\$passwd_prompt_cnt > 1} {
-                    send_user \"\n$userNotation Permission denied. Have you specified the login credentials?\n\"
+                    send_user \"\n$userNotation Permission denied. Please specified the login credentials.\n\"
                     exit 1
                 }
                 send \"$fPasswd\r\"
