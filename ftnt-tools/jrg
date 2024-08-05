@@ -48,21 +48,23 @@ if [ $# -eq 0 ]; then
 fi
 
 query="$@"
-query_removed_escapes=$(echo "$query" | sed 's/\\//g')
+# wad_ssl_sock_port_exec_up_forward_txn:17850
+query_polished=$(echo "$query" | sed 's/\\//g' | cut -d: -f1)
+
 result=$(rg --smart-case \
             --color=ansi \
             --colors 'match:fg:204,51,153' --colors 'match:style:bold' \
-            --line-number --no-heading "$query" |
+            --line-number --no-heading "$query_polished" |
         fzf --ansi \
             --color 'hl:-1:underline,hl+:-1:underline:reverse' \
             --delimiter ':' \
             --preview "bat --color=always {1} --theme='TwoDark' --highlight-line {2}" \
             --preview-window 'top,60%,border-bottom,+{2}+3/3,~3' \
             --cycle \
-            --query "$query_removed_escapes")
+            --query "$query_polished")
 
 if [ -z "$result" ]; then
-    echo "$userNotation No match found for: $query"
+    echo "$userNotation No match found for: $query_polished"
     exit 1
 fi
 

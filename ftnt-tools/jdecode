@@ -85,8 +85,8 @@ def main():
     global user_notation, exe_file_path, crash_log_path, crash_decode_output, write_flag, verbose_flag
     user_notation = "@@@@"
     exe_file_path = "./sysinit/init"
-    crash_log_path = "/data/bugzilla/crash.txt"
-    crash_decode_output = "/data/bugzilla/crash_decoded.txt"
+    crash_log_path = "~/.crash/crash.log"
+    crash_decode_output = "~/.crash/crash_decoded.txt"
     write_flag = False
     verbose_flag = False
 
