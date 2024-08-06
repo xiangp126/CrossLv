@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Default to updating the current session
-all_sessions=false
 user_notation="@@@@"
 
 usage() {
@@ -11,12 +10,10 @@ Usage: $scriptName [options]
        $scriptName [-a] [-h]
 
 Options:
-    -a      Apply changes to all windows in all sessions (default: $all_sessions)
     -h      Print this help message
 
 Example:
     $scriptName     // Update all windows only in the current session
-    $scriptName -a  // Update all windows in all sessions
     $scriptName -h  // Print this help message
 
 _EOF
@@ -24,11 +21,8 @@ _EOF
 }
 
 # Parse command-line options
-while getopts ":ah" opt; do
+while getopts "h" opt; do
     case ${opt} in
-        a )
-            all_sessions=false
-            ;;
         h )
             usage
             ;;
@@ -45,19 +39,13 @@ if [[ $# -gt 0 ]]; then
     exit
 fi
 
-# Function to maximize all windows in a session
-maximize_windows_in_session() {
-    local session="$1"
-
-    # Switch to the session
-    tmux switch-client -t "$session"
-
+maximize_windows_in_current_session() {
     # Get the list of all windows in the session
-    windows=$(tmux list-windows -t "$session" -F '#{window_index}')
+    windows=$(tmux list-windows -F '#{window_index}')
 
     for win in $windows; do
         # Switch to the window
-        tmux select-window -t "$session:$win"
+        tmux select-window -t "$win"
         # Resize the current window to maximum size
         tmux resize-window -A
     done
@@ -65,20 +53,8 @@ maximize_windows_in_session() {
 
 # Record the current session and window
 current_window=$(tmux display-message -p '#I')
-current_session=$(tmux display-message -p '#S')
 
-if [ "$all_sessions" = true ]; then
-    # Update all windows in all sessions
-    sessions=$(tmux list-sessions -F '#{session_name}')
-    for session in $sessions; do
-        maximize_windows_in_session "$session"
-        sleep 2
-    done
-else
-    # Update all windows only in the current session
-    maximize_windows_in_session "$current_session"
-fi
+maximize_windows_in_current_session
 
 # Switch back to the original session and window
-tmux switch-client -t "$current_session"
-tmux select-window -t "$current_session:$current_window"
+tmux select-window -t "$current_window"
