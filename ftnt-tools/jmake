@@ -6,9 +6,10 @@ scriptWd=$(dirname $0)
 pathOfNoPasswdToConfig=$scriptWd/nopasswd_to_config
 ftntBuildTarget="image.out"
 
-# Build flags
-fMode=FGT_VM64_KVM  # FOS: FGT_VM64 for VMWARE, FGT_VM64_KVM for KVM
-fModeSpecified=false
+# Build flags & Options
+fBuildFlags=false
+fBuildTarget="$ftntBuildTarget"
+fMode=""
 fNumOfWorkers=$(nproc)
 fWorkingDir=$(pwd)
 fMaxBuildAttempt=2
@@ -17,13 +18,10 @@ fRunConfigure=false
 fNeedBuild=false
 fGitClean=false
 fRMCompileCommandsJson=false
-# The build target
-fBuildTarget="$ftntBuildTarget"
-# The source file to sync
-fSyncFile=$fBuildTarget
-# The sync target machine
-fSyncPort=22
+# Sync Options
 fSyncTarget=false
+fSyncFile=$fBuildTarget
+fSyncPort=22
 fSyncUsername="admin"
 fSyncPassword="password"
 
@@ -34,9 +32,12 @@ gitExcludePattern2="\*.code-workspace"
 gitExcludeList="$gitExcludePattern1 $gitExcludePattern2"
 
 # Pretty print
-userNotation="@@@@"
-subUserNotation="@@@@ @"
-separator="----------------------------------------------------------------"
+USER_NOTATION="@@@@"
+SUB_USER_NOTATION="@@@@ @"
+# SHORT_SEPARATOR="--------------"
+# SEPARATOR="---------------------------------------------------"
+# SHORT_SEPARATOR2="=============="
+SEPARATOR2="==================================================="
 
 getCurrentTime() {
     echo $(date +"%m/%d/%Y %H:%M:%S")
@@ -52,24 +53,25 @@ Usage: $scriptName [options]
              [-B build_target]
              [-bcCohf]
 
-Build options:
+Build Flags:
     -c      Clean the repo (default: $fGitClean)
     -C      Run Configure intelligently (default: $fRunConfigure)
     -o      Run build commands (set automatically if any of the [bmjwT] options is set)
-    -T      Set the maximum number of build attempts (default: $fMaxBuildAttempt)
     -b      Use Bear to generate $compileCommandsFile (default: $fUseBear)
+    -f      Remove $compileCommandsFile (default: $fRMCompileCommandsJson)
+Build Options:
+    -T      Set the maximum number of build attempts (default: $fMaxBuildAttempt)
     -B      Set the build target (default: $fBuildTarget)
     -m      Set the build mode (default: $fMode, auto detect FGT_VM64_KVM and FPX_KVM)
     -j      Set the number of jobs (default: $fNumOfWorkers)
     -w      Set working directory (default: $fWorkingDir)
-    -f      Remove $compileCommandsFile (default: $fRMCompileCommandsJson)
-Sync options:
+Sync Options:
     -s      Set the source file to sync (default: $fSyncFile)
     -t      Set the target machine (default: $fSyncTarget) to sync the source file specified by -s
     -P      Set the ssh port for sync command (default: $fSyncPort)
     -l/-u   Set the username for sync command (default: $fSyncUsername)
     -p      Set the password for sync command (default: $fSyncPassword)
-Other options:
+Other Options:
     -h      Print this help message
 
 Example:
@@ -88,7 +90,6 @@ while getopts "hm:w:j:cCbB:ofT:t:s:P:p:u:l:" opt; do
     case $opt in
         m)
             fMode=$OPTARG
-            fModeSpecified=true
             fNeedBuild=true
             ;;
         w)
@@ -147,7 +148,7 @@ while getopts "hm:w:j:cCbB:ofT:t:s:P:p:u:l:" opt; do
             usage
             ;;
         ?)
-            echo "$userNotation Invalid option: -$OPTARG" >&2
+            echo "$USER_NOTATION Invalid option: -$OPTARG" >&2
             exit 1
             ;;
     esac
@@ -156,48 +157,118 @@ done
 # Shift to process non-option arguments. New $1, $2, ..., $@
 shift $((OPTIND - 1))
 if [[ $# -gt 0 ]]; then
-    echo "$userNotation Illegal non-option arguments: $@"
+    echo "$USER_NOTATION Illegal non-option arguments: $@"
     exit
 fi
 
-# If fNeedBuild is set, then set fRunConfigure to true as well
-if [[ "$fNeedBuild" == true ]]; then
-    fRunConfigure=true
+# Pre-parse the options
+preParseOptions() {
+    # If fNeedBuild is set, then set fRunConfigure to true as well
+    if [[ "$fNeedBuild" == true ]]; then
+        fRunConfigure=true
+    fi
+
+    # Try to derive and update the build mode from the working directory
+    # 0: not derived, 1: FPX, 2: FGT
+    if [[ "$fWorkingDir" == *"fpx"* ]]; then
+        case "$fMode" in
+            "vmware")
+                fMode="FPX_VMWARE"
+                ;;
+            "kvm")
+                fMode="FPX_KVM"
+                ;;
+            "")
+                fMode="FPX_KVM"
+                ;;
+        esac
+    else
+        if [[ "$fWorkingDir" == *"fos"* ]]; then
+            case "$fMode" in
+                "vmware")
+                    fMode="FGT_VM64"
+                    ;;
+                "kvm")
+                    fMode="FGT_VM64_KVM"
+                    ;;
+                "")
+                    fMode="FGT_VM64_KVM"
+                    ;;
+            esac
+        fi
+    fi
+
+    # Check the working directory
+    if [[ -x "$(command -v realpath)" ]]; then
+        fWorkingDir=$(realpath "$fWorkingDir")
+    fi
+
+    # Check the working directory
+    if [[ ! -d "$fWorkingDir" ]]; then
+        echo "$USER_NOTATION Directory $fWorkingDir not found"
+        exit 1
+    fi
+}
+
+preParseOptions
+
+# Define color variables
+# CYAN='\033[36m'
+LIGHTCYAN='\033[38;5;81m'
+RED='\033[31m'
+BOLD='\033[1m'
+GREEN='\033[32m'
+# YELLOW='\033[33mog'
+# YELLOBOLD='\033[1;33m'
+# REDBOLD='\033[1;31m'
+# CYANBOLD='\033[1;36m'
+RESET='\033[0m'
+COLOR=""
+
+echo $SEPARATOR2
+[[ "$fGitClean" == true || "$fRunConfigure" == true || "$fNeedBuild" == true
+    || "$fUseBear" == true || "$fRMCompileCommandsJson" == true ]] && fBuildFlags=true
+
+if [[ "$fBuildFlags" != false ]]; then
+    COLOR="$GREEN"
+    # echo "$SEPARATOR"
+    echo -e "${BOLD}Build Flags:${RESET}"
+    # echo "$SHORT_SEPARATOR"
+    [[ "$fGitClean"     == true ]] && echo -e "$USER_NOTATION [c] ${COLOR}Clean${RESET} the repo"
+    [[ "$fRunConfigure" == true ]] && echo -e "$USER_NOTATION [C] ${COLOR}Configure${RESET} the project"
+    [[ "$fNeedBuild"    == true ]] && echo -e "$USER_NOTATION [o] ${COLOR}Build${RESET} the project"
+    [[ "$fUseBear"      == true ]] && echo -e "$USER_NOTATION [b] ${COLOR}Generate${RESET} compile_commands.json using bear"
+    [[ "$fRMCompileCommandsJson" == true ]] && echo -e "$USER_NOTATION [f] ${COLOR}Remove${RESET} $compileCommandsFile if exists"
 fi
 
-# Check the working directory
-if [[ -x "$(command -v realpath)" ]]; then
-    fWorkingDir=$(realpath "$fWorkingDir")
-fi
-if [[ ! -d "$fWorkingDir" ]]; then
-    echo "$userNotation Directory $fWorkingDir not found"
-    exit 1
+if [[ "$fNeedBuild" != false ]]; then
+    COLOR="$LIGHTCYAN"
+    # echo "$SEPARATOR"
+    echo -e "${BOLD}Build Optioins:${RESET}"
+    # echo "$SHORT_SEPARATOR"
+    echo -e "$USER_NOTATION [m] Build Mode:   ${COLOR}$fMode${RESET}"
+    echo -e "$USER_NOTATION [B] Build Target: ${COLOR}$fBuildTarget${RESET}"
+    echo -e "$USER_NOTATION [w] Working Directory: ${COLOR}$fWorkingDir${RESET}"
+    echo -e "$USER_NOTATION [T] Maximum Build Attempts: ${COLOR}$fMaxBuildAttempt${RESET}"
+    echo -e "$USER_NOTATION [j] Concurrent Build Jobs:  ${COLOR}$fNumOfWorkers${RESET}"
 fi
 
-echo "$separator"
-echo "$userNotation [w] Set working directory to $fWorkingDir"
-echo "$userNotation [m] Set build mode to $fMode"
-echo "$userNotation [B] Set build target to $fBuildTarget"
-echo "$userNotation [j] Set number of concurrent build jobs to $fNumOfWorkers"
-echo "$userNotation [T] Set the maximum number of build attempts to $fMaxBuildAttempt"
-
-[[ "$fGitClean" == true ]] && echo "$userNotation [c] Will Clean the repo"
-[[ "$fRunConfigure" == true ]] && echo "$userNotation [C] Will run Configure"
-[[ "$fNeedBuild" == true ]] && echo "$userNotation [o] Will build the project"
-[[ "$fUseBear" == true ]] && echo "$userNotation [b] Will generate compile_commands.json using bear"
-[[ "$fRMCompileCommandsJson" == true ]] && echo "$userNotation [f] Will remove $compileCommandsFile if exists"
 if [[ "$fSyncTarget" != false ]]; then
-    echo "$userNotation [s] Scheduled to sync $fSyncFile to $fSyncTarget"
-    echo "$userNotation [S] SYNC_FILE ($fSyncFile)"
-    echo "$userNotation [u] USER ($fSyncUsername)"
-    echo "$userNotation [p] PWD ($fSyncPassword)"
+    COLOR="$RED"
+    # echo "$SEPARATOR"
+    echo -e "${BOLD}Sync Optioins:${RESET}"
+    # echo "$SHORT_SEPARATOR"
+    echo -e "$USER_NOTATION [s] Scheduled to sync ${COLOR}$fSyncFile${RESET} to ${COLOR}$fSyncTarget${RESET}"
+    echo -e "$USER_NOTATION [S] SYNC_FILE: (${COLOR}$fSyncFile${RESET})"
+    echo -e "$USER_NOTATION [u] USER:      (${COLOR}$fSyncUsername${RESET})"
+    echo -e "$USER_NOTATION [p] PASSWORD:  (${COLOR}$fSyncPassword${RESET})"
 fi
-echo "$separator"
+echo "$SEPARATOR2"
 # sleep 0.1
 
 # Clean the working directory
 if [[ "$fGitClean" == true ]]; then
-    echo "$userNotation Cleaning the working directory ..."
+    echo "$USER_NOTATION Cleaning the working directory ..."
     cd "$fWorkingDir" || exit
     gitExcludePattern=""
     for patt in $gitExcludeList; do
@@ -207,43 +278,39 @@ if [[ "$fGitClean" == true ]]; then
                 continue
             fi
         fi
-        echo "$subUserNotation Exclude $patt"
+        echo "$SUB_USER_NOTATION Exclude $patt"
         gitExcludePattern+="--exclude=$patt "
     done
 
     gitCleanCmd="git clean -xdf $gitExcludePattern"
-    echo "$subUserNotation Running: $gitCleanCmd"
+    echo "$SUB_USER_NOTATION Running: $gitCleanCmd"
 
     sleep 1
     eval "$gitCleanCmd"
     if [[ $? -ne 0 ]]; then
-        echo "$userNotation Failed to clean the working directory"
+        echo "$USER_NOTATION Failed to clean the working directory"
         exit 1
     else
-        echo "$subUserNotation Cleaned the working directory successfully"
+        echo "$SUB_USER_NOTATION Cleaned the working directory successfully"
     fi
 fi
 
 expectPath=$(command -v expect)
 if [[ -z "$expectPath" ]]; then
-    echo "$userNotation Command expect not found"
+    echo "$USER_NOTATION Command expect not found"
     exit 1
 fi
 
 # Step 1: Run Configure
 if [[ "$fRunConfigure" == true ]]; then
-    echo "$userNotation Running Configure ..."
-    echo "$subUserNotation Running nopasswd_to_config (Wd:$fWorkingDir, Mode:$fMode)"
+    echo "$USER_NOTATION Running Configure ..."
+    echo "$SUB_USER_NOTATION Running nopasswd_to_config (Wd:$fWorkingDir, Mode:$fMode)"
     sleep 1
 
-    if [[ "$fModeSpecified" == true ]]; then
-        $expectPath -f "$pathOfNoPasswdToConfig" "$fWorkingDir" "$fMode"
-    else
-        $expectPath -f "$pathOfNoPasswdToConfig" "$fWorkingDir"
-    fi
+    $expectPath -f "$pathOfNoPasswdToConfig" "$fWorkingDir" "$fMode"
 
     if [[ $? -ne 0 ]]; then
-        echo "$userNotation Failed to run $pathOfNoPasswdToConfig"
+        echo "$USER_NOTATION Failed to run $pathOfNoPasswdToConfig"
         exit 1
     fi
 fi
@@ -258,8 +325,8 @@ if [[ "$fNeedBuild" != false ]]; then
     if [[ "$fUseBear" == true ]]; then
         bearPath=$(command -v bear)
         if [[ -z "$bearPath" ]]; then
-            echo "$userNotation Command bear not found, please install it first"
-            echo "$userNotation sudo apt install bear libear -y"
+            echo "$USER_NOTATION Command bear not found, please install it first"
+            echo "$USER_NOTATION sudo apt install bear libear -y"
             exit 1
         fi
         pathOfLibear=$(locate libear.so | grep -m 1 libear.so)
@@ -268,8 +335,8 @@ if [[ "$fNeedBuild" != false ]]; then
         else
             defaultLiBearPath="/usr/lib/x86_64-linux-gnu/bear/libear.so"
             if [[ ! -f "$defaultLiBearPath" ]]; then
-                echo "$userNotation libear.so not found, please install it first"
-                echo "$userNotation sudo apt install libear -y"
+                echo "$USER_NOTATION libear.so not found, please install it first"
+                echo "$USER_NOTATION sudo apt install libear -y"
                 exit 1
             fi
             bear="bear -l $defaultLiBearPath"
@@ -281,16 +348,16 @@ if [[ "$fNeedBuild" != false ]]; then
     jsonFile=$compileCommandsFile
     jsonPath=$fWorkingDir/$jsonFile
     if [[ -f "$jsonPath" && ! -w "$jsonPath" ]]; then
-        echo "$userNotation Detected $jsonPath is read-only"
+        echo "$USER_NOTATION Detected $jsonPath is read-only"
         if [[ "$fRMCompileCommandsJson" == true ]]; then
-            echo "$subUserNotation Removing $jsonPath"
+            echo "$SUB_USER_NOTATION Removing $jsonPath"
             rm -f "$jsonPath"
             if [[ $? -ne 0 ]]; then
-                echo "$subUserNotation Failed to remove $jsonPath"
+                echo "$SUB_USER_NOTATION Failed to remove $jsonPath"
                 exit 1
             fi
         else
-            echo "$subUserNotation Just keep $jsonPath as it is"
+            echo "$SUB_USER_NOTATION Just keep $jsonPath as it is"
         fi
     fi
 
@@ -298,8 +365,8 @@ if [[ "$fNeedBuild" != false ]]; then
     attempt=1
     maxAttempt=$fMaxBuildAttempt
     while [[ $attempt -le $maxAttempt ]]; do
-        echo "$userNotation Running build commands: $makeCommand"
-        echo "$subUserNotation Build attempt $attempt/$maxAttempt"
+        echo "$USER_NOTATION Running build commands: $makeCommand"
+        echo "$SUB_USER_NOTATION Build attempt $attempt/$maxAttempt"
         # [[ $attempt -gt 1 ]] && sleep 2
         sleep 2
 
@@ -313,23 +380,23 @@ if [[ "$fNeedBuild" != false ]]; then
     done
 
     if [[ $eval_status -ne 0 ]]; then
-        echo "$userNotation Build projects failed."
-        echo "$subUserNotation Suggest to clean the working directory and try again."
+        echo "$USER_NOTATION Build projects failed."
+        echo "$SUB_USER_NOTATION Suggest to clean the working directory and try again."
         exit 1
     fi
 
     # Remove the write privilege of compile_commands.json
     if [[ -f "$jsonPath" && -w "$jsonPath" ]]; then
-        echo "$userNotation $jsonPath is writable"
-        echo "$userNotation Remove the write privilege of $jsonPath"
+        echo "$USER_NOTATION $jsonPath is writable"
+        echo "$USER_NOTATION Remove the write privilege of $jsonPath"
         chmod -w "$jsonPath"
         if [[ $? -ne 0 ]]; then
-            echo "$userNotation Failed to remove the write privilege of $jsonPath"
+            echo "$USER_NOTATION Failed to remove the write privilege of $jsonPath"
             exit 1
         fi
     fi
 
-    echo "$userNotation Congratulations! You have built projects successfully at $(getCurrentTime)."
+    echo "$USER_NOTATION Congratulations! You have built projects successfully at $(getCurrentTime)."
 fi
 
 # Here is the real expect script
@@ -365,12 +432,12 @@ fi
 if [[ "$fSyncTarget" != false ]]; then
     syncFiles=($(find "$fWorkingDir" -name "$fSyncFile"))
     if [[ ${#syncFiles[@]} -eq 0 ]]; then
-        echo "$userNotation $fSyncFile not found in $fWorkingDir"
+        echo "$USER_NOTATION $fSyncFile not found in $fWorkingDir"
         exit 1
     fi
     # Only sync the first file found
     syncFile="${syncFiles[0]}"
-    echo "$userNotation Syncing $syncFile to $fSyncTarget"
+    echo "$USER_NOTATION Syncing $syncFile to $fSyncTarget"
 
     maxSyncRetries=5
     ESUCCESS=0
@@ -382,13 +449,13 @@ if [[ "$fSyncTarget" != false ]]; then
     # expect -d -c "
     expect -c "
         # Set the initial values
-        set defaultTimeout 120
+        set defaultTimeout 180
         set adjustTimeout 0
         set waitBeforeRetry 10
 
         # Loop to sync the file
         for {set i 1} {\$i <= $maxSyncRetries} {incr i} {
-            send_user \"$subUserNotation Sync attempt \$i/$maxSyncRetries\n\"
+            send_user \"$SUB_USER_NOTATION Sync attempt \$i/$maxSyncRetries\n\"
             spawn -noecho scp -P $fSyncPort $syncFile ${fSyncUsername}@${fSyncTarget}:/fgt-image
             if {\$adjustTimeout != 0} {
                 set timeout \$adjustTimeout
@@ -398,7 +465,7 @@ if [[ "$fSyncTarget" != false ]]; then
 
             expect {
                 \"bad port\" {
-                    send_user \"$subUserNotation Bad port. Connecting aborted.\n\"
+                    send_user \"$SUB_USER_NOTATION Bad port. Connecting aborted.\n\"
                     exit $EFAILED
                 }
                 {yes/no} {
@@ -410,40 +477,40 @@ if [[ "$fSyncTarget" != false ]]; then
                     exp_continue
                 }
                 \"Host key verification failed.\" {
-                    send_user \"$subUserNotation Host key verification failed. Updating known_hosts file...\n\"
-                    send_user \"$subUserNotation Executing: ssh-keygen -R $fSyncTarget\n\"
+                    send_user \"$SUB_USER_NOTATION Host key verification failed. Updating known_hosts file...\n\"
+                    send_user \"$SUB_USER_NOTATION Executing: ssh-keygen -R $fSyncTarget\n\"
                     system \"ssh-keygen -R $fSyncTarget\"
-                    send_user \"$subUserNotation Host key removed from known_hosts file.\n\"
-                    send_user \"$subUserNotation Retrying SCP immediately...\n\"
+                    send_user \"$SUB_USER_NOTATION Host key removed from known_hosts file.\n\"
+                    send_user \"$SUB_USER_NOTATION Retrying SCP immediately...\n\"
                     continue
                 }
                 -re {Connection refused|No route to host} {
                     set adjustTimeout -1
-                    send_user \"$subUserNotation Waiting for \$waitBeforeRetry seconds before retrying...\n\"
+                    send_user \"$SUB_USER_NOTATION Waiting for \$waitBeforeRetry seconds before retrying...\n\"
                     sleep \$waitBeforeRetry
                     # Exponential backoff
                     set waitBeforeRetry [expr {\$waitBeforeRetry * 2}]
                     continue
                 }
                 \"501-Permission Denied\" {
-                    send_user \"$subUserNotation Permission Denied. Please enable admin-scp under 'config system global'.\n\"
+                    send_user \"$SUB_USER_NOTATION Permission Denied. Please enable admin-scp under 'config system global'.\n\"
                     exit $EFAILED
                 }
                 \"check image error\" {
-                    send_user \"$subUserNotation Check image error. Action aborted.\n\"
+                    send_user \"$SUB_USER_NOTATION Check image error. Action aborted.\n\"
                     # exp_continue
                     exit $EFAILED
                 }
                 \"lost connection\" {
-                    send_user \"$subUserNotation Lost connection. Action aborted.\n\"
+                    send_user \"$SUB_USER_NOTATION Lost connection. Action aborted.\n\"
                     exit $EFAILED
                 }
                 timeout {
-                    send_user \"$subUserNotation Timeout. Action aborted.\n\"
+                    send_user \"$SUB_USER_NOTATION Timeout. Action aborted.\n\"
                     exit $ETIMEOUT
                 }
                 eof {
-                    send_user \"$subUserNotation Reaching EOF.\n\"
+                    send_user \"$SUB_USER_NOTATION Reaching EOF.\n\"
                     exit $ESUCCESS
                 }
             }
@@ -452,31 +519,31 @@ if [[ "$fSyncTarget" != false ]]; then
     "
 
     retValue=$?
-    [[ $retValue -ne 0 ]] && echo "$subUserNotation Sync return value: $retValue"
+    [[ $retValue -ne 0 ]] && echo "$SUB_USER_NOTATION Sync return value: $retValue"
 
     case $retValue in
         0)
-            echo "$subUserNotation You have synced $fSyncFile to $fSyncTarget successfully at $(getCurrentTime)."
-            echo "$subUserNotation Login to the server and wait for it to reboot ..."
+            echo "$SUB_USER_NOTATION You have synced $fSyncFile to $fSyncTarget successfully at $(getCurrentTime)."
+            echo "$SUB_USER_NOTATION Login to the server and wait for it to reboot ..."
             jssh -P "$fSyncPort" -u "$fSyncUsername" -p "$fSyncPassword" -t "$fSyncTarget"
             if [[ $? -ne 0 ]]; then
-                echo "$subUserNotation Please check the server status manually."
+                echo "$SUB_USER_NOTATION Please check the server status manually."
                 exit 1
             else
-                echo "$subUserNotation Connection to $fSyncTarget closed at $(getCurrentTime)."
+                echo "$SUB_USER_NOTATION Connection to $fSyncTarget closed at $(getCurrentTime)."
                 exit 0
             fi
             ;;
         $EMAXTRIES)
-            echo "$subUserNotation Failed to sync $fSyncFile to $fSyncTarget after $maxSyncRetries attempts"
+            echo "$SUB_USER_NOTATION Failed to sync $fSyncFile to $fSyncTarget after $maxSyncRetries attempts"
             exit $EMAXTRIES
             ;;
         $ETIMEOUT)
-            echo "$subUserNotation Timeout to sync $fSyncFile to $fSyncTarget"
+            echo "$SUB_USER_NOTATION Timeout to sync $fSyncFile to $fSyncTarget"
             exit $ETIMEOUT
             ;;
         *)
-            echo "$subUserNotation Failed to sync $fSyncFile to $fSyncTarget"
+            echo "$SUB_USER_NOTATION Failed to sync $fSyncFile to $fSyncTarget"
             exit $EFAILED
             ;;
     esac

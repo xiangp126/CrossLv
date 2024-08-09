@@ -197,17 +197,11 @@ export FZF_COMPLETION_TRIGGER='\'
 # Options to fzf command
 export FZF_COMPLETION_OPTS='+c -x'
 
-# Mapping capslock to esc
-# pathOfsetxkbmap=`which setxkbmap 2> /dev/null`
-# if [[ "$pathOfsetxkbmap" != "" && "$DISPLAY" != "" ]]; then
-#     setxkbmap -option caps:escape
+# if command -v tmux &>/dev/null; then
+#     sessions=$(tmux list-sessions 2>/dev/null)
+#     if [[ -n "$sessions" ]]; then
+# cat << _EOF
+# `tmux ls`
+# _EOF
+#     fi
 # fi
-
-if command -v tmux &>/dev/null; then
-    sessions=$(tmux list-sessions 2>/dev/null)
-    if [[ -n "$sessions" ]]; then
-cat << _EOF
-`tmux ls`
-_EOF
-    fi
-fi
