@@ -19,16 +19,18 @@
 # Variables
 scriptName=$(basename $0)
 fSSHPort=22
-fLoginUser="admin"
+fSSHUser="admin"
 fPasswd="password"
 fExpectRoot="# "
 fExpectUser="$ "
 fExpect=$fExpectUser
-fTarget="fgt1"
+fSSHTarget="fgt1"
 fMaxAttempts=2
+fServerAliveInterval=30
+fServerAliveCountMax=3
 # Print Pretty
-userNotation="@@@@"
-separator="----------------------------------------------------------------"
+USER_NOTATION="@@@@"
+SEPARATOR="----------------------------------------------------------------"
 
 usage() {
 cat << _EOF
@@ -39,10 +41,10 @@ usage:
 
 Options:
     -P      fSSHPort     SSH port to use. Default is "$fSSHPort"
-    -l/-u   fLoginUser   User to use for login. Default is "$fLoginUser"
+    -l/-u   fSSHUser   User to use for login. Default is "$fSSHUser"
     -p      fPasswd      Password to use for login. Default is "$fPasswd"
     -E      fExpect      Except prompt to expect(other than "$fExpectRoot"). Default is "$fExpectUser".
-    -t      fTarget(IP)  The device to connect to. Default is "$fTarget"
+    -t      fSSHTarget(IP)  The device to connect to. Default is "$fSSHTarget"
 
 Example:
     $scriptName -t fpx1
@@ -62,13 +64,13 @@ while getopts "p:l:u:t:P:E:h" opt; do
             fPasswd=$OPTARG
             ;;
         u) # User
-            fLoginUser=$OPTARG
+            fSSHUser=$OPTARG
             ;;
         l) # User
-            fLoginUser=$OPTARG
+            fSSHUser=$OPTARG
             ;;
         t)
-            fTarget=$OPTARG
+            fSSHTarget=$OPTARG
             ;;
         E)
             fExpect=$OPTARG
@@ -80,7 +82,7 @@ while getopts "p:l:u:t:P:E:h" opt; do
             usage
             ;;
         ?)
-            echo "$userNotation Invalid option: -$OPTARG" >&2
+            echo "$USER_NOTATION Invalid option: -$OPTARG" >&2
             exit 1
             ;;
     esac
@@ -89,18 +91,18 @@ done
 # Shift to process non-option arguments. New $1, $2, ..., $@
 shift $((OPTIND - 1))
 if [[ $# -gt 0 ]]; then
-    echo "$userNotation Illegal non-option arguments: $@"
+    echo "$USER_NOTATION Illegal non-option arguments: $@"
     exit
 fi
 
-echo $separator
-echo "$userNotation Set Target Device to: $fTarget"
-echo "$userNotation Set SSH Connection Port to: $fSSHPort"
-echo "$userNotation Set Username to: $fLoginUser"
-echo "$userNotation Set Password to: $fPasswd"
-echo "$userNotation Set Maximum Attempts to: $fMaxAttempts"
-echo "$userNotation Connecting to $fTarget ..."
-echo $separator
+echo $SEPARATOR
+echo "$USER_NOTATION Set Target Device to: $fSSHTarget"
+echo "$USER_NOTATION Set SSH Connection Port to: $fSSHPort"
+echo "$USER_NOTATION Set Username to: $fSSHUser"
+echo "$USER_NOTATION Set Password to: $fPasswd"
+echo "$USER_NOTATION Set Maximum Attempts to: $fMaxAttempts"
+echo "$USER_NOTATION Connecting to $fSSHTarget ..."
+echo $SEPARATOR
 
 # expect -d -c "
 expect -c "
@@ -109,11 +111,13 @@ expect -c "
     set timeout 3
 
     while {\$i <= $fMaxAttempts} {
-        # ssh -o StrictHostKeyChecking=no $fTarget
+        # ssh -o StrictHostKeyChecking=no $fSSHTarget
         if {\$i > 1} {
-            send_user \"$userNotation Login attempt \$i/$fMaxAttempts\n\"
+            send_user \"$USER_NOTATION Login attempt \$i/$fMaxAttempts\n\"
         }
-        spawn -noecho ssh -p $fSSHPort $fLoginUser@$fTarget
+        spawn -noecho ssh -o ServerAliveInterval=$fServerAliveInterval \
+                          -o ServerAliveCountMax=$fServerAliveCountMax \
+                          -p $fSSHPort -l $fSSHUser $fSSHTarget
 
         set session_id \$spawn_id
         set passwd_prompt_cnt 0
@@ -125,23 +129,23 @@ expect -c "
             -re {[Pp]assword} {
                 incr passwd_prompt_cnt
                 if {\$passwd_prompt_cnt > 1} {
-                    send_user \"\n$userNotation Permission denied. Please specified the login credentials.\n\"
+                    send_user \"\n$USER_NOTATION Permission denied. Please specified the login credentials.\n\"
                     exit 1
                 }
                 send \"$fPasswd\r\"
                 exp_continue
             }
             {Host key verification failed.} {
-                send_user \"$userNotation Host key verification failed. Updating known_hosts file...\n\"
-                system \"ssh-keygen -R $fTarget\"
-                send_user \"$userNotation Host key removed from known_hosts file.\n\"
-                send_user \"$userNotation Retrying SSH immediately...\n\"
+                send_user \"$USER_NOTATION Host key verification failed. Updating known_hosts file...\n\"
+                system \"ssh-keygen -R $fSSHTarget\"
+                send_user \"$USER_NOTATION Host key removed from known_hosts file.\n\"
+                send_user \"$USER_NOTATION Retrying SSH immediately...\n\"
                 close \$session_id
                 incr i
                 continue
             }
             {No route to host} {
-                send_user \"$userNotation No route to host. Exiting...\n\"
+                send_user \"$USER_NOTATION No route to host. Exiting...\n\"
                 exit 1
             }
             \"$fExpectRoot\" {
@@ -151,24 +155,24 @@ expect -c "
                 break
             }
             timeout {
-                send_user \"$userNotation Timed out waiting for a response.\n\"
+                send_user \"$USER_NOTATION Timed out waiting for a response.\n\"
                 close \$session_id
                 incr i
                 continue
             }
             eof {
-                send_user \"$userNotation Reached EOF. Program ended.\n\"
+                send_user \"$USER_NOTATION Reached EOF. Program ended.\n\"
                 exit 1
             }
         }
     }
 
     if {\$i > $fMaxAttempts} {
-        send_user \"$userNotation Failed to connect to $fTarget.\n\"
+        send_user \"$USER_NOTATION Failed to connect to $fSSHTarget.\n\"
         exit 1
     }
 
-    send_user \"$userNotation Successfully connected to $fTarget.\"
+    send_user \"$USER_NOTATION Successfully connected to $fSSHTarget.\"
     send \"\r\"
     # Interact with the device
     interact
