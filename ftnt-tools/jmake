@@ -259,9 +259,10 @@ if [[ "$fSyncTarget" != false ]]; then
     echo -e "${BOLD}Sync Optioins:${RESET}"
     # echo "$SHORT_SEPARATOR"
     echo -e "$USER_NOTATION [s] Scheduled to sync ${COLOR}$fSyncFile${RESET} to ${COLOR}$fSyncTarget${RESET}"
-    echo -e "$USER_NOTATION [S] SYNC_FILE: (${COLOR}$fSyncFile${RESET})"
-    echo -e "$USER_NOTATION [u] USER:      (${COLOR}$fSyncUsername${RESET})"
-    echo -e "$USER_NOTATION [p] PASSWORD:  (${COLOR}$fSyncPassword${RESET})"
+    echo -e "$USER_NOTATION [u] USER:     (${COLOR}$fSyncUsername${RESET})"
+    echo -e "$USER_NOTATION [p] PASSWORD: (${COLOR}$fSyncPassword${RESET})"
+    echo -e "$USER_NOTATION [S] SYNC_FILE:   (${COLOR}$fSyncFile${RESET})"
+    echo -e "$USER_NOTATION [S] SYNC TARGET: (${COLOR}$fSyncTarget${RESET})"
 fi
 echo "$SEPARATOR2"
 # sleep 0.1
@@ -428,7 +429,7 @@ fi
 #      }
 #  '
 
-# Step 3: Sync the sync_file to the target machine
+# Step 3: Sync the SYNC_FILE to the target machine
 if [[ "$fSyncTarget" != false ]]; then
     syncFiles=($(find "$fWorkingDir" -name "$fSyncFile"))
     if [[ ${#syncFiles[@]} -eq 0 ]]; then
