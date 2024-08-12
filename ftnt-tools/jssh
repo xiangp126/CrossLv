@@ -95,14 +95,19 @@ if [[ $# -gt 0 ]]; then
     exit
 fi
 
-echo $SEPARATOR
-echo "$USER_NOTATION Set Target Device to: $fSSHTarget"
-echo "$USER_NOTATION Set SSH Connection Port to: $fSSHPort"
-echo "$USER_NOTATION Set Username to: $fSSHUser"
-echo "$USER_NOTATION Set Password to: $fPasswd"
-echo "$USER_NOTATION Set Maximum Attempts to: $fMaxAttempts"
-echo "$USER_NOTATION Connecting to $fSSHTarget ..."
-echo $SEPARATOR
+# Define color and formatting variables
+RED='\033[31m'
+RESET='\033[0m'
+
+COLOR="$RED"
+echo -e "$SEPARATOR"
+echo -e "$USER_NOTATION Set Target Device to: ${COLOR}$fSSHTarget${RESET}"
+echo -e "$USER_NOTATION Set SSH Connection Port to: ${COLOR}$fSSHPort${RESET}"
+echo -e "$USER_NOTATION Set Username to: ${COLOR}$fSSHUser${RESET}"
+echo -e "$USER_NOTATION Set Password to: ${COLOR}$fPasswd${RESET}"
+echo -e "$USER_NOTATION Set Maximum Attempts to: ${COLOR}$fMaxAttempts${RESET}"
+echo -e "$USER_NOTATION Connecting to ${COLOR}$fSSHTarget${RESET} ..."
+echo -e "$SEPARATOR"
 
 # expect -d -c "
 expect -c "

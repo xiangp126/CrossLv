@@ -400,35 +400,6 @@ if [[ "$fNeedBuild" != false ]]; then
     echo "$USER_NOTATION Congratulations! You have built projects successfully at $(getCurrentTime)."
 fi
 
-# Here is the real expect script
-#expect -c '                                                                                                      [30/48592]
-#      for {set i 1} {$i <= 5} {incr i} {
-#          set timeout 10
-#          send_user "@@@@ @ Attempt $i/5\n"
-#
-#          spawn -noecho scp /data/fos2/image.out admin@fgt1:/fgt-image
-#          expect {
-#              "*assword:" {
-#                  send "password\r"
-#                  exp_continue
-#              }
-#              "yes/no" {
-#                  send "yes\r"
-#                  exp_continue
-#              }
-#              "Host key verification failed." {
-#                  send_user "@@@@ @ Host key verification failed. Updating known_hosts file...\n"
-#                  system "ssh-keygen -R fgt1"
-#                  send_user "@@@@ @ Host key removed from known_hosts file. Retrying SCP...\n"
-#                  continue
-#              }
-#              eof {
-#                  break
-#              }
-#          }
-#      }
-#  '
-
 # Step 3: Sync the SYNC_FILE to the target machine
 if [[ "$fSyncTarget" != false ]]; then
     syncFiles=($(find "$fWorkingDir" -name "$fSyncFile"))
