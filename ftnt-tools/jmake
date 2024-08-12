@@ -2,8 +2,6 @@
 
 # Variables
 scriptName=$(basename $0)
-scriptWd=$(dirname $0)
-pathOfNoPasswdToConfig=$scriptWd/nopasswd_to_config
 ftntBuildTarget="image.out"
 
 # Build flags & Options
@@ -43,10 +41,18 @@ getCurrentTime() {
     echo $(date +"%m/%d/%Y %H:%M:%S")
 }
 
+showLogo() {
+    cat << _EOF
+      _              __          ___      ___
+     (_)__ _  ___ _ / /__ ___   / _ \    |_  |
+    / //  ' \/ _ '//  '_// -_) / // /_  / __/
+ __/ //_/_/_/\_,_//_/\_\ \__/  \___/(_)/____/
+|___/
+_EOF
+}
+
 usage() {
     cat << _EOF
-jmake 0.2.0
-
 Usage: $scriptName [options]
        $scriptName [-m mode] [-w working_dir] [-j num_of_workers] [-T max_attempt]
              [-s sync_target] [-S sync_file] [-P sync_port] [-l/-u username] [-p password]
@@ -225,6 +231,7 @@ GREEN='\033[32m'
 RESET='\033[0m'
 COLOR=""
 
+showLogo
 echo $SEPARATOR2
 [[ "$fGitClean" == true || "$fRunConfigure" == true || "$fNeedBuild" == true
     || "$fUseBear" == true || "$fRMCompileCommandsJson" == true ]] && fBuildFlags=true
@@ -304,15 +311,56 @@ fi
 
 # Step 1: Run Configure
 if [[ "$fRunConfigure" == true ]]; then
-    echo "$USER_NOTATION Running Configure ..."
-    echo "$SUB_USER_NOTATION Running nopasswd_to_config (Wd:$fWorkingDir, Mode:$fMode)"
+    echo "$USER_NOTATION Running Configure (Wd: $fWorkingDir, Mode: $fMode) ..."
     sleep 1
 
-    $expectPath -f "$pathOfNoPasswdToConfig" "$fWorkingDir" "$fMode"
+    # expect -d -c "
+    expect -c "
+        set path_of_get_credentials ~/.usr/bin/get_credentials
+        source \"\$path_of_get_credentials\"
+
+        set config_bash_prompt \"$ \"
+        send_user \"$SUB_USER_NOTATION Spawning a new bash session.\n\"
+        spawn -noecho bash
+        log_user 1
+        expect \"\$config_bash_prompt\"
+        send \"cd $fWorkingDir\r\"
+        expect \"\$config_bash_prompt\"
+        set config_cmd \"./Configure -m $fMode -d y -c\"
+        send \"\$config_cmd\r\"
+        # log_user 1
+
+        set timeout 180
+        expect {
+            \"Username:\" {
+                send \"\$username\r\"
+                exp_continue
+            }
+            \"Password for '\$username':\" {
+                send \"\$password\r\"
+                exp_continue
+            }
+            \"\$config_bash_prompt\" {
+                # log_user 0
+                # send \"exit\r\"
+                send \"\x04\r\"
+            }
+            timeout {
+                send_user \"$SUB_USER_NOTATION Timeout. Action aborted.\n\"
+                exit 1
+            }
+        }
+
+        expect eof
+    "
+
+    echo "$SUB_USER_NOTATION Exiting from the spawned session."
 
     if [[ $? -ne 0 ]]; then
-        echo "$USER_NOTATION Failed to run $pathOfNoPasswdToConfig"
+        echo "$SUB_USER_NOTATION Failed to run Configure."
         exit 1
+    else
+        echo "$SUB_USER_NOTATION Configure completed successfully."
     fi
 fi
 
