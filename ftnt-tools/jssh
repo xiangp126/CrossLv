@@ -179,7 +179,7 @@ expect -c "
 
     send_user \"$USER_NOTATION Successfully connected to $fSSHTarget.\"
     send \"\r\"
-    # Interact with the device
+
     interact
 "
 
