@@ -26,18 +26,18 @@ set loop_prompt "Error: "
 set token_prompt "FortiToken:"
 
 while {$i <= $max_retry} {
-    spawn sudo /opt/forticlient/vpn -s scm.van.corp.fortinet.com:443 -u $username -p
+    spawn sudo /opt/forticlient/vpn -s scm.van.corp.fortinet.com:443 -u $ftnt_username -p
     expect {
         "(y/n)" {
             send "y\r"
             exp_continue
         }
         "username: " {
-            send "$username\r"
+            send "$ftnt_username\r"
             exp_continue
         }
         "password:" {
-            send "$password\r"
+            send "$ftnt_password\r"
             exp_continue
         }
         $loop_prompt {

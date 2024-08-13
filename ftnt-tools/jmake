@@ -1,19 +1,19 @@
 #!/bin/bash
 
-# Variables
+# Common Variables
 scriptName=$(basename $0)
-ftntBuildTarget="image.out"
 
 # Build flags & Options
-fBuildFlags=false
+ftntBuildTarget="image.out"
 fBuildTarget="$ftntBuildTarget"
-fMode=""
-fNumOfWorkers=$(nproc)
+fBuildModel=""
+fNumOfJobs=$(nproc)
 fWorkingDir=$(pwd)
 fMaxBuildAttempt=2
 fUseBear=false
 fRunConfigure=false
 fNeedBuild=false
+fPrintBuildFlags=false # Print build flags
 fGitClean=false
 fRMCompileCommandsJson=false
 # Sync Options
@@ -41,6 +41,7 @@ getCurrentTime() {
     echo $(date +"%m/%d/%Y %H:%M:%S")
 }
 
+# https://patorjk.com/software/taag/
 showLogo() {
     cat << _EOF
       _              __          ___      ___
@@ -54,7 +55,7 @@ _EOF
 usage() {
     cat << _EOF
 Usage: $scriptName [options]
-       $scriptName [-m mode] [-w working_dir] [-j num_of_workers] [-T max_attempt]
+       $scriptName [-m model] [-w working_dir] [-j num_of_jobs] [-T max_attempt]
              [-s sync_target] [-S sync_file] [-P sync_port] [-l/-u username] [-p password]
              [-B build_target]
              [-bcCohf]
@@ -68,15 +69,15 @@ Build Flags:
 Build Options:
     -T      Set the maximum number of build attempts (default: $fMaxBuildAttempt)
     -B      Set the build target (default: $fBuildTarget)
-    -m      Set the build mode (default: $fMode, auto detect FGT_VM64_KVM and FPX_KVM)
-    -j      Set the number of jobs (default: $fNumOfWorkers)
-    -w      Set working directory (default: $fWorkingDir)
+    -m      Set the build model  (default: $fBuildModel)
+    -j      Set the number of jobs (default: $fNumOfJobs)
+    -w      Set working directory  (default: $fWorkingDir)
 Sync Options:
-    -s      Set the source file to sync (default: $fSyncFile)
-    -t      Set the target machine (default: $fSyncTarget) to sync the source file specified by -s
-    -P      Set the ssh port for sync command (default: $fSyncPort)
-    -l/-u   Set the username for sync command (default: $fSyncUsername)
-    -p      Set the password for sync command (default: $fSyncPassword)
+    -s      Set the sync source file (default: $fSyncFile)
+    -t      Set the sync target machine (default: $fSyncTarget)
+    -P      Set the sync ssh port (default: $fSyncPort)
+    -l/-u   Set the sync username (default: $fSyncUsername)
+    -p      Set the sync password (default: $fSyncPassword)
 Other Options:
     -h      Print this help message
 
@@ -95,7 +96,7 @@ _EOF
 while getopts "hm:w:j:cCbB:ofT:t:s:P:p:u:l:" opt; do
     case $opt in
         m)
-            fMode=$OPTARG
+            fBuildModel=$OPTARG
             fNeedBuild=true
             ;;
         w)
@@ -103,7 +104,7 @@ while getopts "hm:w:j:cCbB:ofT:t:s:P:p:u:l:" opt; do
             fNeedBuild=true
             ;;
         j)
-            fNumOfWorkers=$OPTARG
+            fNumOfJobs=$OPTARG
             fNeedBuild=true
             ;;
         T)
@@ -169,36 +170,36 @@ fi
 
 # Pre-parse the options
 preParseOptions() {
-    # If fNeedBuild is set, then set fRunConfigure to true as well
-    if [[ "$fNeedBuild" == true ]]; then
-        fRunConfigure=true
-    fi
+    # Set fRunConfigure to true if fNeedBuild is true
+    [[ "$fNeedBuild" == true ]] && fRunConfigure=true
 
-    # Try to derive and update the build mode from the working directory
+    # Try to derive and update the build model from the working directory
     # 0: not derived, 1: FPX, 2: FGT
     if [[ "$fWorkingDir" == *"fpx"* ]]; then
-        case "$fMode" in
+        case "$fBuildModel" in
             "vmware")
-                fMode="FPX_VMWARE"
+                fBuildModel="FPX_VMWARE"
                 ;;
             "kvm")
-                fMode="FPX_KVM"
+                fBuildModel="FPX_KVM"
                 ;;
             "")
-                fMode="FPX_KVM"
+                # Default to FPX_KVM
+                fBuildModel="FPX_KVM"
                 ;;
         esac
     else
         if [[ "$fWorkingDir" == *"fos"* ]]; then
-            case "$fMode" in
+            case "$fBuildModel" in
                 "vmware")
-                    fMode="FGT_VM64"
+                    fBuildModel="FGT_VM64"
                     ;;
                 "kvm")
-                    fMode="FGT_VM64_KVM"
+                    fBuildModel="FGT_VM64_KVM"
                     ;;
                 "")
-                    fMode="FGT_VM64_KVM"
+                    # Default to FGT_VM64_KVM
+                    fBuildModel="FGT_VM64_KVM"
                     ;;
             esac
         fi
@@ -234,9 +235,9 @@ COLOR=""
 showLogo
 echo $SEPARATOR2
 [[ "$fGitClean" == true || "$fRunConfigure" == true || "$fNeedBuild" == true
-    || "$fUseBear" == true || "$fRMCompileCommandsJson" == true ]] && fBuildFlags=true
+    || "$fUseBear" == true || "$fRMCompileCommandsJson" == true ]] && fPrintBuildFlags=true
 
-if [[ "$fBuildFlags" != false ]]; then
+if [[ "$fPrintBuildFlags" != false ]]; then
     COLOR="$GREEN"
     # echo "$SEPARATOR"
     echo -e "${BOLD}Build Flags:${RESET}"
@@ -253,11 +254,11 @@ if [[ "$fNeedBuild" != false ]]; then
     # echo "$SEPARATOR"
     echo -e "${BOLD}Build Optioins:${RESET}"
     # echo "$SHORT_SEPARATOR"
-    echo -e "$USER_NOTATION [m] Build Mode:   ${COLOR}$fMode${RESET}"
+    echo -e "$USER_NOTATION [m] Build Modle:  ${COLOR}$fBuildModel${RESET}"
     echo -e "$USER_NOTATION [B] Build Target: ${COLOR}$fBuildTarget${RESET}"
     echo -e "$USER_NOTATION [w] Working Directory: ${COLOR}$fWorkingDir${RESET}"
     echo -e "$USER_NOTATION [T] Maximum Build Attempts: ${COLOR}$fMaxBuildAttempt${RESET}"
-    echo -e "$USER_NOTATION [j] Concurrent Build Jobs:  ${COLOR}$fNumOfWorkers${RESET}"
+    echo -e "$USER_NOTATION [j] Concurrent Build Jobs:  ${COLOR}$fNumOfJobs${RESET}"
 fi
 
 if [[ "$fSyncTarget" != false ]]; then
@@ -311,13 +312,13 @@ fi
 
 # Step 1: Run Configure
 if [[ "$fRunConfigure" == true ]]; then
-    echo "$USER_NOTATION Running Configure (Wd: $fWorkingDir, Mode: $fMode) ..."
+    echo "$USER_NOTATION Running Configure (Wd: $fWorkingDir, Model: $fBuildModel) ..."
     sleep 1
 
     # expect -d -c "
     expect -c "
-        set path_of_get_credentials ~/.usr/bin/get_credentials
-        source \"\$path_of_get_credentials\"
+        set script_to_get_credentials ~/.usr/bin/get_credentials
+        source \"\$script_to_get_credentials\"
 
         set config_bash_prompt \"$ \"
         send_user \"$SUB_USER_NOTATION Spawning a new bash session.\n\"
@@ -326,18 +327,18 @@ if [[ "$fRunConfigure" == true ]]; then
         expect \"\$config_bash_prompt\"
         send \"cd $fWorkingDir\r\"
         expect \"\$config_bash_prompt\"
-        set config_cmd \"./Configure -m $fMode -d y -c\"
+        set config_cmd \"./Configure -m $fBuildModel -d y -c\"
         send \"\$config_cmd\r\"
         # log_user 1
 
         set timeout 180
         expect {
             \"Username:\" {
-                send \"\$username\r\"
+                send \"\$ftnt_username\r\"
                 exp_continue
             }
-            \"Password for '\$username':\" {
-                send \"\$password\r\"
+            \"Password for '\$ftnt_username':\" {
+                send \"\$ftnt_password\r\"
                 exp_continue
             }
             \"\$config_bash_prompt\" {
@@ -368,7 +369,7 @@ fi
 if [[ "$fNeedBuild" != false ]]; then
     # Make make command
     cd "$fWorkingDir" || exit
-    makeCommand="make -j$fNumOfWorkers $fBuildTarget"
+    makeCommand="make -j$fNumOfJobs $fBuildTarget"
 
     # Use Bear to generate compile_commands.json
     if [[ "$fUseBear" == true ]]; then
@@ -414,8 +415,9 @@ if [[ "$fNeedBuild" != false ]]; then
     attempt=1
     maxAttempt=$fMaxBuildAttempt
     while [[ $attempt -le $maxAttempt ]]; do
-        echo "$USER_NOTATION Running build commands: $makeCommand"
-        echo "$SUB_USER_NOTATION Build attempt $attempt/$maxAttempt"
+        COLOR="$GREEN"
+        echo -e "$USER_NOTATION Running build commands: ${COLOR}$makeCommand${RESET}"
+        echo -e "$SUB_USER_NOTATION ${COLOR}Build attempt $attempt/$maxAttempt${RESET}"
         # [[ $attempt -gt 1 ]] && sleep 2
         sleep 2
 
