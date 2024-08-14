@@ -145,7 +145,7 @@ expect -c "
                 system \"ssh-keygen -R $fSSHTarget\"
                 send_user \"$USER_NOTATION Host key removed from known_hosts file.\n\"
                 send_user \"$USER_NOTATION Retrying SSH immediately...\n\"
-                close \$session_id
+                # close \$session_id
                 incr i
                 continue
             }
@@ -161,7 +161,7 @@ expect -c "
             }
             timeout {
                 send_user \"$USER_NOTATION Timed out waiting for a response.\n\"
-                close \$session_id
+                # close \$session_id
                 incr i
                 continue
             }
@@ -182,54 +182,3 @@ expect -c "
 
     interact
 "
-
-# + expect -d -c '
-#     for {set i 1} {$i <= 2} {incr i} {
-#         # ssh -o StrictHostKeyChecking=no 172.18.20.230
-#         # send_user "Sync attempt $i/2\n"
-#         spawn -noecho ssh admin@172.18.20.230
-
-#         expect {
-#             {yes/no} {
-#                 send "yes\r"
-#                 exp_continue
-#             }
-#             -re {[Pp]assword} {
-#                 send "\r"
-#                 exp_continue
-#             }
-#             "Host key verification failed." {
-#                 send_user "@@@@ Host key verification failed. Updating known_hosts file...\n"
-#                 system "ssh-keygen -R 172.18.20.230"
-#                 send_user "@@@@ Host key removed from known_hosts file.\n"
-#                 send_user "@@@@ Retrying SSH immediately...\n"
-#                 continue
-#             }
-#             "Connection refused" {
-#                 send_user "@@@@ Connection refused. Exiting...\n"
-#                 exit 1
-#             }
-#             eof {
-#                 puts "Reached EOF. Exiting..."
-#                 exit 1
-#             }
-#             timeout {
-#                 puts "Timed out waiting for a response."
-#                 exit 1
-#             }
-#             "# " {
-#                 puts "@@@@ Successfully connected to 172.18.20.230"
-#                 break
-#             }
-#         }
-#     }
-
-#     send "\r"
-#     expect "# "
-
-#     # Now you can add additional commands or interactions as needed
-#     # For example, you can automate further commands here
-
-#     # Interact with the device
-#     interact
-# '

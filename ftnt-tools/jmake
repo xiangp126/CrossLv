@@ -217,14 +217,15 @@ preParseOptions() {
     fi
 }
 
+# Pre-parse the options
 preParseOptions
 
 # Define color variables
-# CYAN='\033[36m'
-LIGHTCYAN='\033[38;5;81m'
+CYAN='\033[36m'
 RED='\033[31m'
 BOLD='\033[1m'
 GREEN='\033[32m'
+BLUE='\033[34m'
 # YELLOW='\033[33mog'
 # YELLOBOLD='\033[1;33m'
 # REDBOLD='\033[1;31m'
@@ -232,7 +233,9 @@ GREEN='\033[32m'
 RESET='\033[0m'
 COLOR=""
 
+# Print the Logo
 showLogo
+
 echo $SEPARATOR2
 [[ "$fGitClean" == true || "$fRunConfigure" == true || "$fNeedBuild" == true
     || "$fUseBear" == true || "$fRMCompileCommandsJson" == true ]] && fPrintBuildFlags=true
@@ -250,7 +253,7 @@ if [[ "$fPrintBuildFlags" != false ]]; then
 fi
 
 if [[ "$fNeedBuild" != false ]]; then
-    COLOR="$LIGHTCYAN"
+    COLOR="$CYAN"
     # echo "$SEPARATOR"
     echo -e "${BOLD}Build Optioins:${RESET}"
     # echo "$SHORT_SEPARATOR"
@@ -312,7 +315,9 @@ fi
 
 # Step 1: Run Configure
 if [[ "$fRunConfigure" == true ]]; then
-    echo "$USER_NOTATION Running Configure (Wd: $fWorkingDir, Model: $fBuildModel) ..."
+    COLOR="$BLUE"
+    CONFIGURE_CMD="./Configure -m $fBuildModel -d y -c"
+    echo -e "$USER_NOTATION Running Configure: ${COLOR}$CONFIGURE_CMD${RESET}"
     sleep 1
 
     # expect -d -c "
@@ -327,8 +332,7 @@ if [[ "$fRunConfigure" == true ]]; then
         expect \"\$config_bash_prompt\"
         send \"cd $fWorkingDir\r\"
         expect \"\$config_bash_prompt\"
-        set config_cmd \"./Configure -m $fBuildModel -d y -c\"
-        send \"\$config_cmd\r\"
+        send \"$CONFIGURE_CMD\r\"
         # log_user 1
 
         set timeout 180
@@ -545,8 +549,9 @@ if [[ "$fSyncTarget" != false ]]; then
 
     case $retValue in
         0)
-            echo "$SUB_USER_NOTATION You have synced $fSyncFile to $fSyncTarget successfully at $(getCurrentTime)."
-            echo "$SUB_USER_NOTATION Login to the server and wait for it to reboot ..."
+            COLOR="$GREEN"
+            echo -e "$SUB_USER_NOTATION You have synced $fSyncFile to $fSyncTarget successfully at $(getCurrentTime)."
+            echo -e "$SUB_USER_NOTATION ${COLOR}Login to the server and wait for it to reboot${RESET} ..."
             jssh -P "$fSyncPort" -u "$fSyncUsername" -p "$fSyncPassword" -t "$fSyncTarget"
             if [[ $? -ne 0 ]]; then
                 echo "$SUB_USER_NOTATION Please check the server status manually."
