@@ -33,15 +33,15 @@ set timeout $custom_timeout
 
 expect {
     "Username: " {
-        send "$username\r"
+        send "$ftnt_username\r"
         exp_continue
     }
     "Password: " {
-        send "$password\r"
+        send "$ftnt_password\r"
         exp_continue
     }
-    "Password for '$username': " {
-        send "$password\r"
+    "Password for '$ftnt_username': " {
+        send "$ftnt_password\r"
         exp_continue
     }
     timeout {

@@ -19,22 +19,22 @@ set custom_timeout 180
 set mode "FGT_VM64_KVM"
 
 # Spawn your target script or command using the "mode" variable
-spawn rb_genco_git post --username $username
+spawn rb_genco_git post --username $ftnt_username
 
 # Set the timeout value for this specific interaction
 set timeout $custom_timeout
 
 expect {
     "Username: " {
-        send "$username\r"
+        send "$ftnt_username\r"
         exp_continue
     }
     "Password: " {
-        send "$password\r"
+        send "$ftnt_password\r"
         exp_continue
     }
-    "Password for '$username': " {
-        send "$password\r"
+    "Password for '$ftnt_username': " {
+        send "$ftnt_password\r"
         exp_continue
     }
     timeout {
