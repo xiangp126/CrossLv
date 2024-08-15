@@ -173,11 +173,11 @@ expect -c "
     }
 
     if {\$i > $fMaxAttempts} {
-        send_user \"$USER_NOTATION Failed to connect to $fSSHTarget.\n\"
+        send_user \"$USER_NOTATION Failed to connect to $fSSHTarget\n\"
         exit 1
     }
 
-    send_user \"$USER_NOTATION Successfully connected to $fSSHTarget.\"
+    send_user \"$USER_NOTATION Successfully connected to $fSSHTarget\"
     send \"\r\"
 
     interact

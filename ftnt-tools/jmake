@@ -37,8 +37,18 @@ SUB_USER_NOTATION="@@@@ @"
 # SHORT_SEPARATOR2="=============="
 SEPARATOR2="==================================================="
 
+# Define color variables
+CYAN='\033[36m'
+RED='\033[31m'
+BOLD='\033[1m'
+GREEN='\033[32m'
+BLUE='\033[34m'
+# YELLOW='\033[33m'
+RESET='\033[0m'
+
 getCurrentTime() {
-    echo $(date +"%m/%d/%Y %H:%M:%S")
+    COLOR="$RED"
+    echo -e "${COLOR}$(date +"%m/%d/%Y %H:%M:%S")${RESET}"
 }
 
 # https://patorjk.com/software/taag/
@@ -219,19 +229,6 @@ preParseOptions() {
 
 # Pre-parse the options
 preParseOptions
-
-# Define color variables
-CYAN='\033[36m'
-RED='\033[31m'
-BOLD='\033[1m'
-GREEN='\033[32m'
-BLUE='\033[34m'
-# YELLOW='\033[33mog'
-# YELLOBOLD='\033[1;33m'
-# REDBOLD='\033[1;31m'
-# CYANBOLD='\033[1;36m'
-RESET='\033[0m'
-COLOR=""
 
 # Print the Logo
 showLogo
@@ -463,7 +460,8 @@ if [[ "$fSyncTarget" != false ]]; then
     fi
     # Only sync the first file found
     syncFile="${syncFiles[0]}"
-    echo "$USER_NOTATION Syncing $syncFile to $fSyncTarget"
+    COLOR="$BLUE"
+    echo -e "$USER_NOTATION Syncing ${COLOR}$syncFile${RESET} to ${COLOR}$fSyncTarget${RESET} ..."
 
     maxSyncRetries=5
     ESUCCESS=0
@@ -475,7 +473,7 @@ if [[ "$fSyncTarget" != false ]]; then
     # expect -d -c "
     expect -c "
         # Set the initial values
-        set defaultTimeout 180
+        set defaultTimeout 600
         set adjustTimeout 0
         set waitBeforeRetry 10
 
@@ -527,6 +525,10 @@ if [[ "$fSyncTarget" != false ]]; then
                     # exp_continue
                     exit $EFAILED
                 }
+                \"100-update image completed\" {
+                    send_user \"$SUB_USER_NOTATION 100-update image completed. Action completed.\n\"
+                    exit $ESUCCESS
+                }
                 \"lost connection\" {
                     send_user \"$SUB_USER_NOTATION Lost connection. Action aborted.\n\"
                     exit $EFAILED
@@ -548,7 +550,7 @@ if [[ "$fSyncTarget" != false ]]; then
     [[ $retValue -ne 0 ]] && echo "$SUB_USER_NOTATION Sync return value: $retValue"
 
     case $retValue in
-        0)
+        $ESUCCESS)
             COLOR="$GREEN"
             echo -e "$SUB_USER_NOTATION You have synced $fSyncFile to $fSyncTarget successfully at $(getCurrentTime)."
             echo -e "$SUB_USER_NOTATION ${COLOR}Login to the server and wait for it to reboot${RESET} ..."
@@ -557,7 +559,7 @@ if [[ "$fSyncTarget" != false ]]; then
                 echo "$SUB_USER_NOTATION Please check the server status manually."
                 exit 1
             else
-                echo "$SUB_USER_NOTATION Connection to $fSyncTarget closed at $(getCurrentTime)."
+                echo "$SUB_USER_NOTATION $fSyncTarget started to reboot at $(getCurrentTime)."
                 exit 0
             fi
             ;;
