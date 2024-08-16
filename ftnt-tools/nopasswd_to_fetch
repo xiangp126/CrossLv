@@ -91,11 +91,11 @@ proc common_expect_block {fa_pattern} {
             exp_continue
         }
         -nocase -re "Username: " {
-            send "$username\r"
+            send "$ftnt_username\r"
             exp_continue
         }
         -nocase -re "Password:" {
-            send "$password\r"
+            send "$ftnt_password\r"
             exp_continue
         }
         -re $fa_pattern {
