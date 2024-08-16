@@ -4,6 +4,7 @@
 scriptName=$(basename $0)
 
 # Build flags & Options
+fPlatform="FOS" # Default platform
 ftntBuildTarget="image.out"
 fBuildTarget="$ftntBuildTarget"
 fBuildModel=""
@@ -178,52 +179,78 @@ if [[ $# -gt 0 ]]; then
     exit
 fi
 
-# Pre-parse the options
+# $1: available models, $2: target model
+searchModel() {
+    matchedModels=()
+    local availModels="$1"
+    local targetModel="$2"
+    for model in $availModels; do
+        if [[ "$model" == *"$targetModel"* ]]; then
+            matchedModels+=("$model")
+        fi
+    done
+
+    COLOR="$RED"
+    case ${#matchedModels[@]} in
+        0)
+            echo -e "$USER_NOTATION No matched model found for ${COLOR}$targetModel${RESET}"
+            exit 1
+            ;;
+        1)
+            fBuildModel="${matchedModels[0]}"
+            ;;
+        *)
+            echo "$USER_NOTATION Multiple matched models found for $targetModel"
+            echo "$USER_NOTATION Please specify the model from the following list:"
+            for model in "${matchedModels[@]}"; do
+                echo -e "$USER_NOTATION ${COLOR}$model${RESET}"
+            done
+            exit 1
+            ;;
+    esac
+}
+
 preParseOptions() {
     # Set fRunConfigure to true if fNeedBuild is true
     [[ "$fNeedBuild" == true ]] && fRunConfigure=true
 
-    # Try to derive and update the build model from the working directory
-    # 0: not derived, 1: FPX, 2: FGT
-    if [[ "$fWorkingDir" == *"fpx"* ]]; then
-        case "$fBuildModel" in
-            "vmware")
-                fBuildModel="FPX_VMWARE"
-                ;;
-            "kvm")
-                fBuildModel="FPX_KVM"
-                ;;
-            "")
-                # Default to FPX_KVM
-                fBuildModel="FPX_KVM"
-                ;;
-        esac
-    else
-        if [[ "$fWorkingDir" == *"fos"* ]]; then
-            case "$fBuildModel" in
-                "vmware")
-                    fBuildModel="FGT_VM64"
-                    ;;
-                "kvm")
-                    fBuildModel="FGT_VM64_KVM"
-                    ;;
-                "")
-                    # Default to FGT_VM64_KVM
-                    fBuildModel="FGT_VM64_KVM"
-                    ;;
-            esac
-        fi
-    fi
-
-    # Check the working directory
-    if [[ -x "$(command -v realpath)" ]]; then
-        fWorkingDir=$(realpath "$fWorkingDir")
-    fi
-
-    # Check the working directory
+    command -v realpath >/dev/null 2>&1 && fWorkingDir=$(realpath "$fWorkingDir")
     if [[ ! -d "$fWorkingDir" ]]; then
         echo "$USER_NOTATION Directory $fWorkingDir not found"
         exit 1
+    fi
+
+    if [[ ! -x "$(command -v ./Configure)" ]]; then
+        echo "$USER_NOTATION Command Configure not found"
+        exit 1
+    fi
+    availModels="$(./Configure list)"
+    for model in $availModels; do
+        if [[ "$model" == "FPX"* ]]; then
+            fPlatform="FPX"
+            fBuildModel="$model"
+            break
+        fi
+    done
+
+    # Upper case the build model
+    fBuildModel=$(echo "$fBuildModel" | tr '[:lower:]' '[:upper:]')
+
+    if [[ "$fPlatform" == "FPX" ]]; then
+        if [[ "$fBuildModel" == "" ]]; then
+            fBuildModel="FPX_KVM"
+        else
+            searchModel "$availModels" "$fBuildModel"
+        fi
+    else
+        # The platform is FOS
+        if [[ "$fBuildModel" == "" ]]; then
+            fBuildModel="FGT_VM64_KVM"
+        elif [[ "$fBuildModel" == "VMWARE" ]]; then
+            fBuildModel="FGT_VM64"
+        else
+            searchModel "$availModels" "$fBuildModel"
+        fi
     fi
 }
 
@@ -250,11 +277,12 @@ if [[ "$fPrintBuildFlags" != false ]]; then
 fi
 
 if [[ "$fNeedBuild" != false ]]; then
-    COLOR="$CYAN"
     # echo "$SEPARATOR"
     echo -e "${BOLD}Build Optioins:${RESET}"
     # echo "$SHORT_SEPARATOR"
+    COLOR="$RED"
     echo -e "$USER_NOTATION [m] Build Modle:  ${COLOR}$fBuildModel${RESET}"
+    COLOR="$CYAN"
     echo -e "$USER_NOTATION [B] Build Target: ${COLOR}$fBuildTarget${RESET}"
     echo -e "$USER_NOTATION [w] Working Directory: ${COLOR}$fWorkingDir${RESET}"
     echo -e "$USER_NOTATION [T] Maximum Build Attempts: ${COLOR}$fMaxBuildAttempt${RESET}"
