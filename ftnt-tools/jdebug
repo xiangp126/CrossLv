@@ -158,7 +158,7 @@ expect -c "
             -re {[Pp]assword} {
                 incr passwd_prompt_cnt
                 if {\$passwd_prompt_cnt > 1} {
-                    send_user \"\n$userNotation Permission denied. Please specified the login credentials.\n\"
+                    send_user \"\n$userNotation Permission denied. Please specify the login credentials.\n\"
                     exit 1
                 }
                 send \"$fPassword\r\"
@@ -173,7 +173,7 @@ expect -c "
                 system \"ssh-keygen -R $fTarget\"
                 send_user \"$userNotation Host key removed from known_hosts file.\n\"
                 send_user \"$userNotation Retrying SSH immediately...\n\"
-                close \$session_id
+                # close \$session_id
                 incr i
                 continue
             }
@@ -183,7 +183,7 @@ expect -c "
             }
             timeout {
                 send_user \"$subUserNotation Timeout when connecting to $fTarget\n\"
-                close \$session_id
+                # close \$session_id
                 incr i
                 continue
             }
@@ -213,7 +213,7 @@ expect -c "
                 exp_continue
             }
             \"$fPrompt\" {
-                # Do nothing, just continue
+                # Pass through
             }
             timeout {
                 send_user \"$userNotation Timeout when resetting debug.\r\"
@@ -227,25 +227,32 @@ expect -c "
         send \"end\r\"
         expect \"$fPrompt\"
 
-        set wait_time 5
-        send_user \"$userNotation Wait for \$wait_time seconds to apply the configuration.\n\"
-        for {set j 0} {\$j < \$wait_time * 2} {incr j} {
-            send_user \"====\"
+        # set wait_time 3
+        # send_user \"$userNotation Wait for \$wait_time seconds to apply the configuration.\n\"
+        # for {set j 0} {\$j < \$wait_time * 2} {incr j} {
+        #     send_user \"====\"
+        # }
+        # send_user \"\n\"
+        # for {set i 0} {\$i < \$wait_time * 2} {incr i} {
+        #     send_user \"====\"
+        #     after 500
+        # }
+        # send \"\r\"
+        # expect \"$fPrompt\"
+
+        send \"exit\r\"
+        expect eof {
+            send_user \"$userNotation WAD Worker Count has been set to $fWADWorkerCnt.\n\"
+            exit 0
         }
-        send_user \"\n\"
-        for {set i 0} {\$i < \$wait_time * 2} {incr i} {
-            send_user \"====\"
-            after 500
-        }
-        send \"\r\"
-        expect \"$fPrompt\"
     }
 
     if {\$has_vdom} {
         send \"config global\r\"
         expect \"$fPrompt\"
     }
-    send \"diagnose debug reset\r\"
+    send \"diagnose debug disable\r\"
+    set timeout 30
     expect {
         {Command fail.} {
             # The device has VDOM
@@ -254,7 +261,7 @@ expect -c "
             exp_continue
         }
         \"$fPrompt\" {
-            # Do nothing, just continue
+            # Pass through
         }
         timeout {
             send_user \"$userNotation Timeout when resetting debug.\r\"
@@ -302,7 +309,7 @@ $userNotation Or retry the same command with -N1
             send_user \"\n$userNotation Please check if the input type: $fWorkerType is correct.\n\"
         }
     } elseif {\$worker_cnt == 1} {
-        send_user \"\n$userNotation Found $fWorkerType type PID: \$worker_pids\n\"
+        send_user \"\n$userNotation Exact match found $fWorkerType type PID: \$worker_pid\n\"
     } else {
         send_user \"\n$userNotation Could not find $fWorkerType type PID.\n\"
         exit 1
@@ -313,7 +320,8 @@ $userNotation Or retry the same command with -N1
     send \"\r\"
     expect \"$fPrompt\"
 
-    send \"diagnose debug reset\r\"
+    send \"diagnose debug disable\r\"
+    set timeout 30
     expect \"$fPrompt\"
 
     send \"sys sh\r\"
