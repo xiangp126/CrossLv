@@ -134,7 +134,7 @@ expect -c "
             -re {[Pp]assword} {
                 incr passwd_prompt_cnt
                 if {\$passwd_prompt_cnt > 1} {
-                    send_user \"\n$USER_NOTATION Permission denied. Please specified the login credentials.\n\"
+                    send_user \"\n$USER_NOTATION Permission denied. Please specify the login credentials.\n\"
                     exit 1
                 }
                 send \"$fPasswd\r\"

@@ -504,6 +504,7 @@ if [[ "$fSyncTarget" != false ]]; then
         set defaultTimeout 600
         set adjustTimeout 0
         set waitBeforeRetry 10
+        set passwd_prompt_cnt 0
 
         # Loop to sync the file
         for {set i 1} {\$i <= $maxSyncRetries} {incr i} {
@@ -524,7 +525,12 @@ if [[ "$fSyncTarget" != false ]]; then
                     send \"yes\r\"
                     exp_continue
                 }
-                -re {[Pp]assword} {
+                -nocase {Password:} {
+                    incr passwd_prompt_cnt
+                    if {\$passwd_prompt_cnt > 1} {
+                        send_user \"\n$SUB_USER_NOTATION Permission Denied. Please specify the login credentials.\n\"
+                        exit $EFAILED
+                    }
                     send \"$fSyncPassword\r\"
                     exp_continue
                 }
