@@ -21,6 +21,7 @@ scriptName=$(basename $0)
 fSSHPort=22
 fSSHUser="admin"
 fPasswd="password"
+fVdom=""
 fExpectRoot="# "
 fExpectUser="$ "
 fExpect=$fExpectUser
@@ -37,14 +38,15 @@ cat << _EOF
 jssh 0.1
 
 usage:
-    $scriptName [-l/-u user] [-p passwd] [-P ssh_port] [-E expect] -t target_ip
+    $scriptName [-l/-u user] [-p passwd] [-P ssh_port] [-E expect] [-V vdom] -t target_ip
 
 Options:
-    -P      fSSHPort     SSH port to use. Default is "$fSSHPort"
-    -l/-u   fSSHUser   User to use for login. Default is "$fSSHUser"
-    -p      fPasswd      Password to use for login. Default is "$fPasswd"
-    -E      fExpect      Except prompt to expect(other than "$fExpectRoot"). Default is "$fExpectUser".
-    -t      fSSHTarget(IP)  The device to connect to. Default is "$fSSHTarget"
+    -P      port        SSH port to use. Default is "$fSSHPort"
+    -l/-u   username    Username for login. Default is "$fSSHUser"
+    -p      password    Password for login. Default is "$fPasswd"
+    -E      Expect      String expect(Other than "$fExpectRoot" and "$fExpectUser").
+    -V      vdom        Specify the VDOM. Default is "$fVdom"
+    -t      target      The device to connect to. Default is "$fSSHTarget"
 
 Example:
     $scriptName -t fpx1
@@ -58,7 +60,7 @@ _EOF
 [[ $# -eq 0 ]] && usage
 
 # Parse command-line options
-while getopts "p:l:u:t:P:E:h" opt; do
+while getopts "p:l:u:t:P:E:V:h" opt; do
     case ${opt} in
         p)
             fPasswd=$OPTARG
@@ -77,6 +79,9 @@ while getopts "p:l:u:t:P:E:h" opt; do
             ;;
         P)
             fSSHPort=$OPTARG
+            ;;
+        V)
+            fVdom=$OPTARG
             ;;
         h)
             usage
@@ -179,6 +184,24 @@ expect -c "
 
     send_user \"$USER_NOTATION Successfully connected to $fSSHTarget\"
     send \"\r\"
+
+    # check if fVdom is specified
+    if {\"$fVdom\" != \"\"} {
+        expect {
+            -re \"$fExpectRoot\" {
+                send \"config vdom\r\"
+                expect \"$fExpectRoot\"
+                send \"edit $fVdom\r\"
+                expect \"$fExpectRoot\"
+            }
+            -re \"$fExpect\" {
+                send \"config vdom\r\"
+                expect \"$fExpectRoot\"
+                send \"edit $fVdom\r\"
+                expect \"$fExpectRoot\"
+            }
+        }
+    }
 
     interact
 "
