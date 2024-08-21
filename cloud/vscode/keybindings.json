@@ -512,5 +512,14 @@
 {
 	"key": "f3",
 	"command": "actions.find"
+},
+{
+	"key": "ctrl+shift+.",
+	"command": "gitlens.diffLineWithWorking"
+},
+{
+	"key": "shift+alt+,",
+	"command": "-gitlens.diffLineWithPrevious",
+	"when": "editorTextFocus && config.gitlens.keymap == 'alternate' && gitlens:activeFileStatus =~ /tracked/"
 }
 ]

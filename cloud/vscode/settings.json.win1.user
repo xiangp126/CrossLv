@@ -50,7 +50,11 @@
         "terminal.ansiBrightRed": "#c52121",
         "terminal.ansiRed": "#c52121",
         "terminal.ansiBrightGreen": "#12aaaf",
-        "terminal.ansiGreen": "#16afba"
+        "terminal.ansiGreen": "#16afba",
+        "peekViewResult.fileForeground": "#daae9d",
+        "peekViewResult.lineForeground": "#d3d3d3",
+        "peekViewResult.selectionForeground": "#f4f4f4",
+
     },
     "editor.tokenColorCustomizations": {
         // Setting -> Inspect Editor Tokens and Scopes
@@ -252,7 +256,7 @@
     "gitlens.views.searchAndCompare.files.layout": "tree",
     "gitlens.views.commits.avatars": false,
     "gitlens.plusFeatures.enabled": false,
-    "extensions.autoUpdate": "onlySelectedExtensions",
+    "extensions.autoUpdate": false,
     "gitlens.views.fileHistory.avatars": false,
     "gitlens.views.commitDetails.autolinks.enabled": false,
     "gitlens.views.commitDetails.pullRequests.enabled": false,
@@ -287,4 +291,9 @@
     "files.exclude": {
         "**/.vscode-server": true
     },
+    "bookmarks.keepBookmarksOnLineDelete": true,
+    "workbench.preferredLightColorTheme": "Default Dark Modern",
+    "terminal.integrated.ignoreBracketedPasteMode": true,
+    "workbench.editor.navigationScope": "editor",
+    "diffEditor.renderSideBySide": true,
 }
