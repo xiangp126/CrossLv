@@ -214,14 +214,20 @@ preParseOptions() {
     # Set fRunConfigure to true if fNeedBuild is true
     [[ "$fNeedBuild" == true ]] && fRunConfigure=true
 
+    [[ "$fGitClean" == true || "$fRunConfigure" == true || "$fNeedBuild" == true
+     || "$fUseBear" == true || "$fRMCompileCommandsJson" == true ]] && fPrintBuildFlags=true
+
+    [[ "$fPrintBuildFlags" == false ]] && return
+
     command -v realpath >/dev/null 2>&1 && fWorkingDir=$(realpath "$fWorkingDir")
     if [[ ! -d "$fWorkingDir" ]]; then
         echo "$USER_NOTATION Directory $fWorkingDir not found"
         exit 1
     fi
 
+    cd "$fWorkingDir" || exit
     if [[ ! -x "$(command -v ./Configure)" ]]; then
-        echo "$USER_NOTATION Command Configure not found"
+        echo "$USER_NOTATION Command Configure not found in $fWorkingDir"
         exit 1
     fi
     availModels="$(./Configure list)"
@@ -261,9 +267,6 @@ preParseOptions
 showLogo
 
 echo $SEPARATOR2
-[[ "$fGitClean" == true || "$fRunConfigure" == true || "$fNeedBuild" == true
-    || "$fUseBear" == true || "$fRMCompileCommandsJson" == true ]] && fPrintBuildFlags=true
-
 if [[ "$fPrintBuildFlags" != false ]]; then
     COLOR="$GREEN"
     # echo "$SEPARATOR"

@@ -16,6 +16,9 @@ if {$argc > 0} {
     set mode [lindex $argv 0]
 }
 
+send_user "Restarting forticlient service\n"
+exec sudo systemctl restart forticlient.service
+
 # Spawn your target script or command using the "mode" variable
 # spawn /opt/forticlient/fortivpn connect "SCM SSLVPN" -u $username -w -s -a
 
@@ -26,7 +29,7 @@ set loop_prompt "Error: "
 set token_prompt "FortiToken:"
 
 while {$i <= $max_retry} {
-    spawn sudo /opt/forticlient/vpn -s scm.van.corp.fortinet.com:443 -u $ftnt_username -p
+    spawn -noecho sudo /opt/forticlient/vpn -s scm.van.corp.fortinet.com:443 -u $ftnt_username -p
     expect {
         "(y/n)" {
             send "y\r"

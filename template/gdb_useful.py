@@ -1,6 +1,64 @@
 import re
 import gdb
 
+import gdb
+
+class CircularDoublyLinkedList(gdb.Command):
+    """Command to print and count elements in a circular doubly linked list."""
+
+    def __init__(self):
+        super(CircularDoublyLinkedList, self).__init__("ptlist", gdb.COMMAND_USER)
+
+    def get_node(self, ptr):
+        """Retrieve node data from the given pointer."""
+        return gdb.parse_and_eval(f"(struct list_head *){ptr}")
+
+    def invoke(self, arg, from_tty):
+        """Execute the command."""
+        if not arg:
+            print("Usage: ptlist <head_pointer>")
+            return
+
+        try:
+            head = self.get_node(f"(struct list_head *){arg}")
+            # print(f"Value of arg: {head_ptr}")
+            # print(f"Type of arg: {type(head_ptr)}")
+            # return
+
+            # +p g_wad_app_sessions.sessions
+            # $77 = {
+            #   next = 0x7f36fc296700,
+            #   prev = 0x7f364883df60
+            # }
+
+            elements = []
+            count = 0
+            curr = self.get_node(head['next'])  # Start from head->next
+            max_count = 20
+
+            while True:
+                if curr == head:
+                    break
+                if count >= max_count:
+                    break
+                elements.append(f"{curr}")
+                count += 1
+                curr = self.get_node(curr['next'])
+
+            for i in range(0, len(elements), 5):
+                print(" -> ".join(elements[i:i+5]))
+
+            if count < max_count:
+                print(f"Total number of elements: {count}")
+            else:
+                print(f"Note: Displayed only the first {max_count} elements")
+
+        except gdb.error as e:
+            print(f"Error: {e}")
+
+# Instantiate the command
+CircularDoublyLinkedList()
+
 class PrintMemoryCommand4(gdb.Command):
     """Print memory at the specified address using the x/4bu format."""
     def __init__(self):

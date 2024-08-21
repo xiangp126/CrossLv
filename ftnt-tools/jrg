@@ -1,21 +1,24 @@
 #!/bin/bash
 
 scriptName=$(basename $0)
-userNotation="@@@@"
 fUseVim=false
 EDITOR="code"
+
+# The user notation
+USER_NOTATION="@@@@"
 
 usage() {
     cat << _EOF_
 $scriptName v0.0
 
-Usage: $scriptName [-m] <search term>
+Usage: $scriptName [vz] <search term>
 
 Options:
-    -v: open the file in vim (default is code)
+    -v  Open the file in vim (default is $EDITOR)
+    -z  Search with empty query
 
 Example: $scriptName "search term"
-         $scriptName -m "search term"
+         $scriptName -z
 
 Notice: The search term must be the last argument!
 
@@ -25,16 +28,21 @@ _EOF_
 
 [[ $# -eq 0 ]] && usage
 
+query="$@"
+
 # parse the arguments, -v is for vim, -c is for code
-while getopts "hm" opt; do
+while getopts "hvz" opt; do
     case ${opt} in
-        m)
+        v)
             fUseVim=true
+            ;;
+        z)
+            query=""
             ;;
         h)
             usage
             ;;
-        \?)
+        ?)
             echo "Invalid option: $OPTARG" 1>&2
             exit 1
             ;;
@@ -42,15 +50,31 @@ while getopts "hm" opt; do
 done
 
 shift $((OPTIND -1))
-if [ $# -eq 0 ]; then
-    echo "$userNotation No search term provided"
-    exit 1
-fi
+[[ $# -gt 1 ]] && usage
 
-query="$@"
-# wad_ssl_sock_port_exec_up_forward_txn:17850
+preCheck() {
+    if ! command -v rg &> /dev/null; then
+        echo "$USER_NOTATION ripgrep is not installed"
+        exit 1
+    fi
+
+    if ! command -v fzf &> /dev/null; then
+        echo "$USER_NOTATION fzf is not installed"
+        exit 1
+    fi
+
+    if ! command -v bat &> /dev/null; then
+        echo "$USER_NOTATION bat is not installed"
+        exit 1
+    fi
+}
+
+preCheck
+
+# wad_ssl_sock_port_exec_up_forward_txn:17850 => wad_ssl_sock_port_exec_up_forward_txn
 query_polished=$(echo "$query" | sed 's/\\//g' | cut -d: -f1)
 
+# write the three check into a function
 result=$(rg --smart-case \
             --color=ansi \
             --colors 'match:fg:204,51,153' --colors 'match:style:bold' \
@@ -63,9 +87,10 @@ result=$(rg --smart-case \
             --cycle \
             --query "$query_polished")
 
+# The sample value of result is:
+# daemon/wad/wad_app_eng.c:3071:          goto session_make_failed;
 if [ -z "$result" ]; then
-    echo "$userNotation No match found for: $query_polished"
-    exit 1
+    exit 0
 fi
 
 file="${result%%:*}"
@@ -78,7 +103,7 @@ if [ "$fUseVim" = true ]; then
 fi
 
 if ! command -v $EDITOR &> /dev/null; then
-    echo "$userNotation $EDITOR is not installed"
+    echo "$USER_NOTATION $EDITOR is not installed"
     exit 1
 fi
 $EDITOR "$file":"$linenumber"
