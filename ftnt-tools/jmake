@@ -596,7 +596,7 @@ if [[ "$fSyncTarget" != false ]]; then
                 echo "$SUB_USER_NOTATION Please check the server status manually."
                 exit 1
             else
-                echo "$SUB_USER_NOTATION Target $fSyncTarget started to reboot at $(getCurrentTime)."
+                echo -e "$SUB_USER_NOTATION Target ${COLOR}$fSyncTarget${RESET} started to reboot at $(getCurrentTime)."
                 exit 0
             fi
             ;;
