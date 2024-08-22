@@ -391,7 +391,7 @@
 	"command": "workbench.action.nextEditor"
 },
 {
-	"key": "ctrl+\\",
+	"key": "ctrl+k \\",
 	"command": "workbench.action.splitEditorRight"
 },
 {
@@ -403,7 +403,7 @@
 	"command": "-workbench.action.splitEditor"
 },
 {
-	"key": "ctrl+shift+\\",
+	"key": "ctrl+k -",
 	"command": "workbench.action.splitEditorDown"
 },
 {
@@ -521,5 +521,13 @@
 	"key": "shift+alt+,",
 	"command": "-gitlens.diffLineWithPrevious",
 	"when": "editorTextFocus && config.gitlens.keymap == 'alternate' && gitlens:activeFileStatus =~ /tracked/"
+},
+{
+	"key": "ctrl+k ctrl+e",
+	"command": "workbench.action.closeUnmodifiedEditors"
+},
+{
+	"key": "ctrl+k u",
+	"command": "-workbench.action.closeUnmodifiedEditors"
 }
 ]

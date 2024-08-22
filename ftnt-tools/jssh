@@ -112,7 +112,7 @@ echo -e "$USER_NOTATION Set Username to: ${COLOR}$fSSHUser${RESET}"
 echo -e "$USER_NOTATION Set Password to: ${COLOR}$fPasswd${RESET}"
 echo -e "$USER_NOTATION Set Maximum Attempts to: ${COLOR}$fMaxAttempts${RESET}"
 echo -e "$USER_NOTATION Connecting to ${COLOR}$fSSHTarget${RESET} ..."
-echo -e "$SEPARATOR"
+# echo -e "$SEPARATOR"
 
 # expect -d -c "
 expect -c "
