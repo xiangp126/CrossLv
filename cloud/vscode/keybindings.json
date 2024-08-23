@@ -391,19 +391,11 @@
 	"command": "workbench.action.nextEditor"
 },
 {
-	"key": "ctrl+k \\",
-	"command": "workbench.action.splitEditorRight"
-},
-{
-	"key": "ctrl+k ctrl+\\",
-	"command": "-workbench.action.splitEditorRight"
-},
-{
 	"key": "ctrl+\\",
 	"command": "-workbench.action.splitEditor"
 },
 {
-	"key": "ctrl+k -",
+	"key": "ctrl+b -",
 	"command": "workbench.action.splitEditorDown"
 },
 {
@@ -523,11 +515,116 @@
 	"when": "editorTextFocus && config.gitlens.keymap == 'alternate' && gitlens:activeFileStatus =~ /tracked/"
 },
 {
-	"key": "ctrl+k ctrl+e",
+	"key": "ctrl+b e",
 	"command": "workbench.action.closeUnmodifiedEditors"
 },
 {
 	"key": "ctrl+k u",
 	"command": "-workbench.action.closeUnmodifiedEditors"
+},
+{
+	"key": "ctrl+b left",
+	"command": "workbench.action.focusLeftGroup"
+},
+{
+	"key": "ctrl+k ctrl+left",
+	"command": "-workbench.action.focusLeftGroup"
+},
+{
+	"key": "ctrl+b right",
+	"command": "workbench.action.focusRightGroup"
+},
+{
+	"key": "ctrl+k ctrl+right",
+	"command": "-workbench.action.focusRightGroup"
+},
+{
+	"key": "ctrl+b /",
+	"command": "workbench.action.splitEditorLeft"
+},
+{
+	"key": "ctrl+k ctrl+\\",
+	"command": "-workbench.action.splitEditorLeft"
+},
+{
+	"key": "ctrl+b shift+-",
+	"command": "workbench.action.splitEditorUp"
+},
+{
+	"key": "ctrl+k ctrl+\\",
+	"command": "-workbench.action.splitEditorUp"
+},
+{
+	"key": "ctrl+b up",
+	"command": "workbench.action.focusAboveGroup"
+},
+{
+	"key": "ctrl+k ctrl+up",
+	"command": "-workbench.action.focusAboveGroup"
+},
+{
+	"key": "ctrl+b down",
+	"command": "workbench.action.focusBelowGroup"
+},
+{
+	"key": "ctrl+k ctrl+down",
+	"command": "-workbench.action.focusBelowGroup"
+},
+{
+	"key": "ctrl+b ctrl+left",
+	"command": "workbench.action.moveActiveEditorGroupLeft"
+},
+{
+	"key": "ctrl+k left",
+	"command": "-workbench.action.moveActiveEditorGroupLeft"
+},
+{
+	"key": "ctrl+b ctrl+down",
+	"command": "workbench.action.moveActiveEditorGroupDown"
+},
+{
+	"key": "ctrl+k down",
+	"command": "-workbench.action.moveActiveEditorGroupDown"
+},
+{
+	"key": "ctrl+b ctrl+right",
+	"command": "workbench.action.moveActiveEditorGroupRight"
+},
+{
+	"key": "ctrl+k right",
+	"command": "-workbench.action.moveActiveEditorGroupRight"
+},
+{
+	"key": "ctrl+b ctrl+up",
+	"command": "workbench.action.moveActiveEditorGroupUp"
+},
+{
+	"key": "ctrl+k up",
+	"command": "-workbench.action.moveActiveEditorGroupUp"
+},
+{
+	"key": "ctrl+k ctrl+shift+\\",
+	"command": "-workbench.action.splitEditorInGroup",
+	"when": "activeEditorCanSplitInGroup"
+},
+{
+	"key": "ctrl+x",
+	"command": "editor.action.clipboardCutAction"
+},
+{
+	"key": "ctrl+x",
+	"command": "-editor.action.clipboardCutAction"
+},
+{
+	"key": "ctrl+b \\",
+	"command": "workbench.action.splitEditorRight"
+},
+{
+	"key": "ctrl+k ctrl+\\",
+	"command": "-workbench.action.splitEditorRight"
+},
+{
+	"key": "ctrl+b shift+\\",
+	"command": "workbench.action.splitEditorRight"
 }
 ]
