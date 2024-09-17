@@ -16,9 +16,9 @@ if {$argc > 0} {
     set mode [lindex $argv 0]
 }
 
-send_user "Restarting forticlient service\n"
-spawn -noecho sudo systemctl restart forticlient.service
-expect eof
+# send_user "Restarting forticlient service\n"
+# spawn -noecho sudo systemctl restart forticlient.service
+# expect eof
 
 
 # Spawn your target script or command using the "mode" variable
