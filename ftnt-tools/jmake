@@ -94,6 +94,7 @@ Other Options:
 
 Example:
     $scriptName -m FGT_VM64_KVM -c -T1 -j4 -b
+    $scriptName -m vmware
     $scriptName -t fgt1 -s FGT_VM64_KVM-v7-build1662.out -u "admin" -p "password" -P 22
     $scriptName -h
 
