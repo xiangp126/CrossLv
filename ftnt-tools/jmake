@@ -323,8 +323,9 @@ if [[ "$fGitClean" == true ]]; then
         gitExcludePattern+="--exclude=$patt "
     done
 
+    COLOR="$BLUE"
     gitCleanCmd="git clean -xdf $gitExcludePattern"
-    echo "$SUB_USER_NOTATION Running: $gitCleanCmd"
+    echo -e "$SUB_USER_NOTATION Running: ${COLOR}$gitCleanCmd${RESET}"
 
     sleep 1
     eval "$gitCleanCmd"
@@ -464,8 +465,9 @@ if [[ "$fNeedBuild" != false ]]; then
     done
 
     if [[ $eval_status -ne 0 ]]; then
+        COLOR="$RED"
         echo "$USER_NOTATION Build projects failed."
-        echo "$SUB_USER_NOTATION Suggest to clean the working directory and try again."
+        echo -e "$SUB_USER_NOTATION ${COLOR}Suggest to clean the working directory and try again.${RESET}"
         exit 1
     fi
 
