@@ -51,9 +51,9 @@
         "terminal.ansiRed": "#c52121",
         "terminal.ansiBrightGreen": "#12aaaf",
         "terminal.ansiGreen": "#16afba",
-        "peekViewResult.fileForeground": "#daae9d",
+        "peekViewResult.fileForeground": "#DD90D7",
         "peekViewResult.lineForeground": "#d3d3d3",
-        "peekViewResult.selectionForeground": "#f4f4f4",
+        "peekViewResult.selectionForeground": "#e9e9e9",
 
     },
     "editor.tokenColorCustomizations": {
@@ -91,8 +91,7 @@
                 "scope": "variable.other.property",
                 "settings": {
                     // "foreground": "#9CDCFE",
-                    "foreground": "#bfbdbd",
-                    // "foreground": "#abc3cf",
+                    "foreground": "#b3b3b3",
                 },
             },
             {
@@ -291,9 +290,9 @@
     "files.exclude": {
         "**/.vscode-server": true
     },
-    "bookmarks.keepBookmarksOnLineDelete": true,
     "workbench.preferredLightColorTheme": "Default Dark Modern",
     "terminal.integrated.ignoreBracketedPasteMode": true,
-    "workbench.editor.navigationScope": "editor",
+    "workbench.editor.navigationScope": "editorGroup",
     "diffEditor.renderSideBySide": true,
+    "editor.minimap.size": "fill",
 }
