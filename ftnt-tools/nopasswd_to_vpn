@@ -1,5 +1,4 @@
 #!/usr/bin/expect -f
-
 set header_exp get_credentials
 
 # Get the real directory of the script, resolving any symlinks
@@ -12,14 +11,16 @@ set script_directory [file dirname $script_path]
 # Source the other Expect script in the same directory
 source "$script_directory/$header_exp"
 
+set mode ""
 if {$argc > 0} {
     set mode [lindex $argv 0]
 }
 
-send_user "Restarting forticlient service\n"
-system "sudo systemctl restart forticlient.service"
+if {$mode == "r"} {
+    send_user "Restarting forticlient service\n"
+    system "sudo systemctl restart forticlient.service"
+}
 
-# Spawn your target script or command using the "mode" variable
 # spawn /opt/forticlient/fortivpn connect "SCM SSLVPN" -u $username -w -s -a
 
 set timeout 15

@@ -49,8 +49,11 @@ while getopts "hvz" opt; do
     esac
 done
 
+# OPTIND is a special variable used by getopts
+# that keeps track of the next index in the positional parameters to be processed.
+# After processing options, OPTIND will point to the first non-option argument.
 shift $((OPTIND -1))
-[[ $# -gt 1 ]] && usage
+# [[ $# -gt 1 ]] && usage
 
 preCheck() {
     if ! command -v rg &> /dev/null; then
