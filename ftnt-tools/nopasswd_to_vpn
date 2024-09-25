@@ -16,10 +16,8 @@ if {$argc > 0} {
     set mode [lindex $argv 0]
 }
 
-# send_user "Restarting forticlient service\n"
-# spawn -noecho sudo systemctl restart forticlient.service
-# expect eof
-
+send_user "Restarting forticlient service\n"
+system "sudo systemctl restart forticlient.service"
 
 # Spawn your target script or command using the "mode" variable
 # spawn /opt/forticlient/fortivpn connect "SCM SSLVPN" -u $username -w -s -a

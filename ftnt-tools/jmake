@@ -246,6 +246,8 @@ preParseOptions() {
         if [[ "$fBuildModel" == "" ]]; then
             fBuildModel="FPX_KVM"
         else
+            # Change the max build attempt to 2 for FPX
+            fMaxBuildAttempt=2
             searchModel "$availModels" "$fBuildModel"
         fi
     else
