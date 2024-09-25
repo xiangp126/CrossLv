@@ -76,6 +76,7 @@ if [ ! -d "$repo_dir" ]; then
 fi
 
 # List all subdirectories in the repository directory
+# -o: logical OR operator. It allows to specify an alternative condition for the search.
 repos=$(find "$repo_dir" -mindepth 1 -maxdepth 1 -type d -o -type l | sort)
 
 # Loop through each repository and update it
