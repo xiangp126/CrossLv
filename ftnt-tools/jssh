@@ -102,6 +102,9 @@ fi
 
 # Define color and formatting variables
 RED='\033[31m'
+MAGENTA='\033[35m'
+GREEN='\033[32m'
+BLUE='\033[34m'
 RESET='\033[0m'
 
 COLOR="$RED"
@@ -111,7 +114,7 @@ echo -e "$USER_NOTATION Set SSH Connection Port to: ${COLOR}$fSSHPort${RESET}"
 echo -e "$USER_NOTATION Set Username to: ${COLOR}$fSSHUser${RESET}"
 echo -e "$USER_NOTATION Set Password to: ${COLOR}$fPasswd${RESET}"
 echo -e "$USER_NOTATION Set Maximum Attempts to: ${COLOR}$fMaxAttempts${RESET}"
-echo -e "$USER_NOTATION Connecting to ${COLOR}$fSSHTarget${RESET} ..."
+echo "$USER_NOTATION Connecting to $fSSHTarget ..."
 # echo -e "$SEPARATOR"
 
 # expect -d -c "
@@ -119,6 +122,19 @@ expect -c "
     # Set your SSH credentials
     set i 1
     set timeout 3
+
+    # Define ANSI color codes with capitalized names
+    # Full list can be found here: http://en.wikipedia.org/wiki/ANSI_escape_code
+    # https://stackoverflow.com/questions/12879483/color-texts-at-expect-shell
+    set RESET   \"\033\[0m\"
+    set BOLD    \"\033\[1m\"
+    set RED     \"\033\[31m\"
+    set GREEN   \"\033\[32m\"
+    set YELLOW  \"\033\[33m\"
+    set BLUE    \"\033\[34m\"
+    set MAGENTA \"\033\[35m\"
+    set CYAN    \"\033\[36m\"
+    set WHITE   \"\033\[37m\"
 
     while {\$i <= $fMaxAttempts} {
         # ssh -o StrictHostKeyChecking=no $fSSHTarget
@@ -182,7 +198,7 @@ expect -c "
         exit 1
     }
 
-    send_user \"$USER_NOTATION Successfully connected to $fSSHTarget\"
+    send_user \"$USER_NOTATION \${MAGENTA}Successfully connected to $fSSHTarget\${RESET}\"
     send \"\r\"
 
     # check if fVdom is specified

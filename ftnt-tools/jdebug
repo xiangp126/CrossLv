@@ -33,8 +33,8 @@ fWADWorkerKeep=-1
 fWADWorkerCnt=$fWADWorkerKeep # 0: unlimited, 1: 1 worker, -1: keep the original value
 fMaxAttempts=2
 # Pretty print
-userNotation="@@@@"
-subUserNotation="@@@@ @"
+USER_NOTATION="@@@@"
+SUB_USER_NOTATION="@@@@ @"
 separator="----------------------------------------------------------------"
 
 usage() {
@@ -105,7 +105,7 @@ while getopts "t:w:d:T:l:u:p:P:N:h" opt; do
             usage
             ;;
         ?)
-            echo "$userNotation Invalid option: -$OPTARG" >&2
+            echo "$USER_NOTATION Invalid option: -$OPTARG" >&2
             exit 1
             ;;
     esac
@@ -114,24 +114,31 @@ done
 # Shift to process non-option arguments. New $1, $2, ..., $@
 shift $((OPTIND - 1))
 if [[ $# -gt 0 ]]; then
-    echo "$userNotation Illegal non-option arguments: $@"
+    echo "$USER_NOTATION Illegal non-option arguments: $@"
     exit
 fi
 
+RED='\033[31m'
+MAGENTA='\033[35m'
+RESET='\033[0m'
+COLOR="$RED"
+
 fSearchPatt="type=.*$fWorkerType"
 echo $separator
-echo "$userNotation [t]Set Target Device to: $fTarget"
-echo "$userNotation [w]Set Worker Type to: $fWorkerType(Search Pattern: $fSearchPatt)"
-echo "$userNotation [d]Set GDB Server Listen Port to: $fGDBServerListenPort"
-echo "$userNotation [P]Set SSH Connection Port to: $fSSHConnPort"
-echo "$userNotation [l]Set Username to: $fUsername"
-echo "$userNotation [p]Set Password to: $fPassword"
-echo "$userNotation [T]Set Maximum Attempts to: $fMaxAttempts"
+echo -e "$USER_NOTATION [t]Set Target Device to: ${COLOR}$fTarget${RESET}"
+echo -e "$USER_NOTATION [w]Set Worker Type to: ${COLOR}$fWorkerType${RESET}(Search Pattern: $fSearchPatt)"
+echo -e "$USER_NOTATION [d]Set GDB Server Listen Port to: ${COLOR}$fGDBServerListenPort${RESET}"
+echo -e "$USER_NOTATION [P]Set SSH Connection Port to: ${COLOR}$fSSHConnPort${RESET}"
+echo -e "$USER_NOTATION [l]Set Username to: ${COLOR}$fUsername${RESET}"
+echo -e "$USER_NOTATION [p]Set Password to: ${COLOR}$fPassword${RESET}"
+echo -e "$USER_NOTATION [T]Set Maximum Attempts to: ${COLOR}$fMaxAttempts${RESET}"
 # if $wadWorkerCnt is larger or equal to 0, then print the message.
 if [ "$fWADWorkerCnt" -ge 0 ]; then
-    echo "$userNotation [N]Set WAD Worker Count to: $fWADWorkerCnt"
+    echo -e "$USER_NOTATION [N]Set WAD Worker Count to: ${COLOR}$fWADWorkerCnt${RESET}"
 fi
-echo "$userNotation Connecting to $fTarget ..."
+# COLOR="$MAGENTA"
+# echo -e "$USER_NOTATION ${COLOR}Connecting to $fTarget${RESET} ..."
+echo "$USER_NOTATION Connecting to $fTarget ..."
 echo $separator
 
 # expect -d -c "
@@ -157,7 +164,7 @@ expect -c "
     while {\$i <= $fMaxAttempts} {
         # ssh -o StrictHostKeyChecking=no $fTarget
         if {\$i > 1} {
-            send_user \"$userNotation Login attempt \$i/$fMaxAttempts\n\"
+            send_user \"$USER_NOTATION Login attempt \$i/$fMaxAttempts\n\"
         }
         spawn -noecho ssh -p $fSSHConnPort $fUsername@$fTarget
 
@@ -171,7 +178,7 @@ expect -c "
             -re {[Pp]assword} {
                 incr passwd_prompt_cnt
                 if {\$passwd_prompt_cnt > 1} {
-                    send_user \"\n$userNotation Permission denied. Please specify the login credentials.\n\"
+                    send_user \"\n$USER_NOTATION Permission denied. Please specify the login credentials.\n\"
                     exit 1
                 }
                 send \"$fPassword\r\"
@@ -182,10 +189,10 @@ expect -c "
                 exit 1
             }
             {Host key verification failed.} {
-                send_user \"$userNotation Host key verification failed. Updating known_hosts file...\n\"
+                send_user \"$USER_NOTATION Host key verification failed. Updating known_hosts file...\n\"
                 system \"ssh-keygen -R $fTarget\"
-                send_user \"$userNotation Host key removed from known_hosts file.\n\"
-                send_user \"$userNotation Retrying SSH immediately...\n\"
+                send_user \"$USER_NOTATION Host key removed from known_hosts file.\n\"
+                send_user \"$USER_NOTATION Retrying SSH immediately...\n\"
                 # close \$session_id
                 incr i
                 continue
@@ -195,21 +202,21 @@ expect -c "
                 break
             }
             timeout {
-                send_user \"$subUserNotation Timeout when connecting to $fTarget\n\"
+                send_user \"$SUB_USER_NOTATION Timeout when connecting to $fTarget\n\"
                 # close \$session_id
                 incr i
                 continue
             }
             eof {
-                send_user \"$subUserNotation Reached EOF. Program ended.\n\"
-                send_user \"$subUserNotation Please check if $fTarget is a correct device name.\n\"
+                send_user \"$SUB_USER_NOTATION Reached EOF. Program ended.\n\"
+                send_user \"$SUB_USER_NOTATION Please check if $fTarget is a correct device name.\n\"
                 exit 1
             }
         }
     }
 
     if {\$i > $fMaxAttempts} {
-        send_user \"$userNotation Failed to connect to $fTarget\"
+        send_user \"$USER_NOTATION Failed to connect to $fTarget\"
         exit 1
     }
 
@@ -229,7 +236,7 @@ expect -c "
                 # Pass through
             }
             timeout {
-                send_user \"$userNotation Timeout when resetting debug.\r\"
+                send_user \"$USER_NOTATION Timeout when resetting debug.\r\"
                 exit 1
             }
         }
@@ -241,7 +248,7 @@ expect -c "
         expect \"$fPrompt\"
 
         # set wait_time 3
-        # send_user \"$userNotation Wait for \$wait_time seconds to apply the configuration.\n\"
+        # send_user \"$USER_NOTATION Wait for \$wait_time seconds to apply the configuration.\n\"
         # for {set j 0} {\$j < \$wait_time * 2} {incr j} {
         #     send_user \"====\"
         # }
@@ -255,7 +262,7 @@ expect -c "
 
         send \"exit\r\"
         expect eof {
-            send_user \"$userNotation WAD Worker Count has been set to $fWADWorkerCnt.\n\"
+            send_user \"$USER_NOTATION WAD Worker Count has been set to $fWADWorkerCnt.\n\"
             exit 0
         }
     }
@@ -277,7 +284,7 @@ expect -c "
             # Pass through
         }
         timeout {
-            send_user \"$userNotation Timeout when resetting debug.\r\"
+            send_user \"$USER_NOTATION Timeout when resetting debug.\r\"
             exit 1
         }
     }
@@ -294,10 +301,10 @@ expect -c "
 
     # Define the pattern to match
     set search_patt $fSearchPatt
-    # send_user \"$userNotation Searching for \$search_patt\n\"
+    # send_user \"$USER_NOTATION Searching for \$search_patt\n\"
 
     foreach line [split \$output \"\n\"] {
-            if {[regexp \$search_patt \$line]} {
+            if {[regexp -nocase \$search_patt \$line]} {
             # Extract the PID from the line
             set pid_regex {pid=(\d+)}
             if {[regexp \$pid_regex \$line match worker_pid]} {
@@ -309,22 +316,24 @@ expect -c "
     }
 
     if {\$worker_cnt > 1} {
-        if {[string match \"*work*\" $fWorkerType]} {
-            send_user \"\n$userNotation \${RED}Warning:\${RESET} \$worker_cnt PIDs found: \${RED}\$worker_pids\${RESET} for WAD process of type \${YELLOW}$fWorkerType\${RESET}.\n\"
-            send_user {$userNotation Recommend to set wad worker count to 1 to make life easier.
-$subUserNotation FPX # config system global
-$subUserNotation FPX (global) # set wad-worker-count 1
-$subUserNotation FPX (global) # end
-$userNotation Or retry the same command with -N1
+        if {[string match -nocase \"*work*\" $fWorkerType]} {
+            send_user \"\n$USER_NOTATION \${RED}Warning: \$worker_cnt PIDs found: \$worker_pids for WAD process of type $fWorkerType\${RESET}.\n\"
+            send_user {$USER_NOTATION Recommend to set wad worker count to 1 to make life easier.
+$SUB_USER_NOTATION FPX # config system global
+$SUB_USER_NOTATION FPX (global) # set wad-worker-count 1
+$SUB_USER_NOTATION FPX (global) # end
+$USER_NOTATION Or retry the same command with -N1
             }
         } else {
-            send_user \"\n$userNotation \${RED}Warning:\${RESET} \$worker_cnt PIDs found: \${RED}\$worker_pids\${RESET} for WAD process of type \${YELLOW}$fWorkerType\${RESET}.\"
-            send_user \"\n$userNotation Please check if the input type is correct.\n\"
+            send_user \"\n$USER_NOTATION \${RED}Warning: \$worker_cnt PIDs found: \$worker_pids for WAD process of type $fWorkerType\${RESET}.\"
+            set worker_pid [lindex \$worker_pids 0]
+            send_user \"\n$USER_NOTATION Default to choose the first PID: \${GREEN}\$worker_pid\${RESET}.\n\"
+            send_user \"$USER_NOTATION Recommend to check the input worker type.\n\"
         }
     } elseif {\$worker_cnt == 1} {
-        send_user \"\n$userNotation Exact PID: \${GREEN}\$worker_pid\${RESET} found for WAD process of type \${RED}$fWorkerType\${RESET}.\n\"
+        send_user \"\n$USER_NOTATION Exact matched PID: \${GREEN}\$worker_pid\${RESET} found for WAD process of type \${MAGENTA}$fWorkerType\${RESET}.\n\"
     } else {
-        send_user \"\n$userNotation Could not find WAD process of type \${YELLOW}$fWorkerType\${RESET}.\n\"
+        send_user \"\n$USER_NOTATION Could not find WAD process of type \${MAGENTA}$fWorkerType\${RESET}.\n\"
         exit 1
     }
 
@@ -340,7 +349,7 @@ $userNotation Or retry the same command with -N1
     send \"sys sh\r\"
     expect {
         \"Unknown action\" {
-            send_user \"$userNotation No Shell supported. Please check the image version.\n\"
+            send_user \"$USER_NOTATION No Shell supported. Please check the image version.\n\"
             exit 1
         }
         \"$fPrompt\" {
@@ -356,9 +365,9 @@ $userNotation Or retry the same command with -N1
     trap {
         # Disable console logging. The output may contain multiple blank lines starts with '/ # '.
         log_user 0
-        send_user \"\n$userNotation CTRL+C captured; sending SIGINT to gdbserver as well.\n\"
+        send_user \"\n$USER_NOTATION \${RED}CTRL+C captured; sending SIGINT to gdbserver as well\${RESET}.\n\"
         send \x03
-        send_user \"$userNotation Debugging session terminated.\n\"
+        send_user \"$USER_NOTATION \${MAGENTA}Debugging session terminated\${RESET}.\n\"
     } SIGINT
 
     # interact
