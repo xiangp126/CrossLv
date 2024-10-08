@@ -141,6 +141,19 @@ expect -c "
     set timeout 3
     set has_vdom 0
 
+    # Define ANSI color codes with capitalized names
+    # Full list can be found here: http://en.wikipedia.org/wiki/ANSI_escape_code
+    # https://stackoverflow.com/questions/12879483/color-texts-at-expect-shell
+    set RESET   \"\033\[0m\"
+    set BOLD    \"\033\[1m\"
+    set RED     \"\033\[31m\"
+    set GREEN   \"\033\[32m\"
+    set YELLOW  \"\033\[33m\"
+    set BLUE    \"\033\[34m\"
+    set MAGENTA \"\033\[35m\"
+    set CYAN    \"\033\[36m\"
+    set WHITE   \"\033\[37m\"
+
     while {\$i <= $fMaxAttempts} {
         # ssh -o StrictHostKeyChecking=no $fTarget
         if {\$i > 1} {
@@ -297,7 +310,7 @@ expect -c "
 
     if {\$worker_cnt > 1} {
         if {[string match \"*work*\" $fWorkerType]} {
-            send_user \"\n$userNotation Warning: \$worker_cnt $fWorkerType PIDs found:\n\$worker_pids\n\"
+            send_user \"\n$userNotation \${RED}Warning:\${RESET} \$worker_cnt PIDs found: \${RED}\$worker_pids\${RESET} for WAD process of type \${YELLOW}$fWorkerType\${RESET}.\n\"
             send_user {$userNotation Recommend to set wad worker count to 1 to make life easier.
 $subUserNotation FPX # config system global
 $subUserNotation FPX (global) # set wad-worker-count 1
@@ -305,13 +318,13 @@ $subUserNotation FPX (global) # end
 $userNotation Or retry the same command with -N1
             }
         } else {
-            send_user \"\n$userNotation Multiple $fWorkerType PIDs found: \$worker_pids.\"
-            send_user \"\n$userNotation Please check if the input type: $fWorkerType is correct.\n\"
+            send_user \"\n$userNotation \${RED}Warning:\${RESET} \$worker_cnt PIDs found: \${RED}\$worker_pids\${RESET} for WAD process of type \${YELLOW}$fWorkerType\${RESET}.\"
+            send_user \"\n$userNotation Please check if the input type is correct.\n\"
         }
     } elseif {\$worker_cnt == 1} {
-        send_user \"\n$userNotation Exact match found $fWorkerType type PID: \$worker_pid\n\"
+        send_user \"\n$userNotation Exact PID: \${GREEN}\$worker_pid\${RESET} found for WAD process of type \${RED}$fWorkerType\${RESET}.\n\"
     } else {
-        send_user \"\n$userNotation Could not find $fWorkerType type PID.\n\"
+        send_user \"\n$userNotation Could not find WAD process of type \${YELLOW}$fWorkerType\${RESET}.\n\"
         exit 1
     }
 
