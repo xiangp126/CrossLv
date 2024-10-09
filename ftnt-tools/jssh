@@ -198,7 +198,8 @@ expect -c "
         exit 1
     }
 
-    send_user \"$USER_NOTATION \${MAGENTA}Successfully connected to $fSSHTarget\${RESET}\"
+    puts -nonewline \"$USER_NOTATION \${MAGENTA}Successfully connected to $fSSHTarget\${RESET}\"
+    flush stdout
     send \"\r\"
 
     # check if fVdom is specified
