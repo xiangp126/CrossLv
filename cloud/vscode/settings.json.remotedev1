@@ -34,7 +34,6 @@
     "gitlens.views.searchAndCompare.avatars": false,
     "gitlens.views.workspaces.avatars": false,
     "gitlens.views.patchDetails.avatars": false,
-    "gitlens.views.commitDetails.avatars": false,
     "gitlens.views.commits.avatars": false,
     "gitlens.defaultGravatarsStyle": "mp",
     "remote.autoForwardPorts": false,
@@ -49,4 +48,5 @@
         "**/.vscode-server": true
     },
     "files.autoGuessEncoding": true,
+    "gitlens.views.commitDetails.autolinks.enhanced": false,
 }
