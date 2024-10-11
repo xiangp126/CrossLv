@@ -41,17 +41,17 @@ usage:
     $scriptName [-l/-u user] [-p passwd] [-P ssh_port] [-E expect] [-V vdom] -t target_ip
 
 Options:
-    -P      port        SSH port to use. Default is "$fSSHPort"
     -l/-u   username    Username for login. Default is "$fSSHUser"
     -p      password    Password for login. Default is "$fPasswd"
-    -E      Expect      String expect(Other than "$fExpectRoot" and "$fExpectUser").
-    -V      vdom        Specify the VDOM. Default is "$fVdom"
+    -v      vdom        Specify the VDOM. Default is "$fVdom"
     -t      target      The device to connect to. Default is "$fSSHTarget"
+    -P      Port        SSH Port to connect to. Default is "$fSSHPort"
+    -E      Expect      Promption to expect(Other than "$fExpectRoot" and "$fExpectUser").
 
 Example:
     $scriptName -t fpx1
-    $scriptName -l admin -p 123 -t fgt1 -p 22
-    $scriptName -l admin -p 123 -t 172.16.67.181
+    $scriptName -t 172.16.67.181 -l admin -p "FGT\!123"
+    $scriptName -t 172.16.67.181 -l admin -p "FGT\!123" -P 8822 -v root
 
 _EOF
     exit 0
@@ -60,7 +60,7 @@ _EOF
 [[ $# -eq 0 ]] && usage
 
 # Parse command-line options
-while getopts "p:l:u:t:P:E:V:h" opt; do
+while getopts "p:l:u:t:P:E:v:h" opt; do
     case ${opt} in
         p)
             fPasswd=$OPTARG
@@ -80,7 +80,7 @@ while getopts "p:l:u:t:P:E:V:h" opt; do
         P)
             fSSHPort=$OPTARG
             ;;
-        V)
+        v)
             fVdom=$OPTARG
             ;;
         h)
