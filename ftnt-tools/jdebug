@@ -276,6 +276,8 @@ expect -c "
     expect {
         {Command fail.} {
             # The device has VDOM
+            set COLOR \$MAGENTA
+            send_user \"\${COLOR}Warning: The device has VDOM. Switch to the global configuration mode.\${RESET}\n\"
             expect \"$fPrompt\"
             send \"config global\r\"
             exp_continue
@@ -317,7 +319,8 @@ expect -c "
 
     if {\$worker_cnt > 1} {
         if {[string match -nocase \"*work*\" $fWorkerType]} {
-            send_user \"\n$USER_NOTATION \${RED}Warning: \$worker_cnt PIDs found: \$worker_pids for WAD process of type $fWorkerType\${RESET}.\n\"
+            set COLOR \$RED
+            send_user \"\n$USER_NOTATION \${COLOR}Warning: \$worker_cnt PIDs found: \$worker_pids for WAD process of type $fWorkerType\${RESET}.\n\"
             send_user {$USER_NOTATION Recommend to set wad worker count to 1 to make life easier.
 $SUB_USER_NOTATION FPX # config system global
 $SUB_USER_NOTATION FPX (global) # set wad-worker-count 1
@@ -325,15 +328,17 @@ $SUB_USER_NOTATION FPX (global) # end
 $USER_NOTATION Or retry the same command with -N1
             }
         } else {
-            send_user \"\n$USER_NOTATION \${RED}Warning: \$worker_cnt PIDs found: \$worker_pids for WAD process of type $fWorkerType\${RESET}.\"
+            send_user \"\n$USER_NOTATION \${COLOR}Warning: \$worker_cnt PIDs found: \$worker_pids for WAD process of type $fWorkerType\${RESET}.\"
             set worker_pid [lindex \$worker_pids 0]
-            send_user \"\n$USER_NOTATION Default to choose the first PID: \${GREEN}\$worker_pid\${RESET}.\n\"
+            set COLOR \$GREEN
+            send_user \"\n$USER_NOTATION Default to choose the first PID: \${COLOR}\$worker_pid\${RESET}.\n\"
             send_user \"$USER_NOTATION Recommend to check the input worker type.\n\"
         }
     } elseif {\$worker_cnt == 1} {
-        send_user \"\n$USER_NOTATION Exact matched PID: \${GREEN}\$worker_pid\${RESET} found for WAD process of type \${MAGENTA}$fWorkerType\${RESET}.\n\"
+        set COLOR \$MAGENTA
+        send_user \"\n$USER_NOTATION \${COLOR}Exact matched PID: \$worker_pid found for WAD process of type $fWorkerType\${RESET}.\n\"
     } else {
-        send_user \"\n$USER_NOTATION Could not find WAD process of type \${MAGENTA}$fWorkerType\${RESET}.\n\"
+        send_user \"\n$USER_NOTATION \${COLOR}Could not find WAD process of type $fWorkerType\${RESET}.\n\"
         exit 1
     }
 
@@ -365,9 +370,11 @@ $USER_NOTATION Or retry the same command with -N1
     trap {
         # Disable console logging. The output may contain multiple blank lines starts with '/ # '.
         log_user 0
-        send_user \"\n$USER_NOTATION \${RED}CTRL+C captured; sending SIGINT to gdbserver as well\${RESET}.\n\"
+        set COLOR \$RED
+        send_user \"\n$USER_NOTATION \${COLOR}CTRL+C captured; sending SIGINT to gdbserver as well\${RESET}.\n\"
         send \x03
-        send_user \"$USER_NOTATION \${MAGENTA}Debugging session terminated\${RESET}.\n\"
+        set COLOR \$MAGENTA
+        send_user \"$USER_NOTATION \${COLOR}Debugging session terminated\${RESET}.\n\"
     } SIGINT
 
     # interact

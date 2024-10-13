@@ -300,7 +300,7 @@ if [[ "$fSyncTarget" != false ]]; then
     echo -e "${BOLD}Sync Optioins:${RESET}"
     # echo "$SHORT_SEPARATOR"
     echo -e "$USER_NOTATION [s] Scheduled to sync ${COLOR}$fSyncFile${RESET} to ${COLOR}$fSyncTarget${RESET}"
-    echo -e "$USER_NOTATION [u] User:     (${COLOR}$fSyncUsername${RESET})"
+    echo -e "$USER_NOTATION [l] User:     (${COLOR}$fSyncUsername${RESET})"
     echo -e "$USER_NOTATION [p] Password: (${COLOR}$fSyncPassword${RESET})"
     echo -e "$USER_NOTATION [S] Sync File:   (${COLOR}$fSyncFile${RESET})"
     echo -e "$USER_NOTATION [S] Sync Target: (${COLOR}$fSyncTarget${RESET})"
