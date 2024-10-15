@@ -229,7 +229,7 @@ expect -c "
     proc handle_eof {} {
         global MAGENTA COLOR RESET
         set COLOR \$MAGENTA
-        send_user \"$USER_NOTATION \${COLOR}Bye-bye.\${RESET}\n\"
+        send_user \"$USER_NOTATION \${COLOR}Bye-bye ^_^\${RESET}\n\"
         exit 1
     }
 

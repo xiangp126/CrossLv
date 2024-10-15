@@ -385,7 +385,16 @@ $USER_NOTATION Or retry the same command with -N1
 
     # interact
     log_user 1
-    expect \"$fPrompt\"
+    expect {
+        {Detaching from process} {
+            set COLOR \$MAGENTA
+            send_user \"$USER_NOTATION \${COLOR}Bye-bye ^_^\${RESET}\n\"
+            exit 1
+        }
+        \"$fPrompt\" {
+            # pass through
+        }
+    }
 "
 
 # Process [0]: WAD manager type=manager(0) pid=1014 diagnosis=yes.
