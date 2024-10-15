@@ -326,7 +326,7 @@ expect -c "
     if {\$worker_cnt > 1} {
         if {[string match -nocase \"*work*\" $fWorkerType]} {
             set COLOR \$RED
-            send_user \"\n$USER_NOTATION \${COLOR}Warning: \$worker_cnt PIDs found: \$worker_pids for WAD process of type $fWorkerType\${RESET}.\n\"
+            send_user \"\n$USER_NOTATION \${COLOR}Warning: \$worker_cnt PIDs found: \$worker_pids for WAD process of type $fWorkerType.\${RESET}\n\"
             send_user {$USER_NOTATION Recommend to set wad worker count to 1 to make life easier.
 $SUB_USER_NOTATION FPX # config system global
 $SUB_USER_NOTATION FPX (global) # set wad-worker-count 1
@@ -334,17 +334,17 @@ $SUB_USER_NOTATION FPX (global) # end
 $USER_NOTATION Or retry the same command with -N1
             }
         } else {
-            send_user \"\n$USER_NOTATION \${COLOR}Warning: \$worker_cnt PIDs found: \$worker_pids for WAD process of type $fWorkerType\${RESET}.\"
+            send_user \"\n$USER_NOTATION \${COLOR}Warning: \$worker_cnt PIDs found: \$worker_pids for WAD process of type $fWorkerType.\${RESET}\"
             set worker_pid [lindex \$worker_pids 0]
             set COLOR \$GREEN
-            send_user \"\n$USER_NOTATION Default to choose the first PID: \${COLOR}\$worker_pid\${RESET}.\n\"
+            send_user \"\n$USER_NOTATION Default to choose the first PID: \${COLOR}\$worker_pid.\${RESET}\n\"
             send_user \"$USER_NOTATION Recommend to check the input worker type.\n\"
         }
     } elseif {\$worker_cnt == 1} {
         set COLOR \$MAGENTA
-        send_user \"\n$USER_NOTATION \${COLOR}Exact matched PID: \$worker_pid found for WAD process of type $fWorkerType\${RESET}.\n\"
+        send_user \"\n$USER_NOTATION \${COLOR}Exact matched PID: \$worker_pid found for WAD process of type $fWorkerType.\${RESET}\n\"
     } else {
-        send_user \"\n$USER_NOTATION \${COLOR}Could not find WAD process of type $fWorkerType\${RESET}.\n\"
+        send_user \"\n$USER_NOTATION \${COLOR}Could not find WAD process of type $fWorkerType.\${RESET}\n\"
         exit 1
     }
 
@@ -377,10 +377,10 @@ $USER_NOTATION Or retry the same command with -N1
         # Disable console logging. The output may contain multiple blank lines starts with '/ # '.
         log_user 0
         set COLOR \$RED
-        send_user \"\n$USER_NOTATION \${COLOR}CTRL+C captured; sending SIGINT to gdbserver as well\${RESET}.\n\"
+        send_user \"\n$USER_NOTATION \${COLOR}CTRL+C captured; sending SIGINT to gdbserver as well.\${RESET}\n\"
         send \x03
         set COLOR \$MAGENTA
-        send_user \"$USER_NOTATION \${COLOR}Debugging session terminated\${RESET}.\n\"
+        send_user \"$USER_NOTATION \${COLOR}Debugging session terminated.\${RESET}\n\"
     } SIGINT
 
     # interact
