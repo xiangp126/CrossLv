@@ -29,7 +29,6 @@ fPasswd="password"
 fVdom=""
 fExpectRoot="# "
 fExpectUser="$ "
-fExpect=$fExpectUser
 fSSHTarget="fgt1"
 fMaxAttempts=2
 fServerAliveInterval=30
@@ -80,7 +79,7 @@ while getopts "p:l:u:t:P:E:v:h" opt; do
             fSSHTarget=$OPTARG
             ;;
         E)
-            fExpect=$OPTARG
+            fExpectUser=$OPTARG
             ;;
         P)
             fSSHPort=$OPTARG
@@ -182,7 +181,7 @@ expect -c "
             \"$fExpectRoot\" {
                 break
             }
-            \"$fExpect\" {
+            \"$fExpectUser\" {
                 break
             }
             timeout {
@@ -212,18 +211,32 @@ expect -c "
         expect {
             -re \"$fExpectRoot\" {
                 send \"config vdom\r\"
-                expect \"$fExpectRoot\"
-                send \"edit $fVdom\r\"
-                expect \"$fExpectRoot\"
-            }
-            -re \"$fExpect\" {
-                send \"config vdom\r\"
-                expect \"$fExpectRoot\"
-                send \"edit $fVdom\r\"
-                expect \"$fExpectRoot\"
+                expect {
+                    {Command fail.} {
+                        set COLOR \$BLUE
+                        send_user \"\${COLOR}Error: VDOM $fVdom does not exist\${RESET}\n\"
+                        exit 1
+                    }
+                    \"$fExpectRoot\" {
+                        send \"edit $fVdom\r\"
+                        expect \"$fExpectRoot\"
+                    }
+                }
             }
         }
     }
 
-    interact
+    proc handle_eof {} {
+        global MAGENTA COLOR RESET
+        set COLOR \$MAGENTA
+        send_user \"$USER_NOTATION \${COLOR}Bye-bye.\${RESET}\n\"
+        exit 1
+    }
+
+    interact {
+        # \x04 is code for Ctrl-D
+        \x04 {
+            handle_eof
+        }
+    }
 "
