@@ -388,7 +388,7 @@ $USER_NOTATION Or retry the same command with -N1
     expect {
         {Detaching from process} {
             set COLOR \$MAGENTA
-            send_user \"$USER_NOTATION \${COLOR}Bye-bye ^_^\${RESET}\n\"
+            send_user \"$USER_NOTATION \${COLOR}Bye-bye.\${RESET}\n\"
             exit 1
         }
         \"$fPrompt\" {
