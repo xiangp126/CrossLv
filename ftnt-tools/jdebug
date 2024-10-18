@@ -45,7 +45,7 @@ separator="----------------------------------------------------------------"
 
 usage() {
     cat << _EOF
-jdebug 0.0.1
+$scriptName 0.0.1
 
 Usage: $scriptName [options]
        $scriptName [-t target] [-w worker_type] [-P gdbserver_listen_port] [-T max_attempts]
@@ -176,6 +176,7 @@ expect -c "
 
         set session_id \$spawn_id
         set passwd_prompt_cnt 0
+        set COLOR \$RED
         expect {
             {yes/no} {
                 send \"yes\r\"
@@ -184,7 +185,7 @@ expect -c "
             -re {[Pp]assword} {
                 incr passwd_prompt_cnt
                 if {\$passwd_prompt_cnt > 1} {
-                    send_user \"\n$USER_NOTATION Permission denied. Please specify the login credentials.\n\"
+                    send_user \"\n$USER_NOTATION \${COLOR}Permission denied. Please specify the login credentials.\${RESET}\n\"
                     exit 1
                 }
                 send \"$fPassword\r\"
@@ -208,14 +209,14 @@ expect -c "
                 break
             }
             timeout {
-                send_user \"$SUB_USER_NOTATION Timeout when connecting to $fTarget\n\"
+                send_user \"$SUB_USER_NOTATION \${COLOR}Timeout when connecting to $fTarget.${RESET}\n\"
                 # close \$session_id
                 incr i
                 continue
             }
             eof {
-                send_user \"$SUB_USER_NOTATION Reached EOF. Program ended.\n\"
-                send_user \"$SUB_USER_NOTATION Please check if $fTarget is a correct device name.\n\"
+                send_user \"$SUB_USER_NOTATION \${COLOR}Reached EOF. Program ended.\${RESET}\n\"
+                send_user \"$SUB_USER_NOTATION \${COLOR}Please check if $fTarget is a correct device name.\${RESET}\n\"
                 exit 1
             }
         }

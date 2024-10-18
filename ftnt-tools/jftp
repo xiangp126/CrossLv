@@ -26,13 +26,9 @@ scriptName=$(basename $0)
 fSSHPort=22
 fSSHUser="admin"
 fPasswd="password"
-fVdom=""
-fExpectRoot="# "
-fExpectUser="$ "
+fExpect="sftp>"
 fSSHTarget="fgt1"
 fMaxAttempts=2
-fServerAliveInterval=30
-fServerAliveCountMax=3
 # Print Pretty
 USER_NOTATION="@@@@"
 SEPARATOR="----------------------------------------------------------------"
@@ -47,15 +43,14 @@ usage:
 Options:
     -l/-u   username    Username for login. Default is "$fSSHUser"
     -p      password    Password for login. Default is "$fPasswd"
-    -v      vdom        Specify the VDOM. Default is "$fVdom"
     -t      target      The device to connect to. Default is "$fSSHTarget"
     -P      Port        SSH Port to connect to. Default is "$fSSHPort"
-    -E      Expect      Promption to expect(Other than "$fExpectRoot" and "$fExpectUser").
+    -E      Expect      Promption to expect(Other than "$fExpect").
 
 Example:
     $scriptName -t fpx1
     $scriptName -t 172.16.67.181 -l admin -p "FGT\!123"
-    $scriptName -t 172.16.67.181 -l admin -p "FGT\!123" -P 8822 -v root
+    $scriptName -t 172.16.67.181 -l admin -p "FGT\!123" -P 8822
 
 _EOF
     exit 0
@@ -79,13 +74,10 @@ while getopts "p:l:u:t:P:E:v:h" opt; do
             fSSHTarget=$OPTARG
             ;;
         E)
-            fExpectUser=$OPTARG
+            fExpect=$OPTARG
             ;;
         P)
             fSSHPort=$OPTARG
-            ;;
-        v)
-            fVdom=$OPTARG
             ;;
         h)
             usage
@@ -145,9 +137,7 @@ expect -c "
         if {\$i > 1} {
             send_user \"$USER_NOTATION Login attempt \$i/$fMaxAttempts\n\"
         }
-        spawn -noecho ssh -o ServerAliveInterval=$fServerAliveInterval \
-                          -o ServerAliveCountMax=$fServerAliveCountMax \
-                          -p $fSSHPort -l $fSSHUser $fSSHTarget
+        spawn -noecho sftp -P $fSSHPort $fSSHUser@$fSSHTarget
 
         set session_id \$spawn_id
         set passwd_prompt_cnt 0
@@ -178,10 +168,7 @@ expect -c "
                 send_user \"$USER_NOTATION No route to host. Exiting...\n\"
                 exit 1
             }
-            \"$fExpectRoot\" {
-                break
-            }
-            \"$fExpectUser\" {
+            \"$fExpect\" {
                 break
             }
             timeout {
@@ -206,26 +193,6 @@ expect -c "
     flush stdout
     send \"\r\"
 
-    # check if fVdom is specified
-    if {\"$fVdom\" != \"\"} {
-        expect {
-            -re \"$fExpectRoot\" {
-                send \"config vdom\r\"
-                expect {
-                    {Command fail.} {
-                        set COLOR \$BLUE
-                        send_user \"\${COLOR}Error: VDOM $fVdom does not exist\${RESET}\n\"
-                        exit 1
-                    }
-                    \"$fExpectRoot\" {
-                        send \"edit $fVdom\r\"
-                        expect \"$fExpectRoot\"
-                    }
-                }
-            }
-        }
-    }
-
     proc handle_eof {} {
         global MAGENTA COLOR RESET
         set COLOR \$MAGENTA
@@ -235,8 +202,8 @@ expect -c "
 
     interact {
         # \x04 is code for Ctrl-D
-        # \x04 {
-        #     handle_eof
-        # }
+        \x04 {
+            handle_eof
+        }
     }
 "
