@@ -23,34 +23,50 @@
 
 # Variables
 scriptName=$(basename $0)
-fSSHPort=22
-fSSHUser="admin"
-fPasswd="password"
-fExpect="sftp>"
 fSSHTarget="fgt1"
+fSSHUser="admin"
+fSSHPwd="password"
+fSSHPort=22
+fExpect="sftp> "
+fSSHCmd=""
+fJumpServer=""
+fJumpUser=""
+fJumpPwd=""
+fJumpPort=22
+fWithJumpServer=""
 fMaxAttempts=2
+# fServerAliveInterval=30
+# fServerAliveCountMax=3
 # Print Pretty
 USER_NOTATION="@@@@"
-SEPARATOR="----------------------------------------------------------------"
+SEPARATOR="---------------------------------------------------"
+SHORT_SEPARATOR="--------------------------------------"
 
 usage() {
 cat << _EOF
 $scriptName 0.1
 
 usage:
-    $scriptName [-l/-u user] [-p passwd] [-P ssh_port] [-E expect] [-V vdom] -t target_ip
+    $scriptName [-l/-u user] [-p passwd] [-P ssh_port] [-J jump_server] [-j jump_passwd]
+         [-e expect] -t target_ip
 
 Options:
-    -l/-u   username    Username for login. Default is "$fSSHUser"
-    -p      password    Password for login. Default is "$fPasswd"
-    -t      target      The device to connect to. Default is "$fSSHTarget"
-    -P      Port        SSH Port to connect to. Default is "$fSSHPort"
-    -E      Expect      Promption to expect(Other than "$fExpect").
+    -t     target       The device to connect to. Default is "$fSSHTarget"
+    -l/-u  username     Username for login. Default is "$fSSHUser"
+    -p     password     Password for login. Default is "$fSSHPwd"
+    -P     Port         SSH Port to connect to. Default is "$fSSHPort"
+    -J     Jump Server  The jump server to connect to. Format: user@jumpserver[:port]
+    -j     Jump Passwd  Password for jump server. Default is "$fJumpPwd"
+    -e     Expect       Promption to expect(Other than "$fExpect").
+    -h     Help         Print this help message
 
 Example:
     $scriptName -t fpx1
     $scriptName -t 172.16.67.181 -l admin -p "FGT\!123"
     $scriptName -t 172.16.67.181 -l admin -p "FGT\!123" -P 8822
+    # Use a Jump Server
+    $scriptName -J auto@172.18.20.84:8022 -j qaz -t test@10.120.1.111 -P 2121 -p 123
+    $scriptName -J auto@172.18.20.84:8022 -j qaz -t test@10.120.1.111:2121 -p 123
 
 _EOF
     exit 0
@@ -59,25 +75,32 @@ _EOF
 [[ $# -eq 0 ]] && usage
 
 # Parse command-line options
-while getopts "p:l:u:t:P:E:v:h" opt; do
+while getopts "t:l:u:p:P:J:j:e:h" opt; do
     case ${opt} in
-        p)
-            fPasswd=$OPTARG
-            ;;
-        u) # User
-            fSSHUser=$OPTARG
+        t)
+            fSSHTarget=$OPTARG
             ;;
         l) # User
             fSSHUser=$OPTARG
             ;;
-        t)
-            fSSHTarget=$OPTARG
+        u) # User
+            fSSHUser=$OPTARG
             ;;
-        E)
-            fExpect=$OPTARG
+        p)
+            fSSHPwd=$OPTARG
             ;;
         P)
             fSSHPort=$OPTARG
+            ;;
+        J)
+            fWithJumpServer=true
+            fJumpServer=$OPTARG
+            ;;
+        j)
+            fJumpPwd=$OPTARG
+            ;;
+        e)
+            fExpect=$OPTARG
             ;;
         h)
             usage
@@ -89,7 +112,7 @@ while getopts "p:l:u:t:P:E:v:h" opt; do
     esac
 done
 
-# Shift to process non-option arguments. New $1, $2, ..., $@
+# Shift to process non-option arguments. New $param, $2, ..., $@
 shift $((OPTIND - 1))
 if [[ $# -gt 0 ]]; then
     echo "$USER_NOTATION Illegal non-option arguments: $@"
@@ -103,15 +126,79 @@ GREEN='\033[32m'
 BLUE='\033[34m'
 RESET='\033[0m'
 
+parseAndCheck() {
+    # Check if the target is in the format of user@sshtarget:port
+    param=$fSSHTarget
+    if [[ $fSSHTarget == *@* ]]; then
+        fSSHUser=$(echo "$param" | cut -d@ -f1)
+        fSSHTarget=$(echo "$param" | cut -d@ -f2)
+
+        # Extract the port if it exists
+        # fSSHTarget=172.18.20.84:2121
+        param=$fSSHTarget
+        if [[ $param == *:* ]]; then
+            fSSHTarget=$(echo "$param" | cut -d: -f1)
+            fSSHPort=$(echo "$param" | cut -d: -f2)
+        fi
+    fi
+
+    # Check if the jump server is in the format of user@jumpserver:port
+    if [ "$fWithJumpServer" = true ]; then
+        # Exp: fJumpServer=auto@172.18.20.84:2121
+        param=$fJumpServer
+        if [[ $fJumpServer == *@* ]]; then
+            if [[ $param == *@* ]]; then
+                fJumpUser=$(echo "$param" | cut -d@ -f1)
+                fJumpServer=$(echo "$param" | cut -d@ -f2)
+
+                # Extract the port if it exists
+                # fJumpServer=172.18.20.84:2121
+                param=$fJumpServer
+                if [[ $param == *:* ]]; then
+                    fJumpServer=$(echo "$param" | cut -d: -f1)
+                    fJumpPort=$(echo "$param" | cut -d: -f2)
+                fi
+            fi
+        else
+            COLOR=$MAGENTA
+            echo -e "$USER_NOTATION ${COLOR}Jump Server has to be in the format of user@jumpserver[:port]${RESET}"
+            exit 1
+        fi
+    fi
+}
+parseAndCheck
+
 COLOR="$RED"
-echo -e "$SEPARATOR"
-echo -e "$USER_NOTATION Set Target Device to: ${COLOR}$fSSHTarget${RESET}"
+echo "$SEPARATOR"
+echo -e "$USER_NOTATION Set SSH Target Device to: ${COLOR}$fSSHTarget${RESET}"
+echo -e "$USER_NOTATION Set SSH Username to: ${COLOR}$fSSHUser${RESET}"
+echo -e "$USER_NOTATION Set SSH Password to: ${COLOR}$fSSHPwd${RESET}"
 echo -e "$USER_NOTATION Set SSH Connection Port to: ${COLOR}$fSSHPort${RESET}"
-echo -e "$USER_NOTATION Set Username to: ${COLOR}$fSSHUser${RESET}"
-echo -e "$USER_NOTATION Set Password to: ${COLOR}$fPasswd${RESET}"
 echo -e "$USER_NOTATION Set Maximum Attempts to: ${COLOR}$fMaxAttempts${RESET}"
-echo "$USER_NOTATION Connecting to $fSSHTarget ..."
-# echo -e "$SEPARATOR"
+if [ -n "$fWithJumpServer" ]; then
+    echo $SHORT_SEPARATOR
+    echo -e "$USER_NOTATION Set Jump Server to: ${COLOR}$fJumpServer${RESET}"
+    echo -e "$USER_NOTATION Set Jump Username to: ${COLOR}$fJumpUser${RESET}"
+    echo -e "$USER_NOTATION Set Jump Password to: ${COLOR}$fJumpPwd${RESET}"
+    echo -e "$USER_NOTATION Set Jump Port to: ${COLOR}$fJumpPort${RESET}"
+    if [ -z "$fJumpServer" ] || [ -z "$fJumpUser" ]; then
+        COLOR=$MAGENTA
+        echo -e "$USER_NOTATION ${COLOR}Jump Server and its credentials are not set properly.${RESET}"
+        exit 1
+    fi
+    # echo "$SEPARATOR"
+fi
+echo -n "$USER_NOTATION Connecting to $fSSHTarget"
+if [ -n "$fWithJumpServer" ]; then
+    echo -ne " via Jump Server: $fJumpServer"
+fi
+echo " ..."
+
+if [ -n "$fWithJumpServer" ]; then
+    fSSHCmd="sftp -o \"ProxyJump=$fJumpUser@$fJumpServer\" -P $fSSHPort $fSSHUser@$fSSHTarget"
+else
+    fSSHCmd="sftp -P $fSSHPort $fSSHUser@$fSSHTarget"
+fi
 
 # expect -d -c "
 expect -c "
@@ -137,22 +224,33 @@ expect -c "
         if {\$i > 1} {
             send_user \"$USER_NOTATION Login attempt \$i/$fMaxAttempts\n\"
         }
-        spawn -noecho sftp -P $fSSHPort $fSSHUser@$fSSHTarget
+        spawn -noecho $fSSHCmd
 
         set session_id \$spawn_id
-        set passwd_prompt_cnt 0
+        set ssh_pwd_prompt_cnt 0
+        set jmp_pwd_prompt_cnt 0
+        set COLOR \$MAGENTA
         expect {
             {yes/no} {
                 send \"yes\r\"
                 exp_continue
             }
-            -re {[Pp]assword} {
-                incr passwd_prompt_cnt
-                if {\$passwd_prompt_cnt > 1} {
-                    send_user \"\n$USER_NOTATION Permission denied. Please specify the login credentials.\n\"
+            -re \"$fSSHTarget's (password|Password)\" {
+                incr ssh_pwd_prompt_cnt
+                if {\$ssh_pwd_prompt_cnt > 1} {
+                    send_user \"\n$USER_NOTATION \${COLOR}Login credentials of target: $fSSHTarget is wrong.\${RESET}\n\"
                     exit 1
                 }
-                send \"$fPasswd\r\"
+                send \"$fSSHPwd\r\"
+                exp_continue
+            }
+            -re \"$fJumpServer's (password|Password)\" {
+                incr jmp_pwd_prompt_cnt
+                if {\$jmp_pwd_prompt_cnt > 1} {
+                    send_user \"\n$USER_NOTATION \${COLOR}Login credentials of Jump: $fJumpServer is wrong.\${RESET}\n\"
+                    exit 1
+                }
+                send \"$fJumpPwd\r\"
                 exp_continue
             }
             {Host key verification failed.} {
@@ -178,7 +276,7 @@ expect -c "
                 continue
             }
             eof {
-                send_user \"$USER_NOTATION Reached EOF. Program ended.\n\"
+                send_user \"$USER_NOTATION \${COLOR}Reached EOF. Program ended.\${RESET}\n\"
                 exit 1
             }
         }

@@ -35,7 +35,7 @@ fJumpServer=""
 fJumpUser=""
 fJumpPwd=""
 fJumpPort=22
-fWithJumpServer=false
+fWithJumpServer=""
 fMaxAttempts=2
 fServerAliveInterval=30
 fServerAliveCountMax=3
@@ -49,8 +49,7 @@ cat << _EOF
 $scriptName 0.1
 
 usage:
-    $scriptName [-l/-u user] [-p passwd] [-P ssh_port]
-         [-J jump_server] [-j jump_passwd] [-ju jump_user] [-jP jump_port]
+    $scriptName [-l/-u user] [-p passwd] [-P ssh_port] [-J jump_server] [-j jump_passwd]
          [-e expect] [-v vdom] -t target_ip
 
 Options:
@@ -70,6 +69,7 @@ Example:
     $scriptName -t 172.16.67.181 -l admin -p "FGT\!123" -P 8822 -v root
     # Use a Jump Server
     $scriptName -J auto@172.18.20.84:8022 -j qaz -t test@10.120.1.111 -P 2121 -p 123
+    $scriptName -J auto@172.18.20.84:8022 -j qaz -t test@10.120.1.111:2121 -p 123
 
 _EOF
     exit 0
@@ -133,11 +133,19 @@ BLUE='\033[34m'
 RESET='\033[0m'
 
 parseAndCheck() {
-    # Check if the target is in the format of user@target
+    # Check if the target is in the format of user@sshtarget:port
     param=$fSSHTarget
     if [[ $fSSHTarget == *@* ]]; then
         fSSHUser=$(echo "$param" | cut -d@ -f1)
         fSSHTarget=$(echo "$param" | cut -d@ -f2)
+
+        # Extract the port if it exists
+        # fSSHTarget=172.18.20.84:2121
+        param=$fSSHTarget
+        if [[ $param == *:* ]]; then
+            fSSHTarget=$(echo "$param" | cut -d: -f1)
+            fSSHPort=$(echo "$param" | cut -d: -f2)
+        fi
     fi
 
     # Check if the jump server is in the format of user@jumpserver:port
@@ -152,20 +160,17 @@ parseAndCheck() {
                 # Extract the port if it exists
                 # fJumpServer=172.18.20.84:2121
                 param=$fJumpServer
-                if [[ $fJumpServer == *:* ]]; then
+                if [[ $param == *:* ]]; then
                     fJumpServer=$(echo "$param" | cut -d: -f1)
                     fJumpPort=$(echo "$param" | cut -d: -f2)
                 fi
             fi
-        fi
-
-        if [ -z "$fJumpServer" ] || [ -z "$fJumpUser" ] || [ -z "$fJumpPwd" ]; then
+        else
             COLOR=$MAGENTA
-            echo -e "$USER_NOTATION ${COLOR}Jump Server and its credentials are not set properly.${RESET}"
+            echo -e "$USER_NOTATION ${COLOR}Jump Server has to be in the format of user@jumpserver[:port]${RESET}"
             exit 1
         fi
     fi
-
 }
 parseAndCheck
 
@@ -176,21 +181,26 @@ echo -e "$USER_NOTATION Set SSH Username to: ${COLOR}$fSSHUser${RESET}"
 echo -e "$USER_NOTATION Set SSH Password to: ${COLOR}$fSSHPwd${RESET}"
 echo -e "$USER_NOTATION Set SSH Connection Port to: ${COLOR}$fSSHPort${RESET}"
 echo -e "$USER_NOTATION Set Maximum Attempts to: ${COLOR}$fMaxAttempts${RESET}"
-if [ "$fWithJumpServer" = true ]; then
+if [ -n "$fWithJumpServer" ]; then
     echo $SHORT_SEPARATOR
     echo -e "$USER_NOTATION Set Jump Server to: ${COLOR}$fJumpServer${RESET}"
     echo -e "$USER_NOTATION Set Jump Username to: ${COLOR}$fJumpUser${RESET}"
     echo -e "$USER_NOTATION Set Jump Password to: ${COLOR}$fJumpPwd${RESET}"
     echo -e "$USER_NOTATION Set Jump Port to: ${COLOR}$fJumpPort${RESET}"
+    if [ -z "$fJumpServer" ] || [ -z "$fJumpUser" ]; then
+        COLOR=$MAGENTA
+        echo -e "$USER_NOTATION ${COLOR}Jump Server and its credentials are not set properly.${RESET}"
+        exit 1
+    fi
     # echo "$SEPARATOR"
 fi
 echo -n "$USER_NOTATION Connecting to $fSSHTarget"
-if [ "$fWithJumpServer" = true ]; then
+if [ -n "$fWithJumpServer" ]; then
     echo -ne " via Jump Server: $fJumpServer"
 fi
 echo " ..."
 
-if [ "$fJumpServer" != "" ]; then
+if [ -n "$fWithJumpServer" ]; then
     fSSHCmd="ssh -J $fJumpUser@$fJumpServer:$fJumpPort \
                  -o ServerAliveInterval=$fServerAliveInterval \
                  -o ServerAliveCountMax=$fServerAliveCountMax \
@@ -239,7 +249,7 @@ expect -c "
             -re \"$fSSHTarget's (password|Password)\" {
                 incr ssh_pwd_prompt_cnt
                 if {\$ssh_pwd_prompt_cnt > 1} {
-                    send_user \"\n$USER_NOTATION \${COLOR}Permission denied. Please check the login credentials.\${RESET}\n\"
+                    send_user \"\n$USER_NOTATION \${COLOR}Login credentials of target: $fSSHTarget is wrong.\${RESET}\n\"
                     exit 1
                 }
                 send \"$fSSHPwd\r\"
@@ -248,7 +258,7 @@ expect -c "
             -re \"$fJumpServer's (password|Password)\" {
                 incr jmp_pwd_prompt_cnt
                 if {\$jmp_pwd_prompt_cnt > 1} {
-                    send_user \"\n$USER_NOTATION \${COLOR}Permission denied. Please check the login credentials.\${RESET}\n\"
+                    send_user \"\n$USER_NOTATION \${COLOR}Login credentials of Jump: $fJumpServer is wrong.\${RESET}\n\"
                     exit 1
                 }
                 send \"$fJumpPwd\r\"
