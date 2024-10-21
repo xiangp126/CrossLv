@@ -21,38 +21,39 @@
 # or use
 # $ jssh -l admin -P 8881 -t localhost
 
-# Variables
-scriptName=$(basename $0)
+# Shared Variables
+fExpectUser="$ "
+fExpectRoot="# "
+fExpectSftp="sftp> "
+fSwitchToSftp=""
+fServerAliveInterval=30
+fServerAliveCountMax=3
+# SSH Variables
 fSSHTarget="fgt1"
 fSSHUser="admin"
 fSSHPwd="password"
 fSSHPort=22
 fVdom=""
-fExpectRoot="# "
-fExpectUser="$ "
-fSftpExpect="sftp> "
-fSpawnCmd=""
+# Jump Server Variables
 fJumpServer=""
 fJumpUser=""
 fJumpPwd=""
 fJumpPort=22
 fWithJumpServer=""
+fSpawnCmd=""
 fMaxAttempts=2
-fServerAliveInterval=30
-fServerAliveCountMax=3
-# Use SFTP instead of SSH
-fSwitchToSftp=""
-# Print Pretty
+# Constants
+SCRIPT_NAME=$(basename "$0")
 USER_NOTATION="@@@@"
 SEPARATOR="---------------------------------------------------"
 SHORT_SEPARATOR="--------------------------------------"
 
 usage() {
 cat << _EOF
-$scriptName 1.0
+$SCRIPT_NAME 1.0
 
 usage:
-    $scriptName [-l/-u user] [-p passwd] [-P ssh_port] [-J jump_server] [-j jump_passwd]
+    $SCRIPT_NAME [-l/-u user] [-p passwd] [-P ssh_port] [-J jump_server] [-j jump_passwd]
          [-v vdom] [-F] -t target_ip
 
     Default to SSH, use -F to switch to SFTP
@@ -70,16 +71,16 @@ Options:
 
 Example:
     # SSH Connection
-    $scriptName -t fpx1
-    $scriptName -t 172.16.67.181 -l admin -p "FGT\!123"
-    $scriptName -t 172.16.67.181 -l admin -p "FGT\!123" -P 8822 -v root
+    $SCRIPT_NAME -t fpx1
+    $SCRIPT_NAME -t 172.16.67.181 -l admin -p "FGT\!123"
+    $SCRIPT_NAME -t 172.16.67.181 -l admin -p "FGT\!123" -P 8822 -v root
     # SSH with a Jump Server
-    $scriptName -J auto@172.18.20.84:8022 -j qaz -t test@10.120.1.111:2121 -p 123
-    $scriptName -J auto@172.18.20.84:8022 -j qaz -t test@10.120.1.111 -P 2121 -p 123
+    $SCRIPT_NAME -J auto@172.18.20.84:8022 -j qaz -t test@10.120.1.111:2121 -p 123
+    $SCRIPT_NAME -J auto@172.18.20.84:8022 -j qaz -t test@10.120.1.111 -P 2121 -p 123
     # SFTP Connection
-    $scriptName -t fpx1 -F
+    $SCRIPT_NAME -t fpx1 -F
     # SFTP with a Jump Server
-    $scriptName -J auto@172.18.20.84:8022 -j qaz -t test@10.120.1.111:2121 -p 123 -F
+    $SCRIPT_NAME -J auto@172.18.20.84:8022 -j qaz -t test@10.120.1.111:2121 -p 123 -F
 
 _EOF
     exit 0
@@ -185,8 +186,8 @@ parseAndCheck() {
 parseAndCheck
 
 echo "$SEPARATOR"
+COLOR=$MAGENTA
 if [ -n "$fSwitchToSftp" ]; then
-    COLOR=$MAGENTA
     echo -e "$USER_NOTATION ${COLOR}Switching to SFTP mode${RESET} ..."
 fi
 COLOR="$RED"
@@ -194,6 +195,9 @@ echo -e "$USER_NOTATION Set SSH Target Device to: ${COLOR}$fSSHTarget${RESET}"
 echo -e "$USER_NOTATION Set SSH Username to: ${COLOR}$fSSHUser${RESET}"
 echo -e "$USER_NOTATION Set SSH Password to: ${COLOR}$fSSHPwd${RESET}"
 echo -e "$USER_NOTATION Set SSH Connection Port to: ${COLOR}$fSSHPort${RESET}"
+if [ -n "$fVdom" ]; then
+    echo -e "$USER_NOTATION Set FGT/FPX VDOM to: ${COLOR}$fVdom${RESET}"
+fi
 echo -e "$USER_NOTATION Set Maximum Attempts to: ${COLOR}$fMaxAttempts${RESET}"
 if [ -n "$fWithJumpServer" ]; then
     echo $SHORT_SEPARATOR
@@ -239,7 +243,7 @@ fi
 expect -c "
     # Set your SSH credentials
     set i 1
-    set timeout 3
+    set timeout 5
 
     # Define ANSI color codes with capitalized names
     # Full list can be found here: http://en.wikipedia.org/wiki/ANSI_escape_code
@@ -298,7 +302,7 @@ expect -c "
                 continue
             }
             {No route to host} {
-                send_user \"$USER_NOTATION No route to host. Exiting...\n\"
+                send_user \"$USER_NOTATION \${COLOR}No route to host.\${RESET}\n\"
                 exit 1
             }
             \"$fExpectRoot\" {
@@ -307,11 +311,11 @@ expect -c "
             \"$fExpectUser\" {
                 break
             }
-            \"$fSftpExpect\" {
+            \"$fExpectSftp\" {
                 break
             }
             timeout {
-                send_user \"$USER_NOTATION Timed out waiting for a response.\n\"
+                send_user \"$USER_NOTATION \${COLOR}Timed out waiting for a response.\${RESET}\n\"
                 # close \$session_id
                 incr i
                 continue
@@ -335,12 +339,12 @@ expect -c "
     # check if fVdom is specified (only for SSH)
     if {\"$fVdom\" != \"\" && \"$fSwitchToSftp\" == \"\"} {
         expect {
-            -re \"$fExpectRoot\" {
+            \"$fExpectRoot\" {
                 send \"config vdom\r\"
                 expect {
                     {Command fail.} {
                         set COLOR \$BLUE
-                        send_user \"\${COLOR}Error: VDOM $fVdom does not exist\${RESET}\n\"
+                        send_user \"\n\${COLOR}Error: VDOM is not supported on this device.\${RESET}\n\"
                         exit 1
                     }
                     \"$fExpectRoot\" {
@@ -348,6 +352,12 @@ expect -c "
                         expect \"$fExpectRoot\"
                     }
                 }
+            }
+            \"$fExpectUser\" {
+                puts -nonewline \"$USER_NOTATION \${MAGENTA}VDOM is not supported on this device\${RESET}\"
+                flush stdout
+                send \"\r\"
+                expect \"$fExpectUser\"
             }
         }
     }
