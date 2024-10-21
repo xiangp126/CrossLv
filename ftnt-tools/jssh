@@ -249,7 +249,7 @@ expect -c "
             -re \"$fSSHTarget's (password|Password)\" {
                 incr ssh_pwd_prompt_cnt
                 if {\$ssh_pwd_prompt_cnt > 1} {
-                    send_user \"\n$USER_NOTATION \${COLOR}Login credentials of target: $fSSHTarget is wrong.\${RESET}\n\"
+                    send_user \"\n$USER_NOTATION \${COLOR}Login credentials for SSH Target: $fSSHTarget are wrong.\${RESET}\n\"
                     exit 1
                 }
                 send \"$fSSHPwd\r\"
@@ -258,7 +258,7 @@ expect -c "
             -re \"$fJumpServer's (password|Password)\" {
                 incr jmp_pwd_prompt_cnt
                 if {\$jmp_pwd_prompt_cnt > 1} {
-                    send_user \"\n$USER_NOTATION \${COLOR}Login credentials of Jump: $fJumpServer is wrong.\${RESET}\n\"
+                    send_user \"\n$USER_NOTATION \${COLOR}Login credentials for Jump Server: $fJumpServer are wrong.\${RESET}\n\"
                     exit 1
                 }
                 send \"$fJumpPwd\r\"
