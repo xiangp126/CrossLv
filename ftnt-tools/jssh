@@ -69,13 +69,16 @@ Options:
     -h     Help         Print this help message
 
 Example:
+    # SSH Connection
     $scriptName -t fpx1
     $scriptName -t 172.16.67.181 -l admin -p "FGT\!123"
     $scriptName -t 172.16.67.181 -l admin -p "FGT\!123" -P 8822 -v root
-    # SSH: Use a Jump Server
+    # SSH with a Jump Server
     $scriptName -J auto@172.18.20.84:8022 -j qaz -t test@10.120.1.111:2121 -p 123
     $scriptName -J auto@172.18.20.84:8022 -j qaz -t test@10.120.1.111 -P 2121 -p 123
-    # SFTP: Use a Jump Server
+    # SFTP Connection
+    $scriptName -t fpx1 -F
+    # SFTP with a Jump Server
     $scriptName -J auto@172.18.20.84:8022 -j qaz -t test@10.120.1.111:2121 -p 123 -F
 
 _EOF
