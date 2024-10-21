@@ -132,12 +132,12 @@ COLOR="$RED"
 fSearchPatt="type=.*$fWorkerType"
 echo $separator
 echo -e "$USER_NOTATION [t] Set Target Device to: ${COLOR}$fTarget${RESET}"
-echo -e "$USER_NOTATION [w] Set Worker Type to: ${COLOR}$fWorkerType${RESET}(Search Pattern: $fSearchPatt)"
-echo -e "$USER_NOTATION [d] Set GDB Server Listen Port to: ${COLOR}$fGDBServerListenPort${RESET}"
-echo -e "$USER_NOTATION [P] Set SSH Connection Port to: ${COLOR}$fSSHConnPort${RESET}"
 echo -e "$USER_NOTATION [l] Set Username to: ${COLOR}$fUsername${RESET}"
 echo -e "$USER_NOTATION [p] Set Password to: ${COLOR}$fPassword${RESET}"
-echo -e "$USER_NOTATION [T] Set Maximum Attempts to: ${COLOR}$fMaxAttempts${RESET}"
+echo -e "$USER_NOTATION [P] Set SSH Connection Port to: ${COLOR}$fSSHConnPort${RESET}"
+echo -e "$USER_NOTATION [T] Set SSH Maximum Attempts to: ${COLOR}$fMaxAttempts${RESET}"
+echo -e "$USER_NOTATION [d] Set GDB Server Listen Port to: ${COLOR}$fGDBServerListenPort${RESET}"
+echo -e "$USER_NOTATION [w] Set WAD Worker Type to: ${COLOR}$fWorkerType${RESET}(Search Pattern: ${COLOR}$fSearchPatt)${RESET}"
 # if $wadWorkerCnt is larger or equal to 0, then print the message.
 if [ "$fWADWorkerCnt" -ge 0 ]; then
     echo -e "$USER_NOTATION [N]Set WAD Worker Count to: ${COLOR}$fWADWorkerCnt${RESET}"
@@ -251,8 +251,6 @@ expect -c "
         expect \"$fPrompt\"
         send \"end\r\"
         expect \"$fPrompt\"
-        send \"end\r\"
-        expect \"$fPrompt\"
 
         # set wait_time 3
         # send_user \"$USER_NOTATION Wait for \$wait_time seconds to apply the configuration.\n\"
@@ -269,7 +267,8 @@ expect -c "
 
         send \"exit\r\"
         expect eof {
-            send_user \"$USER_NOTATION WAD Worker Count has been set to $fWADWorkerCnt.\n\"
+            set COLOR \$MAGENTA
+            send_user \"$USER_NOTATION \${COLOR}WAD Worker Count has been set to $fWADWorkerCnt.\${RESET}\n\"
             exit 0
         }
     }
