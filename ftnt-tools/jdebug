@@ -27,7 +27,6 @@
 # $ jssh -l admin -P 8881 -t localhost
 
 # Variables
-scriptName=$(basename "$0")
 fTarget="fgt1"
 fWorkerType="worker"
 fSSHConnPort=22
@@ -38,17 +37,18 @@ fGDBServerListenPort=444
 fWADWorkerKeep=-1
 fWADWorkerCnt=$fWADWorkerKeep # 0: unlimited, 1: 1 worker, -1: keep the original value
 fMaxAttempts=2
-# Pretty print
+# Constants
+SCRIPT_NAME=$(basename "$0")
 USER_NOTATION="@@@@"
 SUB_USER_NOTATION="@@@@ @"
 separator="----------------------------------------------------------------"
 
 usage() {
     cat << _EOF
-$scriptName 0.0.1
+$SCRIPT_NAME 0.1
 
-Usage: $scriptName [options]
-       $scriptName [-t target] [-w worker_type] [-P gdbserver_listen_port] [-T max_attempts]
+Usage: $SCRIPT_NAME [options]
+       $SCRIPT_NAME [-t target] [-w worker_type] [-P gdbserver_listen_port] [-T max_attempts]
               [-u/-l username] [-p password] [-P ssh_conn_port] [-h]
 
 Options:
@@ -64,12 +64,12 @@ Options:
     -h      Print this help message
 
 Example:
-    $scriptName -t fgt1
-    $scriptName -t fgt1 -P 22
-    $scriptName -t fgt1 -p "123" -N1
-    $scriptName -t fgt1 -w algo -d 9229
-    $scriptName -t fgt1 -w algo -d 9229 -l "admin" -p "123"
-    $scriptName -h
+    $SCRIPT_NAME -t fgt1
+    $SCRIPT_NAME -t fgt1 -P 22
+    $SCRIPT_NAME -t fgt1 -p "123" -N1
+    $SCRIPT_NAME -t fgt1 -w algo -d 9229
+    $SCRIPT_NAME -t fgt1 -w algo -d 9229 -l "admin" -p "123"
+    $SCRIPT_NAME -h
 
 _EOF
     exit 0

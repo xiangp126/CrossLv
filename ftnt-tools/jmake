@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Common Variables
-scriptName=$(basename $0)
-
 # Build flags & Options
 fPlatform="FOS" # Default platform
 ftntBuildTarget="image.out"
@@ -30,7 +27,8 @@ gitExcludePattern1=$compileCommandsFile
 gitExcludePattern2="\*.code-workspace"
 gitExcludeList="$gitExcludePattern1 $gitExcludePattern2"
 
-# Pretty print
+# Common Constants
+SCRIPT_NAME=$(basename $0)
 USER_NOTATION="@@@@"
 SUB_USER_NOTATION="@@@@ @"
 # SHORT_SEPARATOR="--------------"
@@ -38,7 +36,7 @@ SUB_USER_NOTATION="@@@@ @"
 # SHORT_SEPARATOR2="=============="
 SEPARATOR2="==================================================="
 
-# Define color variables
+# Color Constants
 CYAN='\033[36m'
 RED='\033[31m'
 BOLD='\033[1m'
@@ -66,8 +64,8 @@ _EOF
 
 usage() {
     cat << _EOF
-Usage: $scriptName [options]
-       $scriptName [-m model] [-w working_dir] [-j num_of_jobs] [-T max_attempt]
+Usage: $SCRIPT_NAME [options]
+       $SCRIPT_NAME [-m model] [-w working_dir] [-j num_of_jobs] [-T max_attempt]
              [-s sync_target] [-S sync_file] [-P sync_port] [-l/-u username] [-p password]
              [-B build_target]
              [-bcCohf]
@@ -94,10 +92,10 @@ Other Options:
     -h      Print this help message
 
 Example:
-    $scriptName -m FGT_VM64_KVM -c -T1 -j4 -b
-    $scriptName -m vmware
-    $scriptName -t fgt1 -s FGT_VM64_KVM-v7-build1662.out -u "admin" -p "password" -P 22
-    $scriptName -h
+    $SCRIPT_NAME -m FGT_VM64_KVM -c -T1 -j4 -b
+    $SCRIPT_NAME -m vmware
+    $SCRIPT_NAME -t fgt1 -s FGT_VM64_KVM-v7-build1662.out -u "admin" -p "password" -P 22
+    $SCRIPT_NAME -h
 
 _EOF
     exit 0

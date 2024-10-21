@@ -136,7 +136,7 @@ if [[ $# -gt 0 ]]; then
     exit
 fi
 
-# Define color and formatting variables
+# Define color constants
 RED='\033[31m'
 MAGENTA='\033[35m'
 GREEN='\033[32m'
