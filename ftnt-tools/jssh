@@ -53,7 +53,7 @@ cat << _EOF
 $SCRIPT_NAME 1.0
 
 usage:
-    $SCRIPT_NAME [-l/-u user] [-p passwd] [-P ssh_port] [-J jump_server] [-j jump_passwd]
+    $SCRIPT_NAME [-l/-u user] [-p passwd] [-P ssh_port] [-J jump_server] [-W jump_passwd]
          [-v vdom] [-F] -t target_ip
 
     Default to SSH, use -F to switch to SFTP
@@ -64,7 +64,7 @@ Options:
     -p     password     Password for login. Default is "$fSSHPwd"
     -P     Port         SSH Port to connect to. Default is "$fSSHPort"
     -J     Jump Server  The jump server to connect to. Format: user@jumpserver[:port]
-    -j     Jump Passwd  Password for jump server. Default is "$fJumpPwd"
+    -W     Jump Passwd  Password for jump server. Default is "$fJumpPwd"
     -v     vdom         Specify the VDOM. Default is "$fVdom"
     -F     SFTP         Switch to SFTP
     -h     Help         Print this help message
@@ -75,12 +75,12 @@ Example:
     $SCRIPT_NAME -t 172.16.67.181 -l admin -p "FGT\!123"
     $SCRIPT_NAME -t 172.16.67.181 -l admin -p "FGT\!123" -P 8822 -v root
     # SSH with a Jump Server
-    $SCRIPT_NAME -J auto@172.18.20.84:8022 -j qaz -t test@10.120.1.111:2121 -p 123
-    $SCRIPT_NAME -J auto@172.18.20.84:8022 -j qaz -t test@10.120.1.111 -P 2121 -p 123
+    $SCRIPT_NAME -J auto@172.18.20.84:8022 -W qaz -t test@10.120.1.111:2121 -p 123
+    $SCRIPT_NAME -J auto@172.18.20.84:8022 -W qaz -t test@10.120.1.111 -P 2121 -p 123
     # SFTP Connection
     $SCRIPT_NAME -t fpx1 -F
     # SFTP with a Jump Server
-    $SCRIPT_NAME -J auto@172.18.20.84:8022 -j qaz -t test@10.120.1.111:2121 -p 123 -F
+    $SCRIPT_NAME -J auto@172.18.20.84:8022 -W qaz -t test@10.120.1.111:2121 -p 123 -F
 
 _EOF
     exit 0
@@ -89,7 +89,7 @@ _EOF
 [[ $# -eq 0 ]] && usage
 
 # Parse command-line options
-while getopts "t:l:u:p:P:J:j:v:Fh" opt; do
+while getopts "t:l:u:p:P:J:W:v:Fh" opt; do
     case ${opt} in
         t)
             fSSHTarget=$OPTARG
@@ -110,7 +110,7 @@ while getopts "t:l:u:p:P:J:j:v:Fh" opt; do
             fWithJumpServer=true
             fJumpServer=$OPTARG
             ;;
-        j)
+        W)
             fJumpPwd=$OPTARG
             ;;
         v)
@@ -191,20 +191,20 @@ if [ -n "$fSwitchToSftp" ]; then
     echo -e "$USER_NOTATION ${COLOR}Switching to SFTP mode${RESET} ..."
 fi
 COLOR="$RED"
-echo -e "$USER_NOTATION Set SSH Target Device to: ${COLOR}$fSSHTarget${RESET}"
-echo -e "$USER_NOTATION Set SSH Username to: ${COLOR}$fSSHUser${RESET}"
-echo -e "$USER_NOTATION Set SSH Password to: ${COLOR}$fSSHPwd${RESET}"
-echo -e "$USER_NOTATION Set SSH Connection Port to: ${COLOR}$fSSHPort${RESET}"
+echo -e "$USER_NOTATION [t] Set SSH Target Device to: ${COLOR}$fSSHTarget${RESET}"
+echo -e "$USER_NOTATION [l] Set SSH Username to: ${COLOR}$fSSHUser${RESET}"
+echo -e "$USER_NOTATION [p] Set SSH Password to: ${COLOR}$fSSHPwd${RESET}"
+echo -e "$USER_NOTATION [P] Set SSH Connection Port to: ${COLOR}$fSSHPort${RESET}"
 if [ -n "$fVdom" ]; then
-    echo -e "$USER_NOTATION Set FGT/FPX VDOM to: ${COLOR}$fVdom${RESET}"
+    echo -e "$USER_NOTATION [v] Set FGT/FPX VDOM to: ${COLOR}$fVdom${RESET}"
 fi
-echo -e "$USER_NOTATION Set Maximum Attempts to: ${COLOR}$fMaxAttempts${RESET}"
+echo -e "$USER_NOTATION [-] Set Maximum Attempts to: ${COLOR}$fMaxAttempts${RESET}"
 if [ -n "$fWithJumpServer" ]; then
     echo $SHORT_SEPARATOR
-    echo -e "$USER_NOTATION Set Jump Server to: ${COLOR}$fJumpServer${RESET}"
-    echo -e "$USER_NOTATION Set Jump Username to: ${COLOR}$fJumpUser${RESET}"
-    echo -e "$USER_NOTATION Set Jump Password to: ${COLOR}$fJumpPwd${RESET}"
-    echo -e "$USER_NOTATION Set Jump Port to: ${COLOR}$fJumpPort${RESET}"
+    echo -e "$USER_NOTATION [J] Set Jump Server to: ${COLOR}$fJumpServer${RESET}"
+    echo -e "$USER_NOTATION [-] Set Jump Username to: ${COLOR}$fJumpUser${RESET}"
+    echo -e "$USER_NOTATION [W] Set Jump Password to: ${COLOR}$fJumpPwd${RESET}"
+    echo -e "$USER_NOTATION [-] Set Jump Port to: ${COLOR}$fJumpPort${RESET}"
     if [ -z "$fJumpServer" ] || [ -z "$fJumpUser" ]; then
         COLOR=$MAGENTA
         echo -e "$USER_NOTATION ${COLOR}Jump Server and its credentials are not set properly.${RESET}"
