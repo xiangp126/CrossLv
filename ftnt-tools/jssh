@@ -344,7 +344,7 @@ expect -c "
                 expect {
                     {Command fail.} {
                         set COLOR \$BLUE
-                        send_user \"\n\${COLOR}Error: VDOM is not supported on this device.\${RESET}\n\"
+                        send_user \"\${COLOR}Error: VDOM is not supported on this device.\${RESET}\n\"
                         exit 1
                     }
                     \"$fExpectRoot\" {
