@@ -55,6 +55,7 @@ MAGENTA='\033[35m'
 GREEN='\033[32m'
 GREY='\033[90m'
 BLUE='\033[34m'
+NORMAL='\033[0m'
 RESET='\033[0m'
 
 usage() {
@@ -118,8 +119,12 @@ while getopts "t:l:u:p:P:J:W:v:c:Fh" opt; do
             fSSHPort=$OPTARG
             ;;
         c)
-            fSSHExecNoLogin=true
+            COLOR=$MAGENTA
             fSSHCmd=$OPTARG
+            if [ -n "$fSSHCmd" ]; then
+                # Only set this flag when $fSSHCmd is not empty
+                fSSHExecNoLogin=true
+            fi
             ;;
         J)
             fWithJumpServer=true
@@ -138,7 +143,7 @@ while getopts "t:l:u:p:P:J:W:v:c:Fh" opt; do
             usage
             ;;
         ?)
-            COLOR=$GREEN
+            COLOR=$MAGENTA
             echo -e "${COLOR}Error: Invalid option: -$OPTARG${RESET}" >&2
             exit 1
             ;;
@@ -148,7 +153,8 @@ done
 # Shift to process non-option arguments. New $param, $2, ..., $@
 shift $((OPTIND - 1))
 if [[ $# -gt 0 ]]; then
-    echo "$USER_NOTATION Illegal non-option arguments: $@"
+    COLOR=$MAGENTA
+    echo -e "${COLOR}Error: Illegal non-option arguments: $@${RESET}"
     exit
 fi
 
@@ -211,7 +217,7 @@ preSet() {
                          -o ServerAliveCountMax=$fServerAliveCountMax \
                          -p $fSSHPort -l $fSSHUser $fSSHTarget"
         fi
-        [ -n "$fSSHExecNoLogin" ] && fSpawnCmd="$fSpawnCmd $fSSHCmd"
+        [ -n "$fSSHExecNoLogin" ] && fSpawnCmd="$fSpawnCmd \"$fSSHCmd\""
     # SFTP command. SFTP does not support $fSSHCmd
     else
         if [ -n "$fWithJumpServer" ]; then
@@ -226,7 +232,7 @@ parseAndCheck
 preSet
 
 echo "$SEPARATOR"
-COLOR=$MAGENTA
+COLOR=$GREY
 fSpawnCmdSimplified=$(echo "$fSpawnCmd" | tr -s ' ')
 if [ -n "$fSwitchToSftp" ]; then
     echo -e "$USER_NOTATION ${COLOR}Switching to SFTP mode${RESET} ..."
@@ -265,12 +271,6 @@ echo -e " ...${RESET}"
 
 # expect -d -c "
 expect -c "
-    if {\"$fSSHExecNoLogin\" != \"\"} {
-        set timeout -1
-    } else {
-        set timeout 5
-    }
-
     # Define ANSI color codes with capitalized names
     # Full list can be found here: http://en.wikipedia.org/wiki/ANSI_escape_code
     # https://stackoverflow.com/questions/12879483/color-texts-at-expect-shell
@@ -284,18 +284,24 @@ expect -c "
     set CYAN    \"\033\[36m\"
     set WHITE   \"\033\[37m\"
 
+    if {\"$fSSHExecNoLogin\" != \"\"} {
+        set timeout -1
+    } else {
+        set timeout 5
+    }
+
     set i 1
+    set COLOR \$MAGENTA
     while {\$i <= $fMaxAttempts} {
         # ssh -o StrictHostKeyChecking=no $fSSHTarget
         if {\$i > 1} {
-            send_user \"$USER_NOTATION Login attempt \$i/$fMaxAttempts\n\"
+            send_user \"$USER_NOTATION \${COLOR}Login attempt \$i/$fMaxAttempts${RESET}\n\"
         }
         spawn -noecho $fSpawnCmd
 
         set session_id \$spawn_id
         set ssh_pwd_prompt_cnt 0
         set jmp_pwd_prompt_cnt 0
-        set COLOR \$MAGENTA
         expect {
             {yes/no} {
                 send \"yes\r\"
@@ -320,10 +326,9 @@ expect -c "
                 exp_continue
             }
             {Host key verification failed.} {
-                send_user \"$USER_NOTATION Host key verification failed. Updating known_hosts file...\n\"
+                send_user \"$USER_NOTATION \${COLOR}Host key verification failed. Updating known_hosts file ...\${RESET}\n\"
                 system \"ssh-keygen -R $fSSHTarget\"
-                send_user \"$USER_NOTATION Host key removed from known_hosts file.\n\"
-                send_user \"$USER_NOTATION Retrying SSH immediately...\n\"
+                send_user \"$USER_NOTATION \${COLOR}Host key removed from known_hosts file.\${RESET}\n\"
                 # close \$session_id
                 incr i
                 continue
