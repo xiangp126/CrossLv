@@ -34,6 +34,8 @@ fSSHUser="admin"
 fSSHPwd="password"
 fSSHPort=22
 fVdom=""
+fSSHCmd=""
+fSSHExecNoLogin=""
 # Jump Server Variables
 fJumpServer=""
 fJumpUser=""
@@ -47,6 +49,12 @@ SCRIPT_NAME=$(basename "$0")
 USER_NOTATION="@@@@"
 SEPARATOR="---------------------------------------------------"
 SHORT_SEPARATOR="--------------------------------------"
+# Colors
+RED='\033[31m'
+MAGENTA='\033[35m'
+GREEN='\033[32m'
+BLUE='\033[34m'
+RESET='\033[0m'
 
 usage() {
 cat << _EOF
@@ -54,7 +62,7 @@ $SCRIPT_NAME 1.0
 
 usage:
     $SCRIPT_NAME [-l/-u user] [-p passwd] [-P ssh_port] [-J jump_server] [-W jump_passwd]
-         [-v vdom] [-F] -t target_ip
+         [-v vdom] [-F] [-c ssh_cmd] -t target_ip
 
     Default to SSH, use -F to switch to SFTP
 
@@ -63,6 +71,7 @@ Options:
     -l/-u  username     Username for login. Default is "$fSSHUser"
     -p     password     Password for login. Default is "$fSSHPwd"
     -P     Port         SSH Port to connect to. Default is "$fSSHPort"
+    -c     Command      Execute commands remotely without opening an interactive login session
     -J     Jump Server  The jump server to connect to. Format: user@jumpserver[:port]
     -W     Jump Passwd  Password for jump server. Default is "$fJumpPwd"
     -v     vdom         Specify the VDOM. Default is "$fVdom"
@@ -72,8 +81,9 @@ Options:
 Example:
     # SSH Connection
     $SCRIPT_NAME -t fpx1
-    $SCRIPT_NAME -t 172.16.67.181 -l admin -p "FGT\!123"
-    $SCRIPT_NAME -t 172.16.67.181 -l admin -p "FGT\!123" -P 8822 -v root
+    $SCRIPT_NAME -t 172.18.52.37 -l admin -p "FGT\!34"
+    $SCRIPT_NAME -t 172.18.52.37 -l admin -p "FGT\!34" -c "whoami"
+    $SCRIPT_NAME -t 172.18.52.37 -l admin -p "FGT\!34" -P 8822 -v root
     # SSH with a Jump Server
     $SCRIPT_NAME -J auto@172.18.20.84:8022 -W qaz -t test@10.120.1.111:2121 -p 123
     $SCRIPT_NAME -J auto@172.18.20.84:8022 -W qaz -t test@10.120.1.111 -P 2121 -p 123
@@ -89,7 +99,7 @@ _EOF
 [[ $# -eq 0 ]] && usage
 
 # Parse command-line options
-while getopts "t:l:u:p:P:J:W:v:Fh" opt; do
+while getopts "t:l:u:p:P:J:W:v:c:Fh" opt; do
     case ${opt} in
         t)
             fSSHTarget=$OPTARG
@@ -105,6 +115,10 @@ while getopts "t:l:u:p:P:J:W:v:Fh" opt; do
             ;;
         P)
             fSSHPort=$OPTARG
+            ;;
+        c)
+            fSSHExecNoLogin=true
+            fSSHCmd=$OPTARG
             ;;
         J)
             fWithJumpServer=true
@@ -123,7 +137,8 @@ while getopts "t:l:u:p:P:J:W:v:Fh" opt; do
             usage
             ;;
         ?)
-            echo "$USER_NOTATION Invalid option: -$OPTARG" >&2
+            COLOR=$GREEN
+            echo -e "${COLOR}Error: Invalid option: -$OPTARG${RESET}" >&2
             exit 1
             ;;
     esac
@@ -135,13 +150,6 @@ if [[ $# -gt 0 ]]; then
     echo "$USER_NOTATION Illegal non-option arguments: $@"
     exit
 fi
-
-# Define color constants
-RED='\033[31m'
-MAGENTA='\033[35m'
-GREEN='\033[32m'
-BLUE='\033[34m'
-RESET='\033[0m'
 
 parseAndCheck() {
     # Check if the target is in the format of user@sshtarget:port
@@ -183,7 +191,16 @@ parseAndCheck() {
         fi
     fi
 }
+
+preSet() {
+    # if $fSwitchToSftp or $fSSHExecNoLogin is set, disable $fvdom
+    if [ -n "$fSwitchToSftp" ] || [ -n "$fSSHExecNoLogin" ]; then
+        fVdom=""
+    fi
+}
+
 parseAndCheck
+preSet
 
 echo "$SEPARATOR"
 COLOR=$MAGENTA
@@ -230,7 +247,8 @@ if [ -z "$fSwitchToSftp" ]; then
                      -o ServerAliveCountMax=$fServerAliveCountMax \
                      -p $fSSHPort -l $fSSHUser $fSSHTarget"
     fi
-# SFTP command
+    [ -n "$fSSHExecNoLogin" ] && fSpawnCmd="$fSpawnCmd $fSSHCmd"
+# SFTP command. SFTP does not support $fSSHCmd
 else
     if [ -n "$fWithJumpServer" ]; then
         fSpawnCmd="sftp -o \"ProxyJump=$fJumpUser@$fJumpServer\" -P $fSSHPort $fSSHUser@$fSSHTarget"
@@ -241,9 +259,11 @@ fi
 
 # expect -d -c "
 expect -c "
-    # Set your SSH credentials
-    set i 1
-    set timeout 5
+    if {$fSSHExecNoLogin != \"\"} {
+        set timeout -1
+    } else {
+        set timeout 5
+    }
 
     # Define ANSI color codes with capitalized names
     # Full list can be found here: http://en.wikipedia.org/wiki/ANSI_escape_code
@@ -258,6 +278,7 @@ expect -c "
     set CYAN    \"\033\[36m\"
     set WHITE   \"\033\[37m\"
 
+    set i 1
     while {\$i <= $fMaxAttempts} {
         # ssh -o StrictHostKeyChecking=no $fSSHTarget
         if {\$i > 1} {
@@ -332,12 +353,17 @@ expect -c "
         exit 1
     }
 
+    if {$fSSHExecNoLogin != \"\"} {
+        # wait for the command to exit
+        wait
+    }
+
     puts -nonewline \"$USER_NOTATION \${MAGENTA}Successfully connected to $fSSHTarget\${RESET}\"
     flush stdout
     send \"\r\"
 
     # check if fVdom is specified (only for SSH)
-    if {\"$fVdom\" != \"\" && \"$fSwitchToSftp\" == \"\"} {
+    if {\"$fVdom\" != \"\"} {
         expect {
             \"$fExpectRoot\" {
                 send \"config vdom\r\"
