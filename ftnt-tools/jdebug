@@ -31,17 +31,18 @@ fTarget="fgt1"
 fWorkerType="worker"
 fSSHConnPort=22
 fUsername="admin"
-fPassword="password"
-fPrompt="# "
-fGDBServerListenPort=444
-fWADWorkerKeep=-1
-fWADWorkerCnt=$fWADWorkerKeep # 0: unlimited, 1: 1 worker, -1: keep the original value
+fPasswd="password"
+fExpectRoot="# "
+# GDB Server listen port
+fGDBSrvLisPort=444
+# 0: unlimited, 1: 1 worker, -1: not change
+fWADWorkerCnt=-1
 fMaxAttempts=2
 # Constants
 SCRIPT_NAME=$(basename "$0")
 USER_NOTATION="@@@@"
 SUB_USER_NOTATION="@@@@ @"
-separator="----------------------------------------------------------------"
+SEPARATOR="----------------------------------------------------------------"
 
 usage() {
     cat << _EOF
@@ -54,9 +55,9 @@ Usage: $SCRIPT_NAME [options]
 Options:
     -t      Target device name or IP address(default: $fTarget)
     -w      Worker type(default: $fWorkerType)
-    -d      GDB Server listen port(default: $fGDBServerListenPort)
+    -d      GDB Server listen port(default: $fGDBSrvLisPort)
     -l/-u   Username(default: $fUsername)
-    -p      Password(default: $fPassword)
+    -p      Password(default: $fPasswd)
     -P      SSH connection port(default: $fSSHConnPort)
     -N      Set wad worker count(default: $fWADWorkerCnt)
             0: unlimited, 1: 1 worker to make life easier, -1: keep the original value
@@ -87,7 +88,7 @@ while getopts "t:w:d:T:l:u:p:P:N:h" opt; do
             fWorkerType=$OPTARG
             ;;
         d)
-            fGDBServerListenPort=$OPTARG
+            fGDBSrvLisPort=$OPTARG
             ;;
         T)
             fMaxAttempts=$OPTARG
@@ -102,7 +103,7 @@ while getopts "t:w:d:T:l:u:p:P:N:h" opt; do
             fUsername=$OPTARG
             ;;
         p)
-            fPassword=$OPTARG
+            fPasswd=$OPTARG
             ;;
         N)
             fWADWorkerCnt=$OPTARG
@@ -130,13 +131,13 @@ RESET='\033[0m'
 COLOR="$RED"
 
 fSearchPatt="type=.*$fWorkerType"
-echo $separator
+echo $SEPARATOR
 echo -e "$USER_NOTATION [t] Set Target Device to: ${COLOR}$fTarget${RESET}"
 echo -e "$USER_NOTATION [l] Set Username to: ${COLOR}$fUsername${RESET}"
-echo -e "$USER_NOTATION [p] Set Password to: ${COLOR}$fPassword${RESET}"
+echo -e "$USER_NOTATION [p] Set Password to: ${COLOR}$fPasswd${RESET}"
 echo -e "$USER_NOTATION [P] Set SSH Connection Port to: ${COLOR}$fSSHConnPort${RESET}"
 echo -e "$USER_NOTATION [T] Set SSH Maximum Attempts to: ${COLOR}$fMaxAttempts${RESET}"
-echo -e "$USER_NOTATION [d] Set GDB Server Listen Port to: ${COLOR}$fGDBServerListenPort${RESET}"
+echo -e "$USER_NOTATION [d] Set GDB Server Listen Port to: ${COLOR}$fGDBSrvLisPort${RESET}"
 echo -e "$USER_NOTATION [w] Set WAD Worker Type to: ${COLOR}$fWorkerType${RESET}(Search Pattern: ${COLOR}$fSearchPatt)${RESET}"
 # if $wadWorkerCnt is larger or equal to 0, then print the message.
 if [ "$fWADWorkerCnt" -ge 0 ]; then
@@ -145,7 +146,7 @@ fi
 # COLOR="$MAGENTA"
 # echo -e "$USER_NOTATION ${COLOR}Connecting to $fTarget${RESET} ..."
 echo "$USER_NOTATION Connecting to $fTarget ..."
-echo $separator
+echo $SEPARATOR
 
 # expect -d -c "
 expect -c "
@@ -188,7 +189,7 @@ expect -c "
                     send_user \"\n$USER_NOTATION \${COLOR}Permission denied. Please specify the login credentials.\${RESET}\n\"
                     exit 1
                 }
-                send \"$fPassword\r\"
+                send \"$fPasswd\r\"
                 exp_continue
             }
             \"Connection refused\" {
@@ -204,8 +205,8 @@ expect -c "
                 incr i
                 continue
             }
-            # $fPrompt must be quoted.
-            \"$fPrompt\" {
+            # $fExpectRoot must be quoted.
+            \"$fExpectRoot\" {
                 break
             }
             timeout {
@@ -233,13 +234,13 @@ expect -c "
             {Command fail.} {
                 # The device has VDOM
                 set has_vdom 1
-                expect \"$fPrompt\"
+                expect \"$fExpectRoot\"
                 send \"config global\r\"
-                expect \"$fPrompt\"
+                expect \"$fExpectRoot\"
                 send \"config system global\r\"
                 exp_continue
             }
-            \"$fPrompt\" {
+            \"$fExpectRoot\" {
                 # Pass through
             }
             timeout {
@@ -248,9 +249,9 @@ expect -c "
             }
         }
         send \"set wad-worker-count $fWADWorkerCnt\r\"
-        expect \"$fPrompt\"
+        expect \"$fExpectRoot\"
         send \"end\r\"
-        expect \"$fPrompt\"
+        expect \"$fExpectRoot\"
 
         # set wait_time 3
         # send_user \"$USER_NOTATION Wait for \$wait_time seconds to apply the configuration.\n\"
@@ -263,7 +264,7 @@ expect -c "
         #     after 500
         # }
         # send \"\r\"
-        # expect \"$fPrompt\"
+        # expect \"$fExpectRoot\"
 
         send \"exit\r\"
         expect eof {
@@ -275,7 +276,7 @@ expect -c "
 
     if {\$has_vdom} {
         send \"config global\r\"
-        expect \"$fPrompt\"
+        expect \"$fExpectRoot\"
     }
     send \"diagnose debug disable\r\"
     set timeout 30
@@ -284,11 +285,11 @@ expect -c "
             # The device has VDOM
             set COLOR \$MAGENTA
             send_user \"\${COLOR}Warning: The device has VDOM. Switch to the global configuration mode.\${RESET}\n\"
-            expect \"$fPrompt\"
+            expect \"$fExpectRoot\"
             send \"config global\r\"
             exp_continue
         }
-        \"$fPrompt\" {
+        \"$fExpectRoot\" {
             # Pass through
         }
         timeout {
@@ -297,9 +298,9 @@ expect -c "
         }
     }
     send \"diagnose debug enable\r\"
-    expect \"$fPrompt\"
+    expect \"$fExpectRoot\"
     send \"diagnose test application wad 1000\r\"
-    expect \"$fPrompt\"
+    expect \"$fExpectRoot\"
     set output \$expect_out(buffer)
 
     # Search for the line with \"type=worker\" and extract the PID
@@ -331,7 +332,7 @@ expect -c "
 $SUB_USER_NOTATION FPX # config system global
 $SUB_USER_NOTATION FPX (global) # set wad-worker-count 1
 $SUB_USER_NOTATION FPX (global) # end
-$USER_NOTATION Or retry the same command with -N1
+$USER_NOTATION Simply retry the same command with -N1
             }
         } else {
             send_user \"\n$USER_NOTATION \${COLOR}Warning: \$worker_cnt PIDs found: \$worker_pids for WAD process of type $fWorkerType.\${RESET}\"
@@ -351,11 +352,11 @@ $USER_NOTATION Or retry the same command with -N1
     set worker_pid [lindex \$worker_pids 0]
 
     send \"\r\"
-    expect \"$fPrompt\"
+    expect \"$fExpectRoot\"
 
     send \"diagnose debug disable\r\"
     set timeout 30
-    expect \"$fPrompt\"
+    expect \"$fExpectRoot\"
 
     send \"sys sh\r\"
     expect {
@@ -363,14 +364,14 @@ $USER_NOTATION Or retry the same command with -N1
             send_user \"$USER_NOTATION No Shell supported. Please check the image version.\n\"
             exit 1
         }
-        \"$fPrompt\" {
+        \"$fExpectRoot\" {
             # Do nothing, just continue
         }
     }
 
     # start gdbserver
     set timeout -1
-    send \"gdbserver 0.0.0.0:$fGDBServerListenPort --attach \$worker_pid\r\"
+    send \"gdbserver 0.0.0.0:$fGDBSrvLisPort --attach \$worker_pid\r\"
 
     # \x03 is used to send a Ctrl-C signal when the trap detects the SIGINT (Ctrl-C) signal.
     trap {
@@ -391,8 +392,8 @@ $USER_NOTATION Or retry the same command with -N1
             send_user \"$USER_NOTATION \${COLOR}Bye-bye.\${RESET}\n\"
             exit 1
         }
-        \"$fPrompt\" {
-            # pass through
+        \"$fExpectRoot\" {
+            # Do nothing, just continue
         }
     }
 "
