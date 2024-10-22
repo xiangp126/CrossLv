@@ -86,6 +86,8 @@ Example:
     $SCRIPT_NAME -t 172.18.52.37 -l admin -p "FGT\!34"
     $SCRIPT_NAME -t 172.18.52.37 -l admin -p "FGT\!34" -c "whoami"
     $SCRIPT_NAME -t 172.18.52.37 -l admin -p "FGT\!34" -P 8822 -v root
+    # Remote Live Capture
+    $SCRIPT_NAME -t 172.18.52.37 -l admin -p "FGT\!34" -c "tcpdump -i eth3 -s 0 -w - 'not port 22'"
     # SSH with a Jump Server
     $SCRIPT_NAME -J auto@172.18.20.84:8022 -W qaz -t test@10.120.1.111:2121 -p 123
     $SCRIPT_NAME -J auto@172.18.20.84:8022 -W qaz -t test@10.120.1.111 -P 2121 -p 123
@@ -211,11 +213,11 @@ preSet() {
             fSpawnCmd="ssh -J $fJumpUser@$fJumpServer:$fJumpPort \
                          -o ServerAliveInterval=$fServerAliveInterval \
                          -o ServerAliveCountMax=$fServerAliveCountMax \
-                         -p $fSSHPort -l $fSSHUser $fSSHTarget"
+                         -p $fSSHPort $fSSHUser@$fSSHTarget"
         else
             fSpawnCmd="ssh -o ServerAliveInterval=$fServerAliveInterval \
                          -o ServerAliveCountMax=$fServerAliveCountMax \
-                         -p $fSSHPort -l $fSSHUser $fSSHTarget"
+                         -p $fSSHPort $fSSHUser@$fSSHTarget"
         fi
         [ -n "$fSSHExecNoLogin" ] && fSpawnCmd="$fSpawnCmd \"$fSSHCmd\""
     # SFTP command. SFTP does not support $fSSHCmd
@@ -307,7 +309,7 @@ expect -c "
                 send \"yes\r\"
                 exp_continue
             }
-            -re \"$fSSHTarget's (password|Password)\" {
+            -re \"$fSSHUser@$fSSHTarget's (password|Password)\" {
                 incr ssh_pwd_prompt_cnt
                 if {\$ssh_pwd_prompt_cnt > 1} {
                     send_user \"\n$USER_NOTATION \${COLOR}Login credentials for SSH Target: $fSSHTarget are wrong.\${RESET}\n\"
@@ -316,7 +318,7 @@ expect -c "
                 send \"$fSSHPwd\r\"
                 exp_continue
             }
-            -re \"$fJumpServer's (password|Password)\" {
+            -re \"$fJumpUser@$fJumpServer's (password|Password)\" {
                 incr jmp_pwd_prompt_cnt
                 if {\$jmp_pwd_prompt_cnt > 1} {
                     send_user \"\n$USER_NOTATION \${COLOR}Login credentials for Jump Server: $fJumpServer are wrong.\${RESET}\n\"
