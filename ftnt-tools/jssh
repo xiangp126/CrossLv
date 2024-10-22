@@ -34,15 +34,15 @@ fSSHUser="admin"
 fSSHPwd="password"
 fSSHPort=22
 fVdom=""
-fSSHCmd=""
+fSSHCmd="" # The command to execute remotely without opening an interactive login session
 fSSHExecNoLogin=""
+fSpawnCmd=""
 # Jump Server Variables
 fJumpServer=""
 fJumpUser=""
 fJumpPwd=""
 fJumpPort=22
 fWithJumpServer=""
-fSpawnCmd=""
 fMaxAttempts=2
 # Constants
 SCRIPT_NAME=$(basename "$0")
@@ -53,6 +53,7 @@ SHORT_SEPARATOR="--------------------------------------"
 RED='\033[31m'
 MAGENTA='\033[35m'
 GREEN='\033[32m'
+GREY='\033[90m'
 BLUE='\033[34m'
 RESET='\033[0m'
 
@@ -197,6 +198,28 @@ preSet() {
     if [ -n "$fSwitchToSftp" ] || [ -n "$fSSHExecNoLogin" ]; then
         fVdom=""
     fi
+
+    # SSH Command
+    if [ -z "$fSwitchToSftp" ]; then
+        if [ -n "$fWithJumpServer" ]; then
+            fSpawnCmd="ssh -J $fJumpUser@$fJumpServer:$fJumpPort \
+                         -o ServerAliveInterval=$fServerAliveInterval \
+                         -o ServerAliveCountMax=$fServerAliveCountMax \
+                         -p $fSSHPort -l $fSSHUser $fSSHTarget"
+        else
+            fSpawnCmd="ssh -o ServerAliveInterval=$fServerAliveInterval \
+                         -o ServerAliveCountMax=$fServerAliveCountMax \
+                         -p $fSSHPort -l $fSSHUser $fSSHTarget"
+        fi
+        [ -n "$fSSHExecNoLogin" ] && fSpawnCmd="$fSpawnCmd $fSSHCmd"
+    # SFTP command. SFTP does not support $fSSHCmd
+    else
+        if [ -n "$fWithJumpServer" ]; then
+            fSpawnCmd="sftp -o \"ProxyJump=$fJumpUser@$fJumpServer\" -P $fSSHPort $fSSHUser@$fSSHTarget"
+        else
+            fSpawnCmd="sftp -P $fSSHPort $fSSHUser@$fSSHTarget"
+        fi
+    fi
 }
 
 parseAndCheck
@@ -204,8 +227,11 @@ preSet
 
 echo "$SEPARATOR"
 COLOR=$MAGENTA
+fSpawnCmdSimplified=$(echo "$fSpawnCmd" | tr -s ' ')
 if [ -n "$fSwitchToSftp" ]; then
     echo -e "$USER_NOTATION ${COLOR}Switching to SFTP mode${RESET} ..."
+else
+    echo -e "$USER_NOTATION ${COLOR}Working under SSH mode${RESET} ..."
 fi
 COLOR="$RED"
 echo -e "$USER_NOTATION [t] Set SSH Target Device to: ${COLOR}$fSSHTarget${RESET}"
@@ -229,37 +255,17 @@ if [ -n "$fWithJumpServer" ]; then
     fi
     # echo "$SEPARATOR"
 fi
-echo -n "$USER_NOTATION Connecting to $fSSHTarget"
+COLOR=$BLUE && echo -e "$USER_NOTATION ${COLOR}$fSpawnCmdSimplified${RESET}"
+COLOR=$GREY
+echo -ne "$USER_NOTATION ${COLOR}Connecting to $fSSHTarget"
 if [ -n "$fWithJumpServer" ]; then
     echo -ne " via Jump Server: $fJumpServer"
 fi
-echo " ..."
-
-# SSH Command
-if [ -z "$fSwitchToSftp" ]; then
-    if [ -n "$fWithJumpServer" ]; then
-        fSpawnCmd="ssh -J $fJumpUser@$fJumpServer:$fJumpPort \
-                     -o ServerAliveInterval=$fServerAliveInterval \
-                     -o ServerAliveCountMax=$fServerAliveCountMax \
-                     -p $fSSHPort -l $fSSHUser $fSSHTarget"
-    else
-        fSpawnCmd="ssh -o ServerAliveInterval=$fServerAliveInterval \
-                     -o ServerAliveCountMax=$fServerAliveCountMax \
-                     -p $fSSHPort -l $fSSHUser $fSSHTarget"
-    fi
-    [ -n "$fSSHExecNoLogin" ] && fSpawnCmd="$fSpawnCmd $fSSHCmd"
-# SFTP command. SFTP does not support $fSSHCmd
-else
-    if [ -n "$fWithJumpServer" ]; then
-        fSpawnCmd="sftp -o \"ProxyJump=$fJumpUser@$fJumpServer\" -P $fSSHPort $fSSHUser@$fSSHTarget"
-    else
-        fSpawnCmd="sftp -P $fSSHPort $fSSHUser@$fSSHTarget"
-    fi
-fi
+echo -e " ...${RESET}"
 
 # expect -d -c "
 expect -c "
-    if {$fSSHExecNoLogin != \"\"} {
+    if {\"$fSSHExecNoLogin\" != \"\"} {
         set timeout -1
     } else {
         set timeout 5
@@ -343,7 +349,7 @@ expect -c "
             }
             eof {
                 send_user \"$USER_NOTATION \${COLOR}Reached EOF. Program ended.\${RESET}\n\"
-                exit 1
+                exit 0
             }
         }
     }
@@ -353,9 +359,11 @@ expect -c "
         exit 1
     }
 
-    if {$fSSHExecNoLogin != \"\"} {
-        # wait for the command to exit
-        wait
+    if {\"$fSSHExecNoLogin\" != \"\"} {
+        expect eof {
+            send_user \"$USER_NOTATION \${COLOR}Reached EOF. Program ended.\${RESET}\n\"
+            exit 0
+        }
     }
 
     puts -nonewline \"$USER_NOTATION \${MAGENTA}Successfully connected to $fSSHTarget\${RESET}\"
