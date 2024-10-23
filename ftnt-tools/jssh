@@ -28,6 +28,9 @@ fExpectSftp="sftp> "
 fSwitchToSftp=""
 fServerAliveInterval=30
 fServerAliveCountMax=3
+# Exp: ssh -t admin@172.18.52.37 -p 123 -c "tcpdump -i eth3 -s 0 -w - 'not port 22'" | wireshark -k -i -
+# WireShark Live Capture: In this mode, Expect will not send any password prompts to stdout.
+fLiveCapture=""
 # SSH Variables
 fSSHTarget="fgt1"
 fSSHUser="admin"
@@ -63,22 +66,23 @@ cat << _EOF
 $SCRIPT_NAME 1.0
 
 usage:
-    $SCRIPT_NAME [-l/-u user] [-p passwd] [-P ssh_port] [-J jump_server] [-W jump_passwd]
+    $SCRIPT_NAME [-l/-u user] [-p passwd] [-P ssh_port] [-J jump_server] [-W jump_passwd] [-C]
          [-v vdom] [-F] [-c ssh_cmd] -t target_ip
 
     Default to SSH, use -F to switch to SFTP
 
 Options:
-    -t     target       The device to connect to. Default is "$fSSHTarget"
-    -l/-u  username     Username for login. Default is "$fSSHUser"
-    -p     password     Password for login. Default is "$fSSHPwd"
-    -P     Port         SSH Port to connect to. Default is "$fSSHPort"
-    -c     Command      Execute commands remotely without opening an interactive login session
-    -J     Jump Server  The jump server to connect to. Format: user@jumpserver[:port]
-    -W     Jump Passwd  Password for jump server. Default is "$fJumpPwd"
-    -v     vdom         Specify the VDOM. Default is "$fVdom"
-    -F     SFTP         Switch to SFTP
-    -h     Help         Print this help message
+    -t     target        The device to connect to. Default is "$fSSHTarget"
+    -l/-u  username      Username for login. Default is "$fSSHUser"
+    -p     password      Password for login. Default is "$fSSHPwd"
+    -P     Port          SSH Port to connect to. Default is "$fSSHPort"
+    -c     Command       Execute commands remotely without opening an interactive login session
+    -C     Live Capture  Should be set when using WireShark Live Capture via pipe
+    -J     Jump Server   The jump server to connect to. Format: user@jumpserver[:port]
+    -W     Jump Passwd   Password for jump server. Default is "$fJumpPwd"
+    -v     vdom          Specify the VDOM. Default is "$fVdom"
+    -F     SFTP          Switch to SFTP
+    -h     Help          Print this help message
 
 Example:
     # SSH Connection
@@ -87,7 +91,8 @@ Example:
     $SCRIPT_NAME -t 172.18.52.37 -l admin -p "FGT\!34" -c "whoami"
     $SCRIPT_NAME -t 172.18.52.37 -l admin -p "FGT\!34" -P 8822 -v root
     # Remote Live Capture
-    $SCRIPT_NAME -t 172.18.52.37 -l admin -p "FGT\!34" -c "tcpdump -i eth3 -s 0 -w - 'not port 22'"
+    # Do not use $SCRIPT_NAME since it can not capture the password prompt before the redirection
+    ssh -t 172.18.52.37 -l admin -p "FGT\!34" -c "tcpdump -i eth3 -s 0 -w - 'not port 22'" | wireshark -k -i -
     # SSH with a Jump Server
     $SCRIPT_NAME -J auto@172.18.20.84:8022 -W qaz -t test@10.120.1.111:2121 -p 123
     $SCRIPT_NAME -J auto@172.18.20.84:8022 -W qaz -t test@10.120.1.111 -P 2121 -p 123
@@ -103,7 +108,7 @@ _EOF
 [[ $# -eq 0 ]] && usage
 
 # Parse command-line options
-while getopts "t:l:u:p:P:J:W:v:c:Fh" opt; do
+while getopts "t:l:u:p:P:J:W:v:c:FCh" opt; do
     case ${opt} in
         t)
             fSSHTarget=$OPTARG
@@ -127,6 +132,9 @@ while getopts "t:l:u:p:P:J:W:v:c:Fh" opt; do
                 # Only set this flag when $fSSHCmd is not empty
                 fSSHExecNoLogin=true
             fi
+            ;;
+        C)
+            fLiveCapture=true
             ;;
         J)
             fWithJumpServer=true
@@ -202,8 +210,13 @@ parseAndCheck() {
 }
 
 preSet() {
-    # if $fSwitchToSftp or $fSSHExecNoLogin is set, disable $fvdom
-    if [ -n "$fSwitchToSftp" ] || [ -n "$fSSHExecNoLogin" ]; then
+    # If $fSwitchToSftp is set, disable $fvdom and $fSSHCmd
+    if [ -n "$fSwitchToSftp" ]; then
+        fSSHCmd=""
+        fSSHExecNoLogin=""
+    fi
+    # If $fSSHExecNoLogin is set, disable $fVdom
+    if [ -n "$fSSHExecNoLogin" ]; then
         fVdom=""
     fi
 
@@ -228,48 +241,49 @@ preSet() {
             fSpawnCmd="sftp -P $fSSHPort $fSSHUser@$fSSHTarget"
         fi
     fi
+    # Squash multiple spaces into one
+    fSpawnCmd=$(echo "$fSpawnCmd" | tr -s ' ')
 }
 
 parseAndCheck
 preSet
 
-echo "$SEPARATOR"
+echo "$SEPARATOR" >&2
 COLOR=$GREY
-fSpawnCmdSimplified=$(echo "$fSpawnCmd" | tr -s ' ')
 if [ -n "$fSwitchToSftp" ]; then
-    echo -e "$USER_NOTATION ${COLOR}Switching to SFTP mode${RESET} ..."
+    echo -e "$USER_NOTATION ${COLOR}Switching to SFTP mode${RESET} ..." >&2
 else
-    echo -e "$USER_NOTATION ${COLOR}Working under SSH mode${RESET} ..."
+    echo -e "$USER_NOTATION ${COLOR}Working under SSH mode${RESET} ..." >&2
 fi
 COLOR="$RED"
-echo -e "$USER_NOTATION [t] Set SSH Target Device to: ${COLOR}$fSSHTarget${RESET}"
-echo -e "$USER_NOTATION [l] Set SSH Username to: ${COLOR}$fSSHUser${RESET}"
-echo -e "$USER_NOTATION [p] Set SSH Password to: ${COLOR}$fSSHPwd${RESET}"
-echo -e "$USER_NOTATION [P] Set SSH Connection Port to: ${COLOR}$fSSHPort${RESET}"
+echo -e "$USER_NOTATION [t] Set SSH Target Device to: ${COLOR}$fSSHTarget${RESET}" >&2
+echo -e "$USER_NOTATION [l] Set SSH Username to: ${COLOR}$fSSHUser${RESET}" >&2
+echo -e "$USER_NOTATION [p] Set SSH Password to: ${COLOR}$fSSHPwd${RESET}" >&2
+echo -e "$USER_NOTATION [P] Set SSH Connection Port to: ${COLOR}$fSSHPort${RESET}" >&2
 if [ -n "$fVdom" ]; then
-    echo -e "$USER_NOTATION [v] Set FGT/FPX VDOM to: ${COLOR}$fVdom${RESET}"
+    echo -e "$USER_NOTATION [v] Set FGT/FPX VDOM to: ${COLOR}$fVdom${RESET}" >&2
 fi
-echo -e "$USER_NOTATION [-] Set Maximum Attempts to: ${COLOR}$fMaxAttempts${RESET}"
+echo -e "$USER_NOTATION [-] Set Maximum Attempts to: ${COLOR}$fMaxAttempts${RESET}" >&2
 if [ -n "$fWithJumpServer" ]; then
-    echo $SHORT_SEPARATOR
-    echo -e "$USER_NOTATION [J] Set Jump Server to: ${COLOR}$fJumpServer${RESET}"
-    echo -e "$USER_NOTATION [-] Set Jump Username to: ${COLOR}$fJumpUser${RESET}"
-    echo -e "$USER_NOTATION [W] Set Jump Password to: ${COLOR}$fJumpPwd${RESET}"
-    echo -e "$USER_NOTATION [-] Set Jump Port to: ${COLOR}$fJumpPort${RESET}"
+    echo "$SHORT_SEPARATOR" >&2
+    echo -e "$USER_NOTATION [J] Set Jump Server to: ${COLOR}$fJumpServer${RESET}" >&2
+    echo -e "$USER_NOTATION [-] Set Jump Username to: ${COLOR}$fJumpUser${RESET}" >&2
+    echo -e "$USER_NOTATION [W] Set Jump Password to: ${COLOR}$fJumpPwd${RESET}" >&2
+    echo -e "$USER_NOTATION [-] Set Jump Port to: ${COLOR}$fJumpPort${RESET}" >&2
     if [ -z "$fJumpServer" ] || [ -z "$fJumpUser" ]; then
         COLOR=$MAGENTA
-        echo -e "$USER_NOTATION ${COLOR}Jump Server and its credentials are not set properly.${RESET}"
+        echo -e "$USER_NOTATION ${COLOR}Jump Server and its credentials are not set properly.${RESET}" >&2
         exit 1
     fi
-    # echo "$SEPARATOR"
+    # echo "$SEPARATOR" >&2
 fi
-COLOR=$BLUE && echo -e "$USER_NOTATION ${COLOR}$fSpawnCmdSimplified${RESET}"
+COLOR=$BLUE && echo -e "$USER_NOTATION ${COLOR}$fSpawnCmd${RESET}" >&2
 COLOR=$GREY
-echo -ne "$USER_NOTATION ${COLOR}Connecting to $fSSHTarget"
+echo -ne "$USER_NOTATION ${COLOR}Connecting to $fSSHTarget" >&2
 if [ -n "$fWithJumpServer" ]; then
-    echo -ne " via Jump Server: $fJumpServer"
+    echo -ne " via Jump Server: $fJumpServer" >&2
 fi
-echo -e " ...${RESET}"
+echo -e " ...${RESET}" >&2
 
 # expect -d -c "
 expect -c "
@@ -297,46 +311,64 @@ expect -c "
     while {\$i <= $fMaxAttempts} {
         # ssh -o StrictHostKeyChecking=no $fSSHTarget
         if {\$i > 1} {
-            send_user \"$USER_NOTATION \${COLOR}Login attempt \$i/$fMaxAttempts${RESET}\n\"
+            puts \"$USER_NOTATION \${COLOR}Login attempt \$i/$fMaxAttempts${RESET}\n\"
+        }
+
+        if {\"$fLiveCapture\" != \"\"} {
+            log_user 0
         }
         spawn -noecho $fSpawnCmd
 
         set session_id \$spawn_id
         set ssh_pwd_prompt_cnt 0
         set jmp_pwd_prompt_cnt 0
+
         expect {
             {yes/no} {
                 send \"yes\r\"
                 exp_continue
             }
-            -re \"$fSSHUser@$fSSHTarget's (password|Password)\" {
+            -re \"$fSSHUser@$fSSHTarget's (password|Password):\" {
+                if {\"$fLiveCapture\" != \"\"} {
+                    set output \$expect_out(buffer)
+                    puts -nonewline stderr \"\$output\"
+                    set expect_out(buffer) \"\"
+                    log_user 1
+                }
+
                 incr ssh_pwd_prompt_cnt
                 if {\$ssh_pwd_prompt_cnt > 1} {
-                    send_user \"\n$USER_NOTATION \${COLOR}Login credentials for SSH Target: $fSSHTarget are wrong.\${RESET}\n\"
+                    puts \"\n$USER_NOTATION \${COLOR}Login credentials for SSH Target: $fSSHTarget are wrong.\${RESET}\n\"
                     exit 1
                 }
                 send \"$fSSHPwd\r\"
                 exp_continue
             }
-            -re \"$fJumpUser@$fJumpServer's (password|Password)\" {
+            -re \"$fJumpUser@$fJumpServer's (password|Password):\" {
+                if {\"$fLiveCapture\" != \"\"} {
+                    set output \$expect_out(buffer)
+                    puts -nonewline stderr \"\$output\"
+                    set expect_out(buffer) \"\"
+                }
+
                 incr jmp_pwd_prompt_cnt
                 if {\$jmp_pwd_prompt_cnt > 1} {
-                    send_user \"\n$USER_NOTATION \${COLOR}Login credentials for Jump Server: $fJumpServer are wrong.\${RESET}\n\"
+                    puts \"\n$USER_NOTATION \${COLOR}Login credentials for Jump Server: $fJumpServer are wrong.\${RESET}\n\"
                     exit 1
                 }
                 send \"$fJumpPwd\r\"
                 exp_continue
             }
             {Host key verification failed.} {
-                send_user \"$USER_NOTATION \${COLOR}Host key verification failed. Updating known_hosts file ...\${RESET}\n\"
+                puts \"$USER_NOTATION \${COLOR}Host key verification failed. Updating known_hosts file ...\${RESET}\n\"
                 system \"ssh-keygen -R $fSSHTarget\"
-                send_user \"$USER_NOTATION \${COLOR}Host key removed from known_hosts file.\${RESET}\n\"
+                puts \"$USER_NOTATION \${COLOR}Host key removed from known_hosts file.\${RESET}\n\"
                 # close \$session_id
                 incr i
                 continue
             }
             {No route to host} {
-                send_user \"$USER_NOTATION \${COLOR}No route to host.\${RESET}\n\"
+                puts \"$USER_NOTATION \${COLOR}No route to host.\${RESET}\n\"
                 exit 1
             }
             \"$fExpectRoot\" {
@@ -349,31 +381,33 @@ expect -c "
                 break
             }
             timeout {
-                send_user \"$USER_NOTATION \${COLOR}Timed out waiting for a response.\${RESET}\n\"
+                puts \"$USER_NOTATION \${COLOR}Timed out waiting for a response.\${RESET}\n\"
                 # close \$session_id
                 incr i
                 continue
             }
             eof {
-                send_user \"$USER_NOTATION \${COLOR}Reached EOF. Program ended.\${RESET}\n\"
+                puts stderr \"$USER_NOTATION \${COLOR}Reached EOF. Program ended.\${RESET}\"
                 exit 0
             }
         }
     }
 
+    log_user 1
+
     if {\$i > $fMaxAttempts} {
-        send_user \"$USER_NOTATION Failed to connect to $fSSHTarget\n\"
+        puts \"$USER_NOTATION Failed to connect to $fSSHTarget\n\"
         exit 1
     }
 
     if {\"$fSSHExecNoLogin\" != \"\"} {
         expect eof {
-            send_user \"$USER_NOTATION \${COLOR}Reached EOF. Program ended.\${RESET}\n\"
+            puts stderr \"$USER_NOTATION \${MAGENTA}Successfully executed the command remotely.\${RESET}\"
             exit 0
         }
     }
 
-    puts -nonewline \"$USER_NOTATION \${MAGENTA}Successfully connected to $fSSHTarget\${RESET}\"
+    puts -nonewline stderr \"$USER_NOTATION \${MAGENTA}Successfully connected to $fSSHTarget\${RESET}\"
     flush stdout
     send \"\r\"
 
@@ -385,7 +419,7 @@ expect -c "
                 expect {
                     {Command fail.} {
                         set COLOR \$BLUE
-                        send_user \"\${COLOR}Error: VDOM is not supported on this device.\${RESET}\n\"
+                        puts \"\${COLOR}Error: VDOM is not supported on this device.\${RESET}\n\"
                         exit 1
                     }
                     \"$fExpectRoot\" {
@@ -406,7 +440,7 @@ expect -c "
     proc handle_eof {} {
         global MAGENTA COLOR RESET
         set COLOR \$MAGENTA
-        send_user \"$USER_NOTATION \${COLOR}Bye-bye.\${RESET}\n\"
+        puts stderr \"$USER_NOTATION \${COLOR}Bye-bye.\${RESET}\"
         exit 1
     }
 
