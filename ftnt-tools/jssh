@@ -22,15 +22,18 @@
 # $ jssh -l admin -P 8881 -t localhost
 
 # Shared Variables
-fExpectUser="$ "
-fExpectRoot="# "
-fExpectSftp="sftp> "
+# Match "$ ", "# " or "sftp> " at the end of the line
+fGroupPattern='(\$|#|sftp>)\s*$' # For Literal Interpretation, use single quotes
+fDollarPattern='\$\s*$'
+fPoundPattern='#\s*$'
+# fSftpPattern='sftp>\s*$'
 fSwitchToSftp=""
 fServerAliveInterval=30
 fServerAliveCountMax=3
 # Exp: ssh -t admin@172.18.52.37 -p 123 -c "tcpdump -i eth3 -s 0 -w - 'not port 22'" | wireshark -k -i -
 # WireShark Live Capture: In this mode, Expect will not send any password prompts to stdout.
 fLiveCapture=""
+fCapturedFile="/tmp/captured.pcap"
 # SSH Variables
 fSSHTarget="fgt1"
 fSSHUser="admin"
@@ -212,6 +215,7 @@ parseAndCheck() {
 preSet() {
     # If $fSwitchToSftp is set, disable $fvdom and $fSSHCmd
     if [ -n "$fSwitchToSftp" ]; then
+        fVdom=""
         fSSHCmd=""
         fSSHExecNoLogin=""
     fi
@@ -314,10 +318,12 @@ expect -c "
             puts \"$USER_NOTATION \${COLOR}Login attempt \$i/$fMaxAttempts${RESET}\n\"
         }
 
-        if {\"$fLiveCapture\" != \"\"} {
-            log_user 0
-        }
+        set fd [open $fCapturedFile w]
         spawn -noecho $fSpawnCmd
+
+        # log_file \$fd
+
+        # puts \"Hello, I am in the spawn command.\"
 
         set session_id \$spawn_id
         set ssh_pwd_prompt_cnt 0
@@ -329,12 +335,6 @@ expect -c "
                 exp_continue
             }
             -re \"$fSSHUser@$fSSHTarget's (password|Password):\" {
-                if {\"$fLiveCapture\" != \"\"} {
-                    set output \$expect_out(buffer)
-                    puts -nonewline stderr \"\$output\"
-                    set expect_out(buffer) \"\"
-                }
-
                 incr ssh_pwd_prompt_cnt
                 if {\$ssh_pwd_prompt_cnt > 1} {
                     puts \"\n$USER_NOTATION \${COLOR}Login credentials for SSH Target: $fSSHTarget are wrong.\${RESET}\n\"
@@ -344,28 +344,12 @@ expect -c "
                 exp_continue
             }
             -re \"$fJumpUser@$fJumpServer's (password|Password):\" {
-                if {\"$fLiveCapture\" != \"\"} {
-                    set output \$expect_out(buffer)
-                    puts -nonewline stderr \"\$output\"
-                    set expect_out(buffer) \"\"
-                }
-
                 incr jmp_pwd_prompt_cnt
                 if {\$jmp_pwd_prompt_cnt > 1} {
                     puts \"\n$USER_NOTATION \${COLOR}Login credentials for Jump Server: $fJumpServer are wrong.\${RESET}\n\"
                     exit 1
                 }
                 send \"$fJumpPwd\r\"
-                exp_continue
-            }
-            # tcpdump: listening on eth3, link-type EN10MB (Ethernet), capture size 65535 bytes
-            -re \"tcpdump: listening on .*\$\" {
-                if {\"$fLiveCapture\" != \"\"} {
-                    set output \$expect_out(buffer)
-                    puts -nonewline stderr \"\$output\"
-                    set expect_out(buffer) \"\"
-                    log_user 1
-                }
                 exp_continue
             }
             {Host key verification failed.} {
@@ -380,13 +364,7 @@ expect -c "
                 puts \"$USER_NOTATION \${COLOR}No route to host.\${RESET}\n\"
                 exit 1
             }
-            \"$fExpectRoot\" {
-                break
-            }
-            \"$fExpectUser\" {
-                break
-            }
-            \"$fExpectSftp\" {
+            -re {$fGroupPattern} {
                 break
             }
             timeout {
@@ -401,8 +379,6 @@ expect -c "
             }
         }
     }
-
-    log_user 1
 
     if {\$i > $fMaxAttempts} {
         puts \"$USER_NOTATION Failed to connect to $fSSHTarget\n\"
@@ -422,28 +398,29 @@ expect -c "
 
     # check if fVdom is specified (only for SSH)
     if {\"$fVdom\" != \"\"} {
+        set timeout 3
         expect {
-            \"$fExpectRoot\" {
+            -re {$fDollarPattern} {
+                puts -nonewline \"$USER_NOTATION \${MAGENTA}VDOM is not supported on this device\${RESET}\"
+                flush stdout
+                send \"\r\"
+            }
+            # Only for FGT/FPX
+            -re {$fPoundPattern} {
                 send \"config vdom\r\"
                 expect {
                     {Command fail.} {
                         set COLOR \$BLUE
-                        puts \"\${COLOR}Error: VDOM is not supported on this device.\${RESET}\n\"
+                        puts stderr \"\${COLOR}Error: VDOM is not supported on this device.\${RESET}\"
                         exit 1
                     }
-                    \"$fExpectRoot\" {
+                    -re {$fGroupPattern} {
                         send \"edit $fVdom\r\"
-                        expect \"$fExpectRoot\"
                     }
                 }
             }
-            \"$fExpectUser\" {
-                puts -nonewline \"$USER_NOTATION \${MAGENTA}VDOM is not supported on this device\${RESET}\"
-                flush stdout
-                send \"\r\"
-                expect \"$fExpectUser\"
-            }
         }
+        expect -re {$fGroupPattern}
     }
 
     proc handle_eof {} {
