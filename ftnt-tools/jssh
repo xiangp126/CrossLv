@@ -330,7 +330,7 @@ expect -c "
     while {\$i <= $fMaxAttempts} {
         # ssh -o StrictHostKeyChecking=no $fSSHTarget
         if {\$i > 1} {
-            puts \"$USER_NOTATION \${COLOR}Login attempt \$i/$fMaxAttempts${RESET}\n\"
+            puts \"$USER_NOTATION \${COLOR}Login attempt \$i/$fMaxAttempts\${RESET}\n\"
         }
 
 
