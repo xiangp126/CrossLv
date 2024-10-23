@@ -333,7 +333,6 @@ expect -c "
                     set output \$expect_out(buffer)
                     puts -nonewline stderr \"\$output\"
                     set expect_out(buffer) \"\"
-                    log_user 1
                 }
 
                 incr ssh_pwd_prompt_cnt
@@ -367,6 +366,7 @@ expect -c "
                     set expect_out(buffer) \"\"
                     log_user 1
                 }
+                exp_continue
             }
             {Host key verification failed.} {
                 puts \"$USER_NOTATION \${COLOR}Host key verification failed. Updating known_hosts file ...\${RESET}\n\"
