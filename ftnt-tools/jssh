@@ -18,7 +18,7 @@
 #
 # and then
 # $ ssh -l admin -p 8881 localhost
-# or use
+# or
 # $ jssh -l admin -P 8881 -t localhost
 
 # Shared Variables
@@ -32,8 +32,8 @@ fServerAliveInterval=30
 fServerAliveCountMax=3
 # Exp: ssh -t admin@172.18.52.37 -p 123 -c "tcpdump -i eth3 -s 0 -w - 'not port 22'" | wireshark -k -i -
 # WireShark Live Capture: In this mode, Expect will not send any password prompts to stdout.
-fLiveCapture=""
-fCapturedFile="/tmp/captured.pcap"
+fNeedRedir=""
+fRedirFile="/tmp/captured.pcap"
 # SSH Variables
 fSSHTarget="fgt1"
 fSSHUser="admin"
@@ -69,21 +69,21 @@ cat << _EOF
 $SCRIPT_NAME 1.0
 
 usage:
-    $SCRIPT_NAME [-l/-u user] [-p passwd] [-P ssh_port] [-J jump_server] [-W jump_passwd] [-C]
+    $SCRIPT_NAME [-l/-u user] [-p passwd] [-P ssh_port] [-J jump_server] [-W jump_passwd] [-R]
          [-v vdom] [-F] [-c ssh_cmd] -t target_ip
 
     Default to SSH, use -F to switch to SFTP
 
 Options:
-    -t     target        The device to connect to. Default is "$fSSHTarget"
-    -l/-u  username      Username for login. Default is "$fSSHUser"
-    -p     password      Password for login. Default is "$fSSHPwd"
+    -t     Target        The device to connect to. Default is "$fSSHTarget"
+    -l/-u  Username      Username for login. Default is "$fSSHUser"
+    -p     Password      Password for login. Default is "$fSSHPwd"
     -P     Port          SSH Port to connect to. Default is "$fSSHPort"
+    -v     Vdom          Specify the VDOM. Default is "$fVdom"
     -c     Command       Execute commands remotely without opening an interactive login session
-    -C     Live Capture  Should be set when using WireShark Live Capture via pipe
+    -R     Redirect      Redirect the output to named pipe: $fRedirFile for live capture
     -J     Jump Server   The jump server to connect to. Format: user@jumpserver[:port]
     -W     Jump Passwd   Password for jump server. Default is "$fJumpPwd"
-    -v     vdom          Specify the VDOM. Default is "$fVdom"
     -F     SFTP          Switch to SFTP
     -h     Help          Print this help message
 
@@ -94,8 +94,7 @@ Example:
     $SCRIPT_NAME -t 172.18.52.37 -l admin -p "FGT\!34" -c "whoami"
     $SCRIPT_NAME -t 172.18.52.37 -l admin -p "FGT\!34" -P 8822 -v root
     # Remote Live Capture
-    # Do not use $SCRIPT_NAME since it can not capture the password prompt before the redirection
-    ssh -t 172.18.52.37 -l admin -p "FGT\!34" -c "tcpdump -i eth3 -s 0 -w - 'not port 22'" | wireshark -k -i -
+    $SCRIPT_NAME -t 172.18.52.37 -l admin -p "FGT\!34" -R
     # SSH with a Jump Server
     $SCRIPT_NAME -J auto@172.18.20.84:8022 -W qaz -t test@10.120.1.111:2121 -p 123
     $SCRIPT_NAME -J auto@172.18.20.84:8022 -W qaz -t test@10.120.1.111 -P 2121 -p 123
@@ -111,7 +110,7 @@ _EOF
 [[ $# -eq 0 ]] && usage
 
 # Parse command-line options
-while getopts "t:l:u:p:P:J:W:v:c:FCh" opt; do
+while getopts "t:l:u:p:P:J:W:v:c:FRh" opt; do
     case ${opt} in
         t)
             fSSHTarget=$OPTARG
@@ -136,8 +135,19 @@ while getopts "t:l:u:p:P:J:W:v:c:FCh" opt; do
                 fSSHExecNoLogin=true
             fi
             ;;
-        C)
-            fLiveCapture=true
+        R)
+            fNeedRedir=true
+            if [ ! -p "$fRedirFile" ]; then
+                COLOR=$MAGENTA
+                echo -e "$USER_NOTATION ${COLOR}Creating the capture file: $fRedirFile${RESET}" >&2
+                rm -f "$fRedirFile" &> /dev/null
+                mkfifo "$fRedirFile"
+                if [ $? -ne 0 ]; then
+                    COLOR=$MAGENTA
+                    echo -e "$USER_NOTATION ${COLOR}Failed to create the capture file: $fRedirFile${RESET}" >&2
+                    exit 1
+                fi
+            fi
             ;;
         J)
             fWithJumpServer=true
@@ -306,6 +316,11 @@ expect -c "
 
     if {\"$fSSHExecNoLogin\" != \"\"} {
         set timeout -1
+        trap {
+            set COLOR \$MAGENTA
+            puts stderr \"\n$USER_NOTATION \${COLOR}CTRL+C captured; Program ended.\${RESET}\"
+            exit 1
+        } SIGINT
     } else {
         set timeout 5
     }
@@ -318,14 +333,20 @@ expect -c "
             puts \"$USER_NOTATION \${COLOR}Login attempt \$i/$fMaxAttempts${RESET}\n\"
         }
 
-        set fd [open $fCapturedFile w]
+
+        if {\"$fNeedRedir\" != \"\"} {
+            set output_file $fRedirFile
+            # Start logging to the output_file
+            # The output here is a named pipe, so the write operation will block until the other end reads.
+            log_file -noappend \$output_file
+
+            # Stop logging by calling log_file without arguments. Don't stop logging here.
+            # log_file
+        }
+
         spawn -noecho $fSpawnCmd
+        set ssh_session_id \$spawn_id
 
-        # log_file \$fd
-
-        # puts \"Hello, I am in the spawn command.\"
-
-        set session_id \$spawn_id
         set ssh_pwd_prompt_cnt 0
         set jmp_pwd_prompt_cnt 0
 
@@ -334,7 +355,7 @@ expect -c "
                 send \"yes\r\"
                 exp_continue
             }
-            -re \"$fSSHUser@$fSSHTarget's (password|Password):\" {
+            -re {$fSSHUser@$fSSHTarget's (password|Password):} {
                 incr ssh_pwd_prompt_cnt
                 if {\$ssh_pwd_prompt_cnt > 1} {
                     puts stderr \"\n$USER_NOTATION \${COLOR}Login credentials for SSH Target: $fSSHTarget are wrong.\${RESET}\n\"
@@ -343,7 +364,7 @@ expect -c "
                 send \"$fSSHPwd\r\"
                 exp_continue
             }
-            -re \"$fJumpUser@$fJumpServer's (password|Password):\" {
+            -re {$fJumpUser@$fJumpServer's (password|Password):} {
                 incr jmp_pwd_prompt_cnt
                 if {\$jmp_pwd_prompt_cnt > 1} {
                     puts stderr \"\n$USER_NOTATION \${COLOR}Login credentials for Jump Server: $fJumpServer are wrong.\${RESET}\n\"
@@ -356,7 +377,7 @@ expect -c "
                 puts stderr \"$USER_NOTATION \${COLOR}Host key verification failed. Updating known_hosts file ...\${RESET}\n\"
                 system \"ssh-keygen -R $fSSHTarget\"
                 puts stderr \"$USER_NOTATION \${COLOR}Host key removed from known_hosts file.\${RESET}\n\"
-                # close \$session_id
+                # close \$ssh_session_id
                 incr i
                 continue
             }
@@ -369,7 +390,7 @@ expect -c "
             }
             timeout {
                 puts stderr \"$USER_NOTATION \${COLOR}Timed out waiting for a response.\${RESET}\n\"
-                # close \$session_id
+                # close \$ssh_session_id
                 incr i
                 continue
             }
