@@ -359,11 +359,14 @@ expect -c "
                 send \"$fJumpPwd\r\"
                 exp_continue
             }
-            # expect string like: tcpdump: listening on eth3, link-type EN10MB (Ethernet), capture size 65535 bytes
-            -re \"^tcpdump:.*\$\" {
-                set COLOR \$GREEN
-                puts \"\${COLOR}\$expect_out(buffer)\${RESET}\"
-                exp_continue
+            # tcpdump: listening on eth3, link-type EN10MB (Ethernet), capture size 65535 bytes
+            -re \"tcpdump: listening on .*\$\"
+                if {\"$fLiveCapture\" != \"\"} {
+                    set output \$expect_out(buffer)
+                    puts -nonewline stderr \"\$output\"
+                    set expect_out(buffer) \"\"
+                    log_user 1
+                }
             }
             {Host key verification failed.} {
                 puts \"$USER_NOTATION \${COLOR}Host key verification failed. Updating known_hosts file ...\${RESET}\n\"
