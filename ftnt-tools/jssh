@@ -337,7 +337,7 @@ expect -c "
             -re \"$fSSHUser@$fSSHTarget's (password|Password):\" {
                 incr ssh_pwd_prompt_cnt
                 if {\$ssh_pwd_prompt_cnt > 1} {
-                    puts \"\n$USER_NOTATION \${COLOR}Login credentials for SSH Target: $fSSHTarget are wrong.\${RESET}\n\"
+                    puts stderr \"\n$USER_NOTATION \${COLOR}Login credentials for SSH Target: $fSSHTarget are wrong.\${RESET}\n\"
                     exit 1
                 }
                 send \"$fSSHPwd\r\"
@@ -346,29 +346,29 @@ expect -c "
             -re \"$fJumpUser@$fJumpServer's (password|Password):\" {
                 incr jmp_pwd_prompt_cnt
                 if {\$jmp_pwd_prompt_cnt > 1} {
-                    puts \"\n$USER_NOTATION \${COLOR}Login credentials for Jump Server: $fJumpServer are wrong.\${RESET}\n\"
+                    puts stderr \"\n$USER_NOTATION \${COLOR}Login credentials for Jump Server: $fJumpServer are wrong.\${RESET}\n\"
                     exit 1
                 }
                 send \"$fJumpPwd\r\"
                 exp_continue
             }
             {Host key verification failed.} {
-                puts \"$USER_NOTATION \${COLOR}Host key verification failed. Updating known_hosts file ...\${RESET}\n\"
+                puts stderr \"$USER_NOTATION \${COLOR}Host key verification failed. Updating known_hosts file ...\${RESET}\n\"
                 system \"ssh-keygen -R $fSSHTarget\"
-                puts \"$USER_NOTATION \${COLOR}Host key removed from known_hosts file.\${RESET}\n\"
+                puts stderr \"$USER_NOTATION \${COLOR}Host key removed from known_hosts file.\${RESET}\n\"
                 # close \$session_id
                 incr i
                 continue
             }
             {No route to host} {
-                puts \"$USER_NOTATION \${COLOR}No route to host.\${RESET}\n\"
+                puts stderr \"$USER_NOTATION \${COLOR}No route to host.\${RESET}\n\"
                 exit 1
             }
             -re {$fGroupPattern} {
                 break
             }
             timeout {
-                puts \"$USER_NOTATION \${COLOR}Timed out waiting for a response.\${RESET}\n\"
+                puts stderr \"$USER_NOTATION \${COLOR}Timed out waiting for a response.\${RESET}\n\"
                 # close \$session_id
                 incr i
                 continue
@@ -381,7 +381,7 @@ expect -c "
     }
 
     if {\$i > $fMaxAttempts} {
-        puts \"$USER_NOTATION Failed to connect to $fSSHTarget\n\"
+        puts stderr \"$USER_NOTATION Failed to connect to $fSSHTarget\n\"
         exit 1
     }
 
@@ -393,23 +393,22 @@ expect -c "
     }
 
     puts -nonewline stderr \"$USER_NOTATION \${MAGENTA}Successfully connected to $fSSHTarget\${RESET}\"
-    flush stdout
+    # flush stdout
     send \"\r\"
 
-    # check if fVdom is specified (only for SSH)
+    # Check if VDOM is supported. VDOM is only supported on FGT/FPX
     if {\"$fVdom\" != \"\"} {
         set timeout 3
         expect {
             -re {$fDollarPattern} {
-                puts -nonewline \"$USER_NOTATION \${MAGENTA}VDOM is not supported on this device\${RESET}\"
-                flush stdout
+                puts -nonewline stderr \"$USER_NOTATION \${MAGENTA}VDOM is not supported on this device\${RESET}\"
                 send \"\r\"
             }
             # Only for FGT/FPX
             -re {$fPoundPattern} {
                 send \"config vdom\r\"
                 expect {
-                    {Command fail.} {
+                    -re {Command fail.|not found,} {
                         set COLOR \$BLUE
                         puts stderr \"\${COLOR}Error: VDOM is not supported on this device.\${RESET}\"
                         exit 1
