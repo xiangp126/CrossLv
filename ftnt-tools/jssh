@@ -30,10 +30,9 @@ fPoundPattern='#\s*$'
 fSwitchToSftp=""
 fServerAliveInterval=30
 fServerAliveCountMax=3
-# Exp: ssh -t admin@172.18.52.37 -p 123 -c "tcpdump -i eth3 -s 0 -w - 'not port 22'" | wireshark -k -i -
-# WireShark Live Capture: In this mode, Expect will not send any password prompts to stdout.
-fNeedRedir=""
-fRedirFile="/tmp/captured.pcap"
+fLiveCapture=""
+fLiveCapturePort="7777"
+fLCBaseCmd=""
 # SSH Variables
 fSSHTarget="fgt1"
 fSSHUser="admin"
@@ -41,14 +40,14 @@ fSSHPwd="password"
 fSSHPort=22
 fVdom=""
 fSSHCmd="" # The command to execute remotely without opening an interactive login session
-fSSHExecNoLogin=""
+fSSHNoShell=""
 fSpawnCmd=""
 # Jump Server Variables
 fJumpServer=""
 fJumpUser=""
 fJumpPwd=""
 fJumpPort=22
-fWithJumpServer=""
+fNeedJumpServer=""
 fMaxAttempts=2
 # Constants
 SCRIPT_NAME=$(basename "$0")
@@ -69,7 +68,7 @@ cat << _EOF
 $SCRIPT_NAME 1.0
 
 usage:
-    $SCRIPT_NAME [-l/-u user] [-p passwd] [-P ssh_port] [-J jump_server] [-W jump_passwd] [-R]
+    $SCRIPT_NAME [-l/-u user] [-p passwd] [-P ssh_port] [-J jump_server] [-W jump_passwd] [-C]
          [-v vdom] [-F] [-c ssh_cmd] -t target_ip
 
     Default to SSH, use -F to switch to SFTP
@@ -81,7 +80,7 @@ Options:
     -P     Port          SSH Port to connect to. Default is "$fSSHPort"
     -v     Vdom          Specify the VDOM. Default is "$fVdom"
     -c     Command       Execute commands remotely without opening an interactive login session
-    -R     Redirect      Redirect the output to named pipe: $fRedirFile for live capture
+    -C     Capture       Live capture packets from the remote device
     -J     Jump Server   The jump server to connect to. Format: user@jumpserver[:port]
     -W     Jump Passwd   Password for jump server. Default is "$fJumpPwd"
     -F     SFTP          Switch to SFTP
@@ -110,7 +109,7 @@ _EOF
 [[ $# -eq 0 ]] && usage
 
 # Parse command-line options
-while getopts "t:l:u:p:P:J:W:v:c:FRh" opt; do
+while getopts "t:l:u:p:P:J:W:v:c:FCh" opt; do
     case ${opt} in
         t)
             fSSHTarget=$OPTARG
@@ -132,25 +131,14 @@ while getopts "t:l:u:p:P:J:W:v:c:FRh" opt; do
             fSSHCmd=$OPTARG
             if [ -n "$fSSHCmd" ]; then
                 # Only set this flag when $fSSHCmd is not empty
-                fSSHExecNoLogin=true
+                fSSHNoShell=true
             fi
             ;;
-        R)
-            fNeedRedir=true
-            if [ ! -p "$fRedirFile" ]; then
-                COLOR=$MAGENTA
-                echo -e "$USER_NOTATION ${COLOR}Creating the capture file: $fRedirFile${RESET}" >&2
-                rm -f "$fRedirFile" &> /dev/null
-                mkfifo "$fRedirFile"
-                if [ $? -ne 0 ]; then
-                    COLOR=$MAGENTA
-                    echo -e "$USER_NOTATION ${COLOR}Failed to create the capture file: $fRedirFile${RESET}" >&2
-                    exit 1
-                fi
-            fi
+        C)
+            fLiveCapture=true
             ;;
         J)
-            fWithJumpServer=true
+            fNeedJumpServer=true
             fJumpServer=$OPTARG
             ;;
         W)
@@ -198,7 +186,7 @@ parseAndCheck() {
     fi
 
     # Check if the jump server is in the format of user@jumpserver:port
-    if [ "$fWithJumpServer" = true ]; then
+    if [ "$fNeedJumpServer" = true ]; then
         # Exp: fJumpServer=auto@172.18.20.84:2121
         param=$fJumpServer
         if [[ $fJumpServer == *@* ]]; then
@@ -227,32 +215,45 @@ preSet() {
     if [ -n "$fSwitchToSftp" ]; then
         fVdom=""
         fSSHCmd=""
-        fSSHExecNoLogin=""
+        fSSHNoShell=""
+        fLiveCapture=""
     fi
-    # If $fSSHExecNoLogin is set, disable $fVdom
-    if [ -n "$fSSHExecNoLogin" ]; then
-        fVdom=""
+    [ -n "$fSSHNoShell" ] && fVdom=""
+
+    # If $fLiveCapture is set, check if $fSSHCmd contains "tcpdump". If not reset $fLiveCapture
+    if [ -n "$fLiveCapture" ]; then
+        if [[ ! $fSSHCmd == *"tcpdump"* ]]; then
+            fLiveCapture=""
+        fi
     fi
 
     # SSH Command
+    cmd=$fSSHCmd
     if [ -z "$fSwitchToSftp" ]; then
-        if [ -n "$fWithJumpServer" ]; then
-            fSpawnCmd="ssh -J $fJumpUser@$fJumpServer:$fJumpPort \
-                         -o ServerAliveInterval=$fServerAliveInterval \
-                         -o ServerAliveCountMax=$fServerAliveCountMax \
-                         -p $fSSHPort $fSSHUser@$fSSHTarget"
-        else
-            fSpawnCmd="ssh -o ServerAliveInterval=$fServerAliveInterval \
-                         -o ServerAliveCountMax=$fServerAliveCountMax \
-                         -p $fSSHPort $fSSHUser@$fSSHTarget"
+        fSpawnCmd="ssh -p $fSSHPort $fSSHUser@$fSSHTarget"
+
+        # Via a Jump Server
+        if [ -n "$fNeedJumpServer" ]; then
+            fSpawnCmd="$fSpawnCmd -J $fJumpUser@$fJumpServer:$fJumpPort"
         fi
-        [ -n "$fSSHExecNoLogin" ] && fSpawnCmd="$fSpawnCmd \"$fSSHCmd\""
+        fLCBaseCmd="$fSpawnCmd \"$fSSHCmd\"" # For printing purpose only
+
+        if [ -n "$fLiveCapture" ]; then
+            cmd="$cmd | nc -l -p $fLiveCapturePort"
+        fi
+
+        fSpawnCmd="$fSpawnCmd \"$cmd\""
+        # Keep the connection alive for login sessions
+        if [ -z "$fSSHNoShell" ]; then
+            fSpawnCmd="$fSpawnCmd \
+                        -o ServerAliveInterval=$fServerAliveInterval \
+                        -o ServerAliveCountMax=$fServerAliveCountMax"
+        fi
     # SFTP command. SFTP does not support $fSSHCmd
     else
-        if [ -n "$fWithJumpServer" ]; then
-            fSpawnCmd="sftp -o \"ProxyJump=$fJumpUser@$fJumpServer\" -P $fSSHPort $fSSHUser@$fSSHTarget"
-        else
-            fSpawnCmd="sftp -P $fSSHPort $fSSHUser@$fSSHTarget"
+        fSpawnCmd="sftp -P $fSSHPort $fSSHUser@$fSSHTarget"
+        if [ -n "$fNeedJumpServer" ]; then
+            fSpawnCmd="$fSpawnCmd -o \"ProxyJump=$fJumpUser@$fJumpServer\""
         fi
     fi
     # Squash multiple spaces into one
@@ -278,7 +279,7 @@ if [ -n "$fVdom" ]; then
     echo -e "$USER_NOTATION [v] Set FGT/FPX VDOM to: ${COLOR}$fVdom${RESET}" >&2
 fi
 echo -e "$USER_NOTATION [-] Set Maximum Attempts to: ${COLOR}$fMaxAttempts${RESET}" >&2
-if [ -n "$fWithJumpServer" ]; then
+if [ -n "$fNeedJumpServer" ]; then
     echo "$SHORT_SEPARATOR" >&2
     echo -e "$USER_NOTATION [J] Set Jump Server to: ${COLOR}$fJumpServer${RESET}" >&2
     echo -e "$USER_NOTATION [-] Set Jump Username to: ${COLOR}$fJumpUser${RESET}" >&2
@@ -291,10 +292,15 @@ if [ -n "$fWithJumpServer" ]; then
     fi
     # echo "$SEPARATOR" >&2
 fi
-COLOR=$BLUE && echo -e "$USER_NOTATION ${COLOR}$fSpawnCmd${RESET}" >&2
+COLOR=$BLUE && echo -e "${COLOR}$fSpawnCmd${RESET}" >&2
+if [ -n "$fLiveCapture" ]; then
+    echo -e "${COLOR}nc $fSSHTarget $fLiveCapturePort${RESET}" >&2
+    COLOR=$MAGENTA && echo -e "${COLOR}$fLCBaseCmd | wireshark -k -i -${RESET}" >&2
+fi
+echo "$SEPARATOR" >&2
 COLOR=$GREY
 echo -ne "$USER_NOTATION ${COLOR}Connecting to $fSSHTarget" >&2
-if [ -n "$fWithJumpServer" ]; then
+if [ -n "$fNeedJumpServer" ]; then
     echo -ne " via Jump Server: $fJumpServer" >&2
 fi
 echo -e " ...${RESET}" >&2
@@ -314,12 +320,12 @@ expect -c "
     set CYAN    \"\033\[36m\"
     set WHITE   \"\033\[37m\"
 
-    if {\"$fSSHExecNoLogin\" != \"\"} {
+    if {\"$fSSHNoShell\" != \"\"} {
         set timeout -1
         trap {
             set COLOR \$MAGENTA
-            puts stderr \"\n$USER_NOTATION \${COLOR}CTRL+C captured; Program ended.\${RESET}\"
-            exit 1
+            puts stderr \"\n$USER_NOTATION \${COLOR}CTRL+C captured; Sending SIGINT to remote as well.\${RESET}\"
+            send \"\x03\"
         } SIGINT
     } else {
         set timeout 5
@@ -333,19 +339,7 @@ expect -c "
             puts \"$USER_NOTATION \${COLOR}Login attempt \$i/$fMaxAttempts\${RESET}\n\"
         }
 
-
-        if {\"$fNeedRedir\" != \"\"} {
-            set output_file $fRedirFile
-            # Start logging to the output_file
-            # The output here is a named pipe, so the write operation will block until the other end reads.
-            log_file -noappend \$output_file
-
-            # Stop logging by calling log_file without arguments. Don't stop logging here.
-            # log_file
-        }
-
         spawn -noecho $fSpawnCmd
-        set ssh_session_id \$spawn_id
 
         set ssh_pwd_prompt_cnt 0
         set jmp_pwd_prompt_cnt 0
@@ -373,11 +367,14 @@ expect -c "
                 send \"$fJumpPwd\r\"
                 exp_continue
             }
+            {Address already in use} {
+                puts stderr \"$USER_NOTATION \${COLOR}Port already in use. killall nc.\${RESET}\n\"
+                exit 1
+            }
             {Host key verification failed.} {
                 puts stderr \"$USER_NOTATION \${COLOR}Host key verification failed. Updating known_hosts file ...\${RESET}\n\"
                 system \"ssh-keygen -R $fSSHTarget\"
                 puts stderr \"$USER_NOTATION \${COLOR}Host key removed from known_hosts file.\${RESET}\n\"
-                # close \$ssh_session_id
                 incr i
                 continue
             }
@@ -406,7 +403,7 @@ expect -c "
         exit 1
     }
 
-    if {\"$fSSHExecNoLogin\" != \"\"} {
+    if {\"$fSSHNoShell\" != \"\"} {
         expect eof {
             puts stderr \"$USER_NOTATION \${MAGENTA}Successfully executed the command remotely.\${RESET}\"
             exit 0
