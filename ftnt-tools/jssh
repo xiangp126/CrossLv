@@ -57,6 +57,9 @@ SHORT_SEPARATOR="--------------------------------------"
 # Colors
 RED='\033[31m'
 MAGENTA='\033[35m'
+CYAN='\033[36m'
+BLACK='\033[30m'
+YELLOW='\033[33m'
 GREEN='\033[32m'
 GREY='\033[90m'
 BLUE='\033[34m'
@@ -93,7 +96,7 @@ Example:
     $SCRIPT_NAME -t 172.18.52.37 -l admin -p "FGT\!34" -c "whoami"
     $SCRIPT_NAME -t 172.18.52.37 -l admin -p "FGT\!34" -P 8822 -v root
     # Remote Live Capture
-    $SCRIPT_NAME -t 172.18.52.37 -l admin -p "FGT\!34" -R
+    $SCRIPT_NAME -t 172.18.52.37 -l admin -p "FGT\!34" -c "tcpdump -i any -s 0 -w - 'not port 22'" -C
     # SSH with a Jump Server
     $SCRIPT_NAME -J auto@172.18.20.84:8022 -W qaz -t test@10.120.1.111:2121 -p 123
     $SCRIPT_NAME -J auto@172.18.20.84:8022 -W qaz -t test@10.120.1.111 -P 2121 -p 123
@@ -290,12 +293,12 @@ if [ -n "$fNeedJumpServer" ]; then
         echo -e "$USER_NOTATION ${COLOR}Jump Server and its credentials are not set properly.${RESET}" >&2
         exit 1
     fi
-    # echo "$SEPARATOR" >&2
 fi
+[ -n "$fLiveCapture" ] && echo -e "$USER_NOTATION [C] nc Listens remotely on Port: ${COLOR}$fLiveCapturePort${RESET}" >&2
 COLOR=$BLUE && echo -e "${COLOR}$fSpawnCmd${RESET}" >&2
 if [ -n "$fLiveCapture" ]; then
     echo -e "${COLOR}nc $fSSHTarget $fLiveCapturePort${RESET}" >&2
-    COLOR=$MAGENTA && echo -e "${COLOR}$fLCBaseCmd | wireshark -k -i -${RESET}" >&2
+    COLOR=$CYAN && echo -e "${COLOR}$fLCBaseCmd | wireshark -k -i -${RESET}" >&2
 fi
 echo "$SEPARATOR" >&2
 COLOR=$GREY
@@ -315,17 +318,25 @@ expect -c "
     set RED     \"\033\[31m\"
     set GREEN   \"\033\[32m\"
     set YELLOW  \"\033\[33m\"
+    set LIGHTYELLOW \"\033\[93m\"
     set BLUE    \"\033\[34m\"
     set MAGENTA \"\033\[35m\"
     set CYAN    \"\033\[36m\"
-    set WHITE   \"\033\[37m\"
+    set GREY    \"\033\[90m\"
 
     if {\"$fSSHNoShell\" != \"\"} {
         set timeout -1
         trap {
             set COLOR \$MAGENTA
-            puts stderr \"\n$USER_NOTATION \${COLOR}CTRL+C captured; Sending SIGINT to remote as well.\${RESET}\"
-            send \"\x03\"
+            if {\"$fLiveCapture\" != \"\"} {
+                set COLOR \$LIGHTYELLOW
+                puts stderr \"\n$USER_NOTATION \${COLOR}CTRL+C captured; Clearing all nc session on the remote.\${RESET}\"
+                set COLOR \$MAGENTA
+                system $SCRIPT_NAME -t $fSSHTarget -l $fSSHUser -p $fSSHPwd -P $fSSHPort -c 'killall nc'
+            } else {
+                puts stderr \"\n$USER_NOTATION \${COLOR}CTRL+C captured; Sending SIGINT to remote as well.\${RESET}\"
+                send \"\x03\"
+            }
         } SIGINT
     } else {
         set timeout 5
@@ -340,6 +351,8 @@ expect -c "
         }
 
         spawn -noecho $fSpawnCmd
+        set session_id [exp_pid]
+        puts stderr \"$USER_NOTATION \${COLOR}Spawned Session ID: \$session_id\${RESET}\"
 
         set ssh_pwd_prompt_cnt 0
         set jmp_pwd_prompt_cnt 0
@@ -367,10 +380,6 @@ expect -c "
                 send \"$fJumpPwd\r\"
                 exp_continue
             }
-            {Address already in use} {
-                puts stderr \"$USER_NOTATION \${COLOR}Port already in use. killall nc.\${RESET}\n\"
-                exit 1
-            }
             {Host key verification failed.} {
                 puts stderr \"$USER_NOTATION \${COLOR}Host key verification failed. Updating known_hosts file ...\${RESET}\n\"
                 system \"ssh-keygen -R $fSSHTarget\"
@@ -392,7 +401,7 @@ expect -c "
                 continue
             }
             eof {
-                puts stderr \"$USER_NOTATION \${COLOR}Reached EOF. Program ended.\${RESET}\"
+                puts stderr \"$USER_NOTATION \${COLOR}Session \$session_id Reached EOF. Program ended.\${RESET}\"
                 exit 0
             }
         }
