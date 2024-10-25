@@ -65,6 +65,7 @@ SEPARATOR_LEFT="<---------------------------------------------------"
 SEPARATOR_RIGHT="--------------------------------------------------->"
 # Colors
 RED='\033[31m'
+LIGHTRED='\033[91m'
 MAGENTA='\033[35m'
 CYAN='\033[36m'
 BLACK='\033[30m'
@@ -73,9 +74,12 @@ YELLOW='\033[33m'
 LIGHTYELLOW='\033[93m'
 GREEN='\033[32m'
 LIGHTGREEN='\033[92m'
-LIGHTBLUE='\033[94m'
 GREY='\033[90m'
 BLUE='\033[34m'
+LIGHTBLUE='\033[94m'
+BACKGROUNDBLACK='\033[40m'
+PURPLE='\033[35m'
+LIGHTPURPLE='\033[95m'
 NORMAL='\033[0m'
 BOLD='\033[1m'
 RESET='\033[0m'
@@ -345,14 +349,14 @@ setSpawnCmd
 
 echo "$SEPARATOR_RIGHT" >&2
 if [ -n "$fNeedLocalForwarder" ]; then
-    COLOR=$RED
+    COLOR=$LIGHTRED
     echo -e "${BOLD}Local Forwarder Options:${RESET}" >&2
     echo -e "[-] Set Local Bind Address to: ${COLOR}$fLFLocalAddr${RESET}" >&2
     echo -e "[-] Set Local Bind Port to: ${COLOR}$fLFLocalPort${RESET}" >&2
     echo -e "[L] Set Local Forwarder: ${COLOR}$fLFLocalAddr:$fLFLocalPort -> $fTarget:$fTargetPort${RESET}" >&2
 else
     echo -e "${BOLD}Target Options:${RESET}" >&2
-    COLOR="$RED"
+    COLOR=$LIGHTRED
     echo -e "[t] Set SSH Target Device to: ${COLOR}$fTarget${RESET}" >&2
     echo -e "[l] Set SSH Username to: ${COLOR}$fTargetUser${RESET}" >&2
     echo -e "[p] Set SSH Password to: ${COLOR}$fTargetPwd${RESET}" >&2
@@ -378,7 +382,7 @@ fi
 
 [ -n "$fLiveCapture" ] && echo -e "[C] nc Listens remotely on Port: ${COLOR}$fLCPort${RESET}" >&2
 
-COLOR=$BLUE
+COLOR=$LIGHTYELLOW
 echo -e "${BOLD}Spawned Command:${RESET}" >&2
 echo -e "${COLOR}$fSpawnCmd${RESET}" >&2
 
@@ -411,7 +415,7 @@ dumpLCTips() {
     fi
 }
 
-dumpLCTips "$LIGHTYELLOW"
+dumpLCTips "$BLUE"
 [ -n "$fNeedJumpServer" ] && dumpLFTips "$LIGHTGREEN"
 
 echo "$SEPARATOR_LEFT" >&2
@@ -443,23 +447,34 @@ expect -c "
     set CYAN    \"\033\[36m\"
     set GREY    \"\033\[90m\"
 
+    # Function to clear all nc sessions on the remote
+    proc clear_nc_sessions {{err_msg \"\"}} {
+        global COLOR LIGHTYELLOW MAGENTA RESET
+        # Var defined here is in local scope
+        set COLOR \$LIGHTYELLOW
+        if {\$err_msg != \"\"} {
+            puts stderr \"$USER_NOTATION \${COLOR}Error: \$err_msg\${RESET}\"
+        }
+        puts stderr \"$USER_NOTATION \${COLOR}Sending commands to clear all nc session on the remote.\n\${RESET}\"
+        if {\"$fNeedJumpServer\" != \"\"} {
+            system $SCRIPT_NAME -t $fTargetUser@$fTarget:$fTargetPort -p $fTargetPwd -J $fJumpOptions -W $fJumpPwd -c 'killall nc\; killall tcpdump'^
+        } else {
+            system $SCRIPT_NAME -t $fTargetUser@$fTarget:$fTargetPort -p $fTargetPwd -c 'killall nc\; killall tcpdump'
+        }
+    }
+
     if {\"$fNoShell\" != \"\" || \"$fNeedLocalForwarder\" != \"\"} {
         set timeout -1
         trap {
-            set COLOR \$MAGENTA
+            set COLOR \$LIGHTYELLOW
             if {\"$fLiveCapture\" != \"\"} {
-                set COLOR \$LIGHTYELLOW
-                puts stderr \"\n$USER_NOTATION \${COLOR}CTRL+C captured; Sending commands to Clear all nc session on the remote.\n\${RESET}\"
-                set COLOR \$MAGENTA
-                if {\"$fNeedJumpServer\" != \"\"} {
-                    system $SCRIPT_NAME -t $fTargetUser@$fTarget:$fTargetPort -p $fTargetPwd -J $fJumpOptions -W $fJumpPwd -c 'killall nc'
-                } else {
-                    system $SCRIPT_NAME -t $fTargetUser@$fTarget:$fTargetPort -p $fTargetPwd -c 'killall nc'
-                }
+                puts stderr \"\n$USER_NOTATION \${COLOR}CTRL+C captured.\${RESET}\"
+                clear_nc_sessions
             } else {
                 puts stderr \"\n$USER_NOTATION \${COLOR}CTRL+C captured; Sending SIGINT to remote as well.\${RESET}\"
                 send \"\x03\"
             }
+            set COLOR \$MAGENTA
         } SIGINT
     } else {
         set timeout 5
@@ -475,7 +490,7 @@ expect -c "
 
         spawn -noecho $fSpawnCmd
         set session_id [exp_pid]
-        puts stderr \"$USER_NOTATION \${COLOR}Spawned Session ID: \$session_id\${RESET}\"
+        puts stderr \"\${COLOR}Spawned Session ID: \$session_id\${RESET}\"
 
         set ssh_pwd_prompt_cnt 0
         set jmp_pwd_prompt_cnt 0
@@ -514,16 +529,12 @@ expect -c "
                 incr i
                 continue
             }
-            {You don't have permission to capture on that device} {
-                set COLOR \$LIGHTYELLOW
-                puts -nonewline stderr \"$USER_NOTATION \${COLOR}Error: You don't have permission to capture on that device.\${RESET}\n\"
-                puts stderr \"$USER_NOTATION \${COLOR}Sending commands to clear all nc session on the remote.\n\${RESET}\"
-                set COLOR \$MAGENTA
-                if {\"$fNeedJumpServer\" != \"\"} {
-                    system $SCRIPT_NAME -t $fTargetUser@$fTarget:$fTargetPort -p $fTargetPwd -J $fJumpOptions -W $fJumpPwd -c 'killall nc'
-                } else {
-                    system $SCRIPT_NAME -t $fTargetUser@$fTarget:$fTargetPort -p $fTargetPwd -c 'killall nc'
+            -re {tcpdump: syntax error|You don't have permission to capture on that device} {
+                set error_msg \$expect_out(0,string)
+                if {\"$fLiveCapture\" != \"\"} {
+                    clear_nc_sessions \$error_msg
                 }
+                puts stderr \"$USER_NOTATION \${COLOR}Error: \$error_msg\${RESET}\"
                 exp_continue
             }
             {No route to host} {
@@ -553,18 +564,15 @@ expect -c "
 
     if {\"$fNoShell\" != \"\"} {
         expect eof {
-            puts stderr \"$USER_NOTATION \${MAGENTA}Successfully executed the command remotely.\${RESET}\"
+            puts stderr \"\n$USER_NOTATION \${COLOR}Session \$session_id executed commands successfully.\${RESET}\"
             exit 0
         }
     }
 
-    puts -nonewline stderr \"$USER_NOTATION \${MAGENTA}Successfully connected to $fTarget\${RESET}\"
-    # flush stdout
-    send \"\r\"
-
     # Check if VDOM is supported. VDOM is only supported on FGT/FPX
     if {\"$fVdom\" != \"\"} {
         set timeout 3
+        send \"\r\"
         expect {
             -re {$fDollarPattern} {
                 puts -nonewline stderr \"$USER_NOTATION \${MAGENTA}VDOM is not supported on this device\${RESET}\"
@@ -576,7 +584,7 @@ expect -c "
                 expect {
                     -re {Command fail.|not found,} {
                         set COLOR \$BLUE
-                        puts stderr \"\${COLOR}Error: VDOM is not supported on this device.\${RESET}\"
+                        puts stderr \"\n\${COLOR}Error: VDOM is not supported on this device.\${RESET}\"
                         exit 1
                     }
                     -re {$fGroupPattern} {
