@@ -30,40 +30,54 @@ fPoundPattern='#\s*$'
 fSwitchToSftp=""
 fServerAliveInterval=30
 fServerAliveCountMax=3
+fMaxAttempts=2
+# Live Capture
 fLiveCapture=""
-fLiveCapturePort="7777"
+fLCPort="7777"
+fLCInterface="any"
 fLCBaseCmd=""
 # SSH Variables
-fSSHTarget="fgt1"
-fSSHUser="admin"
-fSSHPwd="password"
-fSSHPort=22
+fTarget=""
+fTargetUser="admin"
+fTargetPwd="password"
+fTargetPort=22
 fVdom=""
 fSSHCmd="" # The command to execute remotely without opening an interactive login session
-fSSHNoShell=""
+fNoShell=""
 fSpawnCmd=""
-# Jump Server Variables
+# Jump Server
+fNeedJumpServer=""
+fJumpOptions=""
 fJumpServer=""
 fJumpUser=""
-fJumpPwd=""
+fJumpPwd="password"
 fJumpPort=22
-fNeedJumpServer=""
-fMaxAttempts=2
+# Local Forwarder
+# -L [bind_address:]port:host:hostport
+fNeedLocalForwarder=""
+fLFOptions=""
+fLFLocalAddr="127.0.0.1"
+fLFLocalPort="8881"
 # Constants
 SCRIPT_NAME=$(basename "$0")
 USER_NOTATION="@@@@"
-SEPARATOR="---------------------------------------------------"
-SHORT_SEPARATOR="--------------------------------------"
+SEPARATOR_LEFT="<---------------------------------------------------"
+SEPARATOR_RIGHT="--------------------------------------------------->"
 # Colors
 RED='\033[31m'
 MAGENTA='\033[35m'
 CYAN='\033[36m'
 BLACK='\033[30m'
+PURPLE='\033[35m'
 YELLOW='\033[33m'
+LIGHTYELLOW='\033[93m'
 GREEN='\033[32m'
+LIGHTGREEN='\033[92m'
+LIGHTBLUE='\033[94m'
 GREY='\033[90m'
 BLUE='\033[34m'
 NORMAL='\033[0m'
+BOLD='\033[1m'
 RESET='\033[0m'
 
 usage() {
@@ -71,19 +85,22 @@ cat << _EOF
 $SCRIPT_NAME 1.0
 
 usage:
-    $SCRIPT_NAME [-l/-u user] [-p passwd] [-P ssh_port] [-J jump_server] [-W jump_passwd] [-C]
-         [-v vdom] [-F] [-c ssh_cmd] -t target_ip
+    $SCRIPT_NAME [-l/-u user] [-p passwd] [-P ssh_port] [-v vdom] [-F] [-h] -t [user@]target[:port]
+         [-c command] [-C]
+         [-J user@jumpserver[:port]] [-W jump_passwd]
+         [-L [local_bind_address:]local_port:remote_address:remoteport]
 
     Default to SSH, use -F to switch to SFTP
 
 Options:
-    -t     Target        The device to connect to. Default is "$fSSHTarget"
-    -l/-u  Username      Username for login. Default is "$fSSHUser"
-    -p     Password      Password for login. Default is "$fSSHPwd"
-    -P     Port          SSH Port to connect to. Default is "$fSSHPort"
+    -t     Target        The device to connect to. Default is "$fTarget"
+    -l/-u  Username      Username for login. Default is "$fTargetUser"
+    -p     Password      Password for login. Default is "$fTargetPwd"
+    -P     Port          SSH Port to connect to. Default is "$fTargetPort"
     -v     Vdom          Specify the VDOM. Default is "$fVdom"
     -c     Command       Execute commands remotely without opening an interactive login session
     -C     Capture       Live capture packets from the remote device
+    -L     Forwarder     Local Forwarder. Format: [local_bind_address:]local_port:remote_address:remoteport
     -J     Jump Server   The jump server to connect to. Format: user@jumpserver[:port]
     -W     Jump Passwd   Password for jump server. Default is "$fJumpPwd"
     -F     SFTP          Switch to SFTP
@@ -92,18 +109,17 @@ Options:
 Example:
     # SSH Connection
     $SCRIPT_NAME -t fpx1
-    $SCRIPT_NAME -t 172.18.52.37 -l admin -p "FGT\!34"
-    $SCRIPT_NAME -t 172.18.52.37 -l admin -p "FGT\!34" -c "whoami"
-    $SCRIPT_NAME -t 172.18.52.37 -l admin -p "FGT\!34" -P 8822 -v root
-    # Remote Live Capture
-    $SCRIPT_NAME -t 172.18.52.37 -l admin -p "FGT\!34" -c "tcpdump -i any -s 0 -w - 'not port 22'" -C
+    $SCRIPT_NAME -t 172.18.20.214 -l admin -p 1
     # SSH with a Jump Server
-    $SCRIPT_NAME -J auto@172.18.20.84:8022 -W qaz -t test@10.120.1.111:2121 -p 123
-    $SCRIPT_NAME -J auto@172.18.20.84:8022 -W qaz -t test@10.120.1.111 -P 2121 -p 123
+    $SCRIPT_NAME -J fpxauto@172.18.20.84:22 -t guodong@10.120.1.111 -P 2121 -p 123 -W qaz
     # SFTP Connection
-    $SCRIPT_NAME -t fpx1 -F
+    $SCRIPT_NAME -t 172.18.29.111 -l test -p test -F
     # SFTP with a Jump Server
-    $SCRIPT_NAME -J auto@172.18.20.84:8022 -W qaz -t test@10.120.1.111:2121 -p 123 -F
+    $SCRIPT_NAME -J fpxauto@172.18.20.84:22 -t guodong@10.120.1.111 -P 2121 -p 123 -W qaz -F
+    # Remote Live Capture
+    $SCRIPT_NAME -t 172.18.29.111 -l test -p test -c "tcpdump -i any -s 0 -U -n -w - 'not port 22'" -C
+    # Local Port Forwarding
+    $SCRIPT_NAME -L 127.0.0.1:8881:10.40.1.101:22 -J test@172.18.20.226 -W test
 
 _EOF
     exit 0
@@ -112,37 +128,41 @@ _EOF
 [[ $# -eq 0 ]] && usage
 
 # Parse command-line options
-while getopts "t:l:u:p:P:J:W:v:c:FCh" opt; do
+while getopts "t:l:u:p:P:J:W:v:c:FCL:h" opt; do
     case ${opt} in
         t)
-            fSSHTarget=$OPTARG
+            fTarget=$OPTARG
             ;;
         l) # User
-            fSSHUser=$OPTARG
+            fTargetUser=$OPTARG
             ;;
         u) # User
-            fSSHUser=$OPTARG
+            fTargetUser=$OPTARG
             ;;
         p)
-            fSSHPwd=$OPTARG
+            fTargetPwd=$OPTARG
             ;;
         P)
-            fSSHPort=$OPTARG
+            fTargetPort=$OPTARG
             ;;
         c)
             COLOR=$MAGENTA
             fSSHCmd=$OPTARG
             if [ -n "$fSSHCmd" ]; then
                 # Only set this flag when $fSSHCmd is not empty
-                fSSHNoShell=true
+                fNoShell=true
             fi
             ;;
         C)
             fLiveCapture=true
             ;;
+        L)
+            fNeedLocalForwarder=true
+            fLFOptions=$OPTARG
+            ;;
         J)
             fNeedJumpServer=true
-            fJumpServer=$OPTARG
+            fJumpOptions=$OPTARG
             ;;
         W)
             fJumpPwd=$OPTARG
@@ -172,56 +192,103 @@ if [[ $# -gt 0 ]]; then
     exit
 fi
 
-parseAndCheck() {
-    # Check if the target is in the format of user@sshtarget:port
-    param=$fSSHTarget
-    if [[ $fSSHTarget == *@* ]]; then
-        fSSHUser=$(echo "$param" | cut -d@ -f1)
-        fSSHTarget=$(echo "$param" | cut -d@ -f2)
-
-        # Extract the port if it exists
-        # fSSHTarget=172.18.20.84:2121
-        param=$fSSHTarget
-        if [[ $param == *:* ]]; then
-            fSSHTarget=$(echo "$param" | cut -d: -f1)
-            fSSHPort=$(echo "$param" | cut -d: -f2)
-        fi
-    fi
-
-    # Check if the jump server is in the format of user@jumpserver:port
+parseOptions() {
+    # Parse fJumpOptions in the format of user@jumpserver[:port]
     if [ "$fNeedJumpServer" = true ]; then
-        # Exp: fJumpServer=auto@172.18.20.84:2121
-        param=$fJumpServer
-        if [[ $fJumpServer == *@* ]]; then
-            if [[ $param == *@* ]]; then
-                fJumpUser=$(echo "$param" | cut -d@ -f1)
-                fJumpServer=$(echo "$param" | cut -d@ -f2)
-
-                # Extract the port if it exists
-                # fJumpServer=172.18.20.84:2121
-                param=$fJumpServer
-                if [[ $param == *:* ]]; then
-                    fJumpServer=$(echo "$param" | cut -d: -f1)
-                    fJumpPort=$(echo "$param" | cut -d: -f2)
-                fi
-            fi
+        # Exp: -J auto@172.18.20.84:2121 or -J auto@172.18.20.84
+        pattern='^([a-zA-Z0-9._%+-]+)@(([0-9]{1,3}\.){3}[0-9]{1,3})(:([0-9]+))?$'
+        fJumpOptions=$(echo "$fJumpOptions" | xargs)
+        param=$fJumpOptions
+        if [[ $param =~ $pattern ]]; then
+            fJumpUser="${BASH_REMATCH[1]}"
+            fJumpServer="${BASH_REMATCH[2]}"
+            [ -n "${BASH_REMATCH[5]}" ] && fJumpPort="${BASH_REMATCH[5]}"
         else
             COLOR=$MAGENTA
-            echo -e "$USER_NOTATION ${COLOR}Jump Server has to be in the format of user@jumpserver[:port]${RESET}"
+            echo -e "$USER_NOTATION ${COLOR}-J has to be in the format of user@jumpserver[:port]${RESET}"
             exit 1
         fi
+
+        # # Print the BASH_REMATCH array
+        # for i in "${!BASH_REMATCH[@]}"; do
+        #     echo -e "$USER_NOTATION ${COLOR}BASH_REMATCH[$i]: ${BASH_REMATCH[$i]}${RESET}"
+        # done
     fi
+
+    # Parse $fLFOptions in the format of [bind_address:]port:host:hostport
+    # Exp: -L 127.0.0.1:8881:10.40.1.101:22 or -L 8881:10.40.1.101:22
+    if [ -n "$fNeedLocalForwarder" ]; then
+        pattern='^((([0-9]{1,3}\.){3}[0-9]{1,3}):)?([0-9]+):(([0-9]{1,3}\.){3}[0-9]{1,3}):([0-9]+)$'
+        fLFOptions=$(echo "$fLFOptions" | xargs)
+        param=$fLFOptions
+        if [[ $param =~ $pattern ]]; then
+            # BASH_REMATCH[0]: Contains the entire matched string.
+            # BASH_REMATCH[1], BASH_REMATCH[2], etc.: Contain the results of any capturing groups in the regex.
+            [ -n "${BASH_REMATCH[2]}" ] && fLFLocalAddr="${BASH_REMATCH[2]}"
+            fLFLocalPort="${BASH_REMATCH[4]}"
+            fTarget="${BASH_REMATCH[5]}"
+            fTargetPort="${BASH_REMATCH[7]}"
+        else
+            COLOR=$MAGENTA
+            echo -e "$USER_NOTATION ${COLOR}-L has to be in the format of [bind_address:]port:host:hostport${RESET}"
+            exit 1
+        fi
+
+        # # Print the BASH_REMATCH array
+        # for i in "${!BASH_REMATCH[@]}"; do
+        #     echo -e "$USER_NOTATION ${COLOR}BASH_REMATCH[$i]: ${BASH_REMATCH[$i]}${RESET}"
+        # done
+        return
+    fi
+
+    # Parse fTarget in the format of [user@]sshtarget[:port]
+    # Exp: -t auto@172.18.20.84 or -t 172.18.20.84
+    pattern='^(([a-zA-Z0-9._%+-]+)@)?([a-zA-Z0-9._%+-]+)(:([0-9]+))?$'
+    fTarget=$(echo "$fTarget" | xargs)
+    param=$fTarget
+    if [[ $fTarget =~ $pattern ]]; then
+        [ -n "${BASH_REMATCH[2]}" ] && fTargetUser="${BASH_REMATCH[2]}"
+        fTarget="${BASH_REMATCH[3]}"
+        [ -n "${BASH_REMATCH[5]}" ] && fTargetPort="${BASH_REMATCH[5]}"
+    else
+        COLOR=$MAGENTA
+        echo -e "$USER_NOTATION ${COLOR}Target has to be set and in the format of [user@]sshtarget${RESET}"
+        exit 1
+    fi
+
+    # # Print the BASH_REMATCH array
+    # for i in "${!BASH_REMATCH[@]}"; do
+    #     echo -e "$USER_NOTATION ${COLOR}BASH_REMATCH[$i]: ${BASH_REMATCH[$i]}${RESET}"
+    # done
 }
 
-preSet() {
-    # If $fSwitchToSftp is set, disable $fvdom and $fSSHCmd
+checkSanity() {
+    if [ -z "$fTarget" ]; then
+        COLOR=$MAGENTA
+        echo -e "$USER_NOTATION ${COLOR}Target is not set.${RESET}"
+        exit 1
+    fi
+
+    if [ -n "$fNeedLocalForwarder" ]; then
+        if [ -z "$fNeedJumpServer" ]; then
+            COLOR=$MAGENTA
+            echo -e "$USER_NOTATION ${COLOR}Local Forwarder requires a Jump Server to be set as well.${RESET}"
+            exit 1
+        fi
+        fVdom=""
+        fSSHCmd=""
+        fNoShell=""
+        fLiveCapture=""
+    fi
+
     if [ -n "$fSwitchToSftp" ]; then
         fVdom=""
         fSSHCmd=""
-        fSSHNoShell=""
+        fNoShell=""
         fLiveCapture=""
     fi
-    [ -n "$fSSHNoShell" ] && fVdom=""
+
+    [ -n "$fNoShell" ] && fVdom=""
 
     # If $fLiveCapture is set, check if $fSSHCmd contains "tcpdump". If not reset $fLiveCapture
     if [ -n "$fLiveCapture" ]; then
@@ -229,11 +296,22 @@ preSet() {
             fLiveCapture=""
         fi
     fi
+}
+
+setSpawnCmd() {
+    keepAlive="-o ServerAliveInterval=$fServerAliveInterval -o ServerAliveCountMax=$fServerAliveCountMax"
+
+    # Local Port Forwarding
+    if [ -n "$fNeedLocalForwarder" ]; then
+        fSpawnCmd="ssh -N -L $fLFLocalAddr:$fLFLocalPort:$fTarget:$fTargetPort $fJumpUser@$fJumpServer"
+        fSpawnCmd="$fSpawnCmd $keepAlive"
+        return
+    fi
 
     # SSH Command
-    cmd=$fSSHCmd
     if [ -z "$fSwitchToSftp" ]; then
-        fSpawnCmd="ssh -p $fSSHPort $fSSHUser@$fSSHTarget"
+        cmd=$fSSHCmd
+        fSpawnCmd="ssh -p $fTargetPort $fTargetUser@$fTarget"
 
         # Via a Jump Server
         if [ -n "$fNeedJumpServer" ]; then
@@ -242,69 +320,110 @@ preSet() {
         fLCBaseCmd="$fSpawnCmd \"$fSSHCmd\"" # For printing purpose only
 
         if [ -n "$fLiveCapture" ]; then
-            cmd="$cmd | nc -l -p $fLiveCapturePort"
+            cmd="$cmd | nc -l -p $fLCPort"
         fi
 
-        fSpawnCmd="$fSpawnCmd \"$cmd\""
-        # Keep the connection alive for login sessions
-        if [ -z "$fSSHNoShell" ]; then
-            fSpawnCmd="$fSpawnCmd \
-                        -o ServerAliveInterval=$fServerAliveInterval \
-                        -o ServerAliveCountMax=$fServerAliveCountMax"
+        if [ -n "$fNoShell" ]; then
+            fSpawnCmd="$fSpawnCmd \"$cmd\""
+        else
+            fSpawnCmd="$fSpawnCmd $keepAlive"
         fi
     # SFTP command. SFTP does not support $fSSHCmd
     else
-        fSpawnCmd="sftp -P $fSSHPort $fSSHUser@$fSSHTarget"
         if [ -n "$fNeedJumpServer" ]; then
-            fSpawnCmd="$fSpawnCmd -o \"ProxyJump=$fJumpUser@$fJumpServer\""
+            cmd="-o \"ProxyJump=$fJumpUser@$fJumpServer\""
         fi
+        fSpawnCmd="sftp $cmd -P $fTargetPort $fTargetUser@$fTarget"
     fi
     # Squash multiple spaces into one
     fSpawnCmd=$(echo "$fSpawnCmd" | tr -s ' ')
 }
 
-parseAndCheck
-preSet
+parseOptions
+checkSanity
+setSpawnCmd
 
-echo "$SEPARATOR" >&2
-COLOR=$GREY
-if [ -n "$fSwitchToSftp" ]; then
-    echo -e "$USER_NOTATION ${COLOR}Switching to SFTP mode${RESET} ..." >&2
+echo "$SEPARATOR_RIGHT" >&2
+if [ -n "$fNeedLocalForwarder" ]; then
+    COLOR=$RED
+    echo -e "${BOLD}Local Forwarder Options:${RESET}" >&2
+    echo -e "[-] Set Local Bind Address to: ${COLOR}$fLFLocalAddr${RESET}" >&2
+    echo -e "[-] Set Local Bind Port to: ${COLOR}$fLFLocalPort${RESET}" >&2
+    echo -e "[L] Set Local Forwarder: ${COLOR}$fLFLocalAddr:$fLFLocalPort -> $fTarget:$fTargetPort${RESET}" >&2
 else
-    echo -e "$USER_NOTATION ${COLOR}Working under SSH mode${RESET} ..." >&2
+    echo -e "${BOLD}Target Options:${RESET}" >&2
+    COLOR="$RED"
+    echo -e "[t] Set SSH Target Device to: ${COLOR}$fTarget${RESET}" >&2
+    echo -e "[l] Set SSH Username to: ${COLOR}$fTargetUser${RESET}" >&2
+    echo -e "[p] Set SSH Password to: ${COLOR}$fTargetPwd${RESET}" >&2
+    echo -e "[P] Set SSH Connection Port to: ${COLOR}$fTargetPort${RESET}" >&2
+    if [ -n "$fVdom" ]; then
+        echo -e "[v] Set FGT/FPX VDOM to: ${COLOR}$fVdom${RESET}" >&2
+    fi
+    echo -e "[-] Set Maximum Attempts to: ${COLOR}$fMaxAttempts${RESET}" >&2
 fi
-COLOR="$RED"
-echo -e "$USER_NOTATION [t] Set SSH Target Device to: ${COLOR}$fSSHTarget${RESET}" >&2
-echo -e "$USER_NOTATION [l] Set SSH Username to: ${COLOR}$fSSHUser${RESET}" >&2
-echo -e "$USER_NOTATION [p] Set SSH Password to: ${COLOR}$fSSHPwd${RESET}" >&2
-echo -e "$USER_NOTATION [P] Set SSH Connection Port to: ${COLOR}$fSSHPort${RESET}" >&2
-if [ -n "$fVdom" ]; then
-    echo -e "$USER_NOTATION [v] Set FGT/FPX VDOM to: ${COLOR}$fVdom${RESET}" >&2
-fi
-echo -e "$USER_NOTATION [-] Set Maximum Attempts to: ${COLOR}$fMaxAttempts${RESET}" >&2
+
 if [ -n "$fNeedJumpServer" ]; then
-    echo "$SHORT_SEPARATOR" >&2
-    echo -e "$USER_NOTATION [J] Set Jump Server to: ${COLOR}$fJumpServer${RESET}" >&2
-    echo -e "$USER_NOTATION [-] Set Jump Username to: ${COLOR}$fJumpUser${RESET}" >&2
-    echo -e "$USER_NOTATION [W] Set Jump Password to: ${COLOR}$fJumpPwd${RESET}" >&2
-    echo -e "$USER_NOTATION [-] Set Jump Port to: ${COLOR}$fJumpPort${RESET}" >&2
+    echo -e "${BOLD}Jump Server Options:${RESET}" >&2
+    echo -e "[J] Set Jump Server to: ${COLOR}$fJumpServer${RESET}" >&2
+    echo -e "[-] Set Jump Username to: ${COLOR}$fJumpUser${RESET}" >&2
+    echo -e "[W] Set Jump Password to: ${COLOR}$fJumpPwd${RESET}" >&2
+    echo -e "[-] Set Jump Port to: ${COLOR}$fJumpPort${RESET}" >&2
     if [ -z "$fJumpServer" ] || [ -z "$fJumpUser" ]; then
         COLOR=$MAGENTA
-        echo -e "$USER_NOTATION ${COLOR}Jump Server and its credentials are not set properly.${RESET}" >&2
+        echo -e "${COLOR}Jump Server and its credentials are not set properly.${RESET}" >&2
         exit 1
     fi
 fi
-[ -n "$fLiveCapture" ] && echo -e "$USER_NOTATION [C] nc Listens remotely on Port: ${COLOR}$fLiveCapturePort${RESET}" >&2
-COLOR=$BLUE && echo -e "${COLOR}$fSpawnCmd${RESET}" >&2
-if [ -n "$fLiveCapture" ]; then
-    echo -e "${COLOR}nc $fSSHTarget $fLiveCapturePort${RESET}" >&2
-    COLOR=$CYAN && echo -e "${COLOR}$fLCBaseCmd | wireshark -k -i -${RESET}" >&2
-fi
-echo "$SEPARATOR" >&2
-COLOR=$GREY
-echo -ne "$USER_NOTATION ${COLOR}Connecting to $fSSHTarget" >&2
-if [ -n "$fNeedJumpServer" ]; then
-    echo -ne " via Jump Server: $fJumpServer" >&2
+
+[ -n "$fLiveCapture" ] && echo -e "[C] nc Listens remotely on Port: ${COLOR}$fLCPort${RESET}" >&2
+
+COLOR=$BLUE
+echo -e "${BOLD}Spawned Command:${RESET}" >&2
+echo -e "${COLOR}$fSpawnCmd${RESET}" >&2
+
+dumpLFTips() {
+    # Local Forwarding only works when $fNeedJumpServer is set
+    COLOR=$1
+    echo -e "${BOLD}Local Forwarding Command Tips:${RESET}" >&2
+    echo -e "${COLOR}${SCRIPT_NAME} -L $fLFLocalAddr:$fLFLocalPort:$fTarget:$fTargetPort -J $fJumpOptions -W $fJumpPwd${RESET}" >&2
+    echo -e "${COLOR}${SCRIPT_NAME} -t $fLFLocalAddr:$fLFLocalPort -l $fTargetUser -p $fTargetPwd${RESET}" >&2
+}
+
+dumpLCTips() {
+    COLOR=$1
+    echo -e "${BOLD}Live Capture Command Tips:${RESET}" >&2
+    cmd="tcpdump -i $fLCInterface -s 0 -U -n -w - 'not port 22'"
+    if [ -n "$fNeedJumpServer" ]; then
+        if [ -n "$fLiveCapture" ]; then
+            echo -e "${COLOR}nc $fLFLocalAddr $fLCPort | wireshark -k -${RESET}" >&2
+            echo -e "${COLOR}$fLCBaseCmd | wireshark -k -i -${RESET}" >&2
+        else
+            echo -e "${COLOR}${SCRIPT_NAME} -J $fJumpOptions -W $fJumpPwd -t $fTargetUser@$fTarget:$fTargetPort -p $fTargetPwd -c \"$cmd\" -C${RESET}" >&2
+        fi
+    else
+        if [ -n "$fLiveCapture" ]; then
+            echo -e "${COLOR}nc $fTarget $fLCPort | wireshark -k -i -${RESET}" >&2
+            echo -e "${COLOR}$fLCBaseCmd | wireshark -k -i -${RESET}" >&2
+        else
+            echo -e "${COLOR}${SCRIPT_NAME} -t $fTargetUser@$fTarget:$fTargetPort -p $fTargetPwd -c \"$cmd\" -C${RESET}" >&2
+        fi
+    fi
+}
+
+dumpLCTips "$LIGHTYELLOW"
+[ -n "$fNeedJumpServer" ] && dumpLFTips "$LIGHTGREEN"
+
+echo "$SEPARATOR_LEFT" >&2
+if [ -n "$fNeedLocalForwarder" ]; then
+    COLOR=$GREY
+    echo -ne "${COLOR}Connecting to Jump Server: $fJumpServer to set up the Local Forwarder${RESET}" >&2
+else
+    COLOR=$GREY
+    echo -ne "${COLOR}Connecting to $fTarget" >&2
+    if [ -n "$fNeedJumpServer" ]; then
+        echo -ne " via Jump Server: $fJumpServer" >&2
+    fi
 fi
 echo -e " ...${RESET}" >&2
 
@@ -324,15 +443,19 @@ expect -c "
     set CYAN    \"\033\[36m\"
     set GREY    \"\033\[90m\"
 
-    if {\"$fSSHNoShell\" != \"\"} {
+    if {\"$fNoShell\" != \"\" || \"$fNeedLocalForwarder\" != \"\"} {
         set timeout -1
         trap {
             set COLOR \$MAGENTA
             if {\"$fLiveCapture\" != \"\"} {
                 set COLOR \$LIGHTYELLOW
-                puts stderr \"\n$USER_NOTATION \${COLOR}CTRL+C captured; Clearing all nc session on the remote.\${RESET}\"
+                puts stderr \"\n$USER_NOTATION \${COLOR}CTRL+C captured; Sending commands to Clear all nc session on the remote.\n\${RESET}\"
                 set COLOR \$MAGENTA
-                system $SCRIPT_NAME -t $fSSHTarget -l $fSSHUser -p $fSSHPwd -P $fSSHPort -c 'killall nc'
+                if {\"$fNeedJumpServer\" != \"\"} {
+                    system $SCRIPT_NAME -t $fTargetUser@$fTarget:$fTargetPort -p $fTargetPwd -J $fJumpOptions -W $fJumpPwd -c 'killall nc'
+                } else {
+                    system $SCRIPT_NAME -t $fTargetUser@$fTarget:$fTargetPort -p $fTargetPwd -c 'killall nc'
+                }
             } else {
                 puts stderr \"\n$USER_NOTATION \${COLOR}CTRL+C captured; Sending SIGINT to remote as well.\${RESET}\"
                 send \"\x03\"
@@ -345,9 +468,9 @@ expect -c "
     set i 1
     set COLOR \$MAGENTA
     while {\$i <= $fMaxAttempts} {
-        # ssh -o StrictHostKeyChecking=no $fSSHTarget
+        # ssh -o StrictHostKeyChecking=no $fTarget
         if {\$i > 1} {
-            puts \"$USER_NOTATION \${COLOR}Login attempt \$i/$fMaxAttempts\${RESET}\n\"
+            puts -nonewline stderr \"$USER_NOTATION \${COLOR}Login attempt \$i/$fMaxAttempts\${RESET}\n\"
         }
 
         spawn -noecho $fSpawnCmd
@@ -362,13 +485,13 @@ expect -c "
                 send \"yes\r\"
                 exp_continue
             }
-            -re {$fSSHUser@$fSSHTarget's (password|Password):} {
+            -re {$fTargetUser@$fTarget's (password|Password):} {
                 incr ssh_pwd_prompt_cnt
                 if {\$ssh_pwd_prompt_cnt > 1} {
-                    puts stderr \"\n$USER_NOTATION \${COLOR}Login credentials for SSH Target: $fSSHTarget are wrong.\${RESET}\n\"
+                    puts stderr \"\n$USER_NOTATION \${COLOR}Login credentials for SSH Target: $fTarget are wrong.\${RESET}\n\"
                     exit 1
                 }
-                send \"$fSSHPwd\r\"
+                send \"$fTargetPwd\r\"
                 exp_continue
             }
             -re {$fJumpUser@$fJumpServer's (password|Password):} {
@@ -380,12 +503,28 @@ expect -c "
                 send \"$fJumpPwd\r\"
                 exp_continue
             }
-            {Host key verification failed.} {
-                puts stderr \"$USER_NOTATION \${COLOR}Host key verification failed. Updating known_hosts file ...\${RESET}\n\"
-                system \"ssh-keygen -R $fSSHTarget\"
+            -re {host key for (.+?) has changed} {
+                # Get the matched variable from the first capturing group
+                set host \$expect_out(1,string)
+                set COLOR \$LIGHTYELLOW
+                puts -nonewline stderr \"$USER_NOTATION \${COLOR}Host key verification failed. Updating known_hosts file\${RESET}\n\"
+                system \"ssh-keygen -R \$host\"
                 puts stderr \"$USER_NOTATION \${COLOR}Host key removed from known_hosts file.\${RESET}\n\"
+                set COLOR \$MAGENTA
                 incr i
                 continue
+            }
+            {You don't have permission to capture on that device} {
+                set COLOR \$LIGHTYELLOW
+                puts -nonewline stderr \"$USER_NOTATION \${COLOR}Error: You don't have permission to capture on that device.\${RESET}\n\"
+                puts stderr \"$USER_NOTATION \${COLOR}Sending commands to clear all nc session on the remote.\n\${RESET}\"
+                set COLOR \$MAGENTA
+                if {\"$fNeedJumpServer\" != \"\"} {
+                    system $SCRIPT_NAME -t $fTargetUser@$fTarget:$fTargetPort -p $fTargetPwd -J $fJumpOptions -W $fJumpPwd -c 'killall nc'
+                } else {
+                    system $SCRIPT_NAME -t $fTargetUser@$fTarget:$fTargetPort -p $fTargetPwd -c 'killall nc'
+                }
+                exp_continue
             }
             {No route to host} {
                 puts stderr \"$USER_NOTATION \${COLOR}No route to host.\${RESET}\n\"
@@ -395,7 +534,7 @@ expect -c "
                 break
             }
             timeout {
-                puts stderr \"$USER_NOTATION \${COLOR}Timed out waiting for a response.\${RESET}\n\"
+                puts stderr \"$USER_NOTATION \${COLOR}Session \$session_id Timed out waiting for a response.\${RESET}\n\"
                 # close \$ssh_session_id
                 incr i
                 continue
@@ -408,18 +547,18 @@ expect -c "
     }
 
     if {\$i > $fMaxAttempts} {
-        puts stderr \"$USER_NOTATION Failed to connect to $fSSHTarget\n\"
+        puts stderr \"$USER_NOTATION \${COLOR}Failed to connect to $fTarget\${RESET}\"
         exit 1
     }
 
-    if {\"$fSSHNoShell\" != \"\"} {
+    if {\"$fNoShell\" != \"\"} {
         expect eof {
             puts stderr \"$USER_NOTATION \${MAGENTA}Successfully executed the command remotely.\${RESET}\"
             exit 0
         }
     }
 
-    puts -nonewline stderr \"$USER_NOTATION \${MAGENTA}Successfully connected to $fSSHTarget\${RESET}\"
+    puts -nonewline stderr \"$USER_NOTATION \${MAGENTA}Successfully connected to $fTarget\${RESET}\"
     # flush stdout
     send \"\r\"
 
