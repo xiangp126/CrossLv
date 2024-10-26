@@ -315,7 +315,7 @@ setSpawnCmd() {
     # SSH Command
     if [ -z "$fSwitchToSftp" ]; then
         cmd=$fSSHCmd
-        fSpawnCmd="ssh -p $fTargetPort $fTargetUser@$fTarget"
+        fSpawnCmd="ssh -p $fTargetPort -l $fTargetUser $fTarget"
 
         # Via a Jump Server
         if [ -n "$fNeedJumpServer" ]; then
@@ -436,30 +436,47 @@ expect -c "
     # Define ANSI color codes with capitalized names
     # Full list can be found here: http://en.wikipedia.org/wiki/ANSI_escape_code
     # https://stackoverflow.com/questions/12879483/color-texts-at-expect-shell
-    set RESET   \"\033\[0m\"
-    set BOLD    \"\033\[1m\"
-    set RED     \"\033\[31m\"
-    set GREEN   \"\033\[32m\"
-    set YELLOW  \"\033\[33m\"
+    set RESET       \"\033\[0m\"
+    set BOLD        \"\033\[1m\"
+    set RED         \"\033\[31m\"
+    set GREEN       \"\033\[32m\"
+    set LIGHTGREEN  \"\033\[92m\"
+    set YELLOW      \"\033\[33m\"
     set LIGHTYELLOW \"\033\[93m\"
-    set BLUE    \"\033\[34m\"
-    set MAGENTA \"\033\[35m\"
-    set CYAN    \"\033\[36m\"
-    set GREY    \"\033\[90m\"
+    set BLUE        \"\033\[34m\"
+    set MAGENTA     \"\033\[35m\"
+    set CYAN        \"\033\[36m\"
+    set GREY        \"\033\[90m\"
 
-    # Function to clear all nc sessions on the remote
-    proc clear_nc_sessions {{err_msg \"\"}} {
-        global COLOR LIGHTYELLOW MAGENTA RESET
+    # Clear all nc sessions on the remote. Proc has optional argument with a default value
+    proc clear_unfinished_jobs {{err_msg \"\"}} {
+        global LIGHTYELLOW MAGENTA RESET
         # Var defined here is in local scope
         set COLOR \$LIGHTYELLOW
         if {\$err_msg != \"\"} {
             puts stderr \"$USER_NOTATION \${COLOR}Error: \$err_msg\${RESET}\"
         }
-        puts stderr \"$USER_NOTATION \${COLOR}Sending commands to clear all nc session on the remote.\n\${RESET}\"
+        set remote_cmd {killall nc; killall tcpdump}
+        if {\"$fLiveCapture\" != \"\"} {
+            puts stderr \"$USER_NOTATION \${COLOR}Sending commands to clear all nc session on the remote.\n\${RESET}\"
+            if {\"$fNeedJumpServer\" != \"\"} {
+                system $SCRIPT_NAME -t $fTargetUser@$fTarget:$fTargetPort -p $fTargetPwd -J $fJumpOptions -W $fJumpPwd -c '\$remote_cmd'
+            } else {
+                system $SCRIPT_NAME -t $fTargetUser@$fTarget:$fTargetPort -p $fTargetPwd -c '\$remote_cmd'
+            }
+        }
+    }
+
+    proc check_tcpdump_permission {{error_msg \"\"}} {
+        global LIGHTYELLOW MAGENTA RESET
+        set COLOR \$LIGHTYELLOW
+        set remote_cmd {ls -l \`command -v tcpdump\`}
+        # set remote_cmd {stat -c '%a' \`which tcpdump\`}
+        puts stderr \"$USER_NOTATION \${COLOR}Checking tcpdump permission on the remote.\n\${RESET}\"
         if {\"$fNeedJumpServer\" != \"\"} {
-            system $SCRIPT_NAME -t $fTargetUser@$fTarget:$fTargetPort -p $fTargetPwd -J $fJumpOptions -W $fJumpPwd -c 'killall nc\; killall tcpdump'^
+            system $SCRIPT_NAME -t $fTargetUser@$fTarget:$fTargetPort -p $fTargetPwd -J $fJumpOptions -W $fJumpPwd -c '\$remote_cmd'
         } else {
-            system $SCRIPT_NAME -t $fTargetUser@$fTarget:$fTargetPort -p $fTargetPwd -c 'killall nc\; killall tcpdump'
+            system $SCRIPT_NAME -t $fTargetUser@$fTarget:$fTargetPort -p $fTargetPwd -c '\$remote_cmd'
         }
     }
 
@@ -469,7 +486,7 @@ expect -c "
             set COLOR \$LIGHTYELLOW
             if {\"$fLiveCapture\" != \"\"} {
                 puts stderr \"\n$USER_NOTATION \${COLOR}CTRL+C captured.\${RESET}\"
-                clear_nc_sessions
+                clear_unfinished_jobs
             } else {
                 puts stderr \"\n$USER_NOTATION \${COLOR}CTRL+C captured; Sending SIGINT to remote as well.\${RESET}\"
                 send \"\x03\"
@@ -490,7 +507,7 @@ expect -c "
 
         spawn -noecho $fSpawnCmd
         set session_id [exp_pid]
-        puts stderr \"\${COLOR}Spawned Session ID: \$session_id\${RESET}\"
+        puts stderr \"${USER_NOTATION} \${COLOR}Spawned Session ID: \$session_id\${RESET}\"
 
         set ssh_pwd_prompt_cnt 0
         set jmp_pwd_prompt_cnt 0
@@ -531,10 +548,16 @@ expect -c "
             }
             -re {tcpdump: syntax error|You don't have permission to capture on that device} {
                 set error_msg \$expect_out(0,string)
-                if {\"$fLiveCapture\" != \"\"} {
-                    clear_nc_sessions \$error_msg
+                clear_unfinished_jobs \$error_msg
+
+                if {[string match "*permission*" \$error_msg]} {
+                    check_tcpdump_permission
+                    set COLOR \$LIGHTYELLOW
+                    # print, suggest to set the set uid bit
+                    puts stderr \"$USER_NOTATION \${COLOR}Suggest to set the setuid bit for tcpdump.\${RESET}\"
+                    puts stderr \"$USER_NOTATION \${COLOR}sudo chmod u+s /usr/sbin/tcpdump\${RESET}\"
+                    set COLOR \$MAGENTA
                 }
-                puts stderr \"$USER_NOTATION \${COLOR}Error: \$error_msg\${RESET}\"
                 exp_continue
             }
             {No route to host} {
