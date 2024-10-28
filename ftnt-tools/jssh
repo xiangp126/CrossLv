@@ -61,6 +61,7 @@ RED='\033[31m'
 LIGHTRED='\033[91m'
 MAGENTA='\033[35m'
 CYAN='\033[36m'
+LIGHTCYAN='\033[96m'
 BLACK='\033[30m'
 PURPLE='\033[35m'
 YELLOW='\033[33m'
@@ -490,15 +491,17 @@ dumpLCTips() {
 }
 
 dumpLCTips "$BLUE"
-[ -n "$fNeedJumpServer" ] && dumpLFTips "$LIGHTGREEN"
+[ -n "$fNeedJumpServer" ] && dumpLFTips "$LIGHTPURPLE"
 
 if [ -z "$fSwitchToSShfs" ]; then
     fFSRemoteDir="/home/$fTargetUser"
-    fFSMountPoint="$HOME/demo"
+    fFSMountPoint="$HOME/mpdemo"
+    # param="-o reconnect -o transform_symlinks -o follow_symlinks -o cache=yes"
+    param="-o reconnect -o cache=yes"
     COLOR=$LIGHTGREEN
     echo -e "${BOLD}SSHFS Command Tips:${RESET}" >&2
-    echo -e "${COLOR}$SCRIPT_NAME -t $fTarget -l $fTargetUser -p $fTargetPwd -F $fFSRemoteDir:$fFSMountPoint${RESET}" >&2
-    echo -e "${COLOR}sshfs $fFSBasicMountParams -p $fTargetPort $fTargetUser@$fTarget:$fFSRemoteDir $fFSMountPoint${RESET}" >&2
+    echo -e "${COLOR}sshfs $param -p $fTargetPort $fTargetUser@$fTarget:$fFSRemoteDir $fFSMountPoint${RESET}" >&2
+    echo -e "${COLOR}$SCRIPT_NAME -t $fTarget -l $fTargetUser -p $fTargetPwd -P $fTargetPort -F $fFSRemoteDir:$fFSMountPoint${RESET}" >&2
 fi
 
 echo "$SEPARATOR_LEFT" >&2
@@ -606,7 +609,7 @@ expect -c "
         # exp_internal 1 # Enable debugging for expect
         spawn -noecho $fSpawnCmd
         set session_id [exp_pid]
-        puts stderr \"\${COLOR}Spawned Session ID: \$session_id\${RESET}\"
+        puts stderr \"\${GREY}Spawned Session ID: \$session_id\${RESET}\"
 
         set ssh_pwd_prompt_cnt 0
         set jmp_pwd_prompt_cnt 0
@@ -652,11 +655,6 @@ expect -c "
 
                 if {[string match "*permission*" \$error_msg]} {
                     check_tcpdump_permission
-                    set COLOR \$LIGHTYELLOW
-                    # print, suggest to set the set uid bit
-                    puts stderr \"$USER_NOTATION \${COLOR}Suggest to set the setuid bit for tcpdump.\${RESET}\"
-                    puts stderr \"$USER_NOTATION \${COLOR}sudo chmod u+s /usr/sbin/tcpdump\${RESET}\"
-                    set COLOR \$MAGENTA
                 }
                 exp_continue
             }
@@ -674,6 +672,17 @@ expect -c "
                 continue
             }
             eof {
+                if {\"$fNoShell\" != \"\"} {
+                    set output \$expect_out(buffer)
+                    set pattern {(/([^/ ]+)+/tcpdump)}
+                    if {[regexp \$pattern \$output match tcpdump_path]} {
+                        # puts stderr \"Session \$session_id Matched path: \$tcpdump_path.\"
+                        set COLOR \$LIGHTYELLOW
+                        puts stderr \"$USER_NOTATION \${COLOR}Suggest to set the setuid bit for tcpdump.\${RESET}\"
+                        puts stderr \"$USER_NOTATION \${COLOR}sudo chmod u+s /usr\$tcpdump_path\${RESET}\"
+                        set COLOR \$MAGENTA
+                    }
+                }
                 puts stderr \"$USER_NOTATION \${COLOR}Session \$session_id Reached EOF. Program ended.\${RESET}\"
                 exit 0
             }
