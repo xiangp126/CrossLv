@@ -1,41 +1,20 @@
 #!/bin/bash
+# set -x
 
-# SSH Port Forwarding
-# -L [bind_address:]port:host:hostport
-# -N Do not execute a remote command. This is useful for just forwarding ports.
-# Topology:
-# Local(127.0.0.1):8881 --- SSH Connect --- Jump Server(172.18.20.226):22 --- Forward Traffic --- Remote(10.40.1.101):22
-# Usage:
-# $ ssh -N -L Local_IP:Local_Port:Remote_IP:Remote_Port Jump_User@Jump_IP:Jump_Port
-# Jump_User@Jump_IP's Passwd:
-#
-# Give an example:
-# $ ssh -N -L 127.0.0.1:8881:10.40.1.101:22 test@172.18.20.226
-# test@172.18.20.226's Passwd:
-#
-# $ netstat -tulnp | grep -i 8881
-# tcp        0      0 127.0.0.1:8881          0.0.0.0:*               LISTEN      1208750/ssh
-#
-# and then
-# $ ssh -l admin -p 8881 localhost
-# or
-# $ jssh -l admin -P 8881 -t localhost
-
+# Constants
+SCRIPT_NAME=$(basename "$0")
+USER_NOTATION="@@@@"
+SEPARATOR_LEFT="<---------------------------------------------------"
+SEPARATOR_RIGHT="--------------------------------------------------->"
+SSH_MODE="SSH"
+SFTP_MODE="SFTP"
+SSHFS_MODE="SSHFS"
 # Shared Variables
 # Match "$ ", "# " or "sftp> " at the end of the line
 fGroupPattern='(\$|#|sftp>)\s*$' # For Literal Interpretation, use single quotes
 fDollarPattern='\$\s*$'
 fPoundPattern='#\s*$'
 # fSftpPattern='sftp>\s*$'
-fSwitchToSftp=""
-fServerAliveInterval=30
-fServerAliveCountMax=3
-fMaxAttempts=2
-# Live Capture
-fLiveCapture=""
-fLCPort="7777"
-fLCInterface="any"
-fLCBaseCmd=""
 # SSH Variables
 fTarget=""
 fTargetUser="admin"
@@ -45,6 +24,17 @@ fVdom=""
 fSSHCmd="" # The command to execute remotely without opening an interactive login session
 fNoShell=""
 fSpawnCmd=""
+fModeName=$SSH_MODE
+fServerAliveInterval=30
+fServerAliveCountMax=3
+fMaxAttempts=2
+# SFTP Variables
+fSwitchToSftp=""
+# Live Capture
+fLiveCapture=""
+fLCPort="7777"
+fLCInterface="any"
+fLCBaseCmd=""
 # Jump Server
 fNeedJumpServer=""
 fJumpOptions=""
@@ -58,11 +48,14 @@ fNeedLocalForwarder=""
 fLFOptions=""
 fLFLocalAddr="127.0.0.1"
 fLFLocalPort="8881"
-# Constants
-SCRIPT_NAME=$(basename "$0")
-USER_NOTATION="@@@@"
-SEPARATOR_LEFT="<---------------------------------------------------"
-SEPARATOR_RIGHT="--------------------------------------------------->"
+# SSHFS Variables
+fSwitchToSShfs=""
+fFSBasicMountParams="-o reconnect -o transform_symlinks -o follow_symlinks -o cache=yes"
+# fFSMountparams="-o reconnect -o transform_symlinks -o follow_symlinks \
+#                 -o cache=yes -o password_stdin -o StrictHostKeyChecking=no"
+fFSOptions=""
+fFSMountPoint=""
+fFSRemoteDir=""
 # Colors
 RED='\033[31m'
 LIGHTRED='\033[91m'
@@ -89,12 +82,14 @@ cat << _EOF
 $SCRIPT_NAME 1.0
 
 usage:
-    $SCRIPT_NAME [-l/-u user] [-p passwd] [-P ssh_port] [-v vdom] [-F] [-h] -t [user@]target[:port]
+    $SCRIPT_NAME [-l/-u user] [-p passwd] [-P ssh_port] [-v vdom] [-h] -t [user@]target[:port]
          [-c command] [-C]
          [-J user@jumpserver[:port]] [-W jump_passwd]
          [-L [local_bind_address:]local_port:remote_address:remoteport]
+         [-F [dir:]mountpoint]
+         [-T]
 
-    Default to SSH, use -F to switch to SFTP
+    Default to SSH, use -T to switch to SFTP, use -F to switch to SSHFS
 
 Options:
     -t     Target        The device to connect to. Default is "$fTarget"
@@ -107,7 +102,7 @@ Options:
     -L     Forwarder     Local Forwarder. Format: [local_bind_address:]local_port:remote_address:remoteport
     -J     Jump Server   The jump server to connect to. Format: user@jumpserver[:port]
     -W     Jump Passwd   Password for jump server. Default is "$fJumpPwd"
-    -F     SFTP          Switch to SFTP
+    -T     SFTP          Switch to SFTP
     -h     Help          Print this help message
 
 Example:
@@ -117,13 +112,15 @@ Example:
     # SSH with a Jump Server
     $SCRIPT_NAME -J fpxauto@172.18.20.84:22 -t guodong@10.120.1.111 -P 2121 -p 123 -W qaz
     # SFTP Connection
-    $SCRIPT_NAME -t 172.18.29.111 -l test -p test -F
+    $SCRIPT_NAME -t 172.18.29.111 -l test -p test -T
     # SFTP with a Jump Server
-    $SCRIPT_NAME -J fpxauto@172.18.20.84:22 -t guodong@10.120.1.111 -P 2121 -p 123 -W qaz -F
+    $SCRIPT_NAME -J fpxauto@172.18.20.84:22 -t guodong@10.120.1.111 -P 2121 -p 123 -W qaz -T
     # Remote Live Capture
     $SCRIPT_NAME -t 172.18.29.111 -l test -p test -c "tcpdump -i any -s 0 -U -n -w - 'not port 22'" -C
     # Local Port Forwarding
     $SCRIPT_NAME -L 127.0.0.1:8881:10.40.1.101:22 -J test@172.18.20.226 -W test
+    # SSHFS to mount remote directory
+    $SCRIPT_NAME -t 172.18.29.111 -l test -p test -F /home/test:~/mp
 
 _EOF
     exit 0
@@ -132,7 +129,7 @@ _EOF
 [[ $# -eq 0 ]] && usage
 
 # Parse command-line options
-while getopts "t:l:u:p:P:J:W:v:c:FCL:h" opt; do
+while getopts "t:l:u:p:P:J:W:v:c:TF:CL:h" opt; do
     case ${opt} in
         t)
             fTarget=$OPTARG
@@ -175,6 +172,12 @@ while getopts "t:l:u:p:P:J:W:v:c:FCL:h" opt; do
             fVdom=$OPTARG
             ;;
         F)
+            fModeName=$SSHFS_MODE
+            fSwitchToSShfs=true
+            fFSOptions=$OPTARG
+            ;;
+        T)
+            fModeName=$SFTP_MODE
             fSwitchToSftp=true
             ;;
         h)
@@ -197,6 +200,7 @@ if [[ $# -gt 0 ]]; then
 fi
 
 parseOptions() {
+    COLOR=$MAGENTA
     # Parse fJumpOptions in the format of user@jumpserver[:port]
     if [ "$fNeedJumpServer" = true ]; then
         # Exp: -J auto@172.18.20.84:2121 or -J auto@172.18.20.84
@@ -208,7 +212,6 @@ parseOptions() {
             fJumpServer="${BASH_REMATCH[2]}"
             [ -n "${BASH_REMATCH[5]}" ] && fJumpPort="${BASH_REMATCH[5]}"
         else
-            COLOR=$MAGENTA
             echo -e "$USER_NOTATION ${COLOR}-J has to be in the format of user@jumpserver[:port]${RESET}"
             exit 1
         fi
@@ -233,7 +236,6 @@ parseOptions() {
             fTarget="${BASH_REMATCH[5]}"
             fTargetPort="${BASH_REMATCH[7]}"
         else
-            COLOR=$MAGENTA
             echo -e "$USER_NOTATION ${COLOR}-L has to be in the format of [bind_address:]port:host:hostport${RESET}"
             exit 1
         fi
@@ -255,7 +257,6 @@ parseOptions() {
         fTarget="${BASH_REMATCH[3]}"
         [ -n "${BASH_REMATCH[5]}" ] && fTargetPort="${BASH_REMATCH[5]}"
     else
-        COLOR=$MAGENTA
         echo -e "$USER_NOTATION ${COLOR}Target has to be set and in the format of [user@]sshtarget${RESET}"
         exit 1
     fi
@@ -264,6 +265,51 @@ parseOptions() {
     # for i in "${!BASH_REMATCH[@]}"; do
     #     echo -e "$USER_NOTATION ${COLOR}BASH_REMATCH[$i]: ${BASH_REMATCH[$i]}${RESET}"
     # done
+
+    # Parse fFSOptions in the format of [dir:]mountpoint
+    if [ -n "$fSwitchToSShfs" ]; then
+        if [[ $fFSOptions == *":"* ]]; then
+            IFS=':' read -r fFSRemoteDir fFSMountPoint <<< "$fFSOptions"
+        else
+            fFSMountPoint=$fFSOptions
+        fi
+
+        [ -z "$fFSRemoteDir" ] && fFSRemoteDir="/home/$fTargetUser"
+
+        mpoint=$(eval realpath "$fFSMountPoint")
+        if [ $? -ne 0 ]; then
+            echo -e "$USER_NOTATION ${COLOR}Mountpoint $fFSMountPoint does not exist.${RESET}"
+            exit 1
+        fi
+
+        fFSMountPoint=$mpoint
+        if [ ! -d "$fFSMountPoint" ]; then
+            echo -e "$USER_NOTATION ${COLOR}Mountpoint $fFSMountPoint does not exist.${RESET}"
+            exit 1
+        fi
+
+        if [ "$fFSMountPoint" == "$HOME" ]; then
+            echo -e "$USER_NOTATION ${COLOR}Mountpoint cannot be the HOME directory.${RESET}"
+            exit 1
+        fi
+
+        array=("$fFSRemoteDir" "$fFSMountPoint")
+        pattern='^(/([^/ ]+)?)+/?$'
+        for ele in "${array[@]}" ; do
+            if [[ ! $ele =~ $pattern ]]; then
+                echo -e "$USER_NOTATION ${COLOR}sshfs options $ele is not a valid path.${RESET}"
+                exit 1
+            fi
+        done
+
+        if findmnt -rno SOURCE "$fFSMountPoint" &>/dev/null; then
+            echo -e "$USER_NOTATION ${COLOR}$fFSMountPoint is already mounted. To unmount it${RESET}"
+            df -h "$fFSMountPoint"
+            echo -e "$USER_NOTATION use ${COLOR}umount $fFSMountPoint${RESET}"
+            echo -e "$USER_NOTATION or  ${COLOR}fusermount -u $fFSMountPoint${RESET}"
+            exit 1
+        fi
+    fi
 }
 
 checkSanity() {
@@ -285,16 +331,24 @@ checkSanity() {
         fLiveCapture=""
     fi
 
-    if [ -n "$fSwitchToSftp" ]; then
+    if [ -n "$fSwitchToSftp" ] && [ -n "$fSwitchToSShfs" ]; then
+        COLOR=$MAGENTA
+        echo -e "$USER_NOTATION ${COLOR}SFTP and SSHFS mode are mutually exclusive.${RESET}"
+        exit 1
+    fi
+
+    if [ -n "$fSwitchToSftp" ] || [ -n "$fSwitchToSShfs" ]; then
         fVdom=""
         fSSHCmd=""
         fNoShell=""
         fLiveCapture=""
+        fNeedJumpServer=""
+        fNeedLocalForwarder=""
     fi
 
     [ -n "$fNoShell" ] && fVdom=""
 
-    # If $fLiveCapture is set, check if $fSSHCmd contains "tcpdump". If not reset $fLiveCapture
+    # If $fLiveCapture is set, $fsshCmd must contain "tcpdump"
     if [ -n "$fLiveCapture" ]; then
         if [[ ! $fSSHCmd == *"tcpdump"* ]]; then
             fLiveCapture=""
@@ -312,33 +366,48 @@ setSpawnCmd() {
         return
     fi
 
-    # SSH Command
-    if [ -z "$fSwitchToSftp" ]; then
-        cmd=$fSSHCmd
-        fSpawnCmd="ssh -p $fTargetPort -l $fTargetUser $fTarget"
+    case "$fModeName" in
+        "$SSH_MODE")
+            cmd="$fSSHCmd"
+            fSpawnCmd="ssh -p $fTargetPort -l $fTargetUser $fTarget"
 
-        # Via a Jump Server
-        if [ -n "$fNeedJumpServer" ]; then
-            fSpawnCmd="$fSpawnCmd -J $fJumpUser@$fJumpServer:$fJumpPort"
-        fi
-        fLCBaseCmd="$fSpawnCmd \"$fSSHCmd\"" # For printing purpose only
+            # Via a Jump Server
+            if [ -n "$fNeedJumpServer" ]; then
+                fSpawnCmd="$fSpawnCmd -J $fJumpUser@$fJumpServer:$fJumpPort"
+            fi
+            fLCBaseCmd="$fSpawnCmd \"$fSSHCmd\"" # For printing purpose only
 
-        if [ -n "$fLiveCapture" ]; then
-            cmd="$cmd | nc -l -p $fLCPort"
-        fi
+            if [ -n "$fLiveCapture" ]; then
+                cmd="$cmd | nc -l -p $fLCPort"
+            fi
 
-        if [ -n "$fNoShell" ]; then
-            fSpawnCmd="$fSpawnCmd \"$cmd\""
-        else
-            fSpawnCmd="$fSpawnCmd $keepAlive"
-        fi
-    # SFTP command. SFTP does not support $fSSHCmd
-    else
-        if [ -n "$fNeedJumpServer" ]; then
-            cmd="-o \"ProxyJump=$fJumpUser@$fJumpServer\""
-        fi
-        fSpawnCmd="sftp $cmd -P $fTargetPort $fTargetUser@$fTarget"
-    fi
+            if [ -n "$fNoShell" ]; then
+                fSpawnCmd="$fSpawnCmd \"$cmd\""
+            else
+                fSpawnCmd="$fSpawnCmd $keepAlive"
+            fi
+            ;;
+
+        "$SFTP_MODE")
+            cmd=""
+            if [ -n "$fNeedJumpServer" ]; then
+                cmd="-o \"ProxyJump=$fJumpUser@$fJumpServer\""
+            fi
+            fSpawnCmd="sftp $cmd -P $fTargetPort $fTargetUser@$fTarget"
+            ;;
+
+        "$SSHFS_MODE")
+            # Do not use expect to spawn sshfs session, as it will not work as expected
+            param="$fFSBasicMountParams -o password_stdin -o StrictHostKeyChecking=no"
+            fSpawnCmd="echo $fTargetPwd | sshfs $param -p $fTargetPort $fTargetUser@$fTarget:$fFSRemoteDir $fFSMountPoint"
+            ;;
+
+        *)
+            COLOR=$MAGENTA
+            echo -e "$USER_NOTATION ${COLOR}Invalid mode: $fModeName${RESET}"
+            exit 1
+            ;;
+    esac
     # Squash multiple spaces into one
     fSpawnCmd=$(echo "$fSpawnCmd" | tr -s ' ')
 }
@@ -364,7 +433,12 @@ else
     if [ -n "$fVdom" ]; then
         echo -e "[v] Set FGT/FPX VDOM to: ${COLOR}$fVdom${RESET}" >&2
     fi
-    echo -e "[-] Set Maximum Attempts to: ${COLOR}$fMaxAttempts${RESET}" >&2
+fi
+
+if [ $fModeName == $SSHFS_MODE ]; then
+    echo -e "${BOLD}SSHFS Options:${RESET}" >&2
+    echo -e "[F] Set SSHFS Remote Directory to: ${COLOR}$fFSRemoteDir${RESET}" >&2
+    echo -e "[F] Set SSHFS Local Mountpoint to: ${COLOR}$fFSMountPoint${RESET}" >&2
 fi
 
 if [ -n "$fNeedJumpServer" ]; then
@@ -418,6 +492,15 @@ dumpLCTips() {
 dumpLCTips "$BLUE"
 [ -n "$fNeedJumpServer" ] && dumpLFTips "$LIGHTGREEN"
 
+if [ -z "$fSwitchToSShfs" ]; then
+    fFSRemoteDir="/home/$fTargetUser"
+    fFSMountPoint="$HOME/demo"
+    COLOR=$LIGHTGREEN
+    echo -e "${BOLD}SSHFS Command Tips:${RESET}" >&2
+    echo -e "${COLOR}$SCRIPT_NAME -t $fTarget -l $fTargetUser -p $fTargetPwd -F $fFSRemoteDir:$fFSMountPoint${RESET}" >&2
+    echo -e "${COLOR}sshfs $fFSBasicMountParams -p $fTargetPort $fTargetUser@$fTarget:$fFSRemoteDir $fFSMountPoint${RESET}" >&2
+fi
+
 echo "$SEPARATOR_LEFT" >&2
 if [ -n "$fNeedLocalForwarder" ]; then
     COLOR=$GREY
@@ -429,7 +512,22 @@ else
         echo -ne " via Jump Server: $fJumpServer" >&2
     fi
 fi
+
 echo -e " ...${RESET}" >&2
+
+if [ -n "$fSwitchToSShfs" ]; then
+    eval "$fSpawnCmd"
+    COLOR=$LIGHTGREEN
+    if [ $? -ne 0 ]; then
+        echo -e "$USER_NOTATION ${COLOR}Failed to mount $fFSRemoteDir to $fFSMountPoint${RESET}"
+        exit 1
+    else
+        findmnt "$fFSMountPoint"
+        df -h "$fFSMountPoint"
+        echo -e "$USER_NOTATION ${MAGENTA}Successfully mounted${RESET} ${COLOR}$fTargetUser@$fTarget:$fFSRemoteDir${RESET} to ${COLOR}$fFSMountPoint${RESET}"
+        exit 0
+    fi
+fi
 
 # expect -d -c "
 expect -c "
@@ -505,9 +603,10 @@ expect -c "
             puts -nonewline stderr \"$USER_NOTATION \${COLOR}Login attempt \$i/$fMaxAttempts\${RESET}\n\"
         }
 
+        # exp_internal 1 # Enable debugging for expect
         spawn -noecho $fSpawnCmd
         set session_id [exp_pid]
-        puts stderr \"${USER_NOTATION} \${COLOR}Spawned Session ID: \$session_id\${RESET}\"
+        puts stderr \"\${COLOR}Spawned Session ID: \$session_id\${RESET}\"
 
         set ssh_pwd_prompt_cnt 0
         set jmp_pwd_prompt_cnt 0
@@ -523,6 +622,7 @@ expect -c "
                     puts stderr \"\n$USER_NOTATION \${COLOR}Login credentials for SSH Target: $fTarget are wrong.\${RESET}\n\"
                     exit 1
                 }
+
                 send \"$fTargetPwd\r\"
                 exp_continue
             }
