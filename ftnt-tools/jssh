@@ -16,6 +16,7 @@ fDollarPattern='\$\s*$'
 fPoundPattern='#\s*$'
 # fSftpPattern='sftp>\s*$'
 # SSH Variables
+fInputCmd=""
 fTarget=""
 fTargetUser="admin"
 fTargetPwd="password"
@@ -130,6 +131,7 @@ _EOF
 [[ $# -eq 0 ]] && usage
 
 # Parse command-line options
+fInputCmd="$SCRIPT_NAME $*"
 while getopts "t:l:u:p:P:J:W:v:c:TF:CL:h" opt; do
     case ${opt} in
         t)
@@ -457,6 +459,10 @@ fi
 
 [ -n "$fLiveCapture" ] && echo -e "[C] nc Listens remotely on Port: ${COLOR}$fLCPort${RESET}" >&2
 
+COLOR=$NORMAL
+echo -e "${BOLD}Input Command:${RESET}" >&2
+echo -e "${COLOR}$fInputCmd${RESET}" >&2
+
 COLOR=$LIGHTYELLOW
 echo -e "${BOLD}Spawned Command:${RESET}" >&2
 echo -e "${COLOR}$fSpawnCmd${RESET}" >&2
@@ -595,7 +601,7 @@ expect -c "
             set COLOR \$MAGENTA
         } SIGINT
     } else {
-        set timeout 5
+        set timeout 4
     }
 
     set i 1
