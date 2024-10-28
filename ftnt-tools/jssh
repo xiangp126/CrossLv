@@ -603,7 +603,7 @@ expect -c "
     while {\$i <= $fMaxAttempts} {
         # ssh -o StrictHostKeyChecking=no $fTarget
         if {\$i > 1} {
-            puts -nonewline stderr \"$USER_NOTATION \${COLOR}Login attempt \$i/$fMaxAttempts\${RESET}\n\"
+            puts stderr \"$USER_NOTATION \${COLOR}Login attempt \$i/$fMaxAttempts\${RESET}\"
         }
 
         # exp_internal 1 # Enable debugging for expect
@@ -622,7 +622,7 @@ expect -c "
             -re {$fTargetUser@$fTarget's (password|Password):} {
                 incr ssh_pwd_prompt_cnt
                 if {\$ssh_pwd_prompt_cnt > 1} {
-                    puts stderr \"\n$USER_NOTATION \${COLOR}Login credentials for SSH Target: $fTarget are wrong.\${RESET}\n\"
+                    puts stderr \"\n$USER_NOTATION \${COLOR}Login credentials for SSH Target: $fTarget are wrong.\${RESET}\"
                     exit 1
                 }
 
@@ -632,7 +632,7 @@ expect -c "
             -re {$fJumpUser@$fJumpServer's (password|Password):} {
                 incr jmp_pwd_prompt_cnt
                 if {\$jmp_pwd_prompt_cnt > 1} {
-                    puts stderr \"\n$USER_NOTATION \${COLOR}Login credentials for Jump Server: $fJumpServer are wrong.\${RESET}\n\"
+                    puts stderr \"\n$USER_NOTATION \${COLOR}Login credentials for Jump Server: $fJumpServer are wrong.\${RESET}\"
                     exit 1
                 }
                 send \"$fJumpPwd\r\"
@@ -642,7 +642,7 @@ expect -c "
                 # Get the matched variable from the first capturing group
                 set host \$expect_out(1,string)
                 set COLOR \$LIGHTYELLOW
-                puts -nonewline stderr \"$USER_NOTATION \${COLOR}Host key verification failed. Updating known_hosts file\${RESET}\n\"
+                puts stderr \"$USER_NOTATION \${COLOR}Host key verification failed. Updating known_hosts file\${RESET}\"
                 system \"ssh-keygen -R \$host\"
                 puts stderr \"$USER_NOTATION \${COLOR}Host key removed from known_hosts file.\${RESET}\n\"
                 set COLOR \$MAGENTA
@@ -659,14 +659,14 @@ expect -c "
                 exp_continue
             }
             {No route to host} {
-                puts stderr \"$USER_NOTATION \${COLOR}No route to host.\${RESET}\n\"
+                puts stderr \"$USER_NOTATION \${COLOR}No route to host.\${RESET}\"
                 exit 1
             }
             -re {$fGroupPattern} {
                 break
             }
             timeout {
-                puts stderr \"$USER_NOTATION \${COLOR}Session \$session_id Timed out waiting for a response.\${RESET}\n\"
+                puts stderr \"$USER_NOTATION \${COLOR}Session \$session_id Timed out waiting for a response.\${RESET}\"
                 # close \$ssh_session_id
                 incr i
                 continue

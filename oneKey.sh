@@ -1,6 +1,13 @@
 #!/bin/bash
+# Constants
+SCRIPT_NAME=$(basename $0)
+USER_NOTATION="@@@@"
+catBanner="---------------------------------------------------"
+catBanner=$(echo "$catBanner" | sed 's/------/------ /g')
+beautifyGap1="-> "
+beautifyGap2="   "
+beautifyGap3="♣  "
 # Misc Info
-scriptName=$(basename $0)
 workingDir=$(cd $(dirname $0); pwd)
 trackedFilesDir=$workingDir/track-files
 templateFilesDir=$workingDir/template
@@ -9,16 +16,10 @@ ftntToolsDir=$workingDir/ftnt-tools
 completionDirSRC=$workingDir/completion-files
 completionDirDst=$HOME/.bash_completion.d
 downloadDir=$workingDir/Downloads
-catBanner="---------------------------------------------------"
-catBanner=$(echo "$catBanner" | sed 's/------/------ /g')
-beautifyGap1="-> "
-beautifyGap2="   "
-beautifyGap3="♣  "
 # ubuntu is the default OS type
 osType=ubuntu
 osCategory=debian
 # Flags
-usageFlag=false
 forceUpdateFlag=false
 installFlag=false
 linkFlag=true
@@ -27,7 +28,7 @@ toolsFlag=false
 
 usage() {
     cat << _EOF
-Usage: ./$scriptName [iuchH]
+Usage: ./$SCRIPT_NAME [iuchH]
 Options:
     -h, --help                      Print this help message
     -i, --install                   Create symbolic links
@@ -37,15 +38,15 @@ Options:
         -u, --update                Force an update
 
 Recommdned:
-    ./$scriptName -i
+    ./$SCRIPT_NAME -i
 
 Examples:
-    ./$scriptName -i
-    ./$scriptName -it
-    ./$scriptName -ic
-    ./$scriptName -iu
-    ./$scriptName -iuH
-    ./$scriptName -h
+    ./$SCRIPT_NAME -i
+    ./$SCRIPT_NAME -it
+    ./$SCRIPT_NAME -ic
+    ./$SCRIPT_NAME -iu
+    ./$SCRIPT_NAME -iuH
+    ./$SCRIPT_NAME -h
 
 _EOF
 }
@@ -78,7 +79,7 @@ while getopts "uhicHt" opt; do
             linkFlag=false
             ;;
         ?)
-            echo "$userNotation Invalid option: -$OPTARG" >&2
+            echo "$USER_NOTATION Invalid option: -$OPTARG" >&2
             ;;
     esac
 done
@@ -86,7 +87,7 @@ done
 # Shift to process non-option arguments. New $1, $2, ..., $@
 shift $((OPTIND - 1))
 if [ $# -gt 0 ]; then
-    echo "$userNotation Illegal non-option arguments: $@"
+    echo "$USER_NOTATION Illegal non-option arguments: $@"
     exit 1
 fi
 
@@ -140,6 +141,7 @@ installPrerequisitesForDebian() {
         tigervnc-standalone-server
         tigervnc-xorg-extension
         tigervnc-viewer
+        remmina # remote desktop client
         # samba
         # smbclient
         ## hyperscan
