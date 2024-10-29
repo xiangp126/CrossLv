@@ -87,7 +87,7 @@ usage:
     $SCRIPT_NAME [-l/-u user] [-p passwd] [-P ssh_port] [-v vdom] [-h] -t [user@]target[:port]
          [-c command] [-C]
          [-J user@jumpserver[:port]] [-W jump_passwd]
-         [-L [local_bind_address:]local_port:remote_address:remoteport]
+         [-L [[local_bind_address:]local_port:remote_address:remoteport]
          [-F [dir:]mountpoint]
          [-T]
 
@@ -471,8 +471,17 @@ dumpLFTips() {
     # Local Forwarding only works when $fNeedJumpServer is set
     COLOR=$1
     echo -e "${BOLD}Local Forwarding Command Tips:${RESET}" >&2
-    echo -e "${COLOR}${SCRIPT_NAME} -L $fLFLocalAddr:$fLFLocalPort:$fTarget:$fTargetPort -J $fJumpOptions -W $fJumpPwd${RESET}" >&2
-    echo -e "${COLOR}${SCRIPT_NAME} -t $fLFLocalAddr:$fLFLocalPort -l $fTargetUser -p $fTargetPwd${RESET}" >&2
+    if [ -n "$fNeedJumpServer" ]; then
+        echo -e "${COLOR}${SCRIPT_NAME} -L $fLFLocalAddr:$fLFLocalPort:$fTarget:$fTargetPort -J $fJumpOptions -W $fJumpPwd${RESET}" >&2
+        echo -e "${COLOR}${SCRIPT_NAME} -t $fLFLocalAddr:$fLFLocalPort -l $fTargetUser -p $fTargetPwd${RESET}" >&2
+    else
+        demoRemote="remote_addr"
+        demoRemotePort="remote_port"
+        demoRemotePwd="remote_pwd"
+        demoRemoteUser="remote_user"
+        echo -e "${COLOR}${SCRIPT_NAME} -J $fTargetUser@$fTarget -W $fTargetPwd -L $fLFLocalAddr:$fLFLocalPort:$demoRemote:$demoRemotePort${RESET}" >&2
+        echo -e "${COLOR}${SCRIPT_NAME} -t $fLFLocalAddr:$fLFLocalPort -l $demoRemoteUser -p $demoRemotePwd${RESET}" >&2
+    fi
 }
 
 dumpLCTips() {
@@ -497,7 +506,7 @@ dumpLCTips() {
 }
 
 dumpLCTips "$BLUE"
-[ -n "$fNeedJumpServer" ] && dumpLFTips "$LIGHTPURPLE"
+dumpLFTips "$PURPLE"
 
 if [ -z "$fSwitchToSShfs" ]; then
     fFSRemoteDir="/home/$fTargetUser"
