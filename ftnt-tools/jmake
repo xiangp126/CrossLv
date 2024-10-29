@@ -20,13 +20,11 @@ fSyncFile=$fBuildTarget
 fSyncPort=22
 fSyncUsername="admin"
 fSyncPassword="password"
-
 # Git associated variables
 compileCommandsFile="compile_commands.json"
 gitExcludePattern1=$compileCommandsFile
 gitExcludePattern2="\*.code-workspace"
 gitExcludeList="$gitExcludePattern1 $gitExcludePattern2"
-
 # Common Constants
 SCRIPT_NAME=$(basename $0)
 USER_NOTATION="@@@@"
@@ -35,8 +33,7 @@ SUB_USER_NOTATION="@@@@ @"
 # SEPARATOR="---------------------------------------------------"
 # SHORT_SEPARATOR2="=============="
 SEPARATOR2="==================================================="
-
-# Color Constants
+# Colors
 CYAN='\033[36m'
 RED='\033[31m'
 BOLD='\033[1m'
@@ -357,7 +354,7 @@ if [[ "$fRunConfigure" == true ]]; then
         source \"\$script_to_get_credentials\"
 
         set config_bash_prompt \"$ \"
-        send_user \"$SUB_USER_NOTATION Spawning a new bash session.\n\"
+        puts stderr \"$SUB_USER_NOTATION Spawning a new bash session.\n\"
         spawn -noecho bash
         log_user 1
         expect \"\$config_bash_prompt\"
@@ -382,7 +379,7 @@ if [[ "$fRunConfigure" == true ]]; then
                 send \"\x04\r\"
             }
             timeout {
-                send_user \"$SUB_USER_NOTATION Timeout. Action aborted.\n\"
+                puts stderr \"$SUB_USER_NOTATION Timeout. Action aborted.\n\"
                 exit 1
             }
         }
@@ -517,7 +514,7 @@ if [[ "$fSyncTarget" != false ]]; then
 
         # Loop to sync the file
         for {set i 1} {\$i <= $maxSyncRetries} {incr i} {
-            send_user \"$SUB_USER_NOTATION Sync attempt \$i/$maxSyncRetries\n\"
+            puts stderr \"$SUB_USER_NOTATION Sync attempt \$i/$maxSyncRetries\"
             spawn -noecho scp -P $fSyncPort $syncFile ${fSyncUsername}@${fSyncTarget}:/fgt-image
             if {\$adjustTimeout != 0} {
                 set timeout \$adjustTimeout
@@ -527,7 +524,7 @@ if [[ "$fSyncTarget" != false ]]; then
 
             expect {
                 \"bad port\" {
-                    send_user \"$SUB_USER_NOTATION Bad port. Connecting aborted.\n\"
+                    puts stderr \"$SUB_USER_NOTATION Bad port. Connecting aborted.\"
                     exit $EFAILED
                 }
                 {yes/no} {
@@ -537,51 +534,51 @@ if [[ "$fSyncTarget" != false ]]; then
                 -nocase {Password:} {
                     incr passwd_prompt_cnt
                     if {\$passwd_prompt_cnt > 1} {
-                        send_user \"\n$SUB_USER_NOTATION Permission Denied. Please specify the login credentials.\n\"
+                        puts stderr \"\n$SUB_USER_NOTATION Permission Denied. Please specify the login credentials.\"
                         exit $EFAILED
                     }
                     send \"$fSyncPassword\r\"
                     exp_continue
                 }
                 \"Host key verification failed.\" {
-                    send_user \"$SUB_USER_NOTATION Host key verification failed. Updating known_hosts file...\n\"
-                    send_user \"$SUB_USER_NOTATION Executing: ssh-keygen -R $fSyncTarget\n\"
+                    puts stderr \"$SUB_USER_NOTATION Host key verification failed. Updating known_hosts file...\"
+                    puts stderr \"$SUB_USER_NOTATION Executing: ssh-keygen -R $fSyncTarget\"
                     system \"ssh-keygen -R $fSyncTarget\"
-                    send_user \"$SUB_USER_NOTATION Host key removed from known_hosts file.\n\"
-                    send_user \"$SUB_USER_NOTATION Retrying SCP immediately...\n\"
+                    puts stderr \"$SUB_USER_NOTATION Host key removed from known_hosts file.\"
+                    puts stderr \"$SUB_USER_NOTATION Retrying SCP immediately...\"
                     continue
                 }
                 -re {Connection refused|No route to host} {
                     set adjustTimeout -1
-                    send_user \"$SUB_USER_NOTATION Waiting for \$waitBeforeRetry seconds before retrying...\n\"
+                    puts stderr \"$SUB_USER_NOTATION Waiting for \$waitBeforeRetry seconds before retrying ...\"
                     sleep \$waitBeforeRetry
                     # Exponential backoff
                     set waitBeforeRetry [expr {\$waitBeforeRetry * 2}]
                     continue
                 }
                 \"501-Permission Denied\" {
-                    send_user \"$SUB_USER_NOTATION Permission Denied. Please enable admin-scp under 'config system global'.\n\"
+                    puts stderr \"$SUB_USER_NOTATION Permission Denied. Please enable admin-scp under 'config system global'.\"
                     exit $EFAILED
                 }
                 \"check image error\" {
-                    send_user \"$SUB_USER_NOTATION Check image error. Action aborted.\n\"
+                    puts stderr \"$SUB_USER_NOTATION Check image error. Action aborted.\"
                     # exp_continue
                     exit $EFAILED
                 }
                 \"100-update image completed\" {
-                    send_user \"$SUB_USER_NOTATION 100-update image completed. Action completed.\n\"
+                    puts stderr \"$SUB_USER_NOTATION 100-update image completed. Action completed.\"
                     exit $ESUCCESS
                 }
                 \"lost connection\" {
-                    send_user \"$SUB_USER_NOTATION Lost connection. Action aborted.\n\"
+                    puts stderr \"$SUB_USER_NOTATION Lost connection. Action aborted.\"
                     exit $EFAILED
                 }
                 timeout {
-                    send_user \"$SUB_USER_NOTATION Timeout. Action aborted.\n\"
+                    puts stderr \"$SUB_USER_NOTATION Timeout. Action aborted.\"
                     exit $ETIMEOUT
                 }
                 eof {
-                    send_user \"$SUB_USER_NOTATION Reaching EOF.\n\"
+                    puts stderr \"$SUB_USER_NOTATION Reaching EOF.\"
                     exit $ESUCCESS
                 }
             }

@@ -52,8 +52,6 @@ fLFLocalPort="8881"
 # SSHFS Variables
 fSwitchToSShfs=""
 fFSBasicMountParams="-o reconnect -o transform_symlinks -o follow_symlinks -o cache=yes"
-# fFSMountparams="-o reconnect -o transform_symlinks -o follow_symlinks \
-#                 -o cache=yes -o password_stdin -o StrictHostKeyChecking=no"
 fFSOptions=""
 fFSMountPoint=""
 fFSRemoteDir=""
@@ -204,7 +202,7 @@ fi
 
 parseOptions() {
     COLOR=$MAGENTA
-    # Parse fJumpOptions in the format of user@jumpserver[:port]
+    # !! Parse fJumpOptions in the format of user@jumpserver[:port]
     if [ "$fNeedJumpServer" = true ]; then
         # Exp: -J auto@172.18.20.84:2121 or -J auto@172.18.20.84
         pattern='^([a-zA-Z0-9._%+-]+)@(([0-9]{1,3}\.){3}[0-9]{1,3})(:([0-9]+))?$'
@@ -225,7 +223,7 @@ parseOptions() {
         # done
     fi
 
-    # Parse $fLFOptions in the format of [bind_address:]port:host:hostport
+    # !! Parse $fLFOptions in the format of [bind_address:]port:host:hostport
     # Exp: -L 127.0.0.1:8881:10.40.1.101:22 or -L 8881:10.40.1.101:22
     if [ -n "$fNeedLocalForwarder" ]; then
         pattern='^((([0-9]{1,3}\.){3}[0-9]{1,3}):)?([0-9]+):(([0-9]{1,3}\.){3}[0-9]{1,3}):([0-9]+)$'
@@ -247,10 +245,17 @@ parseOptions() {
         # for i in "${!BASH_REMATCH[@]}"; do
         #     echo -e "$USER_NOTATION ${COLOR}BASH_REMATCH[$i]: ${BASH_REMATCH[$i]}${RESET}"
         # done
+
+        if lsof -i:"$fLFLocalPort" -t &>/dev/null; then
+            lsof -i:"$fLFLocalPort"
+            echo -e "$USER_NOTATION ${COLOR}Local port $fLFLocalPort is already in use.${RESET}"
+            exit 1
+        fi
+        # Skip the rest of the parsing
         return
     fi
 
-    # Parse fTarget in the format of [user@]sshtarget[:port]
+    # !! Parse fTarget in the format of [user@]sshtarget[:port]
     # Exp: -t auto@172.18.20.84 or -t 172.18.20.84
     pattern='^(([a-zA-Z0-9._%+-]+)@)?([a-zA-Z0-9._%+-]+)(:([0-9]+))?$'
     fTarget=$(echo "$fTarget" | xargs)
@@ -269,7 +274,7 @@ parseOptions() {
     #     echo -e "$USER_NOTATION ${COLOR}BASH_REMATCH[$i]: ${BASH_REMATCH[$i]}${RESET}"
     # done
 
-    # Parse fFSOptions in the format of [dir:]mountpoint
+    # !! Parse fFSOptions in the format of [dir:]mountpoint
     if [ -n "$fSwitchToSShfs" ]; then
         if [[ $fFSOptions == *":"* ]]; then
             IFS=':' read -r fFSRemoteDir fFSMountPoint <<< "$fFSOptions"
@@ -423,8 +428,6 @@ echo "$SEPARATOR_RIGHT" >&2
 if [ -n "$fNeedLocalForwarder" ]; then
     COLOR=$LIGHTRED
     echo -e "${BOLD}Local Forwarder Options:${RESET}" >&2
-    echo -e "[-] Set Local Bind Address to: ${COLOR}$fLFLocalAddr${RESET}" >&2
-    echo -e "[-] Set Local Bind Port to: ${COLOR}$fLFLocalPort${RESET}" >&2
     echo -e "[L] Set Local Forwarder: ${COLOR}$fLFLocalAddr:$fLFLocalPort -> $fTarget:$fTargetPort${RESET}" >&2
 else
     echo -e "${BOLD}Target Options:${RESET}" >&2
@@ -474,6 +477,7 @@ dumpLFTips() {
     if [ -n "$fNeedJumpServer" ]; then
         echo -e "${COLOR}${SCRIPT_NAME} -L $fLFLocalAddr:$fLFLocalPort:$fTarget:$fTargetPort -J $fJumpOptions -W $fJumpPwd${RESET}" >&2
         echo -e "${COLOR}${SCRIPT_NAME} -t $fLFLocalAddr:$fLFLocalPort -l $fTargetUser -p $fTargetPwd${RESET}" >&2
+        echo -e "${COLOR}ssh -p $fLFLocalPort $fLFLocalAddr -l $fTargetUser${RESET}" >&2
     else
         demoRemote="remote_addr"
         demoRemotePort="remote_port"
@@ -481,6 +485,7 @@ dumpLFTips() {
         demoRemoteUser="remote_user"
         echo -e "${COLOR}${SCRIPT_NAME} -J $fTargetUser@$fTarget -W $fTargetPwd -L $fLFLocalAddr:$fLFLocalPort:$demoRemote:$demoRemotePort${RESET}" >&2
         echo -e "${COLOR}${SCRIPT_NAME} -t $fLFLocalAddr:$fLFLocalPort -l $demoRemoteUser -p $demoRemotePwd${RESET}" >&2
+        echo -e "${COLOR}ssh -p $fLFLocalPort $fLFLocalAddr -l $demoRemoteUser${RESET}" >&2
     fi
 }
 
