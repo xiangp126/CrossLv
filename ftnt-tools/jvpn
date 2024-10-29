@@ -1,0 +1,114 @@
+#!/bin/bash
+
+# Set the header for the Expect script
+script_name=$(basename $0)
+
+usage() {
+    echo "Usage: $script_name [-r]"
+    echo "  -r  Restart the forticlient service"
+    exit 1
+}
+
+while getopts "rh" opt; do
+    case $opt in
+        r)
+            echo "Restarting forticlient service"
+            sudo systemctl restart forticlient.service
+            sudo systemctl status forticlient.service
+            if [ $? -ne 0 ]; then
+                echo "Failed to restart forticlient service"
+                exit 1
+            else
+                echo "Successfully restarted forticlient service"
+            fi
+            exit 0
+            ;;
+        h)
+            usage
+            ;;
+        ?)
+            echo "Invalid option: -$OPTARG" >&2
+            usage
+            ;;
+    esac
+done
+
+if ! command -v get_credentials &> /dev/null; then
+    echo "Error: Command get_credentials not found."
+    exit 1
+fi
+
+if ! credentials_output=$(eval get_credentials); then
+    echo "Error: Failed to get credentials."
+    exit 1
+fi
+
+mapfile -t credentials <<< "$credentials_output"
+ftnt_username=${credentials[0]}
+ftnt_password=${credentials[1]}
+
+spawnCmd="sudo /opt/forticlient/vpn -s scm.van.corp.fortinet.com:443 -u $ftnt_username -p"
+echo "Spawned command: $spawnCmd"
+
+expect -c "
+    set timeout 60
+    set max_retry 5
+    set loop_prompt \"Error\"
+    set token_prompt \"FortiToken\"
+
+    set i 1
+    while { \$i <= \$max_retry } {
+        spawn -noecho $spawnCmd
+        # exp_internal 1
+        expect {
+            {Confirm (y/n)} {
+                send \"y\r\"
+                exp_continue
+            }
+            {yes/no} {
+                send \"y\r\"
+                exp_continue
+            }
+            -re {[Uu]sername} {
+                send \"$ftnt_username\r\"
+                exp_continue
+            }
+            -re {[Pp]assword} {
+                send \"$ftnt_password\r\"
+                exp_continue
+            }
+            {\$loop_prompt} {
+                send_user \"@@@@ Error found, retry \$i\n\n\"
+                incr i
+                continue
+            }
+            \$token_prompt {
+                break
+            }
+            timeout {
+                puts \"Timed out waiting for a response.\"
+                exit 1
+            }
+            eof {
+                puts \"EOF reached.\"
+                exit 1
+            }
+        }
+        incr i
+    }
+
+    if { \$i > \$max_retry } {
+        send_user \"\n@@@@ Maximum retry reached, exit\n\"
+        send_user \"Please try the following commands:\n\"
+        send_user \"sudo rm /opt/forticlient/ems_*.crt\n\"
+        send_user \"sudo systemctl restart forticlient.service\n\"
+        exit 1
+    }
+
+    expect_user -re {(.*)\n}
+    set token \$expect_out(1,string)
+    send \"\$token\r\"
+
+    set timeout -1
+    expect eof
+"
