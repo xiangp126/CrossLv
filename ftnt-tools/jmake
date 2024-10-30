@@ -1,6 +1,9 @@
 #!/bin/bash
+# set -x
 
 # Build flags & Options
+ftntUser=""
+ftntPasswd=""
 fPlatform="FOS" # Default platform
 ftntBuildTarget="image.out"
 fBuildTarget="$ftntBuildTarget"
@@ -40,6 +43,7 @@ BOLD='\033[1m'
 GREEN='\033[32m'
 MAGENTA='\033[35m'
 BLUE='\033[34m'
+GREY='\033[90m'
 # YELLOW='\033[33m'
 RESET='\033[0m'
 
@@ -343,34 +347,48 @@ fi
 
 # Step 1: Run Configure
 if [[ "$fRunConfigure" == true ]]; then
+    if ! command -v get_credentials &> /dev/null; then
+        echo -e "$USER_NOTATION ${RED}Error: Command get_credentials not found.${RESET}"
+        exit 1
+    fi
+
+    if ! credentials_output=$(eval get_credentials); then
+        echo -e "$USER_NOTATION ${RED}Error: Failed to get credentials.${RESET}"
+        exit 1
+    fi
+
+    mapfile -t credentials <<< "$credentials_output"
+    ftntUser=${credentials[0]}
+    ftntPasswd=${credentials[1]}
+
     COLOR="$BLUE"
     CONFIGURE_CMD="./Configure -m $fBuildModel -d y -c"
     echo -e "$USER_NOTATION Running Configure: ${COLOR}$CONFIGURE_CMD${RESET}"
+    COLOR=$GREY
+    echo -e "$SUB_USER_NOTATION ${COLOR}Spawning a new bash session.${RESET}"
     sleep 1
 
     # expect -d -c "
     expect -c "
-        set script_to_get_credentials ~/.usr/bin/get_credentials
-        source \"\$script_to_get_credentials\"
-
         set config_bash_prompt \"$ \"
-        puts stderr \"$SUB_USER_NOTATION Spawning a new bash session.\n\"
-        spawn -noecho bash
+
         log_user 1
+        # exp_internal 1
+        spawn -noecho bash
+
         expect \"\$config_bash_prompt\"
         send \"cd $fWorkingDir\r\"
         expect \"\$config_bash_prompt\"
         send \"$CONFIGURE_CMD\r\"
-        # log_user 1
 
         set timeout 180
         expect {
-            \"Username:\" {
-                send \"\$ftnt_username\r\"
+            {Username} {
+                send \"$ftntUser\r\"
                 exp_continue
             }
-            \"Password for '\$ftnt_username':\" {
-                send \"\$ftnt_password\r\"
+            {Password for '$ftntUser':} {
+                send \"$ftntPasswd\r\"
                 exp_continue
             }
             \"\$config_bash_prompt\" {
@@ -383,17 +401,14 @@ if [[ "$fRunConfigure" == true ]]; then
                 exit 1
             }
         }
-
-        expect eof
     "
 
-    echo "$SUB_USER_NOTATION Exiting from the spawned session."
-
+    COLOR=$MAGENTA
     if [[ $? -ne 0 ]]; then
-        echo "$SUB_USER_NOTATION Failed to run Configure."
+        echo -e "$USER_NOTATION ${COLOR}Failed to run Configure.${RESET}"
         exit 1
     else
-        echo "$SUB_USER_NOTATION Configure completed successfully."
+        echo -e "$USER_NOTATION ${COLOR}Configure completed successfully at $(getCurrentTime)${RESET}"
     fi
 fi
 
@@ -480,7 +495,7 @@ if [[ "$fNeedBuild" != false ]]; then
         fi
     fi
 
-    echo "$USER_NOTATION Congratulations! You have built projects successfully at $(getCurrentTime)."
+    echo "$USER_NOTATION Congratulations! You have built projects successfully at $(getCurrentTime)"
 fi
 
 # Step 3: Sync the SYNC_FILE to the target machine
@@ -592,14 +607,14 @@ if [[ "$fSyncTarget" != false ]]; then
     case $retValue in
         $ESUCCESS)
             COLOR="$GREEN"
-            echo -e "$SUB_USER_NOTATION You have synced $fSyncFile to $fSyncTarget successfully at $(getCurrentTime)."
+            echo -e "$SUB_USER_NOTATION You have synced $fSyncFile to $fSyncTarget successfully at $(getCurrentTime)"
             echo -e "$SUB_USER_NOTATION ${COLOR}Login to the server and wait for it to reboot${RESET} ..."
             jssh -P "$fSyncPort" -u "$fSyncUsername" -p "$fSyncPassword" -t "$fSyncTarget"
             if [[ $? -ne 0 ]]; then
                 echo "$SUB_USER_NOTATION Please check the server status manually."
                 exit 1
             else
-                echo -e "$SUB_USER_NOTATION Target ${COLOR}$fSyncTarget${RESET} started to reboot at $(getCurrentTime)."
+                echo -e "$SUB_USER_NOTATION Target ${COLOR}$fSyncTarget${RESET} started to reboot at $(getCurrentTime)"
                 exit 0
             fi
             ;;
