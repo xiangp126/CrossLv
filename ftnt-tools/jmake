@@ -31,7 +31,6 @@ gitExcludeList="$gitExcludePattern1 $gitExcludePattern2"
 # Common Constants
 SCRIPT_NAME=$(basename $0)
 USER_NOTATION="@@@@"
-SUB_USER_NOTATION="@@@@ @"
 # SHORT_SEPARATOR="--------------"
 # SEPARATOR="---------------------------------------------------"
 # SHORT_SEPARATOR2="=============="
@@ -320,13 +319,13 @@ if [[ "$fGitClean" == true ]]; then
             fi
         fi
         COLOR="$MAGENTA"
-        echo -e "$SUB_USER_NOTATION Exclude ${COLOR}$patt${RESET}"
+        echo -e "$USER_NOTATION Exclude ${COLOR}$patt${RESET}"
         gitExcludePattern+="--exclude=$patt "
     done
 
     COLOR="$BLUE"
     gitCleanCmd="git clean -xdf $gitExcludePattern"
-    echo -e "$SUB_USER_NOTATION Running: ${COLOR}$gitCleanCmd${RESET}"
+    echo -e "$USER_NOTATION Running: ${COLOR}$gitCleanCmd${RESET}"
 
     sleep 1
     COLOR="$RED"
@@ -335,7 +334,7 @@ if [[ "$fGitClean" == true ]]; then
         echo -e "$USER_NOTATION ${COLOR}Failed to clean the working directory.${RESET}"
         exit 1
     else
-        echo -e "$SUB_USER_NOTATION ${COLOR}Cleaned the working directory successfully.${RESET}"
+        echo -e "$USER_NOTATION ${COLOR}Cleaned the working directory successfully.${RESET}"
     fi
 fi
 
@@ -365,7 +364,7 @@ if [[ "$fRunConfigure" == true ]]; then
     CONFIGURE_CMD="./Configure -m $fBuildModel -d y -c"
     echo -e "$USER_NOTATION Running Configure: ${COLOR}$CONFIGURE_CMD${RESET}"
     COLOR=$GREY
-    echo -e "$SUB_USER_NOTATION ${COLOR}Spawning a new bash session.${RESET}"
+    echo -e "$USER_NOTATION ${COLOR}Spawning a new bash session.${RESET}"
     sleep 1
 
     # expect -d -c "
@@ -397,7 +396,7 @@ if [[ "$fRunConfigure" == true ]]; then
                 send \"\x04\r\"
             }
             timeout {
-                puts stderr \"$SUB_USER_NOTATION Timeout. Action aborted.\n\"
+                puts stderr \"$USER_NOTATION Timeout. Action aborted.\n\"
                 exit 1
             }
         }
@@ -408,7 +407,7 @@ if [[ "$fRunConfigure" == true ]]; then
         echo -e "$USER_NOTATION ${COLOR}Failed to run Configure.${RESET}"
         exit 1
     else
-        echo -e "$USER_NOTATION ${COLOR}Configure completed successfully at $(getCurrentTime)${RESET}"
+        echo -e "$USER_NOTATION ${COLOR}Configure completed successfully.${RESET}"
     fi
 fi
 
@@ -447,14 +446,14 @@ if [[ "$fNeedBuild" != false ]]; then
     if [[ -f "$jsonPath" && ! -w "$jsonPath" ]]; then
         echo "$USER_NOTATION Detected $jsonPath is read-only"
         if [[ "$fRMCompileCommandsJson" == true ]]; then
-            echo "$SUB_USER_NOTATION Removing $jsonPath"
+            echo "$USER_NOTATION Removing $jsonPath"
             rm -f "$jsonPath"
             if [[ $? -ne 0 ]]; then
-                echo "$SUB_USER_NOTATION Failed to remove $jsonPath"
+                echo "$USER_NOTATION Failed to remove $jsonPath"
                 exit 1
             fi
         else
-            echo "$SUB_USER_NOTATION Just keep $jsonPath as it is"
+            echo "$USER_NOTATION Just keep $jsonPath as it is"
         fi
     fi
 
@@ -464,7 +463,7 @@ if [[ "$fNeedBuild" != false ]]; then
     while [[ $attempt -le $maxAttempt ]]; do
         COLOR="$GREEN"
         echo -e "$USER_NOTATION Running build commands: ${COLOR}$makeCommand${RESET}"
-        echo -e "$SUB_USER_NOTATION ${COLOR}Build attempt $attempt/$maxAttempt${RESET}"
+        echo -e "$USER_NOTATION ${COLOR}Build attempt $attempt/$maxAttempt${RESET}"
         # [[ $attempt -gt 1 ]] && sleep 2
         sleep 2
 
@@ -480,7 +479,7 @@ if [[ "$fNeedBuild" != false ]]; then
     if [[ $eval_status -ne 0 ]]; then
         COLOR="$RED"
         echo "$USER_NOTATION Build projects failed."
-        echo -e "$SUB_USER_NOTATION ${COLOR}Suggest to clean the working directory and try again.${RESET}"
+        echo -e "$USER_NOTATION ${COLOR}Suggest to clean the working directory and try again.${RESET}"
         exit 1
     fi
 
@@ -529,7 +528,7 @@ if [[ "$fSyncTarget" != false ]]; then
 
         # Loop to sync the file
         for {set i 1} {\$i <= $maxSyncRetries} {incr i} {
-            puts stderr \"$SUB_USER_NOTATION Sync attempt \$i/$maxSyncRetries\"
+            puts stderr \"$USER_NOTATION Sync attempt \$i/$maxSyncRetries\"
             spawn -noecho scp -P $fSyncPort $syncFile ${fSyncUsername}@${fSyncTarget}:/fgt-image
             if {\$adjustTimeout != 0} {
                 set timeout \$adjustTimeout
@@ -539,7 +538,7 @@ if [[ "$fSyncTarget" != false ]]; then
 
             expect {
                 \"bad port\" {
-                    puts stderr \"$SUB_USER_NOTATION Bad port. Connecting aborted.\"
+                    puts stderr \"$USER_NOTATION Bad port. Connecting aborted.\"
                     exit $EFAILED
                 }
                 {yes/no} {
@@ -549,51 +548,51 @@ if [[ "$fSyncTarget" != false ]]; then
                 -nocase {Password:} {
                     incr passwd_prompt_cnt
                     if {\$passwd_prompt_cnt > 1} {
-                        puts stderr \"\n$SUB_USER_NOTATION Permission Denied. Please specify the login credentials.\"
+                        puts stderr \"\n$USER_NOTATION Permission Denied. Please specify the login credentials.\"
                         exit $EFAILED
                     }
                     send \"$fSyncPassword\r\"
                     exp_continue
                 }
                 \"Host key verification failed.\" {
-                    puts stderr \"$SUB_USER_NOTATION Host key verification failed. Updating known_hosts file...\"
-                    puts stderr \"$SUB_USER_NOTATION Executing: ssh-keygen -R $fSyncTarget\"
+                    puts stderr \"$USER_NOTATION Host key verification failed. Updating known_hosts file...\"
+                    puts stderr \"$USER_NOTATION Executing: ssh-keygen -R $fSyncTarget\"
                     system \"ssh-keygen -R $fSyncTarget\"
-                    puts stderr \"$SUB_USER_NOTATION Host key removed from known_hosts file.\"
-                    puts stderr \"$SUB_USER_NOTATION Retrying SCP immediately...\"
+                    puts stderr \"$USER_NOTATION Host key removed from known_hosts file.\"
+                    puts stderr \"$USER_NOTATION Retrying SCP immediately...\"
                     continue
                 }
                 -re {Connection refused|No route to host} {
                     set adjustTimeout -1
-                    puts stderr \"$SUB_USER_NOTATION Waiting for \$waitBeforeRetry seconds before retrying ...\"
+                    puts stderr \"$USER_NOTATION Waiting for \$waitBeforeRetry seconds before retrying ...\"
                     sleep \$waitBeforeRetry
                     # Exponential backoff
                     set waitBeforeRetry [expr {\$waitBeforeRetry * 2}]
                     continue
                 }
                 \"501-Permission Denied\" {
-                    puts stderr \"$SUB_USER_NOTATION Permission Denied. Please enable admin-scp under 'config system global'.\"
+                    puts stderr \"$USER_NOTATION Permission Denied. Please enable admin-scp under 'config system global'.\"
                     exit $EFAILED
                 }
                 \"check image error\" {
-                    puts stderr \"$SUB_USER_NOTATION Check image error. Action aborted.\"
+                    puts stderr \"$USER_NOTATION Check image error. Action aborted.\"
                     # exp_continue
                     exit $EFAILED
                 }
                 \"100-update image completed\" {
-                    puts stderr \"$SUB_USER_NOTATION 100-update image completed. Action completed.\"
+                    puts stderr \"$USER_NOTATION 100-update image completed. Action completed.\"
                     exit $ESUCCESS
                 }
                 \"lost connection\" {
-                    puts stderr \"$SUB_USER_NOTATION Lost connection. Action aborted.\"
+                    puts stderr \"$USER_NOTATION Lost connection. Action aborted.\"
                     exit $EFAILED
                 }
                 timeout {
-                    puts stderr \"$SUB_USER_NOTATION Timeout. Action aborted.\"
+                    puts stderr \"$USER_NOTATION Timeout. Action aborted.\"
                     exit $ETIMEOUT
                 }
                 eof {
-                    puts stderr \"$SUB_USER_NOTATION Reaching EOF.\"
+                    puts stderr \"$USER_NOTATION Reaching EOF.\"
                     exit $ESUCCESS
                 }
             }
@@ -602,32 +601,32 @@ if [[ "$fSyncTarget" != false ]]; then
     "
 
     retValue=$?
-    [[ $retValue -ne 0 ]] && echo "$SUB_USER_NOTATION Sync return value: $retValue"
+    [[ $retValue -ne 0 ]] && echo "$USER_NOTATION Sync return value: $retValue"
 
     case $retValue in
         $ESUCCESS)
-            COLOR="$GREEN"
-            echo -e "$SUB_USER_NOTATION You have synced $fSyncFile to $fSyncTarget successfully at $(getCurrentTime)"
-            echo -e "$SUB_USER_NOTATION ${COLOR}Login to the server and wait for it to reboot${RESET} ..."
+            COLOR=$GREY
+            echo -e "$USER_NOTATION You have synced $fSyncFile to $fSyncTarget successfully at $(getCurrentTime)"
+            echo -e "$USER_NOTATION ${COLOR}Login to the server and wait for it to reboot${RESET} ..."
             jssh -P "$fSyncPort" -u "$fSyncUsername" -p "$fSyncPassword" -t "$fSyncTarget"
             if [[ $? -ne 0 ]]; then
-                echo "$SUB_USER_NOTATION Please check the server status manually."
+                echo "$USER_NOTATION Please check the server status manually."
                 exit 1
             else
-                echo -e "$SUB_USER_NOTATION Target ${COLOR}$fSyncTarget${RESET} started to reboot at $(getCurrentTime)"
+                echo -e "$USER_NOTATION Target ${COLOR}$fSyncTarget${RESET} started to reboot at $(getCurrentTime)"
                 exit 0
             fi
             ;;
         $EMAXTRIES)
-            echo "$SUB_USER_NOTATION Failed to sync $fSyncFile to $fSyncTarget after $maxSyncRetries attempts"
+            echo "$USER_NOTATION Failed to sync $fSyncFile to $fSyncTarget after $maxSyncRetries attempts"
             exit $EMAXTRIES
             ;;
         $ETIMEOUT)
-            echo "$SUB_USER_NOTATION Timeout to sync $fSyncFile to $fSyncTarget"
+            echo "$USER_NOTATION Timeout to sync $fSyncFile to $fSyncTarget"
             exit $ETIMEOUT
             ;;
         *)
-            echo "$SUB_USER_NOTATION Failed to sync $fSyncFile to $fSyncTarget"
+            echo "$USER_NOTATION Failed to sync $fSyncFile to $fSyncTarget"
             exit $EFAILED
             ;;
     esac
