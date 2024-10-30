@@ -15,10 +15,10 @@ ftntUser=${credentials[0]}
 ftntPasswd=${credentials[1]}
 
 USER_NOTATION="@@@@"
-SCRIPT_LOCATION="/tmp/git_upall_repos"
+SCRIPT_LOCATION="/tmp/indexing_repos"
 
 # check if the script exists
-if [ -f "$SCRIPT_LOCATION" ]; then
+if [ ! -f "$SCRIPT_LOCATION" ]; then
     cat << _EOF > $SCRIPT_LOCATION
 #!/bin/bash
 # set -x

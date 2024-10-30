@@ -1,0 +1,82 @@
+#!/bin/bash
+
+# if no argumets, exit
+# Constants
+SCRIPT_NAME=$(basename "$0")
+
+if ! command -v get_credentials &> /dev/null; then
+    echo "Error: Command get_credentials not found."
+    exit 1
+fi
+
+if ! credentials_output=$(eval get_credentials); then
+    echo "Error: Failed to get credentials."
+    exit 1
+fi
+
+mapfile -t credentials <<< "$credentials_output"
+ftntUser=${credentials[0]}
+ftntPasswd=${credentials[1]}
+
+usage() {
+    echo "Usage: $SCRIPT_NAME [-p] [-d] [-u ECO_ID] [-h]"
+    exit 1
+}
+
+[[ $# -eq 0 ]] && usage
+
+# getopt to get options -p -d -u -h
+while getopts "pdu:h" opt; do
+    case ${opt} in
+        p)
+           spawnCmd="rb_genco_git post --username $ftntUser"
+           ;;
+        d)
+           spawnCmd="rbt diff"
+           ;;
+        u)
+           rbid=$OPTARG
+           spawnCmd="rb_genco_git update $rbid"
+           ;;
+        h)
+           usage
+           ;;
+        ?)
+            echo "Invalid option: $OPTARG" 1>&2
+            usage
+            ;;
+    esac
+done
+
+shift $((OPTIND - 1))
+if [[ $# -gt 0 ]]; then
+    COLOR=$MAGENTA
+    echo -e "${COLOR}Error: Illegal non-option arguments: $@${RESET}"
+    exit
+fi
+
+echo "Sapwned command: $spawnCmd"
+
+expect -c "
+    spawn -noecho $spawnCmd
+    expect {
+        {yes/no} {
+            send \"yes\r\"
+            exp_continue
+        }
+        -re {[Uu]sername} {
+            send \"$ftntUser\r\"
+            exp_continue
+        }
+        -re {[Pp]assword} {
+            send \"$ftntPasswd\r\"
+            exp_continue
+        }
+        {password for $ftntUser:} {
+            send \"$ftntPasswd\r\"
+            exp_continue
+        }
+        eof {
+        }
+    }
+"
