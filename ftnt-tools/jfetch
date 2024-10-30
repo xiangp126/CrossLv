@@ -1,0 +1,145 @@
+#!/bin/bash
+
+if ! command -v get_credentials &> /dev/null; then
+    echo "Error: Command get_credentials not found."
+    exit 1
+fi
+
+if ! credentials_output=$(eval get_credentials); then
+    echo "Error: Failed to get credentials."
+    exit 1
+fi
+
+mapfile -t credentials <<< "$credentials_output"
+ftnt_username=${credentials[0]}
+ftnt_password=${credentials[1]}
+
+user_notation="@@@@"
+script_location="/tmp/git_fetch_repos"
+
+# check if the script exists
+if [ ! -f "$script_location" ]; then
+    cat << _EOF > $script_location
+# Define the directory containing your Git repositories
+# set -x
+repos=(
+    "/data/fos"
+    "/data/fos2"
+    "/data/fpx"
+    "/data/fpx2"
+    "/data/sandbox/fos_repro"
+    "/data/sandbox/fpx_repro"
+    "/data/sandbox/fortios-ci"
+)
+
+# Function to update a Git repository
+update_git_repo() {
+    local repo_path="\$1"
+
+    echo -e  "\n$user_notation Updating repository: \$repo_path"
+
+    # Change to the repository directory
+    cd "\$repo_path" || exit 1
+
+    # Check if it's a Git repository
+    if [ -d ".git" ]; then
+        echo "$user_notation Fetching tags:"
+        git fetch --tags
+        # Check if fetching was successful
+        if [ $? -ne 0 ]; then
+            echo "@@@@ Error fetching tags. Aborting."
+            exit 1
+        fi
+        echo "$user_notation Fetching branches: main"
+        git fetch origin main
+        echo "$user_notation Fetching branches: 7.0"
+        git fetch origin 7.0
+        echo "$user_notation Fetching branches: 7.2"
+        git fetch origin 7.2
+        # FPX does not have 7.4 branch currently. Mar.11 2024
+        # git ls-remote --exit-code --quiet --heads origin 7.4
+        git ls-remote --exit-code --quiet --heads origin 7.4
+        if [ $? -eq 0 ]; then
+            git fetch origin 7.4
+        fi
+    else
+        echo "$user_notation Not a Git repository: \$repo_path"
+    fi
+
+    # Return to the original directory
+    cd - &>/dev/null
+}
+
+# Loop through each repository and update it
+for repo in "\${repos[@]}"; do
+    update_git_repo "\$repo"
+done
+_EOF
+fi
+
+expect -c "
+    proc common_expect_block {fa_pattern} {
+        global pattern_found user_notation
+        expect {
+            {yes/no} {
+                send \"yes\r\"
+                exp_continue
+            }
+            -re {[Uu]sername} {
+                send \"$ftnt_username\r\"
+                exp_continue
+            }
+            -re {[Pp]assword} {
+                send \"$ftnt_password\r\"
+                exp_continue
+            }
+            -re \$fa_pattern {
+                puts \"$user_notation Pattern \$fa_pattern\ Found in the output.\"
+                set pattern_found true
+                exp_continue
+            }
+            {OTP: } {
+                # Prompt for and read the FortiToken from the user
+                # set timeout -1
+                expect_user -re \"(.*)\n\"
+                set token \$expect_out(1,string)
+                send \"\$token\r\"
+                exp_continue
+            }
+            {Could not read from remote repository} {
+                puts \"$user_notation Could not read from remote repository. Check your VPN connection.\"
+                exit 1
+            }
+            timeout {
+                puts \"$user_notation Timed out! Have you set up your VPN?\"
+                exit 1
+            }
+            eof {}
+        }
+    }
+
+    set fa_pattern \"2fa_verify\"
+    set pattern_found false
+    set timeout -1
+    spawn bash $script_location
+    # exp_internal 1
+    common_expect_block \$fa_pattern
+    if {\$pattern_found == false} {
+        exit 1
+    }
+
+    set fa_pattern \"OTP validation failed:\"
+    set pattern_found false
+    set timeout 180
+    spawn ssh git@git-van.corp.fortinet.com 2fa_verify
+    common_expect_block \$fa_pattern
+    if {\$pattern_found == true} {
+        exit 1
+    }
+
+    set timeout -1
+    spawn bash $script_location
+    # without this, the script will exit before the fully execution of the script above
+    # wait
+    expect eof
+"
