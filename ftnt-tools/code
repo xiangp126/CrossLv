@@ -7,6 +7,11 @@ function fcode() {
 
     findCmd="find $HOME/.vscode-server/bin -type f -name code -executable"
     codePaths=$($findCmd)
+    if [[ -z $codePaths ]]
+    then
+        echo "Error: vscode code command not found";
+        exit 1
+    fi
 
     splitPaths() {
         # Originally, codePaths contains only one element joined by \n; it needs to be split into two separate elements.
@@ -28,12 +33,6 @@ function fcode() {
         done
     }
 
-    if [[ -z ${codePaths[0]} ]]
-    then
-        echo "Error: vscode code command not found";
-        exit 1
-    fi
-
     splitPaths
 
     if [[ ${#codePaths[@]} -gt 1 ]]
@@ -45,7 +44,7 @@ function fcode() {
 
     codePath=${codePaths[0]}
     sysPath="/run/user/$UID"
-    # List all the vscode-ipc-*.sock files and get the latest one
+    # Get the latest vscode-ipc-*.sock file
     new_IPC_HOOK=$(ls -t ${sysPath}/vscode-ipc-*.sock | head -1)
     if [[ -z $new_IPC_HOOK ]]
     then
@@ -61,7 +60,8 @@ function fcode() {
 
     # VSCODE_IPC_HOOK_CLI is an environment variable that is used by the VS Code CLI to communicate with the server.
     export VSCODE_IPC_HOOK_CLI=$new_IPC_HOOK
-    $codePath $@
+    # echo the passed arguments
+    $codePath "$@"
 }
 
-fcode -g $@
+fcode -g "$@"

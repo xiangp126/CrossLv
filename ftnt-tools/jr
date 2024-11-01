@@ -1,11 +1,15 @@
 #!/bin/bash
+# set -x
 
 scriptName=$(basename $0)
-fUseVim=false
-EDITOR="code"
-
-# The user notation
 USER_NOTATION="@@@@"
+EDITOR="code"
+# Colors
+MAGENTA='\033[35m'
+NORMAL='\033[0m'
+BOLD='\033[1m'
+RESET='\033[0m'
+COLOR=$MAGENTA
 
 usage() {
     cat << _EOF_
@@ -14,7 +18,7 @@ $scriptName v0.0
 Usage: $scriptName [vz] <search term>
 
 Options:
-    -v  Open the file in vim (default is $EDITOR)
+    -v  Open the file with vim (default is $EDITOR)
     -z  Search with empty query
 
 Example: $scriptName "search term"
@@ -34,7 +38,7 @@ query="$@"
 while getopts "hvz" opt; do
     case ${opt} in
         v)
-            fUseVim=true
+            EDITOR="vim"
             ;;
         z)
             query=""
@@ -70,43 +74,81 @@ preCheck() {
         echo "$USER_NOTATION bat is not installed"
         exit 1
     fi
+
+    if ! command -v $EDITOR &> /dev/null; then
+        echo "$USER_NOTATION $EDITOR is not installed"
+        exit 1
+    fi
+}
+
+parserAndPolish() {
+    local param
+    # Remove the leading and trailing spaces
+    param=$(echo "$query" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+
+    # Polish query like <wad_http_req_setup_casb>
+    pattern='^<(.*)>$'
+    if [[ $param =~ $pattern ]]; then
+        param="${BASH_REMATCH[1]}"
+    fi
+    # Polish query like wad_http_req_setup_casb:3071
+    pattern='^(.*)\:[0-9]+$'
+    if [[ "$param" =~ $pattern ]]; then
+        param="${BASH_REMATCH[1]}"
+    fi
+    query="$param"
 }
 
 preCheck
+parserAndPolish
 
-# wad_ssl_sock_port_exec_up_forward_txn:17850 => wad_ssl_sock_port_exec_up_forward_txn
-query_polished=$(echo "$query" | sed 's/\\//g' | cut -d: -f1)
+# result=$(rg --smart-case \
+#             --color=ansi \
+#             --colors 'match:fg:204,51,153' --colors 'match:style:bold' \
+#             --line-number --no-heading "$query" |
+#         fzf --ansi \
+#             --color 'hl:-1:underline,hl+:-1:underline:reverse' \
+#             --delimiter ':' \
+#             --preview "bat --color=always {1} --theme='TwoDark' --highlight-line {2}" \
+#             --preview-window 'top,60%,border-bottom,+{2}+3/3,~3' \
+#             --cycle \
+#             --query "$query")
 
-# write the three check into a function
-result=$(rg --smart-case \
+rgResult=$(rg --smart-case \
             --color=ansi \
             --colors 'match:fg:204,51,153' --colors 'match:style:bold' \
-            --line-number --no-heading "$query_polished" |
+            --line-number --no-heading "$query")
+if [ -z "$rgResult" ]; then
+    echo -e "${COLOR}No result found${RESET}"
+    exit 1
+fi
+
+fzfResult=$(echo "$rgResult" |
         fzf --ansi \
             --color 'hl:-1:underline,hl+:-1:underline:reverse' \
             --delimiter ':' \
             --preview "bat --color=always {1} --theme='TwoDark' --highlight-line {2}" \
             --preview-window 'top,60%,border-bottom,+{2}+3/3,~3' \
             --cycle \
-            --query "$query_polished")
+            --query "$query")
+if [ -z "$fzfResult" ]; then
+    exit 0
+fi
 
-# The sample value of result is:
+# Sample output of fzfResult:
 # daemon/wad/wad_app_eng.c:3071:          goto session_make_failed;
-if [ -z "$result" ]; then
-    exit 0
-fi
-
-file="${result%%:*}"
-linenumber=$(echo "${result}" | cut -d: -f2)
-
-if [ "$fUseVim" = true ]; then
-    EDITOR="vim"
-    $EDITOR +"${linenumber}" "$file"
-    exit 0
-fi
-
-if ! command -v $EDITOR &> /dev/null; then
-    echo "$USER_NOTATION $EDITOR is not installed"
+pattern='([a-zA-Z0-9/.%_-]+):([0-9]+)'
+if [[ $fzfResult =~ $pattern ]]; then
+    file="${BASH_REMATCH[1]}"
+    linenumber="${BASH_REMATCH[2]}"
+else
+    echo -e "${COLOR}Error: The result is in unexpected format${RESET}"
     exit 1
 fi
-$EDITOR "$file":"$linenumber"
+
+if [ "$EDITOR" == "vim" ]; then
+    $EDITOR +"${linenumber}" "$file"
+    exit 0
+else
+    $EDITOR "$file":"$linenumber"
+fi
