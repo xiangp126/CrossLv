@@ -360,10 +360,10 @@ if [[ "$fRunConfigure" == true ]]; then
     ftntUser=${credentials[0]}
     ftntPasswd=${credentials[1]}
 
-    COLOR="$BLUE"
+    COLOR=$BLUE
     CONFIGURE_CMD="./Configure -m $fBuildModel -d y -c"
     echo -e "$USER_NOTATION Running Configure: ${COLOR}$CONFIGURE_CMD${RESET}"
-    COLOR=$GREY
+    COLOR=$MAGENTA
     echo -e "$USER_NOTATION ${COLOR}Spawning a new bash session.${RESET}"
     sleep 1
 
