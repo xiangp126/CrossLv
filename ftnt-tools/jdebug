@@ -171,7 +171,7 @@ expect -c "
     while {\$i <= $fMaxAttempts} {
         # ssh -o StrictHostKeyChecking=no $fTarget
         if {\$i > 1} {
-            send_user \"$USER_NOTATION Login attempt \$i/$fMaxAttempts\n\"
+            puts stderr \"$USER_NOTATION Login attempt \$i/$fMaxAttempts\"
         }
         spawn -noecho ssh -p $fSSHConnPort $fUsername@$fTarget
 
@@ -186,21 +186,21 @@ expect -c "
             -re {[Pp]assword} {
                 incr passwd_prompt_cnt
                 if {\$passwd_prompt_cnt > 1} {
-                    send_user \"\n$USER_NOTATION \${COLOR}Permission denied. Please specify the login credentials.\${RESET}\n\"
+                    puts stderr \"\n$USER_NOTATION \${COLOR}Permission denied. Please specify the login credentials.\${RESET}\n\"
                     exit 1
                 }
                 send \"$fPasswd\r\"
                 exp_continue
             }
             \"Connection refused\" {
-                # send_user \"Connection refused when connecting to $fTarget\n\"
+                # puts stderr \"Connection refused when connecting to $fTarget\"
                 exit 1
             }
             {Host key verification failed.} {
-                send_user \"$USER_NOTATION Host key verification failed. Updating known_hosts file...\n\"
+                puts stderr \"$USER_NOTATION Host key verification failed. Updating known_hosts file ...\"
                 system \"ssh-keygen -R $fTarget\"
-                send_user \"$USER_NOTATION Host key removed from known_hosts file.\n\"
-                send_user \"$USER_NOTATION Retrying SSH immediately...\n\"
+                puts stderr \"$USER_NOTATION Host key removed from known_hosts file.\"
+                puts stderr \"$USER_NOTATION Retrying SSH immediately ...\"
                 # close \$session_id
                 incr i
                 continue
@@ -210,21 +210,21 @@ expect -c "
                 break
             }
             timeout {
-                send_user \"$SUB_USER_NOTATION \${COLOR}Timeout when connecting to $fTarget.${RESET}\n\"
+                puts stderr \"$SUB_USER_NOTATION \${COLOR}Timeout when connecting to $fTarget\${RESET}\"
                 # close \$session_id
                 incr i
                 continue
             }
             eof {
-                send_user \"$SUB_USER_NOTATION \${COLOR}Reached EOF. Program ended.\${RESET}\n\"
-                send_user \"$SUB_USER_NOTATION \${COLOR}Please check if $fTarget is a correct device name.\${RESET}\n\"
+                puts stderr \"$SUB_USER_NOTATION \${COLOR}Reached EOF. Program ended.\${RESET}\"
+                puts stderr \"$SUB_USER_NOTATION \${COLOR}Please check if $fTarget is a correct device name.\${RESET}\"
                 exit 1
             }
         }
     }
 
     if {\$i > $fMaxAttempts} {
-        send_user \"$USER_NOTATION Failed to connect to $fTarget\"
+        puts stderr \"$USER_NOTATION Failed to connect to $fTarget\"
         exit 1
     }
 
@@ -244,7 +244,7 @@ expect -c "
                 # Pass through
             }
             timeout {
-                send_user \"$USER_NOTATION Timeout when resetting debug.\r\"
+                puts stderr \"$USER_NOTATION Timeout when resetting debug.\r\"
                 exit 1
             }
         }
@@ -254,13 +254,13 @@ expect -c "
         expect \"$fExpectRoot\"
 
         # set wait_time 3
-        # send_user \"$USER_NOTATION Wait for \$wait_time seconds to apply the configuration.\n\"
+        # puts stderr \"$USER_NOTATION Wait for \$wait_time seconds to apply the configuration.\"
         # for {set j 0} {\$j < \$wait_time * 2} {incr j} {
-        #     send_user \"====\"
+        #     puts stderr \"====\"
         # }
-        # send_user \"\n\"
+        # puts stderr \"\n\"
         # for {set i 0} {\$i < \$wait_time * 2} {incr i} {
-        #     send_user \"====\"
+        #     puts stderr \"====\"
         #     after 500
         # }
         # send \"\r\"
@@ -269,7 +269,7 @@ expect -c "
         send \"exit\r\"
         expect eof {
             set COLOR \$MAGENTA
-            send_user \"$USER_NOTATION \${COLOR}WAD Worker Count has been set to $fWADWorkerCnt.\${RESET}\n\"
+            puts stderr \"$USER_NOTATION \${COLOR}WAD Worker Count has been set to $fWADWorkerCnt.\${RESET}\"
             exit 0
         }
     }
@@ -284,7 +284,9 @@ expect -c "
         {Command fail.} {
             # The device has VDOM
             set COLOR \$MAGENTA
-            send_user \"\${COLOR}Warning: The device has VDOM. Switch to the global configuration mode.\${RESET}\n\"
+            puts stderr \"\${COLOR}Warning: The device has VDOM. Switch to the global configuration mode.\${RESET}\"
+            expect \"$fExpectRoot\"
+            send \"\r\"
             expect \"$fExpectRoot\"
             send \"config global\r\"
             exp_continue
@@ -293,7 +295,7 @@ expect -c "
             # Pass through
         }
         timeout {
-            send_user \"$USER_NOTATION Timeout when resetting debug.\r\"
+            puts stderr \"$USER_NOTATION Timeout when resetting debug.\r\"
             exit 1
         }
     }
@@ -310,7 +312,7 @@ expect -c "
 
     # Define the pattern to match
     set search_patt $fSearchPatt
-    # send_user \"$USER_NOTATION Searching for \$search_patt\n\"
+    # puts stderr \"$USER_NOTATION Searching for \$search_patt\"
 
     foreach line [split \$output \"\n\"] {
             if {[regexp -nocase \$search_patt \$line]} {
@@ -327,25 +329,25 @@ expect -c "
     if {\$worker_cnt > 1} {
         if {[string match -nocase \"*work*\" $fWorkerType]} {
             set COLOR \$RED
-            send_user \"\n$USER_NOTATION \${COLOR}Warning: \$worker_cnt PIDs found: \$worker_pids for WAD process of type $fWorkerType.\${RESET}\n\"
-            send_user {$USER_NOTATION Recommend to set wad worker count to 1 to make life easier.
+            puts stderr \"\n$USER_NOTATION \${COLOR}Warning: \$worker_cnt PIDs found: \$worker_pids for WAD process of type $fWorkerType.\${RESET}\"
+            puts stderr {$USER_NOTATION Recommend to set wad worker count to 1 to make life easier.
 $SUB_USER_NOTATION FPX # config system global
 $SUB_USER_NOTATION FPX (global) # set wad-worker-count 1
 $SUB_USER_NOTATION FPX (global) # end
 $USER_NOTATION Simply retry the same command with -N1
             }
         } else {
-            send_user \"\n$USER_NOTATION \${COLOR}Warning: \$worker_cnt PIDs found: \$worker_pids for WAD process of type $fWorkerType.\${RESET}\"
+            puts stderr \"\n$USER_NOTATION \${COLOR}Warning: \$worker_cnt PIDs found: \$worker_pids for WAD process of type $fWorkerType.\${RESET}\"
             set worker_pid [lindex \$worker_pids 0]
             set COLOR \$GREEN
-            send_user \"\n$USER_NOTATION Default to choose the first PID: \${COLOR}\$worker_pid.\${RESET}\n\"
-            send_user \"$USER_NOTATION Recommend to check the input worker type.\n\"
+            puts stderr \"\n$USER_NOTATION Default to choose the first PID: \${COLOR}\$worker_pid.\${RESET}\"
+            puts stderr \"$USER_NOTATION Recommend to check the input worker type.\"
         }
     } elseif {\$worker_cnt == 1} {
         set COLOR \$MAGENTA
-        send_user \"\n$USER_NOTATION \${COLOR}Exact matched PID: \$worker_pid found for WAD process of type $fWorkerType.\${RESET}\n\"
+        puts stderr \"\n$USER_NOTATION \${COLOR}Exact matched PID: \$worker_pid found for WAD process of type $fWorkerType.\${RESET}\"
     } else {
-        send_user \"\n$USER_NOTATION \${COLOR}Could not find WAD process of type $fWorkerType.\${RESET}\n\"
+        puts stderr \"\n$USER_NOTATION \${COLOR}Could not find WAD process of type $fWorkerType.\${RESET}\"
         exit 1
     }
 
@@ -361,7 +363,7 @@ $USER_NOTATION Simply retry the same command with -N1
     send \"sys sh\r\"
     expect {
         \"Unknown action\" {
-            send_user \"$USER_NOTATION No Shell supported. Please check the image version.\n\"
+            puts stderr \"$USER_NOTATION No Shell supported. Please check the image version.\"
             exit 1
         }
         \"$fExpectRoot\" {
@@ -378,10 +380,10 @@ $USER_NOTATION Simply retry the same command with -N1
         # Disable console logging. The output may contain multiple blank lines starts with '/ # '.
         log_user 0
         set COLOR \$RED
-        send_user \"\n$USER_NOTATION \${COLOR}CTRL+C captured; sending SIGINT to gdbserver as well.\${RESET}\n\"
+        puts stderr \"\n$USER_NOTATION \${COLOR}CTRL+C captured; sending SIGINT to gdbserver as well.\${RESET}\"
         send \x03
         set COLOR \$MAGENTA
-        send_user \"$USER_NOTATION \${COLOR}Debugging session terminated.\${RESET}\n\"
+        puts stderr \"$USER_NOTATION \${COLOR}Debugging session terminated.\${RESET}\"
     } SIGINT
 
     # interact
@@ -389,7 +391,7 @@ $USER_NOTATION Simply retry the same command with -N1
     expect {
         {Detaching from process} {
             set COLOR \$MAGENTA
-            send_user \"$USER_NOTATION \${COLOR}Bye-bye.\${RESET}\n\"
+            puts stderr \"$USER_NOTATION \${COLOR}Bye-bye.\${RESET}\"
             exit 1
         }
         \"$fExpectRoot\" {
