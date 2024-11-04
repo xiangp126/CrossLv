@@ -263,22 +263,6 @@
 	"command": "-workbench.action.moveEditorToNextGroup"
 },
 {
-	"key": "ctrl+pagedown",
-	"command": "workbench.action.nextEditor"
-},
-{
-	"key": "ctrl+pagedown",
-	"command": "-workbench.action.nextEditor"
-},
-{
-	"key": "ctrl+pageup",
-	"command": "workbench.action.previousEditor"
-},
-{
-	"key": "ctrl+pageup",
-	"command": "-workbench.action.previousEditor"
-},
-{
 	"key": "ctrl+shift+x",
 	"command": "-workbench.view.extensions",
 	"when": "viewContainer.workbench.view.extensions.enabled"
@@ -310,7 +294,7 @@
 	"command": "editor.action.peekTypeDefinition"
 },
 {
-	"key": "ctrl+alt+c",
+	"key": "ctrl+shift+alt+c",
 	"command": "bookmarks.clearFromAllFiles"
 },
 {
@@ -383,14 +367,6 @@
 	"when": "editorFocus"
 },
 {
-	"key": "ctrl+alt+left",
-	"command": "workbench.action.previousEditor"
-},
-{
-	"key": "ctrl+alt+right",
-	"command": "workbench.action.nextEditor"
-},
-{
 	"key": "ctrl+\\",
 	"command": "-workbench.action.splitEditor"
 },
@@ -401,21 +377,6 @@
 {
 	"key": "ctrl+k ctrl+\\",
 	"command": "-workbench.action.splitEditorDown"
-},
-{
-	"key": "ctrl+shift+/",
-	"command": "editor.action.jumpToBracket",
-	"when": "editorTextFocus"
-},
-{
-	"key": "ctrl+shift+\\",
-	"command": "-editor.action.jumpToBracket",
-	"when": "editorTextFocus"
-},
-{
-	"key": "ctrl+shift+,",
-	"command": "gitlens.diffLineWithPrevious",
-	"when": "editorTextFocus && config.gitlens.keymap == 'chorded' && gitlens:activeFileStatus =~ /tracked/"
 },
 {
 	"key": "alt+f7",
@@ -484,15 +445,6 @@
 	"when": "textInputFocus && !accessibilityModeEnabled"
 },
 {
-	"key": "ctrl+alt+m",
-	"command": "gitlens.diffLineWithWorking"
-},
-{
-	"key": "ctrl+alt+p",
-	"command": "gitlens.diffLineWithPrevious",
-	"when": "editorTextFocus && config.gitlens.keymap == 'chorded' && gitlens:activeFileStatus =~ /tracked/"
-},
-{
 	"key": "ctrl+f",
 	"command": "-actions.find",
 	"when": "editorFocus || editorIsOpen"
@@ -508,11 +460,6 @@
 {
 	"key": "ctrl+shift+.",
 	"command": "gitlens.diffLineWithWorking"
-},
-{
-	"key": "shift+alt+,",
-	"command": "-gitlens.diffLineWithPrevious",
-	"when": "editorTextFocus && config.gitlens.keymap == 'alternate' && gitlens:activeFileStatus =~ /tracked/"
 },
 {
 	"key": "ctrl+b e",
@@ -626,5 +573,71 @@
 {
 	"key": "ctrl+b shift+\\",
 	"command": "workbench.action.splitEditorRight"
+},
+{
+	"key": "ctrl+b x",
+	"command": "workbench.action.toggleMaximizeEditorGroup",
+	"when": "editorPartMaximizedEditorGroup || editorPartMultipleEditorGroups"
+},
+{
+	"key": "ctrl+k ctrl+m",
+	"command": "-workbench.action.toggleMaximizeEditorGroup",
+	"when": "editorPartMaximizedEditorGroup || editorPartMultipleEditorGroups"
+},
+{
+	"key": "ctrl+alt+l",
+	"command": "-bookmarks.jumpToNext",
+	"when": "editorTextFocus"
+},
+{
+	"key": "ctrl+alt+j",
+	"command": "-bookmarks.jumpToPrevious",
+	"when": "editorTextFocus"
+},
+{
+	"key": "ctrl+alt+l",
+	"command": "bookmarks.jumpToNext"
+},
+{
+	"key": "ctrl+alt+j",
+	"command": "bookmarks.jumpToPrevious"
+},
+{
+	"key": "ctrl+pagedown",
+	"command": "-notebook.focusNextEditor",
+	"when": "accessibilityModeEnabled && notebookCellEditorFocused"
+},
+{
+	"key": "ctrl+alt+left",
+	"command": "workbench.action.previousEditor"
+},
+{
+	"key": "ctrl+alt+right",
+	"command": "workbench.action.nextEditor"
+},
+{
+	"key": "ctrl+shift+g ,",
+	"command": "-gitlens.diffWithPrevious",
+	"when": "editorTextFocus && !isInDiffEditor && config.gitlens.keymap == 'chorded' && resource in 'gitlens:tabs:tracked'"
+},
+{
+	"key": "ctrl+shift+,",
+	"command": "-editor.action.inPlaceReplace.up",
+	"when": "editorTextFocus && !editorReadonly"
+},
+{
+	"key": "shift+alt+,",
+	"command": "-gitlens.diffLineWithPrevious",
+	"when": "editorTextFocus && config.gitlens.keymap == 'alternate' && resource in 'gitlens:tabs:tracked'"
+},
+{
+	"key": "shift+alt+,",
+	"command": "-gitlens.diffLineWithPrevious",
+	"when": "editorTextFocus && config.gitlens.keymap == 'alternate' && gitlens:activeFileStatus =~ /tracked/"
+},
+{
+	"key": "ctrl+shift+/",
+	"command": "gitlens.diffLineWithPrevious",
+	"when": "editorTextFocus && config.gitlens.keymap == 'chorded' && gitlens:activeFileStatus =~ /tracked/"
 }
 ]
