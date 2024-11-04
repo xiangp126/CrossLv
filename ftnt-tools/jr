@@ -83,19 +83,7 @@ preCheck() {
 
 parserAndPolish() {
     local param
-    # Remove the leading and trailing spaces
-    param=$(echo "$query" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-
-    # Polish query like <wad_http_req_setup_casb>
-    pattern='^<(.*)>$'
-    if [[ $param =~ $pattern ]]; then
-        param="${BASH_REMATCH[1]}"
-    fi
-    # Polish query like wad_http_req_setup_casb:3071
-    pattern='^(.*)\:[0-9]+$'
-    if [[ "$param" =~ $pattern ]]; then
-        param="${BASH_REMATCH[1]}"
-    fi
+    param=$(echo "$query" | sed -E 's/^[[:space:]]*|[[:space:]]*$//g; s/^&//; s/;$//; s/^<|>$//g; s/:[0-9]+$//')
     query="$param"
 }
 
