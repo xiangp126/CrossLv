@@ -48,8 +48,7 @@ usage() {
     cat << _EOF
 $SCRIPT_NAME 0.1
 
-Usage: $SCRIPT_NAME [options]
-       $SCRIPT_NAME [-t target] [-w worker_type] [-P gdbserver_listen_port] [-T max_attempts]
+Usage: $SCRIPT_NAME [-t target] [-w worker_type] [-P gdbserver_listen_port] [-T max_attempts]
               [-u/-l username] [-p password] [-P ssh_conn_port] [-h]
 
 Options:
