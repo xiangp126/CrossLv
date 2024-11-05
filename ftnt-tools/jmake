@@ -166,7 +166,7 @@ while getopts "hm:w:j:cCbB:ofT:t:s:P:p:u:l:" opt; do
             usage
             ;;
         ?)
-            echo "$USER_NOTATION Invalid option: -$OPTARG" >&2
+            echo -e "$USER_NOTATION ${MAGENTA}Invalid option: $OPTARG${RESET}"
             exit 1
             ;;
     esac

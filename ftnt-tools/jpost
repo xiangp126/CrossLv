@@ -3,6 +3,8 @@
 # if no argumets, exit
 # Constants
 SCRIPT_NAME=$(basename "$0")
+MAGENTA='\033[0;35m'
+RESET='\033[0m'
 
 if ! command -v get_credentials &> /dev/null; then
     echo "Error: Command get_credentials not found."
@@ -19,8 +21,26 @@ ftntUser=${credentials[0]}
 ftntPasswd=${credentials[1]}
 
 usage() {
-    echo "Usage: $SCRIPT_NAME [-p] [-d] [-u ECO_ID] [-h]"
-    exit 1
+cat << _EOF
+$SCRIPT_NAME 1.0
+
+Usage:
+    $SCRIPT_NAME [-p] [-d] [-u ECO_ID] [-h]
+
+Options:
+    -p  Post the changes to review board
+    -d  Show the diff of the changes to be posted
+    -u  Update the review board with the new changes
+    -h  Display this help message
+
+Examples:
+    $SCRIPT_NAME -p
+    $SCRIPT_NAME -d
+    $SCRIPT_NAME -u 1234
+    $SCRIPT_NAME -h
+
+_EOF
+    exit 0
 }
 
 [[ $# -eq 0 ]] && usage
@@ -29,7 +49,7 @@ usage() {
 while getopts "pdu:h" opt; do
     case ${opt} in
         p)
-           spawnCmd="rb_genco_git post --username $ftntUser"
+           spawnCmd="rb_genco_git post"
            ;;
         d)
            spawnCmd="rbt diff"
@@ -42,8 +62,8 @@ while getopts "pdu:h" opt; do
            usage
            ;;
         ?)
-            echo "Invalid option: $OPTARG" 1>&2
-            usage
+            echo -e "${MAGENTA}Error: Invalid option: $OPTARG${RESET}" 1>&2
+            exit 1
             ;;
     esac
 done
@@ -55,10 +75,12 @@ if [[ $# -gt 0 ]]; then
     exit
 fi
 
-echo "Sapwned command: $spawnCmd"
+COLOR=$MAGENTA
+echo -e "Spawned Command: ${COLOR}$spawnCmd${RESET}"
 
 expect -c "
     spawn -noecho $spawnCmd
+    set timeout 60
     expect {
         {yes/no} {
             send \"yes\r\"
