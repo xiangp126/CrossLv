@@ -32,8 +32,6 @@ _EOF_
 
 [[ $# -eq 0 ]] && usage
 
-query="$@"
-
 # parse the arguments, -v is for vim, -c is for code
 while getopts "hvz" opt; do
     case ${opt} in
@@ -59,6 +57,8 @@ done
 shift $((OPTIND -1))
 # [[ $# -gt 1 ]] && usage
 
+query="$@"
+
 preCheck() {
     if ! command -v rg &> /dev/null; then
         echo "$USER_NOTATION ripgrep is not installed"
@@ -82,61 +82,75 @@ preCheck() {
 }
 
 parserAndPolish() {
+    [[ -z "$query" ]] && return
     local param
     param=$(echo "$query" | sed -E 's/^[[:space:]]*|[[:space:]]*$//g; s/^&//; s/;$//; s/^<|>$//g; s/:[0-9]+$//')
     query="$param"
 }
 
+searchAndOpen() {
+    local finalResult=""
+    # --glob='*.{c,h,cpp,js,ts,py,html,css,sh,php}'
+            #  --glob='Makefile' \
+    rgGlob=" --glob='*.{c}' \
+             --glob='!*/linux/*'"
+    rgParams=" --smart-case \
+               --color=ansi \
+               --colors 'match:fg:204,51,153' --colors 'match:style:bold' \
+               --line-number \
+               --no-heading"
+    fzfParams=" --ansi \
+                --color 'hl:-1:underline,hl+:-1:underline:reverse' \
+                --delimiter ':' \
+                --preview 'bat --color=always {1} --theme=\"TwoDark\" --highlight-line {2}' \
+                --preview-window 'top,60%,border-bottom,+{2}+3/3,~3' \
+                --cycle"
+    if [ -z "$query" ]; then
+        # rgParams=$(echo "$rgParams" | tr -s ' ')
+        rgParams="$rgParams $rgGlob"
+    fi
+    # Squash multiple whitespaces
+    rgParams=$(echo "$rgParams" | tr -s ' ')
+    fzfParams=$(echo "$fzfParams" | tr -s ' ')
+    # Make the query command
+    rgQuery="rg $rgParams \"$query\""
+    fzfQuery="fzf $fzfParams --query \"$query\""
+
+    if [ -z "$query" ]; then
+        finalResult=$(eval "$rgQuery" | eval "$fzfQuery")
+    else
+        rgResult=$(eval "$rgQuery")
+        if [ -z "$rgResult" ]; then
+            echo -e "${COLOR}No result found${RESET}"
+            exit 1
+        fi
+        finalResult=$(echo "$rgResult" | eval "$fzfQuery")
+    fi
+
+    if [ -z "$finalResult" ]; then
+        exit 0
+    fi
+
+    # Sample output of fzfResult:
+    # daemon/wad/wad_app_eng.c:3071:          goto session_make_failed;
+    pattern='([a-zA-Z0-9/.%_-]+):([0-9]+)'
+    if [[ $finalResult =~ $pattern ]]; then
+        file="${BASH_REMATCH[1]}"
+        linenumber="${BASH_REMATCH[2]}"
+    else
+        echo -e "${COLOR}Error: The result is in unexpected format${RESET}"
+        exit 1
+    fi
+
+    if [ "$EDITOR" == "vim" ]; then
+        $EDITOR +"${linenumber}" "$file"
+        exit 0
+    else
+        $EDITOR "$file":"$linenumber"
+    fi
+
+    }
+
 preCheck
 parserAndPolish
-
-# result=$(rg --smart-case \
-#             --color=ansi \
-#             --colors 'match:fg:204,51,153' --colors 'match:style:bold' \
-#             --line-number --no-heading "$query" |
-#         fzf --ansi \
-#             --color 'hl:-1:underline,hl+:-1:underline:reverse' \
-#             --delimiter ':' \
-#             --preview "bat --color=always {1} --theme='TwoDark' --highlight-line {2}" \
-#             --preview-window 'top,60%,border-bottom,+{2}+3/3,~3' \
-#             --cycle \
-#             --query "$query")
-
-rgResult=$(rg --smart-case \
-            --color=ansi \
-            --colors 'match:fg:204,51,153' --colors 'match:style:bold' \
-            --line-number --no-heading "$query")
-if [ -z "$rgResult" ]; then
-    echo -e "${COLOR}No result found${RESET}"
-    exit 1
-fi
-
-fzfResult=$(echo "$rgResult" |
-        fzf --ansi \
-            --color 'hl:-1:underline,hl+:-1:underline:reverse' \
-            --delimiter ':' \
-            --preview "bat --color=always {1} --theme='TwoDark' --highlight-line {2}" \
-            --preview-window 'top,60%,border-bottom,+{2}+3/3,~3' \
-            --cycle \
-            --query "$query")
-if [ -z "$fzfResult" ]; then
-    exit 0
-fi
-
-# Sample output of fzfResult:
-# daemon/wad/wad_app_eng.c:3071:          goto session_make_failed;
-pattern='([a-zA-Z0-9/.%_-]+):([0-9]+)'
-if [[ $fzfResult =~ $pattern ]]; then
-    file="${BASH_REMATCH[1]}"
-    linenumber="${BASH_REMATCH[2]}"
-else
-    echo -e "${COLOR}Error: The result is in unexpected format${RESET}"
-    exit 1
-fi
-
-if [ "$EDITOR" == "vim" ]; then
-    $EDITOR +"${linenumber}" "$file"
-    exit 0
-else
-    $EDITOR "$file":"$linenumber"
-fi
+searchAndOpen
