@@ -110,7 +110,6 @@ expect -c "
             -re \$fa_pattern {
                 puts \"$USER_NOTATION Pattern \$fa_pattern\ Found in the output.\"
                 set pattern_found true
-                exp_continue
             }
             {OTP: } {
                 # Promption for reading the FortiToken from the user
@@ -118,10 +117,6 @@ expect -c "
                 set token \$expect_out(1,string)
                 send \"\$token\r\"
                 exp_continue
-            }
-            {Could not read from remote repository} {
-                puts \"$USER_NOTATION Could not read from remote repository. Check your VPN connection.\"
-                exit 1
             }
             timeout {
                 puts \"$USER_NOTATION Timed out! Have you set up your VPN?\"

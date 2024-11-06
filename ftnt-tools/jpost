@@ -80,7 +80,7 @@ echo -e "Spawned Command: ${COLOR}$spawnCmd${RESET}"
 
 expect -c "
     spawn -noecho $spawnCmd
-    set timeout 60
+    set timeout 70
     expect {
         {yes/no} {
             send \"yes\r\"
@@ -97,6 +97,10 @@ expect -c "
         {password for $ftntUser:} {
             send \"$ftntPasswd\r\"
             exp_continue
+        }
+        timeout {
+            puts stderr \"Error: Timeout occurred\"
+            exit 1
         }
         eof {
         }
