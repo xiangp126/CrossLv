@@ -511,7 +511,7 @@ if [[ "$fSyncTarget" != false ]]; then
     COLOR="$BLUE"
     echo -e "$USER_NOTATION Syncing ${COLOR}$syncFile${RESET} to ${COLOR}$fSyncTarget${RESET} ..."
 
-    maxSyncRetries=5
+    maxSyncRetries=3
     ESUCCESS=0
     EMAXTRIES=$(($maxSyncRetries + 1))
     ETIMEOUT=$(($maxSyncRetries + 10))
