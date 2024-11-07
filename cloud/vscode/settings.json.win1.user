@@ -63,7 +63,7 @@
                 "scope": "variable.other",
                 "settings": {
                     // "foreground": "#9CDCFE",
-                    "foreground": "#7eb2ce",
+                    "foreground": "#dd90d7",
                 },
             },
             {
@@ -155,6 +155,13 @@
                 "settings": {
                     // "foreground": "#DCDCAA",
                     "foreground": "#b0b08d",
+                },
+            },
+            {
+                "scope": "support.function.builtin.shell",
+                "settings": {
+                    // "foreground": "#DCDCAA",
+                    "foreground": "#c2c27d",
                 },
             },
             {
