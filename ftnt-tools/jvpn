@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Set the header for the Expect script
-script_name=$(basename $0)
+SCRIPT_NAME=$(basename $0)
 
 usage() {
-    echo "Usage: $script_name [-r]"
+    echo "Usage: $SCRIPT_NAME [-r]"
     echo "  -r  Restart the forticlient service"
     exit 1
 }
@@ -38,7 +38,7 @@ if ! command -v get_credentials &> /dev/null; then
     exit 1
 fi
 
-if ! credentials_output=$(eval get_credentials); then
+if ! credentials_output=$(get_credentials); then
     echo "Error: Failed to get credentials."
     exit 1
 fi
