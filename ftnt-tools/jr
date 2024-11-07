@@ -8,6 +8,7 @@ EDITOR="code"
 MAGENTA='\033[35m'
 NORMAL='\033[0m'
 BOLD='\033[1m'
+BLUE='\033[34m'
 RESET='\033[0m'
 COLOR=$MAGENTA
 
@@ -106,7 +107,7 @@ searchAndOpen() {
     else
         rgResult=$(eval "$rgQuery")
         if [ -z "$rgResult" ]; then
-            echo -e "${COLOR}No result found${RESET}"
+            echo -e "${COLOR}No result found for query: $query${RESET}"
             exit 1
         fi
         finalResult=$(echo "$rgResult" | eval "$fzfQuery")
