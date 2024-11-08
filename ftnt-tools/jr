@@ -107,7 +107,7 @@ searchAndOpen() {
     else
         rgResult=$(eval "$rgQuery")
         if [ -z "$rgResult" ]; then
-            echo -e "${COLOR}No result found for query: $query${RESET}"
+            echo -e "No result found for query: ${COLOR}$query${RESET}"
             exit 1
         fi
         finalResult=$(echo "$rgResult" | eval "$fzfQuery")
@@ -132,9 +132,10 @@ searchAndOpen() {
     else
         $EDITOR "$file":"$linenumber"
     fi
-
-    }
+}
 
 checkDependencies
 parserAndPolish
 searchAndOpen
+
+echo -e "The file opened is: ${COLOR}$file:$linenumber${RESET}"
