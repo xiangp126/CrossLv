@@ -2,6 +2,7 @@
 # Constants
 SCRIPT_NAME=$(basename $0)
 USER_NOTATION="@@@@"
+
 catBanner="---------------------------------------------------"
 catBanner=$(echo "$catBanner" | sed 's/------/------ /g')
 beautifyGap1="-> "
