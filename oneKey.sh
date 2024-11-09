@@ -1,14 +1,11 @@
 #!/bin/bash
+# set -x
+
 # Constants
 SCRIPT_NAME=$(basename $0)
 USER_NOTATION="@@@@"
-
-catBanner="---------------------------------------------------"
-catBanner=$(echo "$catBanner" | sed 's/------/------ /g')
-beautifyGap1="-> "
-beautifyGap2="   "
-beautifyGap3="♣  "
-# Misc Info
+SEPARATOR="==================================================="
+# Variables
 workingDir=$(cd $(dirname $0); pwd)
 trackedFilesDir=$workingDir/track-files
 templateFilesDir=$workingDir/template
@@ -16,71 +13,65 @@ vimColorsDir=$workingDir/vim-colors
 ftntToolsDir=$workingDir/ftnt-tools
 completionDirSRC=$workingDir/completion-files
 completionDirDst=$HOME/.bash_completion.d
-downloadDir=$workingDir/Downloads
 # ubuntu is the default OS type
-osType=ubuntu
 osCategory=debian
 # Flags
-forceUpdateFlag=false
-installFlag=false
-linkFlag=true
-checkSudoFlag=false
-toolsFlag=false
+fInsTools=false
+fForceUpdate=false
+# Colors
+CYAN='\033[36m'
+RED='\033[31m'
+BOLD='\033[1m'
+GREEN='\033[32m'
+MAGENTA='\033[35m'
+YELLOW='\033[33m'
+LIGHTYELLOW='\033[93m'
+NORMAL='\033[0m'
+BLUE='\033[34m'
+GREY='\033[90m'
+RESET='\033[0m'
+COLOR=$MAGENTA
 
 usage() {
     cat << _EOF
-Usage: ./$SCRIPT_NAME [iuchH]
+
+Persist the environment settings and tools for the current user
+
+Usage: ./$SCRIPT_NAME [uth]
+
 Options:
-    -h, --help                      Print this help message
-    -i, --install                   Create symbolic links
-    -H, --hard-install              Perform a hard installation
-        -t, --tools                 Link tools into $HOME/.usr/bin
-        -c, --check                 Check sudo privileges
-        -u, --update                Force an update
+    -t, --tools     Link tools into $HOME/.usr/bin
+    -u, --update    Force an update of prerequisites
+    -h, --help      Print this help message
 
 Recommdned:
-    ./$SCRIPT_NAME -i
+    ./$SCRIPT_NAME -t
 
 Examples:
-    ./$SCRIPT_NAME -i
-    ./$SCRIPT_NAME -it
-    ./$SCRIPT_NAME -ic
-    ./$SCRIPT_NAME -iu
-    ./$SCRIPT_NAME -iuH
+    ./$SCRIPT_NAME
+    ./$SCRIPT_NAME -t
+    ./$SCRIPT_NAME -u
     ./$SCRIPT_NAME -h
 
 _EOF
+exit 0
 }
 
-[ $# -eq 0 ] && usage
-# If '-i' need an argument, like '-i hard' then you should use 'i:' with getopts
-# Exp: while 'getopts "fhi:" opt; do' Notice the colon on the right side of i
-while getopts "uhicHt" opt; do
+while getopts "uht" opt; do
     # opt is the option, like 'i' or 'h'
     case $opt in
+        t)
+            fInsTools=true
+            ;;
         u)
-            forceUpdateFlag=true
-            installFlag=true
+            fForceUpdate=true
             ;;
         h)
             usage
-            exit
-            ;;
-        i)
-            installFlag=true
-            ;;
-        t)
-            installFlag=true
-            toolsFlag=true
-            ;;
-        c)
-            checkSudoFlag=true
-            ;;
-        H)  # Hard install
-            linkFlag=false
             ;;
         ?)
-            echo "$USER_NOTATION Invalid option: -$OPTARG" >&2
+            echo "Invalid option: -$OPTARG" >&2
+            exit 1
             ;;
     esac
 done
@@ -88,11 +79,12 @@ done
 # Shift to process non-option arguments. New $1, $2, ..., $@
 shift $((OPTIND - 1))
 if [ $# -gt 0 ]; then
-    echo "$USER_NOTATION Illegal non-option arguments: $@"
+    echo "Illegal non-option arguments: $@"
     exit 1
 fi
 
 installPrerequisitesForDebian() {
+    checkSudoPrivilege
     prerequisitesForUbuntu=(
         ## Basic tools
         tmux
@@ -153,50 +145,41 @@ installPrerequisitesForDebian() {
         libsqlite3-dev
         libpcap-dev
     )
-    cat << _EOF
-$catBanner
-Installing prerequisites for Ubuntu
-_EOF
+
+    echo -e "${COLOR}Installing prerequisites for Ubuntu${RESET}"
 
     sudo apt-get update
     sudo apt-get install -y "${prerequisitesForUbuntu[@]}"
     sudo updatedb
 }
 
-checkOSType() {
-cat << _EOF
-$catBanner
-Check OS platform
-_EOF
+checkOSPlat() {
+    echo -e "${COLOR}Checking OS platform${RESET}"
     if [[ -f /etc/os-release ]]; then
         local os_name
         os_name=$(awk -F= '/^ID=/{print $2}' /etc/os-release)
 
         case "$os_name" in
             "ubuntu")
-                osType=ubuntu
                 osCategory=debian
-                echo "$beautifyGap1 The current OS type is Ubuntu."
+                echo "The current OS type is Ubuntu."
                 ;;
             "centos")
-                osType=centos
                 osCategory=redhat
-                echo "$beautifyGap1 The current OS type is CentOS."
-                echo "$beautifyGap1 We currently do not support CentOS."
+                echo "The current OS type is CentOS."
+                echo "We currently do not support CentOS."
                 exit
                 ;;
             "raspbian")
-                osType=raspbian
                 osCategory=debian
-                echo "$beautifyGap1 The current OS type is raspbian."
+                echo "The current OS type is raspbian."
                 ;;
             *)
-                echo "$beautifyGap1 We currently do not support this OS type."
+                echo "We currently do not support this OS type."
                 exit
                 ;;
         esac
     elif [[ $(uname) == "Darwin" ]]; then
-        osType=mac
         osCategory=mac
         echo "The current OS type is macOS (Mac)."
     else
@@ -207,6 +190,7 @@ _EOF
 }
 
 installPrequesitesForMac() {
+    checkSudoPrivilege
     prerequisitesForMac=(
        yt-dlp
        fzf
@@ -215,39 +199,34 @@ installPrequesitesForMac() {
        vim
     )
 
-    cat << _EOF
-$catBanner
-Installing prerequisites for macOS
-_EOF
-
+    echo -e "${COLOR}Installing prerequisites for macOS${RESET}"
     brew update
     brew install "${prerequisitesForMac[@]}"
 }
 
 setTimeZone() {
-    # set timezone to vancouver, on ubuntu
-    cat << _EOF
-$catBanner
-Set timezone to vancouver
-_EOF
+    echo -e "${COLOR}Setting timezone to Vancouver${RESET}"
     # check time zone if it is already vancouver
     if [ $(timedatectl | grep "Time zone" | awk '{print $3}') == "America/Vancouver" ]; then
-        echo "$beautifyGap1 Time zone is already vancouver, skip"
+        echo -e "${GREY}Time zone is already vancouver${RESET}"
         return
     fi
     sudo timedatectl set-timezone America/Vancouver
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}Success!${RESET}"
+    else
+        echo -e "${RED}Failed!${RESET}"
+        exit 1
+    fi
 }
 
 installLatestFzf() {
-    cat << _EOF
-$catBanner
-Install fzf - The fuzzy finder
-_EOF
+    echo -e "${COLOR}Installing fzf - The fuzzy finder${RESET}"
     if [ -x "$(command -v fzf)" ]; then
         fzfVersion=$(fzf --version | awk '{print $1}')
         version=${fzfVersion%.*}
         if [ $(echo "$version >= 0.23" | bc) -eq 1 ]; then
-            echo "$beautifyGap1 fzf version is greater than 0.23.0, skip"
+            echo "fzf version is greater than 0.23.0, skip"
             return
         fi
         sudo apt-get remove -y fzf
@@ -257,7 +236,7 @@ _EOF
     fzfBinFromVimPlug=$HOME/.vim/bundle/fzf/bin/fzf
     if [ -f $fzfBinFromVimPlug ]; then
         if [ -L /usr/local/bin/fzf ] && [ $(readlink /usr/local/bin/fzf) == $fzfBinFromVimPlug ]; then
-            echo "$beautifyGap1 fzf is already linked to $fzfBinFromVimPlug, skip"
+            echo "fzf is already linked to $fzfBinFromVimPlug, skip"
             return
         fi
         sudo ln -sf $fzfBinFromVimPlug /usr/local/bin/fzf
@@ -282,388 +261,204 @@ _EOF
     sudo ln -sf $HOME/.fzf/bin/fzf /usr/local/bin/fzf
 }
 
-linkBatToBatcat() {
-    cat << _EOF
-$catBanner
-Relink bat to batcat
-_EOF
-    # check if batcat is installed
-    if [ ! -x "$(command -v batcat)" ]; then
-        echo "$beautifyGap1 batcat is not installed, skip"
+
+relinkCommand() {
+    local linkName=$1
+    local sysCmd=$2
+    local linkDst=$HOME/.usr/bin
+    [ -n "$3" ] && linkDst=$3
+    local dst=$linkDst/$linkName
+
+    echo -e "${COLOR}Relink ${linkName} to ${sysCmd}${RESET}"
+    [ ! -d "$linkDst" ] && mkdir -p "$linkDst"
+
+    sysCmdPath=$(command -v "$sysCmd")
+    if [ -z "$sysCmdPath" ]; then
+        echo "${sysCmd} is not installed"
         return
     fi
 
-    batLinkedPath=$HOME/.usr/bin/bat
-    # check if bat is already linked to batcat
-    if [ -L $batLinkedPath ] && [ $(readlink $batLinkedPath) == $(which batcat) ]; then
-        echo "$beautifyGap1 bat is already linked to batcat, skip"
+    if [ -L "$dst" ] && [ "$(readlink "$dst")" == "$sysCmdPath" ]; then
+        echo -e "${GREY}${linkName} is already linked to ${sysCmd}${RESET}"
         return
     fi
 
-    if [ ! -d $HOME/.usr/bin ]; then
-        mkdir -p $HOME/.usr/bin
+    # Create the symlink
+    ln -sf "$sysCmdPath" "$dst"
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}Success!${RESET}"
+    else
+        echo -e "${RED}Failed!${RESET}"
+        exit 1
     fi
-    ln -sf $(which batcat) $batLinkedPath
 }
 
-linkFdToFdfind() {
-    cat << _EOF
-$catBanner
-Relink fd to fdfind
-_EOF
-    if [ ! -x "$(command -v fdfind)" ]; then
-        echo "$beautifyGap1 fdfind is not installed, skip"
-        return
-    fi
+installVimPlugsManager (){
+    echo -e "${COLOR}Install Vim Plugs Manager${RESET}"
+    local vimPlugLoc=$HOME/.vim/autoload/plug.vim
 
-    fdLinkLocation=$HOME/.usr/bin/fd
-    if [ -L $fdLinkLocation ] && [ $(readlink $fdLinkLocation) == $(which fdfind) ]; then
-        echo "$beautifyGap1 fd link already exists, skip"
-        return
-    fi
-
-    ln -sf $(which fdfind) $fdLinkLocation
-}
-
-linkShToBash() {
-    cat << _EOF
-$catBanner
-Relink sh to bash
-_EOF
-    if [ -L /bin/sh ] && [ $(readlink /bin/sh) == "/bin/bash" ]; then
-        echo "$beautifyGap1 sh is already linked to bash, skip"
-        return
-    fi
-
-    # link sh to bash
-    sudo ln -sf /bin/bash /bin/sh
-}
-
-installVimPlugs (){
-    cat << _EOF
-$catBanner
-Install Vim Plugs
-_EOF
-    # check if .vimrc exists
-    if [ ! -f ~/.vimrc ] && [ ! -L ~/.vimrc ]; then
+    if [ ! -f ~/.vimrc ]; then
         echo "No .vimrc found, Abort!"
-        exit
+        exit 1
     fi
 
-    # if [ -d ~/.vim/autoload ]; then
-    #     vim +PlugInstall +PlugUpdate +qall
-    #     return
-    # fi
+    if [ ! -f "$vimPlugLoc" ]; then
+        # use the --insecure option to avoid certificate check
+        curl --insecure -fLo "$vimPlugLoc" --create-dirs \
+        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
-    # use the `--insecure`` option to avoid certificate check
-    curl --insecure -fLo ~/.vim/autoload/plug.vim --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-
-    # Comment out the line in .vimrc starts with colorscheme
-    # if grep -q "colorscheme" ~/.vimrc; then
-    #     sed -i 's/^colorscheme/\" colorscheme/g' ~/.vimrc
-    # fi
+        # Comment out the line in .vimrc starts with colorscheme
+        if grep -q "colorscheme" ~/.vimrc; then
+            sed -i 's/^colorscheme/\" colorscheme/g' ~/.vimrc
+        fi
+    else
+        echo -e "${GREY}Vim Plug is already installed${RESET}"
+    fi
 
     vim +PlugInstall +PlugUpdate +qall
 
-    # Uncomment the line in .vimrc starts with colorscheme
-    # if grep -q "\" colorscheme" ~/.vimrc; then
-    #     sed -i 's/^\" colorscheme/colorscheme/g' ~/.vimrc
-    # fi
-}
-
-installTrackedFiles() {
-    cat << _EOF
-$catBanner
-Sync tracked files to $HOME
-_EOF
-    ls "$trackedFilesDir" | while read -r file; do
-      echo "$beautifyGap2 $file"
-    done
-    echo
-
-    for file in $(ls $trackedFilesDir); do
-        if [ -L $HOME/.$file ]; then
-            rm -f $HOME/.$file
+    if [ ! -f "$vimPlugLoc" ]; then
+        # Uncomment the line in .vimrc starts with colorscheme
+        if grep -q "\" colorscheme" ~/.vimrc; then
+            sed -i 's/^\" colorscheme/colorscheme/g' ~/.vimrc
         fi
-        rsync -av $trackedFilesDir/$file $HOME/.$file
-    done
+    fi
 }
 
 followUpTrackExceptions() {
-    cat << _EOF
-$catBanner
-Follow up the exceptions
-_EOF
+    echo -e "${COLOR}Follow up the exceptions${RESET}"
     # Copy back the privileged git config.
     gitconfigCheckFile=$HOME/.gitconfig.fortinet
-    if [ -f $gitconfigCheckFile  ]; then
-        echo "$beautifyGap3 The privileged file $gitconfigCheckFile exists."
-        echo "$beautifyGap1 Relink $HOME/.gitconfig to $gitconfigCheckFile"
-        ln -sf $gitconfigCheckFile $HOME/.gitconfig
+    if [ -f "$gitconfigCheckFile"  ]; then
+        echo "The privileged file $gitconfigCheckFile exists."
+        echo "Relink $HOME/.gitconfig to $gitconfigCheckFile"
+        ln -sf "$gitconfigCheckFile" "$HOME"/.gitconfig
+        if [ $? -eq 0 ]; then
+            echo -e "${GREEN}Success!${RESET}"
+        else
+            echo -e "${RED}Failed!${RESET}"
+            exit 1
+        fi
     fi
 }
 
-linkTrackedFiles() {
-    cat << _EOF
-$catBanner
-Link tracked files to $HOME
-_EOF
-    ls "$trackedFilesDir" | while read -r file; do
-        echo "$beautifyGap2 $file"
-    done
-    echo
+linkFiles() {
+    local srcDir="$1"        # Source directory
+    local dstDir="$2"        # Destination directory
+    local copyToHidden="$3"  # Copy to hidden file
+    local backupDir="$3"     # Optional backup directory
+    local dstPresix=""       # Prefix for destination filename
 
-    # backup the existing files to $HOME/Public/.env.bak
-    local backupDir=$HOME/Public/.env.bak
-    if [ ! -d $backupDir ]; then
-        mkdir -p $backupDir
-    fi
+    echo -e "${COLOR}Linking files from $(basename "$srcDir") to ${dstDir}${RESET}"
+    [ ! -d "$dstDir" ] && mkdir -p "$dstDir"
+    [ -n "$backupDir" ] && [ ! -d "$backupDir" ] && mkdir -p "$backupDir"
+    [ -n "$copyToHidden" ] && dstPresix="."
 
-    for file in $(ls $trackedFilesDir); do
-        if [ -f $HOME/.$file ] && [ ! -L $HOME/.$file ]; then
-            echo "$beautifyGap1 $HOME/.$file is not link, backup it to $backupDir"
-            mv $HOME/.$file $backupDir/$file.bak
+    # Iterate over files in the source directory
+    for file in "$srcDir"/*; do
+        local filename=$(basename "$file")
+        local src="$srcDir/$filename"
+        local dst="$dstDir/${dstPresix}$filename"
+
+        # echo -e "Linking ${COLOR}$filename${RESET} => $dst"
+        echo -e "${LIGHTYELLOW}$filename${RESET}"
+
+        # If target exists in the destination as a regular file (not a symlink), back it up first
+        if [ -n "$backupDir" ] && [ -f "$dst" ] && [ ! -L "$dst" ]; then
+            echo "$dst is not a link, backing it up to $backupDir"
+            mv "$dst" "$backupDir/$filename.bak"
         fi
 
-        if [ -L $HOME/.$file ] && [ $(readlink $HOME/.$file) == $trackedFilesDir/$file ]; then
-            echo "$beautifyGap1 $HOME/.$file already exists, skip"
+        # If the symlink already exists and points to the correct location, skip it
+        if [ -L "$dst" ] && [ "$(readlink "$dst")" == "$src" ]; then
+            echo -e "${GREY}$dst is already been linked.${RESET}"
             continue
         fi
-        ln -sf $trackedFilesDir/$file $HOME/.$file
-    done
-}
 
-linkVimColors() {
-    cat << _EOF
-$catBanner
-Link vim colors to $HOME/.vim/colors
-_EOF
-    ls "$vimColorsDir" | while read -r file; do
-        echo "$beautifyGap2 $file"
-    done
-    echo
-
-    local targetDir=$HOME/.vim/colors
-    if [ ! -d $targetDir ]; then
-        mkdir -p $targetDir
-    fi
-
-    for file in $(ls $vimColorsDir); do
-        if [ -L $targetDir/$file ] && [ $(readlink $targetDir/$file) == $vimColorsDir/$file ]; then
-            echo "$beautifyGap1 $targetDir/$file already exists, skip"
-            continue
+        # Create or update the symbolic link
+        ln -sf "$src" "$dst"
+        if [ $? -eq 0 ]; then
+            echo -e "${GREEN}Success!${RESET}"
+        else
+            echo -e "${RED}Failed!${RESET}"
+            exit 1
         fi
-        ln -sf $vimColorsDir/$file $targetDir/$file
     done
 
-    # remove broken links in $targetDir
-    find "$targetDir" -type l \
-    -exec test ! -e {} \; \
-    -exec echo "$beautifyGap3 Deleting broken link: {}" \; \
-    -exec rm -f {} \;
-}
-
-installVimColors() {
-    cat << _EOF
-$catBanner
-Install vim colors to $HOME/.vim/colors
-_EOF
-    ls "$vimColorsDir" | while read -r file; do
-        echo "$beautifyGap2 $file"
-    done
-    echo
-
-    local targetDir=$HOME/.vim/colors
-    if [ ! -d $targetDir ]; then
-        mkdir -p $targetDir
-    fi
-
-    for file in $(ls $vimColorsDir); do
-        if [ -f $targetDir/$file ]; then
-            echo "$beautifyGap1 $targetDir/$file already exists, skip"
-            continue
-        fi
-        rsync -av $vimColorsDir/$file $targetDir/$file
-    done
-}
-
-linkFtntTools() {
-    cat << _EOF
-$catBanner
-Link ftnt tools to $HOME/.usr/bin
-_EOF
-    ls "$ftntToolsDir" | while read -r file; do
-        echo "$beautifyGap2 $file"
-    done
-    echo
-
-    local targetDir=$HOME/.usr/bin
-    if [ ! -d $targetDir ]; then
-        mkdir -p $targetDir
-    fi
-
-    for file in $(ls $ftntToolsDir); do
-        if [ -L $targetDir/$file ] && [ $(readlink $targetDir/$file) == $ftntToolsDir/$file ]; then
-            echo "$beautifyGap1 $targetDir/$file already exists, skip"
-            continue
-        fi
-        ln -sf $ftntToolsDir/$file $targetDir/$file
-    done
-
-    # remove broken links in $targetDir
-    find "$targetDir" -type l \
-    -exec test ! -e {} \; \
-    -exec echo "$beautifyGap3 Deleting broken link: {}" \; \
-    -exec rm -f {} \;
-}
-
-linkTemplateFiles() {
-    cat << _EOF
-$catBanner
-Link template files to $HOME/Template
-_EOF
-    ls "$templateFilesDir" | while read -r file; do
-        echo "$beautifyGap2 $file"
-    done
-    echo
-
-    targetDir=$HOME/Templates
-    if [ ! -d $targetDir ]; then
-        mkdir -p $targetDir
-    fi
-
-    for file in $(ls $templateFilesDir); do
-        if [ -L $targetDir/$file ] && [ $(readlink $targetDir/$file) == $templateFilesDir/$file ]; then
-            echo "$beautifyGap1 $targetDir/$file already exists, skip"
-            continue
-        fi
-        ln -sf $templateFilesDir/$file $targetDir/$file
-    done
-
-    # remove broken links in $targetDir
-    find "$targetDir" -type l \
-    -exec test ! -e {} \; \
-    -exec echo "$beautifyGap3 Deleting broken link: {}" \; \
-    -exec rm -f {} \;
-}
-
-linkCompletionFiles() {
-    cat << _EOF
-$catBanner
-Install completion files into $completionDirDst
-_EOF
-    ls "$completionDirSRC" | while read -r file; do
-        echo "$beautifyGap2 $file"
-    done
-    echo
-
-    if [ ! -d $completionDirDst ]; then
-        mkdir -p $completionDirDst
-    fi
-    # rsync -av --delete $completionDirSRC/ $completionDirDst/
-    for file in $(ls $completionDirSRC); do
-        if [ -L $completionDirDst/$file ] && [ $(readlink $completionDirDst/$file) == $completionDirSRC/$file ]; then
-            echo "$beautifyGap1 $completionDirDst/$file already exists, skip"
-            continue
-        fi
-        ln -sf $completionDirSRC/$file $completionDirDst/$file
-    done
+    COLOR=$GREEN
+    find "$dstDir" -type l ! \
+            -exec test -e {} \; \
+            -exec rm -f {} \; \
+            -exec echo -e "${COLOR}Deleting broken link: {}${RESET}" \;
+    COLOR=$MAGENTA
 }
 
 changeTMOUTToWritable() {
-    cat << _EOF
-$catBanner
-Change TMOUT to writable
-_EOF
+    echo -e "${COLOR}Change TMOUT to writable${RESET}"
     # TMOUT is readonly in /etc/profile, change it to writable
     # so that we can unset it in .bashrc
     if ! grep -q "TMOUT" /etc/profile; then
-        echo "$beautifyGap1 TMOUT is not found in /etc/profile, skip"
+        echo "TMOUT is not found in /etc/profile, skip"
         return
     fi
 
     if grep -q "^readonly TMOUT" /etc/profile; then
-        echo "$beautifyGap1 TMOUT is readonly in /etc/profile, change it to writable"
+        echo "TMOUT is readonly in /etc/profile, change it to writable"
     else
-        echo "$beautifyGap1 TMOUT is already writable in /etc/profile, skip"
+        echo -e "${GREY}TMOUT is already writable in /etc/profile${RESET}"
         return
     fi
 
     sudo sed -i 's/^readonly TMOUT/# readonly TMOUT/g' /etc/profile
     if [ $? -eq 0 ]; then
-        echo "$beautifyGap1 Success!"
+        echo -e "${GREEN}Success!${RESET}"
     else
-        echo "$beautifyGap2 Failed!"
+        echo -e "${RED}Failed!${RESET}"
+        exit 1
     fi
 }
 
 checkSudoPrivilege() {
-    cat << _EOF
-$catBanner
-Check sudo privilege
-_EOF
+    echo -e "${COLOR}Checking sudo privilege${RESET}"
     if sudo -v >/dev/null 2>&1; then
-        echo "$beautifyGap1 You have sudo privilege. Continue!"
+        echo "You have sudo privilege. Continue!"
     else
-        echo "$beautifyGap2 You do not have sudo privilege. Abort!"
+        echo "You do not have sudo privilege. Abort!"
         exit 0
     fi
 }
 
-printMessage() {
-    echo "$beautifyGap1 Please source ~/.bashrc manually to take effect."
-}
-
 mainInstallProcedure() {
     if [ "$osCategory" == "debian" ]; then
-        echo "$beautifyGap1 Processing $osType ..."
-        # Pre-Installation
-        [ "$checkSudoFlag" == "true" ] && checkSudoPrivilege
-        [ "$forceUpdateFlag" == "true" ] && installPrerequisitesForDebian
-        # In-Installation
-        if [ "$linkFlag" == "true" ]; then
-            linkTrackedFiles
-        else
-            installTrackedFiles
+        [ "$fForceUpdate" == "true" ] && installPrerequisitesForDebian
+        linkFiles "$trackedFilesDir" "$HOME" 1 "$HOME/Public/.env.bak"
+        linkFiles "$completionDirSRC" "$completionDirDst"
+        linkFiles "$vimColorsDir" "$HOME/.vim/colors"
+
+        if [ "$fInsTools" == "true" ]; then
+            echo -e "${COLOR}Linking FTNT tools ...${RESET}"
+            linkFiles "$ftntToolsDir" "$HOME/.usr/bin"
+            echo -e "${COLOR}Linking template files ...${RESET}"
+            linkFiles "$templateFilesDir" "$HOME/Templates"
         fi
-        linkCompletionFiles
-        linkVimColors
-        [ "$toolsFlag" == "true" ] && linkFtntTools
-        [ "$toolsFlag" == "true" ] && linkTemplateFiles
+
         followUpTrackExceptions
-        # Vim plugins & fzf
-        installVimPlugs
-        installLatestFzf # This should be after installVimPlugs
-        # Post-Installation, currentlu only enabled for ubuntu
-        linkShToBash
-        linkBatToBatcat
-        linkFdToFdfind
+        installVimPlugsManager
+        # installLatestFzf # fzf is already installed by vim-plug
+        relinkCommand "bat" "batcat"
+        relinkCommand "fd" "fdfind"
+        relinkCommand "sh" "bash" /bin/
         setTimeZone
         changeTMOUTToWritable
     elif [ "$osCategory" == "mac" ]; then
-        echo "$beautifyGap1 Processing $osType ..."
         # Pre-Installation, currently disabled for MacOS
-        # [ "$checkSudoFlag" == "true" ] && checkSudoPrivilege
         # [ "$forceUpdateFlag" == "true" ] && installPrequesitesForMac
-
-        # In-Installation
-        if [ "$linkFlag" == "true" ]; then
-            linkTrackedFiles
-        else
-            installTrackedFiles
-        fi
-        installVimPlugs
-        installLatestFzf # This should be after installVimPlugs
-        linkCompletionFiles
+        linkFiles "$trackedFilesDir" "$HOME" 1 "$HOME/Public/.env.bak"
+        linkFiles "$completionDirSRC" "$completionDirDst"
+        linkFiles "$vimColorsDir" "$HOME/.vim/colors"
+        installVimPlugsManager
     fi
 }
 
-main() {
-    checkOSType
-    mainInstallProcedure
-    printMessage
-}
-
-
-[ "$installFlag" == "true" ] && main
+checkOSPlat
+mainInstallProcedure
