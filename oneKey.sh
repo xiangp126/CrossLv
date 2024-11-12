@@ -86,7 +86,7 @@ if [ $# -gt 0 ]; then
     exit 1
 fi
 
-installPrerequisitesForDebian() {
+updatePrerequisitesForDebian() {
     checkSudoPrivilege
     prerequisitesForUbuntu=(
         ## Basic tools
@@ -149,7 +149,7 @@ installPrerequisitesForDebian() {
         libpcap-dev
     )
 
-    echo -e "${COLOR}Installing prerequisites for Ubuntu${RESET}"
+    echo -e "${COLOR}Updating prerequisites for Ubuntu${RESET}"
 
     sudo apt-get update
     sudo apt-get install -y "${prerequisitesForUbuntu[@]}"
@@ -192,7 +192,7 @@ checkOSPlat() {
     fi
 }
 
-installPrequesitesForMac() {
+updatePrequesitesForMac() {
     checkSudoPrivilege
     prerequisitesForMac=(
         yt-dlp
@@ -202,7 +202,7 @@ installPrequesitesForMac() {
         vim
     )
 
-    echo -e "${COLOR}Installing prerequisites for macOS${RESET}"
+    echo -e "${COLOR}Updating prerequisites for macOS${RESET}"
     brew update
     brew install "${prerequisitesForMac[@]}"
 }
@@ -304,7 +304,7 @@ linkFilesToPath() {
     local backupDir="$3"     # Optional backup directory
     local dstPresix=""       # Prefix for destination filename
 
-    echo -e "${NORMAL}Linking files from $(basename "$srcDir") to ${dstDir}${RESET}"
+    echo -e "${COLOR}Linking files from $(basename "$srcDir") to ${dstDir}${RESET}"
     [ ! -d "$srcDir" ] && echo "Source directory $srcDir does not exist, abort!" && exit 1
     [ ! -d "$dstDir" ] && mkdir -p "$dstDir"
     [ -n "$backupDir" ] && [ ! -d "$backupDir" ] && mkdir -p "$backupDir"
@@ -412,17 +412,14 @@ checkSudoPrivilege() {
 
 mainInstallProcedure() {
     if [ "$osCategory" == "debian" ]; then
-        [ "$fForceUpdate" == "true" ] && installPrerequisitesForDebian
-        echo -e "${COLOR}Linking treacked files, completions, and vim colors ...${RESET}"
+        [ "$fForceUpdate" == "true" ] && updatePrerequisitesForDebian
         linkFilesToPath "$trackedFilesDir" "$HOME" 1 "$HOME/Public/.env.bak"
         linkFilesToPath "$completionDirSRC" "$completionDirDst"
         linkFilesToPath "$vimColorsDir" "$HOME/.vim/colors"
         followUpTrackExceptions
 
         if [ "$fInsTools" == "true" ]; then
-            echo -e "${COLOR}Linking FTNT tools ...${RESET}"
             linkFilesToPath "$ftntToolsDir" "$HOME/.usr/bin"
-            echo -e "${COLOR}Linking Template files ...${RESET}"
             linkFilesToPath "$templateFilesDir" "$HOME/Templates"
         fi
 
