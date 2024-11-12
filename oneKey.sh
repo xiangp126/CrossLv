@@ -8,11 +8,13 @@ SEPARATOR="==================================================="
 # Variables
 workingDir=$(cd $(dirname $0); pwd)
 trackedFilesDir=$workingDir/track-files
-templateFilesDir=$workingDir/template
-vimColorsDir=$workingDir/vim-colors
-ftntToolsDir=$workingDir/ftnt-tools
 completionDirSRC=$workingDir/completion-files
 completionDirDst=$HOME/.bash_completion.d
+templateFilesDir=$workingDir/template
+ftntToolsDir=$workingDir/ftnt-tools
+vimColorsDir=$workingDir/vim-colors
+vimPlugsManagerPath=$HOME/.vim/autoload/plug.vim
+fzfBinPath=$HOME/.vim/bundle/fzf/bin/fzf
 # ubuntu is the default OS type
 osCategory=debian
 # Flags
@@ -23,6 +25,7 @@ CYAN='\033[36m'
 RED='\033[31m'
 BOLD='\033[1m'
 GREEN='\033[32m'
+NORMAL='\033[0m'
 MAGENTA='\033[35m'
 YELLOW='\033[33m'
 LIGHTYELLOW='\033[93m'
@@ -192,11 +195,11 @@ checkOSPlat() {
 installPrequesitesForMac() {
     checkSudoPrivilege
     prerequisitesForMac=(
-       yt-dlp
-       fzf
-       fd
-       bat
-       vim
+        yt-dlp
+        fzf
+        fd
+        bat
+        vim
     )
 
     echo -e "${COLOR}Installing prerequisites for macOS${RESET}"
@@ -220,47 +223,31 @@ setTimeZone() {
     fi
 }
 
-installLatestFzf() {
-    echo -e "${COLOR}Installing fzf - The fuzzy finder${RESET}"
-    if [ -x "$(command -v fzf)" ]; then
-        fzfVersion=$(fzf --version | awk '{print $1}')
-        version=${fzfVersion%.*}
-        if [ $(echo "$version >= 0.23" | bc) -eq 1 ]; then
-            echo "fzf version is greater than 0.23.0, skip"
-            return
-        fi
-        sudo apt-get remove -y fzf
+handleVimPlugins (){
+    echo -e "${COLOR}Install Vim Plugins Manager${RESET}"
+
+    if [ ! -f ~/.vimrc ]; then
+        echo "No .vimrc found, Abort!"
+        exit 1
     fi
 
-    # Check if fzf was already installed by vim-plug in ~/.vim/bundle/fzf
-    fzfBinFromVimPlug=$HOME/.vim/bundle/fzf/bin/fzf
-    if [ -f $fzfBinFromVimPlug ]; then
-        if [ -L /usr/local/bin/fzf ] && [ $(readlink /usr/local/bin/fzf) == $fzfBinFromVimPlug ]; then
-            echo "fzf is already linked to $fzfBinFromVimPlug, skip"
-            return
-        fi
-        sudo ln -sf $fzfBinFromVimPlug /usr/local/bin/fzf
-        return
+    if [ ! -f "$vimPlugsManagerPath" ]; then
+        # use the --insecure option to avoid certificate check
+        curl --insecure -fLo "$vimPlugsManagerPath" --create-dirs \
+        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    else
+        echo -e "${GREY}Vim Plug is already installed${RESET}"
     fi
 
-    # Then we have to install fzf manually
-    if [ -f $HOME/.fzf/bin/fzf ]; then
-        echo "Manual installed fzf already exists, skip"
-        return
+    echo -e "${COLOR}Update Vim Plugins${RESET}"
+    vim +PlugInstall +PlugUpdate +qall
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}Success!${RESET}"
+    else
+        echo -e "${RED}Failed!${RESET}"
+        exit 1
     fi
-
-    fzfOfficialSite=https://github.com/junegunn/fzf.git
-    git clone -c http.sslVerify=false --depth 1 $fzfOfficialSite $HOME/.fzf
-
-    sed -i 's/^\([[:space:]]*curl\)/\1 -k/g' $HOME/.fzf/install
-    sed -i 's/^\([[:space:]]*wget\)/\1 --no-check-certificate/g' $HOME/.fzf/install
-    # ~/.fzf/install --completion --key-bindings --no-update-rc
-    ~/.fzf/install --bin
-
-    # link this fzf to /usr/local/bin/fzf
-    sudo ln -sf $HOME/.fzf/bin/fzf /usr/local/bin/fzf
 }
-
 
 relinkCommand() {
     local linkName=$1
@@ -279,7 +266,7 @@ relinkCommand() {
     fi
 
     if [ -L "$dst" ] && [ "$(readlink "$dst")" == "$sysCmdPath" ]; then
-        echo -e "${GREY}${linkName} is already linked to ${sysCmd}${RESET}"
+        echo -e "${GREY}${linkName} is already linked to ${sysCmdPath}${RESET}"
         return
     fi
 
@@ -290,38 +277,6 @@ relinkCommand() {
     else
         echo -e "${RED}Failed!${RESET}"
         exit 1
-    fi
-}
-
-installVimPlugsManager (){
-    echo -e "${COLOR}Install Vim Plugs Manager${RESET}"
-    local vimPlugLoc=$HOME/.vim/autoload/plug.vim
-
-    if [ ! -f ~/.vimrc ]; then
-        echo "No .vimrc found, Abort!"
-        exit 1
-    fi
-
-    if [ ! -f "$vimPlugLoc" ]; then
-        # use the --insecure option to avoid certificate check
-        curl --insecure -fLo "$vimPlugLoc" --create-dirs \
-        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-
-        # Comment out the line in .vimrc starts with colorscheme
-        if grep -q "colorscheme" ~/.vimrc; then
-            sed -i 's/^colorscheme/\" colorscheme/g' ~/.vimrc
-        fi
-    else
-        echo -e "${GREY}Vim Plug is already installed${RESET}"
-    fi
-
-    vim +PlugInstall +PlugUpdate +qall
-
-    if [ ! -f "$vimPlugLoc" ]; then
-        # Uncomment the line in .vimrc starts with colorscheme
-        if grep -q "\" colorscheme" ~/.vimrc; then
-            sed -i 's/^\" colorscheme/colorscheme/g' ~/.vimrc
-        fi
     fi
 }
 
@@ -342,14 +297,15 @@ followUpTrackExceptions() {
     fi
 }
 
-linkFiles() {
+linkFilesToPath() {
     local srcDir="$1"        # Source directory
     local dstDir="$2"        # Destination directory
     local copyToHidden="$3"  # Copy to hidden file
     local backupDir="$3"     # Optional backup directory
     local dstPresix=""       # Prefix for destination filename
 
-    echo -e "${COLOR}Linking files from $(basename "$srcDir") to ${dstDir}${RESET}"
+    echo -e "${NORMAL}Linking files from $(basename "$srcDir") to ${dstDir}${RESET}"
+    [ ! -d "$srcDir" ] && echo "Source directory $srcDir does not exist, abort!" && exit 1
     [ ! -d "$dstDir" ] && mkdir -p "$dstDir"
     [ -n "$backupDir" ] && [ ! -d "$backupDir" ] && mkdir -p "$backupDir"
     [ -n "$copyToHidden" ] && dstPresix="."
@@ -393,6 +349,32 @@ linkFiles() {
     COLOR=$MAGENTA
 }
 
+linkFileToPath() {
+    local srcFile="$1"      # Source file
+    local dstDir="$2"       # Destination directory
+
+    local filename=$(basename "$srcFile")
+    local dst="$dstDir/$filename"
+    local src="$srcFile"
+
+    echo -e "${COLOR}Linking ${filename} to ${dstDir}${RESET}"
+    [ ! -f "$srcFile" ] && echo "Source file $srcFile does not exist, abort!" && exit 1
+    [ ! -d "$dstDir" ] && mkdir -p "$dstDir"
+
+    if [ -L "$dst" ] && [ "$(readlink "$dst")" == "$src" ]; then
+        echo -e "${GREY}${filename} is already linked to ${dstDir}${RESET}"
+        return
+    fi
+
+    ln -sf "$srcFile" "$dst"
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}Success!${RESET}"
+    else
+        echo -e "${RED}Failed!${RESET}"
+        exit 1
+    fi
+}
+
 changeTMOUTToWritable() {
     echo -e "${COLOR}Change TMOUT to writable${RESET}"
     # TMOUT is readonly in /etc/profile, change it to writable
@@ -431,32 +413,34 @@ checkSudoPrivilege() {
 mainInstallProcedure() {
     if [ "$osCategory" == "debian" ]; then
         [ "$fForceUpdate" == "true" ] && installPrerequisitesForDebian
-        linkFiles "$trackedFilesDir" "$HOME" 1 "$HOME/Public/.env.bak"
-        linkFiles "$completionDirSRC" "$completionDirDst"
-        linkFiles "$vimColorsDir" "$HOME/.vim/colors"
+        echo -e "${COLOR}Linking treacked files, completions, and vim colors ...${RESET}"
+        linkFilesToPath "$trackedFilesDir" "$HOME" 1 "$HOME/Public/.env.bak"
+        linkFilesToPath "$completionDirSRC" "$completionDirDst"
+        linkFilesToPath "$vimColorsDir" "$HOME/.vim/colors"
+        followUpTrackExceptions
 
         if [ "$fInsTools" == "true" ]; then
             echo -e "${COLOR}Linking FTNT tools ...${RESET}"
-            linkFiles "$ftntToolsDir" "$HOME/.usr/bin"
-            echo -e "${COLOR}Linking template files ...${RESET}"
-            linkFiles "$templateFilesDir" "$HOME/Templates"
+            linkFilesToPath "$ftntToolsDir" "$HOME/.usr/bin"
+            echo -e "${COLOR}Linking Template files ...${RESET}"
+            linkFilesToPath "$templateFilesDir" "$HOME/Templates"
         fi
 
-        followUpTrackExceptions
-        installVimPlugsManager
-        # installLatestFzf # fzf is already installed by vim-plug
+        handleVimPlugins
+
+        linkFileToPath "$fzfBinPath" "$HOME/.usr/bin"
         relinkCommand "bat" "batcat"
         relinkCommand "fd" "fdfind"
         relinkCommand "sh" "bash" /bin/
+
         setTimeZone
         changeTMOUTToWritable
     elif [ "$osCategory" == "mac" ]; then
-        # Pre-Installation, currently disabled for MacOS
-        # [ "$forceUpdateFlag" == "true" ] && installPrequesitesForMac
-        linkFiles "$trackedFilesDir" "$HOME" 1 "$HOME/Public/.env.bak"
-        linkFiles "$completionDirSRC" "$completionDirDst"
-        linkFiles "$vimColorsDir" "$HOME/.vim/colors"
-        installVimPlugsManager
+        # [ "$fForceUpdate" == "true" ] && installPrequesitesForMac
+        linkFilesToPath "$trackedFilesDir" "$HOME" 1 "$HOME/Public/.env.bak"
+        linkFilesToPath "$completionDirSRC" "$completionDirDst"
+        linkFilesToPath "$vimColorsDir" "$HOME/.vim/colors"
+        handleVimPlugins
     fi
 }
 
