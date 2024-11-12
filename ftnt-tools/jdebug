@@ -5,27 +5,6 @@
 # FPX (global) # set wad-worker-count 1
 # FPX (global) # end
 
-# SSH Port Forwarding
-# -L [bind_address:]port:host:hostport
-# -N Do not execute a remote command. This is useful for just forwarding ports.
-# Topology:
-# Local(127.0.0.1):8881 --- SSH Connect --- Jump Server(172.18.20.226):22 --- Forward Traffic --- Remote(10.40.1.101):22
-# Usage:
-# $ ssh -N -L Local_IP:Local_Port:Remote_IP:Remote_Port Jump_User@Jump_IP:Jump_Port
-# Jump_User@Jump_IP's Passwd:
-#
-# Give an example:
-# $ ssh -N -L 127.0.0.1:8881:10.40.1.101:22 test@172.18.20.226
-# test@172.18.20.226's Passwd:
-#
-# $ netstat -tulnp | grep -i 8881
-# tcp        0      0 127.0.0.1:8881          0.0.0.0:*               LISTEN      1208750/ssh
-#
-# and then
-# $ ssh -l admin -p 8881 localhost
-# or use
-# $ jssh -l admin -P 8881 -t localhost
-
 # Variables
 fTarget="fgt1"
 fWorkerType="worker"
