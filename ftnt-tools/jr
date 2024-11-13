@@ -71,33 +71,31 @@ checkDependencies() {
 parserAndPolish() {
     [[ -z "$query" ]] && return
     local param
-    param=$(echo "$query" | sed -E 's/^[[:space:]]*|[[:space:]]*$//g; s/^&//; s/;$//; s/^<|>$//g; s/:[0-9]+$//')
+    param=$(echo "$query" | sed -E 's/^[[:space:]]*|[[:space:]]*$//g; s/^[&!]//; s/;$//; s/^<|>$//g; s/:[0-9]+$//')
     query="$param"
 }
 
 searchAndOpen() {
     local finalResult=""
     # --glob='*.{c,h,cpp,js,ts,py,html,css,sh,php}'
-            #  --glob='Makefile' \
-    rgGlob=" --glob='*.{c}' \
-             --glob='!*/linux/*'"
-    rgParams=" --smart-case \
-               --color=ansi \
-               --colors 'match:fg:204,51,153' --colors 'match:style:bold' \
-               --line-number \
-               --no-heading"
-    fzfParams=" --ansi \
-                --color 'hl:-1:underline,hl+:-1:underline:reverse' \
-                --delimiter ':' \
-                --preview 'bat --color=always {1} --theme=\"TwoDark\" --highlight-line {2}' \
-                --preview-window 'top,60%,border-bottom,+{2}+3/3,~3' \
-                --cycle"
+    local rgGlob="--glob='*.{c}'"
+    local rgParams="--smart-case \
+                    --color=ansi \
+                    --colors 'match:fg:204,51,153' --colors 'match:style:bold' \
+                    --line-number \
+                    --no-heading"
+    local fzfParams="--ansi \
+                     --color 'hl:-1:underline,hl+:-1:underline:reverse' \
+                     --delimiter ':' \
+                     --preview 'bat --color=always {1} --theme=\"TwoDark\" --highlight-line {2}' \
+                     --preview-window 'top,60%,border-bottom,+{2}+3/3,~3' \
+                     --cycle"
     if [ -z "$query" ]; then
         rgParams="$rgParams $rgGlob"
     fi
     # Squash multiple whitespaces
-    rgParams=${rgParams//+([[:space:]])/ }
-    fzfParams=${fzfParams//+([[:space:]])/ }
+    rgParams=$(echo "$rgParams" | tr -s ' ')
+    fzfParams=$(echo "$fzfParams" | tr -s ' ')
     # Make the query command
     rgQuery="rg $rgParams \"$query\""
     fzfQuery="fzf $fzfParams --query \"$query\""
