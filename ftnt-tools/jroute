@@ -46,7 +46,7 @@ help() {
         echo "[$gateway_name == ${gateway_ips[$gateway_name]}]"
     done
     echo $BANNER2
-    echo "$USER_NOTATION default via $current_gw_ip(${reverse_gateway_ips[$current_gw_ip]}) dev $device"
+    echo -e "$USER_NOTATION ${COLOR}default via $current_gw_ip(${reverse_gateway_ips[$current_gw_ip]}) dev $device${RESET}"
     exit 1
 }
 
