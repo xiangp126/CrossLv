@@ -249,37 +249,6 @@ handleVimPlugins (){
     fi
 }
 
-relinkCommand() {
-    local linkName=$1
-    local sysCmd=$2
-    local linkDst=$HOME/.usr/bin
-    [ -n "$3" ] && linkDst=$3
-    local dst=$linkDst/$linkName
-
-    echo -e "${COLOR}Relink ${linkName} to ${sysCmd}${RESET}"
-    [ ! -d "$linkDst" ] && mkdir -p "$linkDst"
-
-    sysCmdPath=$(command -v "$sysCmd")
-    if [ -z "$sysCmdPath" ]; then
-        echo "${sysCmd} is not installed"
-        return
-    fi
-
-    if [ -L "$dst" ] && [ "$(readlink "$dst")" == "$sysCmdPath" ]; then
-        echo -e "${GREY}${linkName} is already linked to ${sysCmdPath}${RESET}"
-        return
-    fi
-
-    # Create the symlink
-    ln -sf "$sysCmdPath" "$dst"
-    if [ $? -eq 0 ]; then
-        echo -e "${GREEN}Success!${RESET}"
-    else
-        echo -e "${RED}Failed!${RESET}"
-        exit 1
-    fi
-}
-
 followUpTrackExceptions() {
     echo -e "${COLOR}Follow up the exceptions${RESET}"
     # Copy back the privileged git config.
@@ -298,26 +267,26 @@ followUpTrackExceptions() {
 }
 
 linkFilesToPath() {
-    local srcDir="$1"        # Source directory
-    local dstDir="$2"        # Destination directory
-    local copyToHidden="$3"  # Copy to hidden file
-    local backupDir="$3"     # Optional backup directory
-    local dstPresix=""       # Prefix for destination filename
+    local targetDir="$1"      # Source directory
+    local linkPath="$2"       # Destination directory
+    local needHide="$3"       # Copy to hidden file
+    local backupDir="$3"      # Optional backup directory
+    local linknamePrefix=""   # Prefix for destination filename
 
-    echo -e "${COLOR}Linking files from $(basename "$srcDir") to ${dstDir}${RESET}"
-    [ ! -d "$srcDir" ] && echo "Source directory $srcDir does not exist, abort!" && exit 1
-    [ ! -d "$dstDir" ] && mkdir -p "$dstDir"
+    echo -e "${COLOR}Creating symlink: ${linkPath}/* -> $(basename "$targetDir")/*${RESET}"
+    [ ! -d "$targetDir" ] && echo "Source directory $targetDir does not exist, abort!" && exit 1
+    [ ! -d "$linkPath" ] && mkdir -p "$linkPath"
     [ -n "$backupDir" ] && [ ! -d "$backupDir" ] && mkdir -p "$backupDir"
-    [ -n "$copyToHidden" ] && dstPresix="."
+    [ -n "$needHide" ] && linknamePrefix="."
 
     # Iterate over files in the source directory
-    for file in "$srcDir"/*; do
+    for file in "$targetDir"/*; do
         local filename=$(basename "$file")
-        local src="$srcDir/$filename"
-        local dst="$dstDir/${dstPresix}$filename"
+        local src="$targetDir/$filename"
+        local dst="$linkPath/${linknamePrefix}$filename"
 
         # echo -e "Linking ${COLOR}$filename${RESET} => $dst"
-        echo -e "${LIGHTYELLOW}$filename${RESET}"
+        echo -e "${LIGHTYELLOW}$dst -> $filename${RESET}"
 
         # If target exists in the destination as a regular file (not a symlink), back it up first
         if [ -n "$backupDir" ] && [ -f "$dst" ] && [ ! -L "$dst" ]; then
@@ -342,7 +311,7 @@ linkFilesToPath() {
     done
 
     COLOR=$GREEN
-    find "$dstDir" -type l ! \
+    find "$linkPath" -type l ! \
             -exec test -e {} \; \
             -exec rm -f {} \; \
             -exec echo -e "${COLOR}Deleting broken link: {}${RESET}" \;
@@ -350,23 +319,53 @@ linkFilesToPath() {
 }
 
 linkFileToPath() {
-    local srcFile="$1"      # Source file
-    local dstDir="$2"       # Destination directory
+    local target="$1"       # The target to link
+    local linkPath="$2"     # Destination directory to link to
 
-    local filename=$(basename "$srcFile")
-    local dst="$dstDir/$filename"
-    local src="$srcFile"
+    local filename=$(basename "$target")
+    local dst="$linkPath/$filename"
+    local src="$target"
 
-    echo -e "${COLOR}Linking ${filename} to ${dstDir}${RESET}"
-    [ ! -f "$srcFile" ] && echo "Source file $srcFile does not exist, abort!" && exit 1
-    [ ! -d "$dstDir" ] && mkdir -p "$dstDir"
+    echo -e "${COLOR}Creating symlink: $filename -> $src${RESET}"
+    [ ! -f "$target" ] && echo "Source file $target does not exist, abort!" && exit 1
+    [ ! -d "$linkPath" ] && mkdir -p "$linkPath"
 
     if [ -L "$dst" ] && [ "$(readlink "$dst")" == "$src" ]; then
-        echo -e "${GREY}${filename} is already linked to ${dstDir}${RESET}"
+        echo -e "${GREY}${filename} is already linked to ${linkPath}${RESET}"
         return
     fi
 
-    ln -sf "$srcFile" "$dst"
+    ln -sf "$target" "$dst"
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}Success!${RESET}"
+    else
+        echo -e "${RED}Failed!${RESET}"
+        exit 1
+    fi
+}
+
+relinkCommand() {
+    local sysCmd=$1
+    local linkName=$2
+    local linkPath=$HOME/.usr/bin
+    [ -n "$3" ] && linkPath=$3
+    local dst=$linkPath/$linkName
+
+    [ ! -d "$linkPath" ] && mkdir -p "$linkPath"
+    sysCmdPath=$(command -v "$sysCmd")
+    if [ -z "$sysCmdPath" ]; then
+        echo "${sysCmd} is not installed"
+        return
+    fi
+
+    echo -e "${COLOR}Creating symlink: ${linkName} -> syscmd: ${sysCmdPath}${RESET}"
+    if [ -L "$dst" ] && [ "$(readlink "$dst")" == "$sysCmdPath" ]; then
+        echo -e "${GREY}${linkName} is already linked to ${sysCmdPath}${RESET}"
+        return
+    fi
+
+    # Create the symlink
+    ln -sf "$sysCmdPath" "$dst"
     if [ $? -eq 0 ]; then
         echo -e "${GREEN}Success!${RESET}"
     else
@@ -426,9 +425,9 @@ mainInstallProcedure() {
         handleVimPlugins
 
         linkFileToPath "$fzfBinPath" "$HOME/.usr/bin"
-        relinkCommand "bat" "batcat"
-        relinkCommand "fd" "fdfind"
-        relinkCommand "sh" "bash" /bin/
+        relinkCommand "batcat" "bat"
+        relinkCommand "fdfind" "fd"
+        relinkCommand "bash" "sh" "/bin/"
 
         setTimeZone
         changeTMOUTToWritable
