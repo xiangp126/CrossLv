@@ -9,6 +9,7 @@ BANNER3="--------------NOW----------------"
 USERNAME=$(whoami)
 HOSTNAME=$(hostname)
 
+[ ! -f "$GETCOLORS" ] && echo "File not found: $GETCOLORS" && exit 1
 source "$GETCOLORS"
 
 declare -A gateway_ips=(
