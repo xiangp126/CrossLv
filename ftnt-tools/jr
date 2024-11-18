@@ -78,20 +78,24 @@ parserAndPolish() {
 searchAndOpen() {
     local finalResult=""
     # --glob='*.{c,h,cpp,js,ts,py,html,css,sh,php}'
-    local rgGlob="--glob='*.{c}'"
+    local rgExtraGlob="--glob='*.{c}'"
     local rgParams="--smart-case \
                     --color=ansi \
                     --colors 'match:fg:204,51,153' --colors 'match:style:bold' \
                     --line-number \
-                    --no-heading"
+                    --no-heading \
+                    --glob='!fpx-sync/*' \
+                    --glob='!linux-*/*' \
+                   "
     local fzfParams="--ansi \
                      --color 'hl:-1:underline,hl+:-1:underline:reverse' \
                      --delimiter ':' \
                      --preview 'bat --color=always {1} --theme=\"TwoDark\" --highlight-line {2}' \
                      --preview-window 'top,60%,border-bottom,+{2}+3/3,~3' \
-                     --cycle"
+                     --cycle \
+                    "
     if [ -z "$query" ]; then
-        rgParams="$rgParams $rgGlob"
+        rgParams="$rgParams $rgExtraGlob"
     fi
     # Squash multiple whitespaces
     rgParams=$(echo "$rgParams" | tr -s ' ')
@@ -99,6 +103,10 @@ searchAndOpen() {
     # Make the query command
     rgQuery="rg $rgParams \"$query\""
     fzfQuery="fzf $fzfParams --query \"$query\""
+
+    # Debugging
+    # echo -e "rgQuery: ${COLOR}$rgQuery${RESET}"
+    # echo -e "fzfQuery: ${COLOR}$fzfQuery${RESET}"
 
     if [ -z "$query" ]; then
         finalResult=$(eval "$rgQuery" | eval "$fzfQuery")
