@@ -6,7 +6,7 @@ window_id="1"
 pane_id="1"
 user_notation="@@@@"
 # It's a dos file, with CRLF(^M) line endings.
-command_file="/data/bugzilla/commands.c"
+command_file="/data/bugzilla/debug.c"
 tmux_prefix="C-x"
 
 usage() {
@@ -23,8 +23,7 @@ Options:
     -h      Print this help message
 
 Examples:
-    $scriptName -s log -w 8 -p 1
-    $scriptName -s log -w 8 -p 1 -f $command_file
+    $scriptName -s log -w 2 -p 2 -f $command_file
 
 Tips:
     Type $tmux_prefix, then q to view the pane number within the tmux window.

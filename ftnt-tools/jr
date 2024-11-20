@@ -1,9 +1,12 @@
 #!/bin/bash
 # set -x
 
+# Variables
+fEditor="code"
+fDebug=0
+# Constants
 SCRIPTNAME=$(basename $0)
-USER_NOTATION="@@@@"
-EDITOR="code"
+# USER_NOTATION="@@@@"
 # Colors
 MAGENTA='\033[35m'
 NORMAL='\033[0m'
@@ -16,11 +19,12 @@ usage() {
     cat << _EOF_
 $SCRIPTNAME v0.0
 
-Usage: $SCRIPTNAME [vz] <search term>
+Usage: $SCRIPTNAME [vzd] <search term>
 
 Options:
-    -v  Open the file with vim (default is $EDITOR)
-    -z  Search with empty query
+    -z  Search with empty query (you can also use jz command directly)
+    -v  Open the file with vim (default is $fEditor)
+    -d  Print debug information
 
 Example: $SCRIPTNAME "search term"
          $SCRIPTNAME -z
@@ -34,13 +38,16 @@ _EOF_
 [[ $# -eq 0 ]] && usage
 
 # parse the arguments, -v is for vim, -c is for code
-while getopts "hvz" opt; do
+while getopts "hvdz" opt; do
     case ${opt} in
         v)
-            EDITOR="vim"
+            fEditor="vim"
             ;;
         z)
             query=""
+            ;;
+        d)
+            fDebug=1
             ;;
         h)
             usage
@@ -61,7 +68,7 @@ shift $((OPTIND -1))
 query="$@"
 
 checkDependencies() {
-    local dependencies=("rg" "fzf" "bat" "$EDITOR")
+    local dependencies=("rg" "fzf" "bat" "$fEditor")
     for dep in "${dependencies[@]}"; do
         (command -v "$dep" &>/dev/null || echo "$dep is not installed") &
     done
@@ -97,16 +104,22 @@ searchAndOpen() {
     if [ -z "$query" ]; then
         rgParams="$rgParams $rgExtraGlob"
     fi
+
     # Squash multiple whitespaces
     rgParams=$(echo "$rgParams" | tr -s ' ')
     fzfParams=$(echo "$fzfParams" | tr -s ' ')
+
     # Make the query command
     rgQuery="rg $rgParams \"$query\""
-    fzfQuery="fzf $fzfParams --query \"$query\""
+    # Remove the backslashes from the fzf query
+    # Only fzf needs to remove the backslashes
+    fzfQuery="fzf $fzfParams --query \"${query//\\/}\""
 
     # Debugging
-    # echo -e "rgQuery: ${COLOR}$rgQuery${RESET}"
-    # echo -e "fzfQuery: ${COLOR}$fzfQuery${RESET}"
+    if [ $fDebug -ge 1 ]; then
+        echo -e "rgQuery: ${COLOR}$rgQuery${RESET}"
+        echo -e "fzfQuery: ${COLOR}$fzfQuery${RESET}"
+    fi
 
     if [ -z "$query" ]; then
         finalResult=$(eval "$rgQuery" | eval "$fzfQuery")
@@ -132,11 +145,11 @@ searchAndOpen() {
         exit 1
     fi
 
-    if [ "$EDITOR" == "vim" ]; then
-        $EDITOR +"${linenumber}" "$file"
+    if [ "$fEditor" == "vim" ]; then
+        $fEditor +"${linenumber}" "$file"
         exit 0
     else
-        $EDITOR "$file":"$linenumber"
+        $fEditor "$file":"$linenumber"
     fi
 }
 
@@ -144,4 +157,4 @@ checkDependencies
 parserAndPolish
 searchAndOpen
 
-echo -e "The file opened is: ${COLOR}$file:$linenumber${RESET}"
+echo -e "The file opened: ${COLOR}$file:$linenumber${RESET}"

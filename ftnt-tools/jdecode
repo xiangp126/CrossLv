@@ -72,7 +72,6 @@ def print_help(script_name, exe_file_path, crash_log_path):
     print("  -e, --exe <exe_file_path>    Path to the executable file (default: {})".format(exe_file_path))
     print("  -c, --crash <crash_log_path> Path to the crash log file (default: {})".format(crash_log_path))
     print("  -o, --output <output_path>   Path to the crash decode output file (default: {})".format(crash_decode_output))
-    print("  -w, --write                  Enable write mode")
     print("  -v, --verbose                Enable verbose mode")
     print("  -h, --help                   Display this help message")
     print("\nExample:")
@@ -87,7 +86,7 @@ def main():
     exe_file_path = "./sysinit/init"
     crash_log_path = "/data/bugzilla/crash.txt"
     crash_decode_output = "/data/bugzilla/crash_decoded.txt"
-    write_flag = False
+    write_flag = True
     verbose_flag = False
 
     try:
@@ -106,8 +105,6 @@ def main():
             crash_log_path = arg
         elif opt in ("-o", "--output"):
             crash_decode_output = arg
-        elif opt in ("-w", "--write"):
-            write_flag = True
         elif opt in ("-v", "--verbose"):
             verbose_flag = True
 
