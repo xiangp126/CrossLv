@@ -4,6 +4,7 @@
 # Variables
 fEditor="code"
 fDebug=0
+fOnlyRg=0
 # Constants
 SCRIPTNAME=$(basename $0)
 # USER_NOTATION="@@@@"
@@ -25,6 +26,7 @@ Options:
     -z  Search with empty query (you can also use jz command directly)
     -v  Open the file with vim (default is $fEditor)
     -d  Print debug information
+    -r  Only use rg to search, not use fzf
 
 Example: $SCRIPTNAME "search term"
          $SCRIPTNAME -z
@@ -38,7 +40,7 @@ _EOF_
 [[ $# -eq 0 ]] && usage
 
 # parse the arguments, -v is for vim, -c is for code
-while getopts "hvdz" opt; do
+while getopts "hvdrz" opt; do
     case ${opt} in
         v)
             fEditor="vim"
@@ -48,6 +50,9 @@ while getopts "hvdz" opt; do
             ;;
         d)
             fDebug=1
+            ;;
+        r)
+            fOnlyRg=1
             ;;
         h)
             usage
@@ -129,6 +134,7 @@ searchAndOpen() {
             echo -e "No result found for query: ${COLOR}$query${RESET}"
             exit 1
         fi
+        [ $fOnlyRg -eq 1 ] && echo "$rgResult" && exit 0
         finalResult=$(echo "$rgResult" | eval "$fzfQuery")
     fi
 

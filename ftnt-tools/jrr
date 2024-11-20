@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if ! command -v jr &> /dev/null
+then
+    echo "jr command could not be found"
+    exit
+fi
+
+jr -r "$@"
