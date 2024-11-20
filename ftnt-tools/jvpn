@@ -2,6 +2,12 @@
 
 # Set the header for the Expect script
 SCRIPT_NAME=$(basename $0)
+GET_COLORS="$HOME/Templates/getcolors.sh"
+
+if [ -f "$GET_COLORS" ]; then
+    source "$GET_COLORS"
+fi
+
 
 usage() {
     echo "Usage: $SCRIPT_NAME [-r]"
@@ -12,16 +18,15 @@ usage() {
 while getopts "rh" opt; do
     case $opt in
         r)
-            echo "Restarting forticlient service"
+            echo -e "${COLOR}Restarting forticlient service${RESET}"
             sudo systemctl restart forticlient.service
-            sudo systemctl status forticlient.service
+            # sudo systemctl status forticlient.service
             if [ $? -ne 0 ]; then
-                echo "Failed to restart forticlient service"
+                echo -e "${COLOR}Failed to restart forticlient service${RESET}"
                 exit 1
             else
-                echo "Successfully restarted forticlient service"
+                echo -e "${COLOR}Successfully restarted forticlient service${RESET}"
             fi
-            exit 0
             ;;
         h)
             usage

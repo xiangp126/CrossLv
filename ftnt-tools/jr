@@ -90,7 +90,7 @@ parserAndPolish() {
 searchAndOpen() {
     local finalResult=""
     # --glob='*.{c,h,cpp,js,ts,py,html,css,sh,php}'
-    local rgExtraGlob="--glob='*.{c}'"
+    local rgNullQueryExtraGlob="--glob='*.{c}'"
     local rgParams="--smart-case \
                     --color=ansi \
                     --colors 'match:fg:204,51,153' --colors 'match:style:bold' \
@@ -107,7 +107,7 @@ searchAndOpen() {
                      --cycle \
                     "
     if [ -z "$query" ]; then
-        rgParams="$rgParams $rgExtraGlob"
+        rgParams="$rgParams $rgNullQueryExtraGlob"
     fi
 
     # Squash multiple whitespaces
