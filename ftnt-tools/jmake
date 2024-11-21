@@ -309,16 +309,18 @@ echo "$SEPARATOR2"
 # Clean the working directory
 if [[ "$fGitClean" == true ]]; then
     echo "$USER_NOTATION Cleaning the working directory ..."
+
+    COLOR="$MAGENTA"
     cd "$fWorkingDir" || exit
     gitExcludePattern=""
     for patt in $gitExcludeList; do
         if [[ "$fRMCompileCommandsJson" == true ]]; then
             if [[ "$patt" == "$compileCommandsFile" ]]; then
                 # Do not add it to the exclude list
+                echo -e "$USER_NOTATION ${COLOR}Remove $compileCommandsFile${RESET}"
                 continue
             fi
         fi
-        COLOR="$MAGENTA"
         echo -e "$USER_NOTATION Exclude ${COLOR}$patt${RESET}"
         gitExcludePattern+="--exclude=$patt "
     done
@@ -440,23 +442,6 @@ if [[ "$fNeedBuild" != false ]]; then
         makeCommand="$bear $makeCommand"
     fi
 
-    # Check if the existing compile_commands.json is writable
-    jsonFile=$compileCommandsFile
-    jsonPath=$fWorkingDir/$jsonFile
-    if [[ -f "$jsonPath" && ! -w "$jsonPath" ]]; then
-        echo "$USER_NOTATION Detected $jsonPath is read-only"
-        if [[ "$fRMCompileCommandsJson" == true ]]; then
-            echo "$USER_NOTATION Removing $jsonPath"
-            rm -f "$jsonPath"
-            if [[ $? -ne 0 ]]; then
-                echo "$USER_NOTATION Failed to remove $jsonPath"
-                exit 1
-            fi
-        else
-            echo "$USER_NOTATION Just keep $jsonPath as it is"
-        fi
-    fi
-
     # Loop to build the projects
     attempt=1
     maxAttempt=$fMaxBuildAttempt
@@ -483,13 +468,26 @@ if [[ "$fNeedBuild" != false ]]; then
         exit 1
     fi
 
-    # Remove the write privilege of compile_commands.json
-    if [[ -f "$jsonPath" && -w "$jsonPath" ]]; then
-        echo "$USER_NOTATION $jsonPath is writable"
-        echo "$USER_NOTATION Remove the write privilege of $jsonPath"
-        chmod -w "$jsonPath"
-        if [[ $? -ne 0 ]]; then
-            echo "$USER_NOTATION Failed to remove the write privilege of $jsonPath"
+    # Remove the write privilege of compile_commands.json if it is writable
+    jsonFile=$compileCommandsFile
+    jsonPath=$fWorkingDir/$jsonFile
+    COLOR=$MAGENTA
+    if [[ -f "$jsonPath" ]]; then
+        if [[ -w "$jsonPath" ]]; then
+            echo -e "$USER_NOTATION ${COLOR}$jsonPath is writable${RESET}"
+            echo -e "$USER_NOTATION ${COLOR}Remove the write privilege of $jsonPath${RESET}"
+            chmod -w "$jsonPath"
+            if [[ $? -ne 0 ]]; then
+                echo -e "$USER_NOTATION ${COLOR}Failed to remove the write privilege of $jsonPath${RESET}"
+                exit 1
+            fi
+        else
+            echo -e "$USER_NOTATION ${COLOR}$jsonPath is read-only${RESET}"
+        fi
+    else
+        echo -e "$USER_NOTATION ${COLOR}No $jsonFile found in $fWorkingDir${RESET}"
+        if [[ "$fUseBear" == true ]]; then
+            echo -e "$USER_NOTATION ${COLOR}Please check the bear command${RESET}"
             exit 1
         fi
     fi
