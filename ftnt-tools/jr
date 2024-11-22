@@ -116,8 +116,7 @@ searchAndOpen() {
 
     # Make the query command
     rgQuery="rg $rgParams \"$query\""
-    # Remove the backslashes from the fzf query
-    # Only fzf needs to remove the backslashes
+    # Remove the backslashes from the fzf query. Only fzf needs to remove the backslashes
     fzfQuery="fzf $fzfParams --query \"${query//\\/}\""
 
     # Debugging
