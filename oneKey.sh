@@ -310,6 +310,10 @@ linkFilesToPath() {
         fi
     done
 
+    if [ "$linkPath" == "$HOME" ]; then
+        return
+    fi
+
     COLOR=$GREEN
     find "$linkPath" -type l ! \
             -exec test -e {} \; \
