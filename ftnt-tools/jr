@@ -7,6 +7,8 @@ fDebug=0
 fOnlyRg=0
 # Constants
 SCRIPTNAME=$(basename $0)
+SEPARATOR_LEFT="<---------------------------------------------------"
+SEPARATOR_RIGHT="--------------------------------------------------->"
 # USER_NOTATION="@@@@"
 # Colors
 MAGENTA='\033[35m'
@@ -121,8 +123,10 @@ searchAndOpen() {
 
     # Debugging
     if [ $fDebug -ge 1 ]; then
+        echo $SEPARATOR_RIGHT
         echo -e "rgQuery: ${COLOR}$rgQuery${RESET}"
         echo -e "fzfQuery: ${COLOR}$fzfQuery${RESET}"
+        echo $SEPARATOR_LEFT
     fi
 
     if [ -z "$query" ]; then

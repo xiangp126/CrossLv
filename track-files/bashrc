@@ -120,9 +120,9 @@ export PATH
 export PKG_CONFIG_PATH
 export LD_LIBRARY_PATH
 unset TMOUT
-# Fortios variables.
+# FOS variables.
 export FORTIPKG="$HOME/fortipkg"
-export USESUDO=`which sudo`
+# export USESUDO=`which sudo`
 alias build_tags='ctags -R --extra=+f --languages=C,+C++ --links=no;cscope -Rbqk'
 
 # Enable programmable completion features (you don't need to enable
@@ -134,60 +134,61 @@ fi
 
 # find bash completion for third-party tools | only for Mac
 if [[ -d /usr/local/etc/bash_completion.d ]]; then
-    for file in `find /usr/local/etc/bash_completion.d -type l`
-    do
-        source $file
+    for file in /usr/local/etc/bash_completion.d/*; do
+        # Only source symlinks
+        [[ -L $file ]] && source "$file"
     done
 fi
 
 fzf_bash_completion="$HOME/.vim/bundle/fzf-tab-completion/bash/fzf-bash-completion.sh"
 if [[ -f "$fzf_bash_completion" ]]; then
-    source $fzf_bash_completion
+    source "$fzf_bash_completion"
     bind -x '"/\t": fzf_bash_completion'
 fi
 
-# Loop to source extra bash completions
-extraCompletionDir=$HOME/.bash_completion.d
+# Source additional bash completions
+extraCompletionDir="$HOME/.bash_completion.d"
 if [[ -d "$extraCompletionDir" ]]; then
-    for file in `find $extraCompletionDir -regex ".*.bash$"`
-    do
-        source $file
+    for file in "$extraCompletionDir"/*.bash; do
+        # Only source existing files
+        [[ -f $file ]] && source "$file"
     done
 fi
 
 # Settings for fzf -- the fuzzy finder
 # Use fd (https://github.com/sharkdp/fd) instead of the default find
-if [[ "`which fd 2> /dev/null`" != '' ]]; then
-    # Remove the type f option to include directories
+if command -v fd &> /dev/null; then
     FZF_DEFAULT_COMMAND="fd . \
-        --hidden \
-        --follow \
-        --no-ignore \
-        --exclude '.vscode-server' \
-        --exclude '.git' \
-        --exclude '.cache' \
-        --exclude '*.sw[p|o]' \
-        --exclude '*.[a|o]' \
-        --exclude '*.so'"
+                         --hidden \
+                         --follow \
+                         --no-ignore \
+                         --exclude '.vscode-server' \
+                         --exclude '.git' \
+                         --exclude '.cache' \
+                         --exclude '*.sw[p|o]' \
+                         --exclude '*.[a|o]' \
+                         --exclude '*.so' \
+                        "
     FZF_DEFAULT_COMMAND=${FZF_DEFAULT_COMMAND//+([[:space:]])/ }
     FZF_ALT_C_COMMAND="fd . \
-        --type d \
-        --hidden \
-        --follow \
-        --no-ignore \
-        --exclude '.vscode-server' \
-        --exclude '.git'"
+                        --type d \
+                        --hidden \
+                        --follow \
+                        --no-ignore \
+                        --exclude '.vscode-server' \
+                        --exclude '.git' \
+                       "
     FZF_ALT_C_COMMAND=${FZF_ALT_C_COMMAND//+([[:space:]])/ }
     export FZF_DEFAULT_COMMAND
     export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
     export FZF_ALT_C_COMMAND
 
     _fzf_compgen_path() {
-        eval $FZF_DEFAULT_COMMAND
+        eval "$FZF_DEFAULT_COMMAND"
     }
     # Use fd to generate the list for directory completion
     _fzf_compgen_dir() {
-        eval $FZF_ALT_C_COMMAND
+        eval "$FZF_ALT_C_COMMAND"
     }
 fi
 export LINES=100
@@ -197,12 +198,3 @@ export FZF_DEFAULT_OPTS="--layout=reverse --inline-info --color=fg+:247 --multi"
 export FZF_COMPLETION_TRIGGER='\'
 # Options to fzf command
 export FZF_COMPLETION_OPTS='+c -x'
-
-# if command -v tmux &>/dev/null; then
-#     sessions=$(tmux list-sessions 2>/dev/null)
-#     if [[ -n "$sessions" ]]; then
-# cat << _EOF
-# `tmux ls`
-# _EOF
-#     fi
-# fi
