@@ -37,7 +37,7 @@ stty -ixon
 # export LS_COLORS=$LS_COLORS:'ex=0;0:ln=36:di=34:ow=01;90'
 export LS_COLORS=$LS_COLORS:'ex=0;0:ln=36:di=34'
 
-if [[ "`uname -s`" == 'Darwin' ]]; then
+if [[ $(uname -s) == 'Darwin' ]]; then
     # Compatible with Mac
     alias ls='ls -G'
     # alias netstat='netstat -an -p tcp'
@@ -57,7 +57,7 @@ alias grep='grep -i --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias gdb='gdb -q'
-alias bat='bat --pager "less -iRF"'
+alias bat="bat --pager 'less -iRF'"
 # alias valgrind='valgrind --tool=memcheck --leak-check=full --show-reachable=yes'
 alias rg='rg --smart-case --color=ansi'
 alias 7zP='7z a -mhe=on -p'
@@ -74,7 +74,7 @@ alias bear='bear -l /usr/lib/x86_64-linux-gnu/bear/libear.so'
 # alias to change directory
 function __cd () {
     if [ -d "$1" ]; then
-        cd "$1"
+        cd "$1" || exit
     fi
 }
 alias cdg='__cd $HOME/myGit'
@@ -102,13 +102,13 @@ export QUOTING_STYLE=literal
 export BAT_THEME=TwoDark
 
 # Useful local variables.
-# For wireshark to decode SSL/TLS traffic
-export SSLKEYLOGFILE=~/.ssl-keys.log
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 export LC_CTYPE=en_US.UTF-8
 export SHELL=/bin/bash
 export EDITOR=vim
+# Wireshark to decode SSL/TLS traffic
+export SSLKEYLOGFILE=~/.ssl-keys.log
 PKG_CONFIG_PATH=$HOME/.usr/lib/pkgconfig:/usr/local/lib/pkgconfig
 LD_LIBRARY_PATH=/usr/lib:/usr/lib64:/usr/local/lib:/usr/local/lib64
 LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/.usr/lib:$HOME/.usr/lib64
@@ -140,16 +140,13 @@ if [[ -d /usr/local/etc/bash_completion.d ]]; then
     done
 fi
 
-fzf_bash_completion="$HOME/.vim/bundle/fzf-tab-completion/bash/fzf-bash-completion.sh"
-if [[ -f "$fzf_bash_completion" ]]; then
-    source "$fzf_bash_completion"
-    bind -x '"/\t": fzf_bash_completion'
-fi
+# For fzf-tab-completion vim plugin
+bind -x '"/\t": fzf_bash_completion'
 
 # Source additional bash completions
 extraCompletionDir="$HOME/.bash_completion.d"
 if [[ -d "$extraCompletionDir" ]]; then
-    for file in "$extraCompletionDir"/*.bash; do
+    for file in "$extraCompletionDir"/*; do
         # Only source existing files
         [[ -f $file ]] && source "$file"
     done

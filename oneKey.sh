@@ -8,13 +8,14 @@ SEPARATOR="==================================================="
 # Variables
 workingDir=$(cd $(dirname $0); pwd)
 trackedFilesDir=$workingDir/track-files
-completionDirSRC=$workingDir/completion-files
-completionDirDst=$HOME/.bash_completion.d
-templateFilesDir=$workingDir/template
+trackedCompSrc=$workingDir/completion-files
+trackedCompDst=$HOME/.bash_completion.d
+ftntTempDir=$workingDir/template
 ftntToolsDir=$workingDir/ftnt-tools
 vimColorsDir=$workingDir/vim-colors
 vimPlugsManagerPath=$HOME/.vim/autoload/plug.vim
 fzfBinPath=$HOME/.vim/bundle/fzf/bin/fzf
+fzfTabCompletionPath=$HOME/.vim/bundle/fzf-tab-completion/bash/fzf-bash-completion.sh
 # ubuntu is the default OS type
 osCategory=debian
 # Flags
@@ -296,7 +297,7 @@ linkFilesToPath() {
 
         # If the symlink already exists and points to the correct location, skip it
         if [ -L "$dst" ] && [ "$(readlink "$dst")" == "$src" ]; then
-            echo -e "${GREY}$dst is already been linked.${RESET}"
+            echo -e "${GREY}$dst is already linked.${RESET}"
             continue
         fi
 
@@ -335,7 +336,7 @@ linkFileToPath() {
     [ ! -d "$linkPath" ] && mkdir -p "$linkPath"
 
     if [ -L "$dst" ] && [ "$(readlink "$dst")" == "$src" ]; then
-        echo -e "${GREY}${filename} is already linked to ${linkPath}${RESET}"
+        echo -e "${GREY}${filename} is already linked to ${src}${RESET}"
         return
     fi
 
@@ -417,17 +418,18 @@ mainInstallProcedure() {
     if [ "$osCategory" == "debian" ]; then
         [ "$fForceUpdate" == "true" ] && updatePrerequisitesForDebian
         linkFilesToPath "$trackedFilesDir" "$HOME" 1 "$HOME/Public/.env.bak"
-        linkFilesToPath "$completionDirSRC" "$completionDirDst"
+        linkFilesToPath "$trackedCompSrc" "$trackedCompDst"
         linkFilesToPath "$vimColorsDir" "$HOME/.vim/colors"
         followUpTrackExceptions
 
         if [ "$fInsTools" == "true" ]; then
             linkFilesToPath "$ftntToolsDir" "$HOME/.usr/bin"
-            linkFilesToPath "$templateFilesDir" "$HOME/Templates"
+            linkFilesToPath "$ftntTempDir" "$HOME/Templates"
         fi
 
         handleVimPlugins
 
+        linkFileToPath "$fzfTabCompletionPath" "$trackedCompDst"
         linkFileToPath "$fzfBinPath" "$HOME/.usr/bin"
         relinkCommand "batcat" "bat"
         relinkCommand "fdfind" "fd"
@@ -438,7 +440,7 @@ mainInstallProcedure() {
     elif [ "$osCategory" == "mac" ]; then
         # [ "$fForceUpdate" == "true" ] && installPrequesitesForMac
         linkFilesToPath "$trackedFilesDir" "$HOME" 1 "$HOME/Public/.env.bak"
-        linkFilesToPath "$completionDirSRC" "$completionDirDst"
+        linkFilesToPath "$trackedCompSrc" "$trackedCompDst"
         linkFilesToPath "$vimColorsDir" "$HOME/.vim/colors"
         handleVimPlugins
     fi

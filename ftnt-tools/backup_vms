@@ -30,17 +30,21 @@ for vm in "${vms[@]}"; do
         # Extract the file name from the source path
         file_name=$(basename "$source_path")
         # Copy the VM's disk image file to the backup directory using rsync
-        sudo rsync -av "$source_path" "$backup_dir/$file_name"
+        sudo rsync -av "$source_path" "$backup_dir/$file_name" &
         
         # Backup the XML configuration file
         # sudo virsh dumpxml "$vm" > "$backup_dir/$vm.xml"
         qemu_xml_path=/etc/libvirt/qemu
-        sudo rsync -azPv "$qemu_xml_path/$vm.xml" "$backup_dir/$vm.xml"
+        sudo rsync -azPv "$qemu_xml_path/$vm.xml" "$backup_dir/$vm.xml" &
         
-        echo -e "Backup complete for VM: $vm\n"
+        # echo -e "Backup complete for VM: $vm\n"
+        echo -e "Backup jobs started for VM: $vm\n"
     else
         echo -e "Error: Source path is empty for VM $vm\n"
     fi
 done
+
+# Wait for all background processes to finish
+wait
 
 echo -e "All VM backups completed.\n"
