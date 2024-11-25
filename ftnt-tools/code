@@ -1,42 +1,42 @@
 #!/bin/bash
+# set -x
+
+findCmd="find $HOME/.vscode-server/bin -type f -name code -executable"
+codePaths=$($findCmd)
+numOfCodePaths=${#codePaths[@]}
+
+splitPaths() {
+    # Originally, codePaths contains only one element joined by \n; it needs to be split into two separate elements.
+    # /home/userid/.vscode-server/bin/fee1edb8d6d72a0ddff41e5f71a671c23ed924b9/bin/remote-cli/code
+    # /home/userid/.vscode-server/bin/b1c0a14de1414fcdaa400695b4db1c0799bc3124/bin/remote-cli/code
+    IFS=$'\n' read -d '' -r -a codePaths <<< "$codePaths"
+    for i in "${!codePaths[@]}"
+    do
+        version=$(${codePaths[$i]} --version | head -n 1 | awk '{print $1}')
+        versionMap[$i]=$version
+        # echo "Version: $version"
+    done
+}
+
+printPathInfo () {
+    for i in "${!codePaths[@]}"
+    do
+        echo "${versionMap[$i]} : ${codePaths[$i]}"
+    done
+}
 
 function fcode() {
     # Unable to connect to VS Code server: Error in request - ENOENT /run/user/1000/vscode-ipc-*.sock
     # https://github.com/microsoft/vscode-remote-release/issues/6997#issue-1319650016
     # https://github.com/microsoft/vscode-remote-release/issues/6362#issuecomment-1046458477
 
-    findCmd="find $HOME/.vscode-server/bin -type f -name code -executable"
-    codePaths=$($findCmd)
-    if [[ -z $codePaths ]]
+    if [[ $numOfCodePaths -eq 0 ]]
     then
-        echo "Error: vscode code command not found";
+        echo "Error: No vscode code command found"
         exit 1
-    fi
-
-    splitPaths() {
-        # Originally, codePaths contains only one element joined by \n; it needs to be split into two separate elements.
-        # /home/userid/.vscode-server/bin/fee1edb8d6d72a0ddff41e5f71a671c23ed924b9/bin/remote-cli/code
-        # /home/userid/.vscode-server/bin/b1c0a14de1414fcdaa400695b4db1c0799bc3124/bin/remote-cli/code
-        IFS=$'\n' read -d '' -r -a codePaths <<< "$codePaths"
-        for i in "${!codePaths[@]}"
-        do
-            version=$(${codePaths[$i]} --version | head -n 1 | awk '{print $1}')
-            versionMap[$i]=$version
-            # echo "Version: $version"
-        done
-    }
-
-    printPathInfo () {
-        for i in "${!codePaths[@]}"
-        do
-            echo "${versionMap[$i]} : ${codePaths[$i]}"
-        done
-    }
-
-    splitPaths
-
-    if [[ ${#codePaths[@]} -gt 1 ]]
+    elif [[ ${#codePaths[@]} -gt 1 ]]
     then
+        splitPaths
         echo "Error: More than one vscode code command found, please delete the older version(s) and try again."
         printPathInfo
         exit 1
@@ -52,11 +52,9 @@ function fcode() {
         exit 1
     fi
 
-    # find /run/user/$UID -maxdepth 1 -type s -name "vscode-ipc-*" ! -wholename $new_IPC_HOOK -exec ls {} +
     # Remove vscode-ipc-*.sock files except the latest one
-    find /run/user/$UID -maxdepth 1 -type s -name "vscode-ipc-*" ! -wholename $new_IPC_HOOK -delete
-    # Remove vscode-git-*.sock files
-    find /run/user/$UID -maxdepth 1 -type s -name "vscode-git-*.sock" -delete
+    # Cos a new vscode-ipc-*.sock file is created every time the vscode window is relaunched
+    find /run/user/$UID -maxdepth 1 -type s -name "vscode-ipc-*" ! -wholename "$new_IPC_HOOK" -delete
 
     # VSCODE_IPC_HOOK_CLI is an environment variable that is used by the VS Code CLI to communicate with the server.
     export VSCODE_IPC_HOOK_CLI=$new_IPC_HOOK
