@@ -6,7 +6,9 @@ codePaths=$($findCmd)
 numOfCodePaths=${#codePaths[@]}
 
 splitPaths() {
-    # Originally, codePaths contains only one element joined by \n; it needs to be split into two separate elements.
+    [[ $numOfCodePaths -le 1 ]] && return
+    # Originally, codePaths contains only one element joined by \n;
+    # It needs to be split into two separate elements.
     # /home/userid/.vscode-server/bin/fee1edb8d6d72a0ddff41e5f71a671c23ed924b9/bin/remote-cli/code
     # /home/userid/.vscode-server/bin/b1c0a14de1414fcdaa400695b4db1c0799bc3124/bin/remote-cli/code
     IFS=$'\n' read -d '' -r -a codePaths <<< "$codePaths"
