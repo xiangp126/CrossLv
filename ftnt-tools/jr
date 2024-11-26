@@ -5,6 +5,7 @@
 fEditor="code"
 fDebug=0
 fOnlyRg=0
+fzfSelected=""
 # Constants
 SCRIPTNAME=$(basename $0)
 SEPARATOR_LEFT="<---------------------------------------------------"
@@ -90,7 +91,6 @@ parserAndPolish() {
 }
 
 searchAndOpen() {
-    local finalResult=""
     # --glob='*.{c,h,cpp,js,ts,py,html,css,sh,php}'
     local rgNullQueryExtraGlob="--glob='*.{c}'"
     local rgParams="--smart-case \
@@ -130,7 +130,7 @@ searchAndOpen() {
     fi
 
     if [ -z "$query" ]; then
-        finalResult=$(eval "$rgQuery" | eval "$fzfQuery")
+        fzfSelected=$(eval "$rgQuery" | eval "$fzfQuery")
     else
         rgResult=$(eval "$rgQuery")
         if [ -z "$rgResult" ]; then
@@ -138,15 +138,15 @@ searchAndOpen() {
             exit 1
         fi
         [ $fOnlyRg -eq 1 ] && echo "$rgResult" && exit 0
-        finalResult=$(echo "$rgResult" | eval "$fzfQuery")
+        fzfSelected=$(echo "$rgResult" | eval "$fzfQuery")
     fi
 
-    [ -z "$finalResult" ] && exit 0
+    [ -z "$fzfSelected" ] && exit 0
 
     # Sample output of fzfResult:
     # daemon/wad/wad_app_eng.c:3071:          goto session_make_failed;
     pattern='([a-zA-Z0-9/.%_-]+):([0-9]+)'
-    if [[ $finalResult =~ $pattern ]]; then
+    if [[ $fzfSelected =~ $pattern ]]; then
         file="${BASH_REMATCH[1]}"
         linenumber="${BASH_REMATCH[2]}"
     else
@@ -166,4 +166,8 @@ checkDependencies
 parserAndPolish
 searchAndOpen
 
-echo -e "The file opened: ${COLOR}$file:$linenumber${RESET}"
+if [ -n "$fzfSelected" ];
+then
+    # echo -e "The file opened: ${COLOR}$file:$linenumber${RESET}"
+    echo -e "The line opened: ${COLOR}$fzfSelected${RESET}"
+fi

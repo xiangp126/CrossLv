@@ -123,7 +123,7 @@ unset TMOUT
 # FOS variables.
 export FORTIPKG="$HOME/fortipkg"
 # export USESUDO=`which sudo`
-alias build_tags='ctags -R --extra=+f --languages=C,+C++ --links=no;cscope -Rbqk'
+# alias build_tags='ctags -R --extra=+f --languages=C,+C++ --links=no;cscope -Rbqk'
 
 # Enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
