@@ -18,8 +18,8 @@ Usage:
     $script_name -t vm_name
 
 Options:
-    -t      vm_name      Name of the VM to restore
-    -h      help         Display this help message
+    -t   vm_name   Name of the VM to restore
+    -h   help      Display this help message
 
 Example:
     $script_name -t fgt1

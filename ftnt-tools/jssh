@@ -615,7 +615,7 @@ expect -c "
             set COLOR \$MAGENTA
         } SIGINT
     } else {
-        set timeout 8
+        set timeout 5
     }
 
     set i 1

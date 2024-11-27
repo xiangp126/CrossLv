@@ -169,5 +169,5 @@ searchAndOpen
 if [ -n "$fzfSelected" ];
 then
     # echo -e "The file opened: ${COLOR}$file:$linenumber${RESET}"
-    echo -e "The line opened: ${COLOR}$fzfSelected${RESET}"
+    echo -e "Line opened: ${COLOR}${fzfSelected:0:80}${RESET}"
 fi
