@@ -120,7 +120,7 @@ Example:
     # Local Port Forwarding
     $SCRIPT_NAME -L 127.0.0.1:8881:10.40.1.101:22 -J test@172.18.20.226 -W test
     # SSHFS to mount remote directory
-    $SCRIPT_NAME -t 172.18.29.111 -l test -p test -F /home/test:~/mp
+    $SCRIPT_NAME -t 172.18.29.111 -l test -p test -F /home/test:~/MP
 
 _EOF
     exit 0
@@ -311,8 +311,9 @@ parseOptions() {
         done
 
         if findmnt -rno SOURCE "$fFSMountPoint" &>/dev/null; then
-            echo -e "$USER_NOTATION ${COLOR}$fFSMountPoint is already mounted. To unmount it${RESET}"
+            echo -e "$USER_NOTATION ${COLOR}$fFSMountPoint is already mounted.${RESET}"
             df -h "$fFSMountPoint"
+            echo "To unmount it,"
             echo -e "$USER_NOTATION use ${COLOR}umount $fFSMountPoint${RESET}"
             echo -e "$USER_NOTATION or  ${COLOR}fusermount -u $fFSMountPoint${RESET}"
             exit 1
@@ -492,7 +493,7 @@ dumpLFTips() {
 dumpLCTips() {
     COLOR=$1
     echo -e "${BOLD}Live Capture Command Tips:${RESET}" >&2
-    cmd="tcpdump -i $fLCInterface -s 0 -U -n -w - 'not port 22'"
+    cmd="tcpdump -i $fLCInterface -s 0 -U -n -w - 'not port 22 and not arp'"
     if [ -n "$fNeedJumpServer" ]; then
         if [ -n "$fLiveCapture" ]; then
             echo -e "${COLOR}nc $fLFLocalAddr $fLCPort | wireshark -k -${RESET}" >&2
@@ -502,7 +503,10 @@ dumpLCTips() {
         fi
     else
         if [ -n "$fLiveCapture" ]; then
+            local sslKeyFilename="${SSLKEYLOGFILE##*/}"
             echo -e "${COLOR}nc $fTarget $fLCPort | wireshark -k -i -${RESET}" >&2
+            echo -e "${COLOR}nc $fTarget $fLCPort | wireshark -o \"tls.keylog_file:$SSLKEYLOGFILE\" -k -i -${RESET}" >&2
+            echo -e "${COLOR}nc $fTarget $fLCPort | wireshark -o \"tls.keylog_file:$HOME/MP/$sslKeyFilename\" -k -i -${RESET}" >&2
             echo -e "${COLOR}$fLCBaseCmd | wireshark -k -i -${RESET}" >&2
         else
             echo -e "${COLOR}${SCRIPT_NAME} -t $fTargetUser@$fTarget:$fTargetPort -p $fTargetPwd -c \"$cmd\" -C${RESET}" >&2
@@ -515,7 +519,7 @@ dumpLFTips "$PURPLE"
 
 if [ -z "$fSwitchToSShfs" ]; then
     fFSRemoteDir="/home/$fTargetUser"
-    fFSMountPoint="$HOME/mpdemo"
+    fFSMountPoint="$HOME/MP"
     # param="-o reconnect -o transform_symlinks -o follow_symlinks -o cache=yes"
     param="-o reconnect -o cache=yes"
     COLOR=$LIGHTGREEN
