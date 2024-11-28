@@ -313,9 +313,10 @@ parseOptions() {
         if findmnt -rno SOURCE "$fFSMountPoint" &>/dev/null; then
             echo -e "$USER_NOTATION ${COLOR}$fFSMountPoint is already mounted.${RESET}"
             df -h "$fFSMountPoint"
-            echo "To unmount it,"
-            echo -e "$USER_NOTATION use ${COLOR}umount $fFSMountPoint${RESET}"
-            echo -e "$USER_NOTATION or  ${COLOR}fusermount -u $fFSMountPoint${RESET}"
+            echo "$USER_NOTATION To unmount it, use"
+            echo -e "${COLOR}umount $fFSMountPoint${RESET}"
+            echo "$USER_NOTATION or (specifically used for unmounting FUSE file systems)"
+            echo -e "${COLOR}fusermount -u $fFSMountPoint${RESET}"
             exit 1
         fi
     fi
@@ -505,7 +506,7 @@ dumpLCTips() {
         if [ -n "$fLiveCapture" ]; then
             local sslKeyFilename="${SSLKEYLOGFILE##*/}"
             echo -e "${COLOR}nc $fTarget $fLCPort | wireshark -k -i -${RESET}" >&2
-            echo -e "${COLOR}nc $fTarget $fLCPort | wireshark -o \"tls.keylog_file:$SSLKEYLOGFILE\" -k -i -${RESET}" >&2
+            echo -e "${COLOR}nc $fTarget $fLCPort | wireshark -o \"tls.keylog_file:/home/$fTargetUser/$sslKeyFilename\" -k -i -${RESET}" >&2
             echo -e "${COLOR}nc $fTarget $fLCPort | wireshark -o \"tls.keylog_file:$HOME/MP/$sslKeyFilename\" -k -i -${RESET}" >&2
             echo -e "${COLOR}$fLCBaseCmd | wireshark -k -i -${RESET}" >&2
         else
