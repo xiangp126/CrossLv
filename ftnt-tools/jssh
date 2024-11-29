@@ -15,6 +15,8 @@ fGroupPattern='(\$|#|sftp>)\s*$' # For Literal Interpretation, use single quotes
 fDollarPattern='\$\s*$'
 fPoundPattern='#\s*$'
 # fSftpPattern='sftp>\s*$'
+fSSHpassInstalled=""
+fLCWithSSHpass=""
 # SSH Variables
 fInputCmd=""
 fTarget=""
@@ -23,7 +25,7 @@ fTargetPwd="password"
 fTargetPort=22
 fVdom=""
 fSSHCmd="" # The command to execute remotely without opening an interactive login session
-fNoShell=""
+fNoLoginShell=""
 fSpawnCmd=""
 fModeName=$SSH_MODE
 fServerAliveInterval=30
@@ -55,7 +57,6 @@ fFSBasicMountParams="-o reconnect -o transform_symlinks -o follow_symlinks -o ca
 fFSOptions=""
 fFSMountPoint=""
 fFSRemoteDir=""
-fSSHpassInstalled=""
 # Colors
 RED='\033[31m'
 LIGHTRED='\033[91m'
@@ -77,8 +78,10 @@ LIGHTPURPLE='\033[95m'
 NORMAL='\033[0m'
 BOLD='\033[1m'
 RESET='\033[0m'
+COLOR=$MAGENTA
 
 usage() {
+    COLOR=$GREY
 cat << _EOF
 $SCRIPT_NAME 1.0
 
@@ -108,21 +111,30 @@ Options:
 
 Example:
     # SSH Connection
-    $SCRIPT_NAME -t fpx1
-    $SCRIPT_NAME -t 172.18.20.214 -l admin -p 1
+    $(printf "$COLOR$SCRIPT_NAME -t %s$RESET" "fpx1")
+    $(printf "$COLOR$SCRIPT_NAME -t %s -l %s -p %s$RESET" "172.18.20.214" "admin" "1")
+    $(printf "$COLOR$SCRIPT_NAME -t %s -p %s$RESET" "fpxauto@172.18.20.84:22" "qaz")
+
     # SSH with a Jump Server
-    $SCRIPT_NAME -J fpxauto@172.18.20.84:22 -t guodong@10.120.1.111 -P 2121 -p 123 -W qaz
+    $(printf "$COLOR$SCRIPT_NAME -t %s -P %s -p %s -J %s -W %s$RESET" "guodong@10.120.1.111" "2121" "123" "fpxauto@172.18.20.84:22" "qaz")
+    $(printf "$COLOR$SCRIPT_NAME -t %s -l %s -p %s -J %s -W %s$RESET" "172.18.52.37" "owner" "FGT12\!34" "fpxauto@172.18.20.84:22" "qaz")
+
     # SFTP Connection
-    $SCRIPT_NAME -t 172.18.29.111 -l test -p test -T
+    $(printf "$COLOR$SCRIPT_NAME -t %s -l %s -p %s -T$RESET" "172.18.52.37" "owner" "FGT12\!34")
+
     # SFTP with a Jump Server
-    $SCRIPT_NAME -J fpxauto@172.18.20.84:22 -t guodong@10.120.1.111 -P 2121 -p 123 -W qaz -T
+    $(printf "$COLOR$SCRIPT_NAME -t %s -l %s -p %s -J %s -W %s -T$RESET" "172.18.52.37" "owner" "FGT12\!34" "fpxauto@172.18.20.84:22" "qaz")
+
     # Remote Live Capture
-    $SCRIPT_NAME -t 172.18.29.111 -l test -p test -c "tcpdump -i any -s 0 -U -n -w - 'not port 22'" -C
+    $(printf "$COLOR$SCRIPT_NAME -t %s -p %s -c %s -C$RESET" "fpxauto@172.18.20.84:22" "qaz" "tcpdump -i any -s 0 -U -n -w - 'not port 22'")
+    $(printf "$COLOR$SCRIPT_NAME -t %s -l %s -p %s -J %s -W %s -c %s -C$RESET" "172.18.52.37" "owner" "FGT12\!34" "fpxauto@172.18.20.84:22" "qaz" "tcpdump -i any -s 0 -U -n -w - 'not port 22'")
+
     # Local Port Forwarding
-    $SCRIPT_NAME -L 127.0.0.1:8881:10.120.1.111:2121 -J fpxauto@172.18.20.84:22 -W qaz
+    $(printf "$COLOR$SCRIPT_NAME -L %s:%s:%s:%s -J %s -W %s -l %s -p %s$RESET" "127.0.0.1" "8881" "172.18.52.37" "22" "fpxauto@172.18.20.84:22" "qaz" "owner" "FGT12\!34")
+
     # SSHFS to mount remote directory
-    $SCRIPT_NAME -t 172.18.29.111 -l test -p test -F /home/test:~/MP
-    $SCRIPT_NAME -t guodong@10.120.1.111 -P 2121 -p 123 -J fpxauto@172.18.20.84:22 -W qaz -F :~/MP
+    $(printf "$COLOR$SCRIPT_NAME -t %s -l %s -p %s -F %s$RESET" "172.18.52.37" "owner" "FGT12\!34" ":~/MP")
+    $(printf "$COLOR$SCRIPT_NAME -t %s -l %s -p %s -J %s -W %s -F %s$RESET" "172.18.52.37" "owner" "FGT12\!34" "fpxauto@172.18.20.84:22" "qaz" ":~/MP")
 
 _EOF
     exit 0
@@ -154,7 +166,7 @@ while getopts "t:l:u:p:P:J:W:v:c:TF:CL:h" opt; do
             fSSHCmd=$OPTARG
             if [ -n "$fSSHCmd" ]; then
                 # Only set this flag when $fSSHCmd is not empty
-                fNoShell=true
+                fNoLoginShell=true
             fi
             ;;
         C)
@@ -198,9 +210,28 @@ done
 shift $((OPTIND - 1))
 if [[ $# -gt 0 ]]; then
     COLOR=$MAGENTA
-    echo -e "${COLOR}Error: Illegal non-option arguments: $@${RESET}"
-    exit
+    echo -e "${COLOR}Error: Illegal non-option arguments: $@${RESET}" >&2
+    exit 1
 fi
+
+checkSSHpass() {
+    if command -v sshpass &>/dev/null
+    then
+        fSSHpassInstalled=true
+    else
+        COLOR=$MAGENTA
+        echo -e "$USER_NOTATION ${COLOR}sshpass is not installed. Please install sshpass.${RESET}" >&2
+        exit 1
+    fi
+}
+
+checkWireshark() {
+    if ! command -v wireshark &>/dev/null; then
+        COLOR=$MAGENTA
+        echo -e "$USER_NOTATION ${COLOR}Wireshark is not installed. Please install Wireshark.${RESET}" >&2
+        exit 1
+    fi
+}
 
 parseOptions() {
     COLOR=$MAGENTA
@@ -215,7 +246,7 @@ parseOptions() {
             fJumpServer="${BASH_REMATCH[2]}"
             [ -n "${BASH_REMATCH[5]}" ] && fJumpPort="${BASH_REMATCH[5]}"
         else
-            echo -e "$USER_NOTATION ${COLOR}-J has to be in the format of user@jumpserver[:port]${RESET}"
+            echo -e "$USER_NOTATION ${COLOR}-J has to be in the format of user@jumpserver[:port]${RESET}" 2>&1
             exit 1
         fi
 
@@ -239,7 +270,7 @@ parseOptions() {
             fTarget="${BASH_REMATCH[5]}"
             fTargetPort="${BASH_REMATCH[7]}"
         else
-            echo -e "$USER_NOTATION ${COLOR}-L has to be in the format of [bind_address:]port:host:hostport${RESET}"
+            echo -e "$USER_NOTATION ${COLOR}-L has to be in the format of [bind_address:]port:host:hostport${RESET}" 2>&1
             exit 1
         fi
 
@@ -250,7 +281,7 @@ parseOptions() {
 
         if lsof -i:"$fLFLocalPort" -t &>/dev/null; then
             lsof -i:"$fLFLocalPort"
-            echo -e "$USER_NOTATION ${COLOR}Local port $fLFLocalPort is already in use.${RESET}"
+            echo -e "$USER_NOTATION ${COLOR}Local port $fLFLocalPort is already in use.${RESET}" 2>&1
             exit 1
         fi
         # Skip the rest of the parsing
@@ -288,18 +319,18 @@ parseOptions() {
 
         mpoint=$(eval realpath "$fFSMountPoint")
         if [ $? -ne 0 ]; then
-            echo -e "$USER_NOTATION ${COLOR}Mountpoint $fFSMountPoint does not exist.${RESET}"
+            echo -e "$USER_NOTATION ${COLOR}Mountpoint $fFSMountPoint does not exist.${RESET}" 2>&1
             exit 1
         fi
 
         fFSMountPoint=$mpoint
         if [ ! -d "$fFSMountPoint" ]; then
-            echo -e "$USER_NOTATION ${COLOR}Mountpoint $fFSMountPoint does not exist.${RESET}"
+            echo -e "$USER_NOTATION ${COLOR}Mountpoint $fFSMountPoint does not exist.${RESET}" 2>&1
             exit 1
         fi
 
         if [ "$fFSMountPoint" == "$HOME" ]; then
-            echo -e "$USER_NOTATION ${COLOR}Mountpoint cannot be the HOME directory.${RESET}"
+            echo -e "$USER_NOTATION ${COLOR}Mountpoint cannot be the HOME directory.${RESET}" 2>&1
             exit 1
         fi
 
@@ -313,13 +344,16 @@ parseOptions() {
         done
 
         if findmnt -rno SOURCE "$fFSMountPoint" &>/dev/null; then
-            echo -e "$USER_NOTATION ${COLOR}$fFSMountPoint is already mounted.${RESET}"
-            df -h "$fFSMountPoint"
-            echo "$USER_NOTATION To unmount it, use"
-            echo -e "${COLOR}umount $fFSMountPoint${RESET}"
-            echo "$USER_NOTATION or (specifically used for unmounting FUSE file systems)"
-            echo -e "${COLOR}fusermount -u $fFSMountPoint${RESET}"
+            cat << EOF
+$(printf "$COLOR%s is already mounted.$RESET\n" "$fFSMountPoint")
+$(df -h "$fFSMountPoint")
+To unmount it, use
+$(printf "$LIGHTGREEN%s$RESET" "umount $fFSMountPoint")
+or (specifically used for unmounting FUSE file systems)
+$(printf "$LIGHTGREEN%s$RESET" "susermount -u $fFSMountPoint")
+EOF
             exit 1
+
         fi
     fi
 }
@@ -339,7 +373,7 @@ checkSanity() {
         fi
         fVdom=""
         fSSHCmd=""
-        fNoShell=""
+        fNoLoginShell=""
         fLiveCapture=""
     fi
 
@@ -353,7 +387,7 @@ checkSanity() {
     if [ -n "$fSwitchToSftp" ]; then
         fVdom=""
         fSSHCmd=""
-        fNoShell=""
+        fNoLoginShell=""
         fLiveCapture=""
         fNeedJumpServer=""
         fNeedLocalForwarder=""
@@ -363,17 +397,22 @@ checkSanity() {
     if [ -n "$fSwitchToSShfs" ]; then
         fVdom=""
         fSSHCmd=""
-        fNoShell=""
+        fNoLoginShell=""
         fLiveCapture=""
         fNeedLocalForwarder=""
+        checkSSHpass
     fi
 
-    [ -n "$fNoShell" ] && fVdom=""
+    [ -n "$fNoLoginShell" ] && fVdom=""
 
     # If $fLiveCapture is set, $fsshCmd must contain "tcpdump"
     if [ -n "$fLiveCapture" ]; then
         if [[ ! $fSSHCmd == *"tcpdump"* ]]; then
             fLiveCapture=""
+        else
+            checkSSHpass
+            checkWireshark
+            fLCWithSSHpass=true
         fi
     fi
 }
@@ -393,19 +432,34 @@ setSpawnCmd() {
     case "$fModeName" in
         "$SSH_MODE")
             cmd="$fSSHCmd"
+
+            # Live Capture with sshpass
+            # Launch a local Wireshark session to capture the packets live.
+            if [ -n "$fLCWithSSHpass" ]; then
+                param=""
+                if [ -n "$fNeedJumpServer" ]; then
+                    param="-o \"ProxyCommand=sshpass -p '$fJumpPwd' ssh -W %h:%p $fJumpUser@$fJumpServer\""
+                fi
+                fSpawnCmd="sshpass -p $fTargetPwd ssh $param -p $fTargetPort -l $fTargetUser $fTarget \"$cmd\" | wireshark -k -i -"
+                return
+            fi
+
+            # Live Capture without sshpass
+            # Spawn a remote nc session to listen on the target.
+            if [ -n "$fLiveCapture" ]; then
+                cmd="$cmd | nc -l -p $fLCPort"
+            fi
+
             fSpawnCmd="ssh -p $fTargetPort -l $fTargetUser $fTarget"
 
             # Via a Jump Server
             if [ -n "$fNeedJumpServer" ]; then
                 fSpawnCmd="$fSpawnCmd -J $fJumpUser@$fJumpServer:$fJumpPort"
             fi
-            fLCBaseCmd="$fSpawnCmd \"$fSSHCmd\"" # For printing purpose only
 
-            if [ -n "$fLiveCapture" ]; then
-                cmd="$cmd | nc -l -p $fLCPort"
-            fi
+            fLCBaseCmd="$fSpawnCmd \"$fSSHCmd\"" # Live Capture base command. For printing purpose only
 
-            if [ -n "$fNoShell" ]; then
+            if [ -n "$fNoLoginShell" ]; then
                 fSpawnCmd="$fSpawnCmd \"$cmd\""
             else
                 fSpawnCmd="$fSpawnCmd $keepAlive"
@@ -422,9 +476,6 @@ setSpawnCmd() {
 
         "$SSHFS_MODE")
             # Do not use expect to spawn sshfs session, as it will not work as expected
-            if command -v sshpass &>/dev/null; then
-                fSSHpassInstalled=true
-            fi
             param="$fFSBasicMountParams -o StrictHostKeyChecking=no -o sshfs_debug"
 
             # Case: no Jump Server
@@ -435,7 +486,7 @@ setSpawnCmd() {
                 if [ -n "$fSSHpassInstalled" ]; then
                     param="$param -o password_stdin"
                     if [ -n "$fNeedJumpServer" ]; then
-                        param="$param -o \"ProxyCommand=sshpass -p \"$fJumpPwd\" ssh -W %h:%p $fJumpUser@$fJumpServer\""
+                        param="$param -o \"ProxyCommand=sshpass -p '$fJumpPwd' ssh -W %h:%p $fJumpUser@$fJumpServer\""
                     fi
                 else
                     param="$param -o \"ProxyJump=$fJumpUser@$fJumpServer\""
@@ -602,6 +653,19 @@ if [ -n "$fSwitchToSShfs" ]; then
     fi
 fi
 
+if [ -n "$fLCWithSSHpass" ]; then
+    COLOR=$MAGENTA
+    # Execute the ssh command directly without using expect
+    eval "$fSpawnCmd"
+    if [ $? -ne 0 ]; then
+        echo -e "$USER_NOTATION ${COLOR}Failed to capture packets from $fTarget${RESET}"
+        exit 1
+    else
+        echo -e "$USER_NOTATION ${COLOR}Successfully captured packets from $fTarget${RESET}"
+        exit 0
+    fi
+fi
+
 # expect -d -c "
 expect -c "
     # Define ANSI color codes with capitalized names
@@ -651,7 +715,7 @@ expect -c "
         }
     }
 
-    if {\"$fNoShell\" != \"\" || \"$fNeedLocalForwarder\" != \"\"} {
+    if {\"$fNoLoginShell\" != \"\" || \"$fNeedLocalForwarder\" != \"\"} {
         set timeout -1
         trap {
             set COLOR \$LIGHTYELLOW
@@ -676,8 +740,10 @@ expect -c "
             puts stderr \"$USER_NOTATION \${COLOR}Login attempt \$i/$fMaxAttempts\${RESET}\"
         }
 
-        # exp_internal 1 # Enable debugging for expect
+        # Enable debugging for expect
+        # exp_internal 1
         spawn -noecho $fSpawnCmd
+
         set session_id [exp_pid]
         puts stderr \"\${GREY}Spawned Session ID: \$session_id\${RESET}\"
 
@@ -713,6 +779,7 @@ expect -c "
                 set host \$expect_out(1,string)
                 set COLOR \$LIGHTYELLOW
                 puts stderr \"$USER_NOTATION \${COLOR}Host key verification failed. Updating known_hosts file\${RESET}\"
+                puts stderr \"$USER_NOTATION \${COLOR}ssh-keygen -R \$host\${RESET}\"
                 system \"ssh-keygen -R \$host\"
                 puts stderr \"$USER_NOTATION \${COLOR}Host key removed from known_hosts file.\${RESET}\n\"
                 set COLOR \$MAGENTA
@@ -742,7 +809,7 @@ expect -c "
                 continue
             }
             eof {
-                if {\"$fNoShell\" != \"\"} {
+                if {\"$fNoLoginShell\" != \"\"} {
                     set output \$expect_out(buffer)
                     set pattern {(/([^/ ]+)+/tcpdump)}
                     if {[regexp \$pattern \$output match tcpdump_path]} {
@@ -764,7 +831,7 @@ expect -c "
         exit 1
     }
 
-    if {\"$fNoShell\" != \"\"} {
+    if {\"$fNoLoginShell\" != \"\"} {
         expect eof {
             puts stderr \"\n$USER_NOTATION \${COLOR}Session \$session_id executed commands successfully.\${RESET}\"
             exit 0

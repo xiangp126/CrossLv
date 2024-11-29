@@ -75,12 +75,16 @@ shift $((OPTIND -1))
 
 query="$@"
 
+# Only need to run for the first time
 checkDependencies() {
     local dependencies=("rg" "fzf" "bat" "$fEditor")
+
     for dep in "${dependencies[@]}"; do
-        (command -v "$dep" &>/dev/null || echo "$dep is not installed") &
+        if ! command -v "$dep" &>/dev/null; then
+            echo -e "Error: ${COLOR}$dep${RESET} is not installed."
+            exit 1
+        fi
     done
-    wait
 }
 
 parserAndPolish() {
@@ -162,7 +166,7 @@ searchAndOpen() {
     fi
 }
 
-checkDependencies
+# checkDependencies
 parserAndPolish
 searchAndOpen
 
