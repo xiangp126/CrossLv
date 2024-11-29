@@ -1,23 +1,23 @@
 #!/bin/bash
 
 scriptName=$(basename $0)
-if [[ "$#" < 1 ]]; then
+if [[ "$#" -lt 1 ]]; then
     echo "Usage: $scriptName <commit_path>"
     echo "Example: $scriptName ."
     exit 1
 fi
 
 # set the destination directory
-destination_dir=/data/bugzilla
+destination_dir=/data/bugzilla/CC
 diff_name="u.diff"
 
 # get the source directory from the argument
 source_dir=$1
-if [ ! -d $source_dir ]; then
+if [ ! -d "$source_dir" ]; then
     echo "Error: $source_dir does not exist or is not a directory"
     exit 1
 fi
-cd $source_dir
+cd "$source_dir" || exit
 if [ ! -d .git ]; then
     echo "Error: $source_dir is not a git repository"
     exit 1
@@ -40,5 +40,5 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-cd - &> /dev/null
+cd - &> /dev/null || exit
 bat -p "$destination_dir/$diff_name"
