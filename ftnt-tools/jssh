@@ -37,7 +37,6 @@ fSwitchToSftp=""
 fLiveCapture=""
 fLCPort="7777"
 fLCInterface="any"
-fLCBaseCmd=""
 # Jump Server
 fNeedJumpServer=""
 fJumpOptions=""
@@ -81,7 +80,8 @@ RESET='\033[0m'
 COLOR=$MAGENTA
 
 usage() {
-    COLOR=$GREY
+    local dumpOptions=""
+    dumpOptions="not port 22 and not arp"
 cat << _EOF
 $SCRIPT_NAME 1.0
 
@@ -111,30 +111,31 @@ Options:
 
 Example:
     # SSH Connection
-    $(printf "$COLOR$SCRIPT_NAME -t %s$RESET" "fpx1")
-    $(printf "$COLOR$SCRIPT_NAME -t %s -l %s -p %s$RESET" "172.18.20.214" "admin" "1")
-    $(printf "$COLOR$SCRIPT_NAME -t %s -p %s$RESET" "fpxauto@172.18.20.84:22" "qaz")
+    $SCRIPT_NAME -t fpx1
+    $SCRIPT_NAME -t 172.18.20.214 -l admin -p 1
+    $SCRIPT_NAME -t fpxauto@172.18.20.84:22 -p qaz
 
     # SSH with a Jump Server
-    $(printf "$COLOR$SCRIPT_NAME -t %s -P %s -p %s -J %s -W %s$RESET" "guodong@10.120.1.111" "2121" "123" "fpxauto@172.18.20.84:22" "qaz")
-    $(printf "$COLOR$SCRIPT_NAME -t %s -l %s -p %s -J %s -W %s$RESET" "172.18.52.37" "owner" "FGT12\!34" "fpxauto@172.18.20.84:22" "qaz")
+    $SCRIPT_NAME -t guodong@10.120.1.111 -P 2121 -p "123" -J fpxauto@172.18.20.84:22 -W qaz
+    $SCRIPT_NAME -t 172.18.52.37 -l owner -p "FGT12\!34" -J fpxauto@172.18.20.84:22 -W qaz
 
     # SFTP Connection
-    $(printf "$COLOR$SCRIPT_NAME -t %s -l %s -p %s -T$RESET" "172.18.52.37" "owner" "FGT12\!34")
+    $SCRIPT_NAME -t 172.18.52.37 -l owner -p "FGT12\!34" -T
 
     # SFTP with a Jump Server
-    $(printf "$COLOR$SCRIPT_NAME -t %s -l %s -p %s -J %s -W %s -T$RESET" "172.18.52.37" "owner" "FGT12\!34" "fpxauto@172.18.20.84:22" "qaz")
+    $SCRIPT_NAME -t 172.18.52.37 -l owner -p "FGT12\!34" -J fpxauto@172.18.20.84:22 -W qaz -T
 
     # Remote Live Capture
-    $(printf "$COLOR$SCRIPT_NAME -t %s -p %s -c %s -C$RESET" "fpxauto@172.18.20.84:22" "qaz" "tcpdump -i any -s 0 -U -n -w - 'not port 22'")
-    $(printf "$COLOR$SCRIPT_NAME -t %s -l %s -p %s -J %s -W %s -c %s -C$RESET" "172.18.52.37" "owner" "FGT12\!34" "fpxauto@172.18.20.84:22" "qaz" "tcpdump -i any -s 0 -U -n -w - 'not port 22'")
+    $SCRIPT_NAME -t fpxauto@172.18.20.84:22 -p qaz -c "tcpdump -i any -s 0 -U -n -vv '$dumpOptions'"
+    $SCRIPT_NAME -t fpxauto@172.18.20.84:22 -p qaz -c "tcpdump -i any -s 0 -U -n -w - '$dumpOptions'" -C
+    $SCRIPT_NAME -t 172.18.52.37 -l owner -p "FGT12\!34" -J fpxauto@172.18.20.84:22 -W qaz -c "tcpdump -i any -s 0 -U -n -w - '$dumpOptions'" -C
 
     # Local Port Forwarding
-    $(printf "$COLOR$SCRIPT_NAME -L %s:%s:%s:%s -J %s -W %s -l %s -p %s$RESET" "127.0.0.1" "8881" "172.18.52.37" "22" "fpxauto@172.18.20.84:22" "qaz" "owner" "FGT12\!34")
+    $SCRIPT_NAME -L 127.0.0.1:8881:172.18.52.37:22 -J fpxauto@172.18.20.84:22 -W qaz -l owner -p "FGT12\!34" 
 
     # SSHFS to mount remote directory
-    $(printf "$COLOR$SCRIPT_NAME -t %s -l %s -p %s -F %s$RESET" "172.18.52.37" "owner" "FGT12\!34" ":~/MP")
-    $(printf "$COLOR$SCRIPT_NAME -t %s -l %s -p %s -J %s -W %s -F %s$RESET" "172.18.52.37" "owner" "FGT12\!34" "fpxauto@172.18.20.84:22" "qaz" ":~/MP")
+    $SCRIPT_NAME -t 172.18.52.37 -l owner -p "FGT12\!34" -F :~/MP
+    $SCRIPT_NAME -t 172.18.52.37 -l owner -p "FGT12\!34" -J fpxauto@172.18.20.84:22 -W qaz -F :~/MP
 
 _EOF
     exit 0
@@ -215,13 +216,15 @@ if [[ $# -gt 0 ]]; then
 fi
 
 checkSSHpass() {
-    if command -v sshpass &>/dev/null
-    then
-        fSSHpassInstalled=true
+    local path=""
+    path=$(command -v sshpass)
+    if [ -n "$path" ]; then
+        if [ -x "$path" ]; then
+            fSSHpassInstalled=true
+        fi
     else
-        COLOR=$MAGENTA
-        echo -e "$USER_NOTATION ${COLOR}sshpass is not installed. Please install sshpass.${RESET}" >&2
-        exit 1
+        fSSHpassInstalled=""
+        echo -e "$USER_NOTATION ${MAGENTA}sshpass is not installed. Please install sshpass.${RESET}" >&2
     fi
 }
 
@@ -408,11 +411,12 @@ checkSanity() {
     # If $fLiveCapture is set, $fsshCmd must contain "tcpdump"
     if [ -n "$fLiveCapture" ]; then
         if [[ ! $fSSHCmd == *"tcpdump"* ]]; then
+            # Disable the live capture if the command does not contain "tcpdump"
             fLiveCapture=""
         else
             checkSSHpass
             checkWireshark
-            fLCWithSSHpass=true
+            [ -n "$fSSHpassInstalled" ] && fLCWithSSHpass=true
         fi
     fi
 }
@@ -456,8 +460,6 @@ setSpawnCmd() {
             if [ -n "$fNeedJumpServer" ]; then
                 fSpawnCmd="$fSpawnCmd -J $fJumpUser@$fJumpServer:$fJumpPort"
             fi
-
-            fLCBaseCmd="$fSpawnCmd \"$fSSHCmd\"" # Live Capture base command. For printing purpose only
 
             if [ -n "$fNoLoginShell" ]; then
                 fSpawnCmd="$fSpawnCmd \"$cmd\""
@@ -562,10 +564,10 @@ dumpLFTips() {
     echo -e "${BOLD}Local Forwarding Command Tips:${RESET}" >&2
     if [ -n "$fNeedJumpServer" ]; then
         if [ -n "$fNeedLocalForwarder" ]; then
-            echo -e "${COLOR}${SCRIPT_NAME} -t $fTargetUser@$fLFLocalAddr:$fLFLocalPort -p $fTargetPwd${RESET}" >&2
+            echo -e "${COLOR}${SCRIPT_NAME} -t $fTargetUser@$fLFLocalAddr:$fLFLocalPort -p \"$fTargetPwd\"${RESET}" >&2
             echo -e "${COLOR}ssh $fLFLocalAddr -p $fLFLocalPort -l $fTargetUser${RESET}" >&2
         else
-            echo -e "${COLOR}${SCRIPT_NAME} -L $fLFLocalAddr:$fLFLocalPort:$fTarget:$fTargetPort -J $fJumpOptions -W $fJumpPwd -l $fTargetUser -p $fTargetPwd${RESET}" >&2
+            echo -e "${COLOR}${SCRIPT_NAME} -L $fLFLocalAddr:$fLFLocalPort:$fTarget:$fTargetPort -J $fJumpOptions -W \"$fJumpPwd\" -l $fTargetUser -p \"$fTargetPwd\"${RESET}" >&2
         fi
     fi
 }
@@ -574,23 +576,20 @@ dumpLCTips() {
     COLOR=$1
     echo -e "${BOLD}Live Capture Command Tips:${RESET}" >&2
     cmd="tcpdump -i $fLCInterface -s 0 -U -n -w - 'not port 22 and not arp'"
+    # Live Capture Commands
     if [ -n "$fNeedJumpServer" ]; then
-        if [ -n "$fLiveCapture" ]; then
-            echo -e "${COLOR}nc $fLFLocalAddr $fLCPort | wireshark -k -${RESET}" >&2
-            echo -e "${COLOR}$fLCBaseCmd | wireshark -k -i -${RESET}" >&2
-        else
-            echo -e "${COLOR}${SCRIPT_NAME} -J $fJumpOptions -W $fJumpPwd -t $fTargetUser@$fTarget:$fTargetPort -p $fTargetPwd -c \"$cmd\" -C${RESET}" >&2
-        fi
+        echo -e "${COLOR}${SCRIPT_NAME} -t $fTargetUser@$fTarget:$fTargetPort -p \"$fTargetPwd\" -J $fJumpUser@$fJumpServer:$fJumpPort -W \"$fJumpPwd\" -c \"$cmd\" -C${RESET}" >&2
     else
-        if [ -n "$fLiveCapture" ]; then
-            local sslKeyFilename="${SSLKEYLOGFILE##*/}"
-            echo -e "${COLOR}nc $fTarget $fLCPort | wireshark -k -i -${RESET}" >&2
-            echo -e "${COLOR}nc $fTarget $fLCPort | wireshark -o \"tls.keylog_file:/home/$fTargetUser/$sslKeyFilename\" -k -i -${RESET}" >&2
-            echo -e "${COLOR}nc $fTarget $fLCPort | wireshark -o \"tls.keylog_file:$HOME/MP/$sslKeyFilename\" -k -i -${RESET}" >&2
-            echo -e "${COLOR}$fLCBaseCmd | wireshark -k -i -${RESET}" >&2
-        else
-            echo -e "${COLOR}${SCRIPT_NAME} -t $fTargetUser@$fTarget:$fTargetPort -p $fTargetPwd -c \"$cmd\" -C${RESET}" >&2
-        fi
+        echo -e "${COLOR}${SCRIPT_NAME} -t $fTargetUser@$fTarget:$fTargetPort -p \"$fTargetPwd\" -c \"$cmd\" -C${RESET}" >&2
+    fi
+
+    if [ -n "$fNeedLocalForwarder" ]; then
+        echo -e "${COLOR}nc $fLFLocalAddr $fLCPort | wireshark -k -${RESET}" >&2
+    else
+        local sslKeyFilename="${SSLKEYLOGFILE##*/}"
+        echo -e "${COLOR}nc $fTarget $fLCPort | wireshark -k -i -${RESET}" >&2
+        echo -e "${COLOR}nc $fTarget $fLCPort | wireshark -o \"tls.keylog_file:/home/$fTargetUser/$sslKeyFilename\" -k -i -${RESET}" >&2
+        echo -e "${COLOR}nc $fTarget $fLCPort | wireshark -o \"tls.keylog_file:$HOME/MP/$sslKeyFilename\" -k -i -${RESET}" >&2
     fi
 }
 
@@ -598,24 +597,24 @@ dumpLCTips "$BLUE"
 dumpLFTips "$PURPLE"
 
 if [ -z "$fSwitchToSShfs" ]; then
-    fFSRemoteDir="/home/$fTargetUser"
-    fFSMountPoint="$HOME/MP"
-    # param="-o reconnect -o transform_symlinks -o follow_symlinks -o cache=yes"
-    param="-o reconnect -o cache=yes"
     COLOR=$LIGHTGREEN
+    __remote_dir="/home/$fTargetUser"
+    __mount_point="$HOME/MP"
+    __addr=$fTarget
+    __port=$fTargetPort
     echo -e "${BOLD}SSHFS Command Tips:${RESET}" >&2
     if [ -n "$fNeedJumpServer" ]; then
-        if [ -z "$fNeedLocalForwarder" ]; then
-            echo -e "${COLOR}$SCRIPT_NAME -t $fTargetUser@$fTarget:$fTargetPort -p $fTargetPwd -J $fJumpUser@$fJumpServer:$fJumpPort -W $fJumpPwd -F $fFSRemoteDir:$fFSMountPoint${RESET}" >&2
+        if [ -n "$fNeedLocalForwarder" ]; then
+            echo -e "${COLOR}$SCRIPT_NAME -t $fTargetUser@$fLFLocalAddr:$fLFLocalPort -p \"$fTargetPwd\" -F $__remote_dir:$__mount_point${RESET}" >&2
         else
-            echo -e "${COLOR}$SCRIPT_NAME -t $fTargetUser@$fLFLocalAddr:$fLFLocalPort -p $fTargetPwd -F $fFSRemoteDir:$fFSMountPoint${RESET}" >&2
+            echo -e "${COLOR}$SCRIPT_NAME -t $fTargetUser@$fTarget:$fTargetPort -p \"$fTargetPwd\" -J $fJumpUser@$fJumpServer:$fJumpPort -W \"$fJumpPwd\" -F $__remote_dir:$__mount_point${RESET}" >&2
         fi
     else
-        if [ -z "$fNeedLocalForwarder" ]; then
-            echo -e "${COLOR}$SCRIPT_NAME -t $fTargetUser@$fTarget:$fTargetPort -p $fTargetPwd -F $fFSRemoteDir:$fFSMountPoint${RESET}" >&2
-        else
-            echo -e "${COLOR}$SCRIPT_NAME -t $fTargetUser@$fLFLocalAddr:$fLFLocalPort -p $fTargetPwd -F $fFSRemoteDir:$fFSMountPoint${RESET}" >&2
+        if [ -n "$fNeedLocalForwarder" ]; then
+            __addr=$fLFLocalAddr
+            __port=$fLFLocalPort
         fi
+        echo -e "${COLOR}$SCRIPT_NAME -t $fTargetUser@$__addr:$__port -p \"$fTargetPwd\" -F $__remote_dir:$__mount_point${RESET}" >&2
     fi
 fi
 
