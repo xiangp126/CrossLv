@@ -106,6 +106,7 @@ updatePrerequisitesForDebian() {
         dos2unix
         expect
         sshfs
+        sshpass
         shellcheck
         mlocate
         net-tools

@@ -95,6 +95,7 @@ expect -c "
     set max_retry 5
     set loop_prompt \"Error\"
     set token_prompt \"FortiToken\"
+    set cnt_confirm_prompt 0
 
     set i 1
     while { \$i <= \$max_retry } {
@@ -102,8 +103,14 @@ expect -c "
         # exp_internal 1
         expect {
             {Confirm (y/n)} {
-                send \"y\r\"
-                exp_continue
+                incr cnt_confirm_prompt
+                puts \"cnt_confirm_prompt: \$cnt_confirm_prompt\"
+                if { \$cnt_confirm_prompt <= 1 } {
+                    send \"y\r\"
+                    exp_continue
+                } else {
+                    exp_continue
+                }
             }
             {yes/no} {
                 send \"y\r\"
