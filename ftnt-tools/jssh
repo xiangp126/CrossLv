@@ -116,26 +116,26 @@ Example:
     $SCRIPT_NAME -t fpxauto@172.18.20.84:22 -p qaz
 
     # SSH with a Jump Server
-    $SCRIPT_NAME -t guodong@10.120.1.111 -P 2121 -p "123" -J fpxauto@172.18.20.84:22 -W "qaz"
-    $SCRIPT_NAME -t 172.18.52.37 -l owner -p "FGT12\!34" -J fpxauto@172.18.20.84:22 -W "qaz"
+    $SCRIPT_NAME -t guodong@10.120.1.111 -P 2121 -p 123 -J fpxauto@172.18.20.84:22 -W qaz
+    $SCRIPT_NAME -t 172.18.52.37 -l owner -p FGT12\!34 -J fpxauto@172.18.20.84:22 -W qaz
 
     # SFTP Connection
-    $SCRIPT_NAME -t 172.18.52.37 -l owner -p "FGT12\!34" -T
+    $SCRIPT_NAME -t 172.18.52.37 -l owner -p FGT12\!34 -T
 
     # SFTP with a Jump Server
-    $SCRIPT_NAME -t 172.18.52.37 -l owner -p "FGT12\!34" -J fpxauto@172.18.20.84:22 -W "qaz" -T
+    $SCRIPT_NAME -t 172.18.52.37 -l owner -p FGT12\!34 -J fpxauto@172.18.20.84:22 -W qaz -T
 
     # Remote Live Capture
-    $SCRIPT_NAME -t fpxauto@172.18.20.84:22 -p "qaz" -c "tcpdump -i any -s 0 -U -n -vv '$dumpOptions'"
-    $SCRIPT_NAME -t fpxauto@172.18.20.84:22 -p "qaz" -c "tcpdump -i any -s 0 -U -n -w - '$dumpOptions'" -C
-    $SCRIPT_NAME -t 172.18.52.37 -l owner -p "FGT12\!34" -J fpxauto@172.18.20.84:22 -W "qaz" -c "tcpdump -i any -s 0 -U -n -w - '$dumpOptions'" -C
+    $SCRIPT_NAME -t fpxauto@172.18.20.84:22 -p qaz -c "tcpdump -i any -s 0 -U -n -vv '$dumpOptions'"
+    $SCRIPT_NAME -t fpxauto@172.18.20.84:22 -p qaz -c "tcpdump -i any -s 0 -U -n -w - '$dumpOptions'" -C
+    $SCRIPT_NAME -t 172.18.52.37 -l owner -p FGT12\!34 -J fpxauto@172.18.20.84:22 -W qaz -c "tcpdump -i any -s 0 -U -n -w - '$dumpOptions'" -C
 
     # Local Port Forwarding
-    $SCRIPT_NAME -L 127.0.0.1:8881:172.18.52.37:22 -J fpxauto@172.18.20.84:22 -W "qaz" -l owner -p "FGT12\!34"
+    $SCRIPT_NAME -L 127.0.0.1:8881:172.18.52.37:22 -J fpxauto@172.18.20.84:22 -W qaz -l owner -p FGT12\!34
 
     # SSHFS to mount remote directory
-    $SCRIPT_NAME -t 172.18.52.37 -l owner -p "FGT12\!34" -F :~/MP
-    $SCRIPT_NAME -t 172.18.52.37 -l owner -p "FGT12\!34" -J fpxauto@172.18.20.84:22 -W "qaz" -F :~/MP
+    $SCRIPT_NAME -t 172.18.52.37 -l owner -p FGT12\!34 -F :~/MP
+    $SCRIPT_NAME -t 172.18.52.37 -l owner -p FGT12\!34 -J fpxauto@172.18.20.84:22 -W qaz -F :~/MP
 
 _EOF
     exit 0
@@ -442,9 +442,9 @@ setSpawnCmd() {
             if [ -n "$fLCWithSSHpass" ]; then
                 param=""
                 if [ -n "$fNeedJumpServer" ]; then
-                    param="-o \"ProxyCommand=sshpass -p '$fJumpPwd' ssh -W %h:%p $fJumpUser@$fJumpServer\""
+                    param="-o \"ProxyCommand=sshpass -p $fJumpPwd ssh -W %h:%p $fJumpUser@$fJumpServer\""
                 fi
-                fSpawnCmd="sshpass -p '$fTargetPwd' ssh $param -p $fTargetPort -l $fTargetUser $fTarget \"$cmd\" | wireshark -k -i -"
+                fSpawnCmd="sshpass -p $fTargetPwd ssh $param -p $fTargetPort -l $fTargetUser $fTarget \"$cmd\" | wireshark -k -i -"
                 return
             fi
 
@@ -488,7 +488,7 @@ setSpawnCmd() {
                 if [ -n "$fSSHpassInstalled" ]; then
                     param="$param -o password_stdin"
                     if [ -n "$fNeedJumpServer" ]; then
-                        param="$param -o \"ProxyCommand=sshpass -p '$fJumpPwd' ssh -W %h:%p $fJumpUser@$fJumpServer\""
+                        param="$param -o \"ProxyCommand=sshpass -p $fJumpPwd ssh -W %h:%p $fJumpUser@$fJumpServer\""
                     fi
                 else
                     param="$param -o \"ProxyJump=$fJumpUser@$fJumpServer\""
@@ -578,9 +578,9 @@ dumpLCTips() {
     cmd="tcpdump -i $fLCInterface -s 0 -U -n -w - 'not port 22 and not arp'"
     # Live Capture Commands
     if [ -n "$fNeedJumpServer" ]; then
-        echo -e "${COLOR}${SCRIPT_NAME} -t $fTargetUser@$fTarget:$fTargetPort -p \"$fTargetPwd\" -J $fJumpUser@$fJumpServer:$fJumpPort -W \"$fJumpPwd\" -c \"$cmd\" -C${RESET}" >&2
+        echo -e "${COLOR}${SCRIPT_NAME} -t $fTargetUser@$fTarget:$fTargetPort -p $fTargetPwd -J $fJumpUser@$fJumpServer:$fJumpPort -W \"$fJumpPwd\" -c \"$cmd\" -C${RESET}" >&2
     else
-        echo -e "${COLOR}${SCRIPT_NAME} -t $fTargetUser@$fTarget:$fTargetPort -p \"$fTargetPwd\" -c \"$cmd\" -C${RESET}" >&2
+        echo -e "${COLOR}${SCRIPT_NAME} -t $fTargetUser@$fTarget:$fTargetPort -p $fTargetPwd -c \"$cmd\" -C${RESET}" >&2
     fi
 
     if [ -n "$fNeedLocalForwarder" ]; then
