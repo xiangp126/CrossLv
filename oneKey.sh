@@ -272,7 +272,7 @@ linkFilesToPath() {
     local targetDir="$1"      # Source directory
     local linkPath="$2"       # Destination directory
     local needHide="$3"       # Copy to hidden file
-    local backupDir="$3"      # Optional backup directory
+    local backupDir="$4"      # Optional backup directory
     local linknamePrefix=""   # Prefix for destination filename
 
     echo -e "${COLOR}Creating symlink: ${linkPath}/* -> $(basename "$targetDir")/*${RESET}"
@@ -440,7 +440,7 @@ mainInstallProcedure() {
         changeTMOUTToWritable
     elif [ "$osCategory" == "mac" ]; then
         # [ "$fForceUpdate" == "true" ] && installPrequesitesForMac
-        linkFilesToPath "$trackedFilesDir" "$HOME" 1 "$HOME/Public/.env.bak"
+        linkFilesToPath "$trackedFilesDir" "$HOME" true "$HOME/Public/.env.bak"
         linkFilesToPath "$trackedCompSrc" "$trackedCompDst"
         linkFilesToPath "$vimColorsDir" "$HOME/.vim/colors"
         handleVimPlugins
