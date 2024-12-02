@@ -117,25 +117,25 @@ Example:
 
     # SSH with a Jump Server
     $SCRIPT_NAME -t guodong@10.120.1.111 -P 2121 -p 123 -J fpxauto@172.18.20.84:22 -W qaz
-    $SCRIPT_NAME -t 172.18.52.37 -l owner -p FGT12\!34 -J fpxauto@172.18.20.84:22 -W qaz
+    $SCRIPT_NAME -t 172.18.52.37 -l owner -p "FGT12\!34" -J fpxauto@172.18.20.84:22 -W qaz
 
     # SFTP Connection
-    $SCRIPT_NAME -t 172.18.52.37 -l owner -p FGT12\!34 -T
+    $SCRIPT_NAME -t 172.18.52.37 -l owner -p "FGT12\!34" -T
 
     # SFTP with a Jump Server
-    $SCRIPT_NAME -t 172.18.52.37 -l owner -p FGT12\!34 -J fpxauto@172.18.20.84:22 -W qaz -T
+    $SCRIPT_NAME -t 172.18.52.37 -l owner -p "FGT12\!34" -J fpxauto@172.18.20.84:22 -W qaz -T
 
     # Remote Live Capture
     $SCRIPT_NAME -t fpxauto@172.18.20.84:22 -p qaz -c "tcpdump -i any -s 0 -U -n -vv '$dumpOptions'"
     $SCRIPT_NAME -t fpxauto@172.18.20.84:22 -p qaz -c "tcpdump -i any -s 0 -U -n -w - '$dumpOptions'" -C
-    $SCRIPT_NAME -t 172.18.52.37 -l owner -p FGT12\!34 -J fpxauto@172.18.20.84:22 -W qaz -c "tcpdump -i any -s 0 -U -n -w - '$dumpOptions'" -C
+    $SCRIPT_NAME -t 172.18.52.37 -l owner -p "FGT12\!34" -J fpxauto@172.18.20.84:22 -W qaz -c "tcpdump -i any -s 0 -U -n -w - '$dumpOptions'" -C
 
     # Local Port Forwarding
-    $SCRIPT_NAME -L 127.0.0.1:8881:172.18.52.37:22 -J fpxauto@172.18.20.84:22 -W qaz -l owner -p FGT12\!34
+    $SCRIPT_NAME -L 127.0.0.1:8881:172.18.52.37:22 -J fpxauto@172.18.20.84:22 -W qaz -l owner -p "FGT12\!34"
 
     # SSHFS to mount remote directory
-    $SCRIPT_NAME -t 172.18.52.37 -l owner -p FGT12\!34 -F :~/MP
-    $SCRIPT_NAME -t 172.18.52.37 -l owner -p FGT12\!34 -J fpxauto@172.18.20.84:22 -W qaz -F :~/MP
+    $SCRIPT_NAME -t 172.18.52.37 -l owner -p "FGT12\!34" -F :~/MP
+    $SCRIPT_NAME -t 172.18.52.37 -l owner -p "FGT12\!34" -J fpxauto@172.18.20.84:22 -W qaz -F :~/MP
 
 _EOF
     exit 0
