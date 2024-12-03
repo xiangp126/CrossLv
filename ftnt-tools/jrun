@@ -1,35 +1,39 @@
 #!/bin/bash
+set -x
 
-scriptName=$(basename $0)
-session_id="log"
-window_id="1"
-pane_id="1"
-user_notation="@@@@"
-# It's a dos file, with CRLF(^M) line endings.
-command_file="/data/bugzilla/debug.c"
-tmux_prefix="C-x"
+fSessionId="log"
+fWinId="1"
+fPaneId="1"
+fSendNewLine=""
+# If the command file is a dos file, there will be a '\r\n' ending in each command.
+fCmdFile="/data/bugzilla/debug.c"
+fTmuxPrefix="C-x"
+SCRIPT_NAME=$(basename $0)
+USER_NOTATION="@@@@"
 
 usage() {
     cat << _EOF
 jrun 0.0.0
 
-Usage: $scriptName [-s session_id] [-w window_id] [-p pane_id] [-f command_file]
+Usage: $SCRIPT_NAME [-s session_id] [-w window_id] [-p pane_id] [-f command_file]
+            [-n] [-h]
 
 Options:
-    -s      Set session ID (default: $session_id)
-    -w      Set window ID (default: $window_id)
-    -p      Set pane ID (default: $pane_id)
-    -f      Specify command file (default: $command_file)
+    -s      Set session ID (default: $fSessionId)
+    -w      Set window ID (default: $fWinId)
+    -p      Set pane ID (default: $fPaneId)
+    -f      Specify command file (default: $fCmdFile)
+    -n      Send Enter at the end of each command
     -h      Print this help message
 
 Examples:
-    $scriptName -s log -w 2 -p 2 -f $command_file
+    $SCRIPT_NAME -s log -w 2 -p 2 -f $fCmdFile
 
 Tips:
-    Type $tmux_prefix, then q to view the pane number within the tmux window.
-    Type $tmux_prefix, then s to view the session name in tmux.
-    use // to comment out a line in the command file.
-    use ! to omit the rest of the commands in the command file.
+    1. Type $fTmuxPrefix, then q to view the pane number within the tmux window.
+    2. Type $fTmuxPrefix, then s to view the session name in tmux.
+    3. use // to comment out a line in the command file.
+    4. use ! to omit the rest of the commands in the command file.
 
 _EOF
     exit
@@ -38,25 +42,28 @@ _EOF
 [[ $# -eq 0 ]] && usage
 
 # Parse options
-while getopts "s:w:p:f:h" opt; do
+while getopts "s:w:p:nf:h" opt; do
     case $opt in
         s)
-            session_id="$OPTARG"
+            fSessionId="$OPTARG"
             ;;
         w)
-            window_id="$OPTARG"
+            fWinId="$OPTARG"
             ;;
         p)
-            pane_id="$OPTARG"
+            fPaneId="$OPTARG"
             ;;
         f)
-            command_file="$OPTARG"
+            fCmdFile="$OPTARG"
+            ;;
+        n)
+            fSendNewLine="true"
             ;;
         h)
             usage
             ;;
         ?)
-            echo "$user_notation Invalid option: -$OPTARG" >&2
+            echo "$USER_NOTATION Invalid option: -$OPTARG" >&2
             exit 1
             ;;
     esac
@@ -65,12 +72,12 @@ done
 # Shift to process non-option arguments. New $1, $2, ..., $@
 shift $((OPTIND - 1))
 if [[ $# -gt 0 ]]; then
-    echo "$user_notation Illegal non-option arguments: $@"
+    echo "$USER_NOTATION Illegal non-option arguments: $@"
     exit
 fi
 
-if [[ ! -f "$command_file" ]]; then
-    echo "$user_notation Command file '$command_file' not found."
+if [[ ! -f "$fCmdFile" ]]; then
+    echo "$USER_NOTATION Command file '$fCmdFile' not found."
     exit 1
 fi
 
@@ -81,8 +88,8 @@ fi
 # done < "$command_file"
 
 # Read commands from file line by line
-tail -n +1 "$command_file" | while IFS= read -r command; do
-	# echo "$user_notation Original command: $command"
+tail -n +1 "$fCmdFile" | while IFS= read -r command; do
+	# echo "$USER_NOTATION Original command: $command"
 
 	# In Bash, the <<< operator is used for here-strings.
 	# Here-strings are a way to pass a string as input to a command.
@@ -91,28 +98,35 @@ tail -n +1 "$command_file" | while IFS= read -r command; do
 	# 1. Eliminates comments that begin with //, accounting for possible leading spaces.
 	# 2. Deletes everything preceding the first colon (:) or hash (#) encountered.
 	# 3. Clears any leading spaces that remain after the previous operations.
-	cleaned_command=$(sed '/^[[:space:]]*\/\//d; s/.*[:#]//; s/^[[:space:]]*//' <<< "$command")
+	cleanedCmd=$(sed '/^[[:space:]]*\/\//d; s/.*[:#]//; s/^[[:space:]]*//' <<< "$command")
 
 	# If the cleaned command starts with an exclamation mark, exit
-    if [[ ${cleaned_command:0:1} == "!" ]]; then
+    if [[ ${cleanedCmd:0:1} == "!" ]]; then
         exit 0
     fi
 
-    if [[ -z "$cleaned_command" ]]; then
-        # echo "$user_notation Cleaned command: Empty"
+    if [[ -z "$cleanedCmd" ]]; then
+        # echo "$USER_NOTATION Cleaned command: Empty"
         continue
     fi
 
-	# echo "$user_notation Original command: $command"
-	echo "$user_notation Sending: $cleaned_command"
+	# echo "$USER_NOTATION Original command: $command"
+	echo "$USER_NOTATION Sending: $cleanedCmd"
 
-    # Because there's a '\r\n' ending in each command already,
+    # Because there's a '\r\n' ending in each command already if the command file is a dos file,
     # We don't need to add an 'Enter' at the end of the send-keys command anymore.
-    # tmux send-keys -t "$session_id:$window_id.$pane_id" "$cleaned_command" Enter
-    tmux send-keys -t "$session_id:$window_id.$pane_id" "$cleaned_command"
+    # But I still provide an option to add an 'Enter' at the end of each command forcefully.
+    if [[ -n "$fSendNewLine" ]]; then
+        # String end and home will be treated as key home and key end if not send them as literal strings.
+        # Use -l to send the command as a literal string
+        tmux send-keys -t "$fSessionId:$fWinId.$fPaneId" -l "$cleanedCmd"
+        tmux send-keys -t "$fSessionId:$fWinId.$fPaneId" C-m
+    else
+        tmux send-keys -t "$fSessionId:$fWinId.$fPaneId" -l "$cleanedCmd"
+    fi
 
 	if [[ $? -ne 0 ]]; then
-		echo "$user_notation Failed to send command: $cleaned_command"
+		echo "$USER_NOTATION Failed to send command: $cleanedCmd"
 		exit 1
 	fi
 done
