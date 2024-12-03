@@ -341,7 +341,7 @@ $USER_NOTATION Simply retry the same command with -N1
     send \"sys sh\r\"
     expect {
         \"Unknown action\" {
-            puts stderr \"$USER_NOTATION No Shell supported. Please check the image version.\"
+            puts stderr \"\n$USER_NOTATION \${MAGENTA}No Shell supported. Please use debug image.\${RESET}\"
             exit 1
         }
         \"$fExpectRoot\" {

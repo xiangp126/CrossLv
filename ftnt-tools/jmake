@@ -362,6 +362,10 @@ if [[ "$fRunConfigure" == true ]]; then
     mapfile -t credentials <<< "$credentials_output"
     ftntUser=${credentials[0]}
     ftntPasswd=${credentials[1]}
+    if [[ -z "$ftntUser" || -z "$ftntPasswd" ]]; then
+        echo -e "$USER_NOTATION ${RED}Error: Failed to get credentials.${RESET}"
+        exit 1
+    fi
 
     COLOR=$BLUE
     CONFIGURE_CMD="./Configure -m $fBuildModel -d y -c"
@@ -525,9 +529,22 @@ if [[ "$fSyncTarget" != false ]]; then
         set waitBeforeRetry 10
         set passwd_prompt_cnt 0
 
+        set RESET       \"\033\[0m\"
+        set BOLD        \"\033\[1m\"
+        set RED         \"\033\[31m\"
+        set GREEN       \"\033\[32m\"
+        set LIGHTGREEN  \"\033\[92m\"
+        set YELLOW      \"\033\[33m\"
+        set LIGHTYELLOW \"\033\[93m\"
+        set BLUE        \"\033\[34m\"
+        set MAGENTA     \"\033\[35m\"
+        set CYAN        \"\033\[36m\"
+        set GREY        \"\033\[90m\"
+        set COLOR       \$MAGENTA
+
         # Loop to sync the file
         for {set i 1} {\$i <= $maxSyncRetries} {incr i} {
-            puts stderr \"$USER_NOTATION Sync attempt \$i/$maxSyncRetries\"
+            puts stderr \"$USER_NOTATION Sync attempt \${COLOR}\$i/$maxSyncRetries\${RESET}\"
             spawn -noecho scp -P $fSyncPort $syncFile ${fSyncUsername}@${fSyncTarget}:/fgt-image
             if {\$adjustTimeout != 0} {
                 set timeout \$adjustTimeout
@@ -570,7 +587,7 @@ if [[ "$fSyncTarget" != false ]]; then
                     continue
                 }
                 \"501-Permission Denied\" {
-                    puts stderr \"$USER_NOTATION Permission Denied. Please enable admin-scp under 'config system global'.\"
+                    puts stderr \"$USER_NOTATION Permission Denied. Please enable \${COLOR}admin-scp\${RESET} under \${COLOR}config system global\${RESET}\"
                     exit $EFAILED
                 }
                 \"check image error\" {
