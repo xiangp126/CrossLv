@@ -4,8 +4,8 @@
 # Constants
 SCRIPT_NAME=$(basename "$0")
 USER_NOTATION="@@@@"
-SEPARATOR_LEFT="<------------------------------------------------------------------------"
-SEPARATOR_RIGHT="--------------------------------------------------->"
+SEPARATOR_LEFT="<-----------------------------------"
+SEPARATOR_RIGHT="----------------------------------------------------------------------->"
 SSH_MODE="SSH"
 SFTP_MODE="SFTP"
 SSHFS_MODE="SSHFS"
@@ -512,7 +512,7 @@ parseOptions
 checkSanity
 setSpawnCmd
 
-echo "$SEPARATOR_RIGHT" >&2
+echo "$SEPARATOR_LEFT" >&2
 if [ -n "$fNeedLocalForwarder" ]; then
     COLOR=$LIGHTRED
     echo -e "${BOLD}Local Forwarder Options:${RESET}" >&2
@@ -618,7 +618,7 @@ if [ -z "$fSwitchToSShfs" ]; then
     fi
 fi
 
-echo "$SEPARATOR_LEFT" >&2
+echo "$SEPARATOR_RIGHT" >&2
 if [ -n "$fNeedLocalForwarder" ]; then
     COLOR=$GREY
     echo -ne "${COLOR}Connecting to Jump Server: $fJumpServer to set up the Local Forwarder${RESET}" >&2

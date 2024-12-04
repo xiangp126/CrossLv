@@ -12,6 +12,7 @@ fSSHConnPort=22
 fUsername="admin"
 fPasswd="password"
 fExpectRoot="# "
+fNoDebug=""
 # GDB Server listen port
 fGDBSrvLisPort=444
 # 0: unlimited, 1: 1 worker, -1: not change
@@ -21,7 +22,8 @@ fMaxAttempts=2
 SCRIPT_NAME=$(basename "$0")
 USER_NOTATION="@@@@"
 SUB_USER_NOTATION="@@@@ @"
-SEPARATOR="----------------------------------------------------------------"
+SEPARATOR_LT="<----------------------------------------------------------------"
+SEPARATOR_RT="---------------------------------------------------------------->"
 
 usage() {
     cat << _EOF
@@ -29,6 +31,7 @@ $SCRIPT_NAME 0.1
 
 Usage: $SCRIPT_NAME [-t target] [-w worker_type] [-P gdbserver_listen_port] [-T max_attempts]
               [-u/-l username] [-p password] [-P ssh_conn_port] [-h]
+              [-n]
 
 Options:
     -t      Target device name or IP address(default: $fTarget)
@@ -39,6 +42,7 @@ Options:
     -P      SSH connection port(default: $fSSHConnPort)
     -N      Set wad worker count(default: $fWADWorkerCnt)
             0: unlimited, 1: 1 worker to make life easier, -1: keep the original value
+    -n      No debug(default: $fNoDebug), only display the wad process info
     -T      Maximum attempt(default: $fMaxAttempts)
     -h      Print this help message
 
@@ -57,7 +61,7 @@ _EOF
 [[ $# -eq 0 ]] && usage
 
 # Parse the options
-while getopts "t:w:d:T:l:u:p:P:N:h" opt; do
+while getopts "t:w:d:T:l:u:p:P:N:nh" opt; do
     case $opt in
         t)
             fTarget=$OPTARG
@@ -86,6 +90,9 @@ while getopts "t:w:d:T:l:u:p:P:N:h" opt; do
         N)
             fWADWorkerCnt=$OPTARG
             ;;
+        n)
+            fNoDebug="true"
+            ;;
         h)
             usage
             ;;
@@ -109,7 +116,7 @@ RESET='\033[0m'
 COLOR="$RED"
 
 fSearchPatt="type=.*$fWorkerType"
-echo $SEPARATOR
+echo $SEPARATOR_LT
 echo -e "[t] Set Target Device to: ${COLOR}$fTarget${RESET}"
 echo -e "[l] Set Username to: ${COLOR}$fUsername${RESET}"
 echo -e "[p] Set Password to: ${COLOR}$fPasswd${RESET}"
@@ -119,12 +126,12 @@ echo -e "[d] Set GDB Server Listen Port to: ${COLOR}$fGDBSrvLisPort${RESET}"
 echo -e "[w] Set WAD Worker Type to: ${COLOR}$fWorkerType${RESET}(Search Pattern: ${COLOR}$fSearchPatt)${RESET}"
 # if $wadWorkerCnt is larger or equal to 0, then print the message.
 if [ "$fWADWorkerCnt" -ge 0 ]; then
-    echo -e "$USER_NOTATION [N]Set WAD Worker Count to: ${COLOR}$fWADWorkerCnt${RESET}"
+    echo -e "[N] Set WAD Worker Count to: ${COLOR}$fWADWorkerCnt${RESET}"
 fi
 # COLOR="$MAGENTA"
 # echo -e "$USER_NOTATION ${COLOR}Connecting to $fTarget${RESET} ..."
 echo "Connecting to $fTarget ..."
-echo $SEPARATOR
+echo $SEPARATOR_RT
 
 # expect -d -c "
 expect -c "
@@ -247,7 +254,7 @@ expect -c "
         send \"exit\r\"
         expect eof {
             set COLOR \$MAGENTA
-            puts stderr \"$USER_NOTATION \${COLOR}WAD Worker Count has been set to $fWADWorkerCnt.\${RESET}\"
+            puts stderr \"$USER_NOTATION \${COLOR}WAD worker count has been set to $fWADWorkerCnt successfully.\${RESET}\"
             exit 0
         }
     }
@@ -281,6 +288,15 @@ expect -c "
     expect \"$fExpectRoot\"
     send \"diagnose test application wad 1000\r\"
     expect \"$fExpectRoot\"
+    # Only display the wad process info
+    if {\"$fNoDebug\" != \"\"} {
+        send \"exit\r\"
+        expect eof {
+            set COLOR \$MAGENTA
+            puts stderr \"$USER_NOTATION \${COLOR}No Debug Mode. Exiting the script.\${RESET}\"
+            exit 0
+        }
+    }
     set output \$expect_out(buffer)
 
     # Search for the line with \"type=worker\" and extract the PID
