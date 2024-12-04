@@ -4,11 +4,12 @@
 # Constants
 SCRIPT_NAME=$(basename "$0")
 USER_NOTATION="@@@@"
-SEPARATOR_LEFT="<-----------------------------------"
+SEPARATOR_LEFT="<--------------------------------------------"
 SEPARATOR_RIGHT="----------------------------------------------------------------------->"
 SSH_MODE="SSH"
 SFTP_MODE="SFTP"
 SSHFS_MODE="SSHFS"
+TELNET_MODE="TELNET"
 # Shared Variables
 # Match "$ ", "# " or "sftp> " at the end of the line
 fGroupPattern='(\$|#|sftp>)\s*$' # For Literal Interpretation, use single quotes
@@ -90,10 +91,10 @@ usage:
          [-c command] [-C]
          [-J user@jumpserver[:port]] [-W jump_passwd]
          [-L [[local_bind_address:]local_port:remote_address:remoteport]
-         [-F [dir:]mountpoint]
-         [-T]
+         [-M [dir:]mountpoint]
+         [-S] [-T]
 
-    Default to SSH, use -T to switch to SFTP, use -F to switch to SSHFS
+    Default to SSH, use -S to switch to SFTP, use -M to switch to SSHFS
 
 Options:
     -t     Target        The device to connect to. Default is "$fTarget"
@@ -106,7 +107,9 @@ Options:
     -L     Forwarder     Local Forwarder. Format: [local_bind_address:]local_port:remote_address:remoteport
     -J     Jump Server   The jump server to connect to. Format: user@jumpserver[:port]
     -W     Jump Passwd   Password for jump server. Default is "$fJumpPwd"
-    -T     SFTP          Switch to SFTP
+    -M     Mountpoint    SSHFS Mode. Mount remote directory to local directory. Format: [dir:]mountpoint
+    -S     SFTP Mode     Connect to the target device via SFTP
+    -T     Telnet Mode   telnet to the target device
     -h     Help          Print this help message
 
 Example:
@@ -120,10 +123,10 @@ Example:
     $SCRIPT_NAME -t 172.18.52.37 -l owner -p "FGT12\!34" -J fpxauto@172.18.20.84:22 -W qaz
 
     # SFTP Connection
-    $SCRIPT_NAME -t 172.18.52.37 -l owner -p "FGT12\!34" -T
+    $SCRIPT_NAME -t 172.18.52.37 -l owner -p "FGT12\!34" -S
 
     # SFTP with a Jump Server
-    $SCRIPT_NAME -t 172.18.52.37 -l owner -p "FGT12\!34" -J fpxauto@172.18.20.84:22 -W qaz -T
+    $SCRIPT_NAME -t 172.18.52.37 -l owner -p "FGT12\!34" -J fpxauto@172.18.20.84:22 -W qaz -S
 
     # Remote Live Capture
     $SCRIPT_NAME -t fpxauto@172.18.20.84:22 -p qaz -c "tcpdump -i any -s 0 -U -n -vv '$dumpOptions'"
@@ -134,8 +137,8 @@ Example:
     $SCRIPT_NAME -L 127.0.0.1:8881:172.18.52.37:22 -J fpxauto@172.18.20.84:22 -W qaz -l owner -p "FGT12\!34"
 
     # SSHFS to mount remote directory
-    $SCRIPT_NAME -t 172.18.52.37 -l owner -p "FGT12\!34" -F :~/MP
-    $SCRIPT_NAME -t 172.18.52.37 -l owner -p "FGT12\!34" -J fpxauto@172.18.20.84:22 -W qaz -F :~/MP
+    $SCRIPT_NAME -t 172.18.52.37 -l owner -p "FGT12\!34" -M :~/MP
+    $SCRIPT_NAME -t 172.18.52.37 -l owner -p "FGT12\!34" -J fpxauto@172.18.20.84:22 -W qaz -M :~/MP
 
 _EOF
     exit 0
@@ -145,7 +148,7 @@ _EOF
 
 # Parse command-line options
 fInputCmd="$SCRIPT_NAME $*"
-while getopts "t:l:u:p:P:J:W:v:c:TF:CL:h" opt; do
+while getopts "t:l:u:p:P:J:W:v:c:TSM:CL:h" opt; do
     case ${opt} in
         t)
             fTarget=$OPTARG
@@ -187,14 +190,17 @@ while getopts "t:l:u:p:P:J:W:v:c:TF:CL:h" opt; do
         v)
             fVdom=$OPTARG
             ;;
-        F)
+        M)
             fModeName=$SSHFS_MODE
             fSwitchToSShfs=true
             fFSOptions=$OPTARG
             ;;
-        T)
+        S)
             fModeName=$SFTP_MODE
             fSwitchToSftp=true
+            ;;
+        T)
+            fModeName=$TELNET_MODE
             ;;
         h)
             usage
@@ -232,6 +238,22 @@ checkWireshark() {
     if ! command -v wireshark &>/dev/null; then
         COLOR=$MAGENTA
         echo -e "$USER_NOTATION ${COLOR}Wireshark is not installed. Please install Wireshark.${RESET}" >&2
+        exit 1
+    fi
+}
+
+setCredentials() {
+    local credentials=()
+    if ! credentials_output=$(eval get_credentials); then
+        echo -e "$USER_NOTATION ${RED}Error: Failed to get credentials.${RESET}"
+        exit 1
+    fi
+
+    mapfile -t credentials <<< "$credentials_output"
+    fTargetUser=${credentials[0]}
+    fTargetPwd=${credentials[1]}
+    if [[ -z "$fTargetUser" || -z "$fTargetPwd" ]]; then
+        echo -e "$USER_NOTATION ${RED}Error: Failed to get credentials.${RESET}"
         exit 1
     fi
 }
@@ -476,6 +498,11 @@ setSpawnCmd() {
             fSpawnCmd="sftp $param -P $fTargetPort $fTargetUser@$fTarget"
             ;;
 
+        "$TELNET_MODE")
+            fSpawnCmd="telnet $fTarget"
+            setCredentials
+            ;;
+
         "$SSHFS_MODE")
             # Do not use expect to spawn sshfs session, as it will not work as expected
             param="$fFSBasicMountParams -o StrictHostKeyChecking=no -o sshfs_debug"
@@ -560,7 +587,7 @@ echo -e "${COLOR}$fSpawnCmd${RESET}" >&2
 
 dumpLFTips() {
     # Local Forwarding only works when $fNeedJumpServer is set
-    COLOR=$1
+    local COLOR=$1
     echo -e "${BOLD}Local Forwarding Command Tips:${RESET}" >&2
     if [ -n "$fNeedJumpServer" ]; then
         if [ -n "$fNeedLocalForwarder" ]; then
@@ -573,9 +600,9 @@ dumpLFTips() {
 }
 
 dumpLCTips() {
-    COLOR=$1
+    local COLOR=$1
     echo -e "${BOLD}Live Capture Command Tips:${RESET}" >&2
-    cmd="tcpdump -i $fLCInterface -s 0 -U -n -w - 'not port 22 and not arp'"
+    local cmd="tcpdump -i $fLCInterface -s 0 -U -n -w - 'not port 22 and not arp'"
     # Live Capture Commands
     if [ -n "$fNeedJumpServer" ]; then
         echo -e "${COLOR}${SCRIPT_NAME} -t $fTargetUser@$fTarget:$fTargetPort -p $fTargetPwd -J $fJumpUser@$fJumpServer:$fJumpPort -W \"$fJumpPwd\" -c \"$cmd\" -C${RESET}" >&2
@@ -593,30 +620,33 @@ dumpLCTips() {
     fi
 }
 
-dumpLCTips "$BLUE"
-dumpLFTips "$PURPLE"
-
-if [ -z "$fSwitchToSShfs" ]; then
-    COLOR=$LIGHTGREEN
-    __remote_dir="/home/$fTargetUser"
-    __mount_point="$HOME/MP"
-    __addr=$fTarget
-    __port=$fTargetPort
-    echo -e "${BOLD}SSHFS Command Tips:${RESET}" >&2
-    if [ -n "$fNeedJumpServer" ]; then
-        if [ -n "$fNeedLocalForwarder" ]; then
-            echo -e "${COLOR}$SCRIPT_NAME -t $fTargetUser@$fLFLocalAddr:$fLFLocalPort -p \"$fTargetPwd\" -F $__remote_dir:$__mount_point${RESET}" >&2
+dumpSSHFSTips() {
+    local COLOR=$1
+    if [ -z "$fSwitchToSShfs" ]; then
+        local __remote_dir="/home/$fTargetUser"
+        local __mount_point="$HOME/MP"
+        local __addr=$fTarget
+        local __port=$fTargetPort
+        echo -e "${BOLD}SSHFS Command Tips:${RESET}" >&2
+        if [ -n "$fNeedJumpServer" ]; then
+            if [ -n "$fNeedLocalForwarder" ]; then
+                echo -e "${COLOR}$SCRIPT_NAME -t $fTargetUser@$fLFLocalAddr:$fLFLocalPort -p \"$fTargetPwd\" -M $__remote_dir:$__mount_point${RESET}" >&2
+            else
+                echo -e "${COLOR}$SCRIPT_NAME -t $fTargetUser@$fTarget:$fTargetPort -p \"$fTargetPwd\" -J $fJumpUser@$fJumpServer:$fJumpPort -W \"$fJumpPwd\" -M $__remote_dir:$__mount_point${RESET}" >&2
+            fi
         else
-            echo -e "${COLOR}$SCRIPT_NAME -t $fTargetUser@$fTarget:$fTargetPort -p \"$fTargetPwd\" -J $fJumpUser@$fJumpServer:$fJumpPort -W \"$fJumpPwd\" -F $__remote_dir:$__mount_point${RESET}" >&2
+            if [ -n "$fNeedLocalForwarder" ]; then
+                __addr=$fLFLocalAddr
+                __port=$fLFLocalPort
+            fi
+            echo -e "${COLOR}$SCRIPT_NAME -t $fTargetUser@$__addr:$__port -p \"$fTargetPwd\" -M $__remote_dir:$__mount_point${RESET}" >&2
         fi
-    else
-        if [ -n "$fNeedLocalForwarder" ]; then
-            __addr=$fLFLocalAddr
-            __port=$fLFLocalPort
-        fi
-        echo -e "${COLOR}$SCRIPT_NAME -t $fTargetUser@$__addr:$__port -p \"$fTargetPwd\" -F $__remote_dir:$__mount_point${RESET}" >&2
     fi
-fi
+}
+
+dumpLCTips "$BLUE"
+dumpSSHFSTips "$LIGHTGREEN"
+dumpLFTips "$PURPLE"
 
 echo "$SEPARATOR_RIGHT" >&2
 if [ -n "$fNeedLocalForwarder" ]; then
@@ -749,6 +779,25 @@ expect -c "
         set ssh_pwd_prompt_cnt 0
         set jmp_pwd_prompt_cnt 0
 
+        # Only for telnet
+        if {\"$fModeName\" == \"$TELNET_MODE\"} {
+            expect {
+                {login: } {
+                    send \"$fTargetUser\r\"
+                    exp_continue
+                }
+                -re {[pP]assword: } {
+                    send \"$fTargetPwd\r\"
+                    exp_continue
+                }
+                eof {
+                    puts stderr \"$USER_NOTATION \${COLOR}Session \$session_id Reached EOF. Program ended.\${RESET}\"
+                    exit 0
+                }
+            }
+        }
+
+        # Main expect block
         expect {
             {yes/no} {
                 send \"yes\r\"
@@ -772,6 +821,9 @@ expect -c "
                 }
                 send \"$fJumpPwd\r\"
                 exp_continue
+            }
+            -re {$fGroupPattern} {
+                break
             }
             -re {host key for (.+?) has changed} {
                 # Get the matched variable from the first capturing group
@@ -797,15 +849,6 @@ expect -c "
             {No route to host} {
                 puts stderr \"$USER_NOTATION \${COLOR}No route to host.\${RESET}\"
                 exit 1
-            }
-            -re {$fGroupPattern} {
-                break
-            }
-            timeout {
-                puts stderr \"$USER_NOTATION \${COLOR}Session \$session_id Timed out waiting for a response.\${RESET}\"
-                # close \$ssh_session_id
-                incr i
-                continue
             }
             eof {
                 if {\"$fNoLoginShell\" != \"\"} {
