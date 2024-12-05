@@ -41,8 +41,9 @@
     "files.exclude": {
         "**/.vscode-server": true,
         "**/devops": true,
-        "**/fortipkg": true,
         "**/Downloads": true,
+        "**/fortipkg": true,
+        "**/MP": true
     },
     "files.watcherExclude": {
         "**/.vscode-server": true

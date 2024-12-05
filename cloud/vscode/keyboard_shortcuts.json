@@ -462,7 +462,7 @@
 	"command": "gitlens.diffLineWithWorking"
 },
 {
-	"key": "ctrl+b e",
+	"key": "ctrl+b shift+x",
 	"command": "workbench.action.closeUnmodifiedEditors"
 },
 {
@@ -644,5 +644,9 @@
 	"key": "shift+alt+,",
 	"command": "-gitlens.diffLineWithPrevious",
 	"when": "editorTextFocus && config.gitlens.keymap == 'alternate' && gitlens:activeFileStatus =~ /tracked/"
+},
+{
+	"key": "ctrl+shift+q",
+	"command": "workbench.action.closeOtherEditors"
 }
 ]
