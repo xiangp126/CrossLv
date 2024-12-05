@@ -10,6 +10,7 @@ SSH_MODE="SSH"
 SFTP_MODE="SFTP"
 SSHFS_MODE="SSHFS"
 TELNET_MODE="TELNET"
+fMode=$SSH_MODE
 # Shared Variables
 # Match "$ ", "# " or "sftp> " at the end of the line
 fGroupPattern='(\$|#|sftp>)\s*$' # For Literal Interpretation, use single quotes
@@ -28,7 +29,6 @@ fVdom=""
 fSSHCmd="" # The command to execute remotely without opening an interactive login session
 fNoLoginShell=""
 fSpawnCmd=""
-fModeName=$SSH_MODE
 fServerAliveInterval=30
 fServerAliveCountMax=3
 fMaxAttempts=2
@@ -191,16 +191,16 @@ while getopts "t:l:u:p:P:J:W:v:c:TSM:CL:h" opt; do
             fVdom=$OPTARG
             ;;
         M)
-            fModeName=$SSHFS_MODE
+            fMode=$SSHFS_MODE
             fSwitchToSShfs=true
             fFSOptions=$OPTARG
             ;;
         S)
-            fModeName=$SFTP_MODE
+            fMode=$SFTP_MODE
             fSwitchToSftp=true
             ;;
         T)
-            fModeName=$TELNET_MODE
+            fMode=$TELNET_MODE
             ;;
         h)
             usage
@@ -455,7 +455,7 @@ setSpawnCmd() {
         return
     fi
 
-    case "$fModeName" in
+    case "$fMode" in
         "$SSH_MODE")
             cmd="$fSSHCmd"
 
@@ -527,7 +527,7 @@ setSpawnCmd() {
 
         *)
             COLOR=$MAGENTA
-            echo -e "$USER_NOTATION ${COLOR}Invalid mode: $fModeName${RESET}"
+            echo -e "$USER_NOTATION ${COLOR}Invalid mode: $fMode${RESET}"
             exit 1
             ;;
     esac
@@ -539,57 +539,60 @@ parseOptions
 checkSanity
 setSpawnCmd
 
-echo "$SEPARATOR_LEFT" >&2
-if [ -n "$fNeedLocalForwarder" ]; then
-    COLOR=$LIGHTRED
-    echo -e "${BOLD}Local Forwarder Options:${RESET}" >&2
-    echo -e "[L] Set Local Forwarder: ${COLOR}$fLFLocalAddr:$fLFLocalPort -> $fTarget:$fTargetPort${RESET}" >&2
-else
-    echo -e "${BOLD}Target Options:${RESET}" >&2
-    COLOR=$LIGHTRED
-    echo -e "[t] Set SSH Target Device to: ${COLOR}$fTarget${RESET}" >&2
-    echo -e "[l] Set SSH Username to: ${COLOR}$fTargetUser${RESET}" >&2
-    echo -e "[p] Set SSH Password to: ${COLOR}$fTargetPwd${RESET}" >&2
-    echo -e "[P] Set SSH Connection Port to: ${COLOR}$fTargetPort${RESET}" >&2
-    if [ -n "$fVdom" ]; then
-        echo -e "[v] Set FGT/FPX VDOM to: ${COLOR}$fVdom${RESET}" >&2
+dumpPreTips() {
+    echo "$SEPARATOR_LEFT" >&2
+    local COLOR=""
+    if [ -n "$fNeedLocalForwarder" ]; then
+        COLOR=$LIGHTRED
+        echo -e "${BOLD}Local Forwarder Options:${RESET}" >&2
+        echo -e "[L] Set Local Forwarder: ${COLOR}$fLFLocalAddr:$fLFLocalPort -> $fTarget:$fTargetPort${RESET}" >&2
+    else
+        echo -e "${BOLD}Target Options:${RESET}" >&2
+        COLOR=$LIGHTRED
+        echo -e "[t] Set SSH Target Device to: ${COLOR}$fTarget${RESET}" >&2
+        echo -e "[l] Set SSH Username to: ${COLOR}$fTargetUser${RESET}" >&2
+        echo -e "[p] Set SSH Password to: ${COLOR}$fTargetPwd${RESET}" >&2
+        echo -e "[P] Set SSH Connection Port to: ${COLOR}$fTargetPort${RESET}" >&2
+        if [ -n "$fVdom" ]; then
+            echo -e "[v] Set FGT/FPX VDOM to: ${COLOR}$fVdom${RESET}" >&2
+        fi
     fi
-fi
 
-if [ $fModeName == $SSHFS_MODE ]; then
-    echo -e "${BOLD}SSHFS Options:${RESET}" >&2
-    echo -e "[F] Set SSHFS Remote Directory to: ${COLOR}$fFSRemoteDir${RESET}" >&2
-    echo -e "[F] Set SSHFS Local Mountpoint to: ${COLOR}$fFSMountPoint${RESET}" >&2
-fi
-
-if [ -n "$fNeedJumpServer" ]; then
-    echo -e "${BOLD}Jump Server Options:${RESET}" >&2
-    echo -e "[J] Set Jump Server to: ${COLOR}$fJumpServer${RESET}" >&2
-    echo -e "[-] Set Jump Username to: ${COLOR}$fJumpUser${RESET}" >&2
-    echo -e "[W] Set Jump Password to: ${COLOR}$fJumpPwd${RESET}" >&2
-    echo -e "[-] Set Jump Port to: ${COLOR}$fJumpPort${RESET}" >&2
-    if [ -z "$fJumpServer" ] || [ -z "$fJumpUser" ]; then
-        COLOR=$MAGENTA
-        echo -e "${COLOR}Jump Server and its credentials are not set properly.${RESET}" >&2
-        exit 1
+    if [ $fMode == $SSHFS_MODE ]; then
+        echo -e "${BOLD}SSHFS Options:${RESET}" >&2
+        echo -e "[F] Set SSHFS Remote Directory to: ${COLOR}$fFSRemoteDir${RESET}" >&2
+        echo -e "[F] Set SSHFS Local Mountpoint to: ${COLOR}$fFSMountPoint${RESET}" >&2
     fi
-fi
 
-[ -n "$fLiveCapture" ] && echo -e "[C] nc Listens remotely on Port: ${COLOR}$fLCPort${RESET}" >&2
+    if [ -n "$fNeedJumpServer" ]; then
+        echo -e "${BOLD}Jump Server Options:${RESET}" >&2
+        echo -e "[J] Set Jump Server to: ${COLOR}$fJumpServer${RESET}" >&2
+        echo -e "[-] Set Jump Username to: ${COLOR}$fJumpUser${RESET}" >&2
+        echo -e "[W] Set Jump Password to: ${COLOR}$fJumpPwd${RESET}" >&2
+        echo -e "[-] Set Jump Port to: ${COLOR}$fJumpPort${RESET}" >&2
+        if [ -z "$fJumpServer" ] || [ -z "$fJumpUser" ]; then
+            COLOR=$MAGENTA
+            echo -e "${COLOR}Jump Server and its credentials are not set properly.${RESET}" >&2
+            exit 1
+        fi
+    fi
 
-COLOR=$NORMAL
-echo -e "${BOLD}Input Command:${RESET}" >&2
-echo -e "${COLOR}$fInputCmd${RESET}" >&2
+    [ -n "$fLiveCapture" ] && echo -e "[C] nc Listens remotely on Port: ${COLOR}$fLCPort${RESET}" >&2
 
-COLOR=$LIGHTYELLOW
-echo -e "${BOLD}Spawned Command:${RESET}" >&2
-echo -e "${COLOR}$fSpawnCmd${RESET}" >&2
+    COLOR=$NORMAL
+    echo -e "${BOLD}Input Command:${RESET}" >&2
+    echo -e "${COLOR}$fInputCmd${RESET}" >&2
+
+    COLOR=$LIGHTYELLOW
+    echo -e "${BOLD}Spawned Command:${RESET}" >&2
+    echo -e "${COLOR}$fSpawnCmd${RESET}" >&2
+}
 
 dumpLFTips() {
     # Local Forwarding only works when $fNeedJumpServer is set
     local COLOR=$1
-    echo -e "${BOLD}Local Forwarding Command Tips:${RESET}" >&2
     if [ -n "$fNeedJumpServer" ]; then
+        echo -e "${BOLD}Local Forwarding Command Tips:${RESET}" >&2
         if [ -n "$fNeedLocalForwarder" ]; then
             echo -e "${COLOR}${SCRIPT_NAME} -t $fTargetUser@$fLFLocalAddr:$fLFLocalPort -p \"$fTargetPwd\"${RESET}" >&2
             echo -e "${COLOR}ssh $fLFLocalAddr -p $fLFLocalPort -l $fTargetUser${RESET}" >&2
@@ -644,24 +647,31 @@ dumpSSHFSTips() {
     fi
 }
 
-dumpLCTips "$BLUE"
-dumpSSHFSTips "$LIGHTGREEN"
-dumpLFTips "$PURPLE"
-
-echo "$SEPARATOR_RIGHT" >&2
-if [ -n "$fNeedLocalForwarder" ]; then
-    COLOR=$GREY
-    echo -ne "${COLOR}Connecting to Jump Server: $fJumpServer to set up the Local Forwarder${RESET}" >&2
-else
-    COLOR=$GREY
-    echo -ne "${COLOR}Connecting to $fTarget" >&2
-    if [ -n "$fNeedJumpServer" ]; then
-        echo -ne " via Jump Server: $fJumpServer" >&2
+dumpPostTips() {
+    local COLOR=""
+    echo "$SEPARATOR_RIGHT" >&2
+    if [ -n "$fNeedLocalForwarder" ]; then
+        COLOR=$GREY
+        echo -ne "${COLOR}Connecting to Jump Server: $fJumpServer to set up the Local Forwarder${RESET}" >&2
+    else
+        COLOR=$GREY
+        echo -ne "${COLOR}Connecting to $fTarget" >&2
+        if [ -n "$fNeedJumpServer" ]; then
+            echo -ne " via Jump Server: $fJumpServer" >&2
+        fi
     fi
+    echo -e " ...${RESET}" >&2
+}
+
+if [ "$fMode" != "$TELNET_MODE" ]; then
+    dumpPreTips
+    dumpLCTips "$BLUE"
+    dumpSSHFSTips "$LIGHTGREEN"
+    dumpLFTips "$PURPLE"
+    dumpPostTips
 fi
 
-echo -e " ...${RESET}" >&2
-
+# Use bash to hahdle sshfs commands directly
 if [ -n "$fSwitchToSShfs" ]; then
     COLOR=$MAGENTA
     if [ -n "$fNeedJumpServer" ] && [ -z "$fSSHpassInstalled" ]; then
@@ -779,8 +789,8 @@ expect -c "
         set ssh_pwd_prompt_cnt 0
         set jmp_pwd_prompt_cnt 0
 
-        # Only for telnet
-        if {\"$fModeName\" == \"$TELNET_MODE\"} {
+        # Only for telnet. If do not need telnet, remove this block
+        if {\"$fMode\" == \"$TELNET_MODE\"} {
             expect {
                 {login: } {
                     send \"$fTargetUser\r\"
@@ -789,6 +799,11 @@ expect -c "
                 -re {[pP]assword: } {
                     send \"$fTargetPwd\r\"
                     exp_continue
+                }
+                timeout {
+                    puts stderr \"$USER_NOTATION \${COLOR}Session \$session_id Timed out waiting for a response.\${RESET}\"
+                    incr i
+                    continue
                 }
                 eof {
                     puts stderr \"$USER_NOTATION \${COLOR}Session \$session_id Reached EOF. Program ended.\${RESET}\"
@@ -849,6 +864,12 @@ expect -c "
             {No route to host} {
                 puts stderr \"$USER_NOTATION \${COLOR}No route to host.\${RESET}\"
                 exit 1
+            }
+            timeout {
+                puts stderr \"$USER_NOTATION \${COLOR}Session \$session_id Timed out waiting for a response.\${RESET}\"
+                # close \$ssh_session_id
+                incr i
+                continue
             }
             eof {
                 if {\"$fNoLoginShell\" != \"\"} {

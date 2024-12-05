@@ -110,6 +110,7 @@ updatePrerequisitesForDebian() {
         shellcheck
         mlocate
         net-tools
+        nftables
         bash-completion
         openssh-server
         python3-dev
