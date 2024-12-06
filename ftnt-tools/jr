@@ -96,14 +96,15 @@ parserAndPolish() {
 
 searchAndOpen() {
     # --glob='*.{c,h,cpp,js,ts,py,html,css,sh,php}'
-    local rgNullQueryExtraGlob="--glob='*.{c}'"
+    local rgNullQueryExtraGlob="--glob='*.{c}' \
+                                --glob='!linux-*/*' \
+                               "
     local rgParams="--smart-case \
                     --color=ansi \
                     --colors 'match:fg:204,51,153' --colors 'match:style:bold' \
                     --line-number \
                     --no-heading \
                     --glob='!fpx-sync/*' \
-                    --glob='!linux-*/*' \
                    "
     local fzfParams="--ansi \
                      --color 'hl:-1:underline,hl+:-1:underline:reverse' \
