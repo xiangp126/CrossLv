@@ -260,6 +260,8 @@ nnoremap <leader>T   :call fzf#vim#buffer_tags(expand('<cword>'),
 
 " buffers
 nnoremap <leader>b   :Buffers<CR>
+nnoremap <silent> <leader>n :bnext<CR>
+nnoremap <silent> <leader>p :bprevious<CR>
 
 " marks
 nnoremap <leader>m   : Marks<CR>
