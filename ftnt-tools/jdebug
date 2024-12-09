@@ -293,7 +293,7 @@ expect -c "
         send \"exit\r\"
         expect eof {
             set COLOR \$MAGENTA
-            puts stderr \"$USER_NOTATION \${COLOR}No Debug Mode. Exiting the script.\${RESET}\"
+            puts stderr \"$USER_NOTATION \${COLOR}Only display the WAD process info in No Debug mode\${RESET}\"
             exit 0
         }
     }
