@@ -2,6 +2,7 @@
 # set -x
 
 # Build flags & Options
+fPoundPattern='#\s*$'
 ftntUser=""
 ftntPasswd=""
 fPlatform="FOS" # Default platform
@@ -17,6 +18,7 @@ fNeedBuild=false
 fPrintBuildFlags=false # Print build flags
 fGitClean=false
 fRMCompileCommandsJson=false
+fInputCmd=""
 # Sync Options
 fSyncTarget=false
 fSyncFile=$fBuildTarget
@@ -95,7 +97,7 @@ Other Options:
 Example:
     $SCRIPT_NAME -m FGT_VM64_KVM -c -T1 -j4 -b
     $SCRIPT_NAME -m vmware
-    $SCRIPT_NAME -t fgt1 -s FGT_VM64_KVM-v7-build1662.out -u "admin" -p "password" -P 22
+    $SCRIPT_NAME -t fgt1 -s FGT_VM64_KVM-v7-build1662.out -l "admin" -p "password" -P 22
     $SCRIPT_NAME -h
 
 _EOF
@@ -104,7 +106,8 @@ _EOF
 
 [[ $# -eq 0 ]] && usage
 
-# Parse the options
+# Parse command line options
+fInputCmd="$SCRIPT_NAME $*"
 while getopts "hm:w:j:cCbB:ofT:t:s:P:p:u:l:" opt; do
     case $opt in
         m)
@@ -264,7 +267,6 @@ preParseOptions() {
 
 preParseOptions
 # exit 0 # Just for debugging
-
 showLogo
 
 echo $SEPARATOR2
@@ -305,7 +307,8 @@ if [[ "$fSyncTarget" != false ]]; then
     echo -e "$USER_NOTATION [S] Sync Target: (${COLOR}$fSyncTarget${RESET})"
 fi
 echo "$SEPARATOR2"
-# sleep 0.1
+echo -en "${BOLD}Input Command: ${RESET}" >&2
+echo -e "${LIGHTYELLOW}$fInputCmd${RESET}" >&2
 
 # Clean the working directory
 if [[ "$fGitClean" == true ]]; then
@@ -368,7 +371,10 @@ if [[ "$fRunConfigure" == true ]]; then
     fi
 
     COLOR=$BLUE
-    CONFIGURE_CMD="./Configure -m $fBuildModel -d y -c"
+    # -d y  Build debug image
+    # -c    Enable code coverage
+    # -B    Install and boot into BusyBox shell instead of init
+    CONFIGURE_CMD="./Configure -m $fBuildModel -d y -c -B"
     echo -e "$USER_NOTATION Running Configure: ${COLOR}$CONFIGURE_CMD${RESET}"
     COLOR=$MAGENTA
     echo -e "$USER_NOTATION ${COLOR}Spawning a new bash session.${RESET}"
@@ -516,9 +522,10 @@ if [[ "$fSyncTarget" != false ]]; then
 
     maxSyncRetries=3
     ESUCCESS=0
-    EMAXTRIES=$(($maxSyncRetries + 1))
-    ETIMEOUT=$(($maxSyncRetries + 10))
-    EFAILED=$((ETIMEOUT + 1))
+    EMAXTRIES=$(($maxSyncRetries + 1))    # 4
+    ETIMEOUT=$(($maxSyncRetries + 2))     # 5
+    EFAILED=$(($maxSyncRetries + 3))      # 6
+    EPERMDENIED=$(($maxSyncRetries + 4))  # 7
     # If not use escape for $i, it will be replaced by the value of $i, since it is in the bash environment.
     # But \$i will keep as $i in the expect script generated.
     # expect -d -c "
@@ -588,11 +595,11 @@ if [[ "$fSyncTarget" != false ]]; then
                 }
                 \"501-Permission Denied\" {
                     puts stderr \"$USER_NOTATION Permission Denied. Please enable \${COLOR}admin-scp\${RESET} under \${COLOR}config system global\${RESET}\"
-                    exit $EFAILED
+                    exit $EPERMDENIED
                 }
                 \"check image error\" {
                     puts stderr \"$USER_NOTATION Check image error. Action aborted.\"
-                    # exp_continue
+                    puts stderr \"$USER_NOTATION Please check if the model of the image matches the target machine.\"
                     exit $EFAILED
                 }
                 \"100-update image completed\" {
@@ -623,8 +630,8 @@ if [[ "$fSyncTarget" != false ]]; then
         $ESUCCESS)
             COLOR=$GREY
             echo -e "$USER_NOTATION You have synced $fSyncFile to $fSyncTarget successfully at $(getCurrentTime)"
-            echo -e "$USER_NOTATION ${COLOR}Login to the server and wait for it to reboot${RESET} ..."
-            jssh -P "$fSyncPort" -u "$fSyncUsername" -p "$fSyncPassword" -t "$fSyncTarget"
+            echo -e "$USER_NOTATION ${BLUE}Login to the server and wait for it to reboot${RESET} ..."
+            jssh -P "$fSyncPort" -l "$fSyncUsername" -p "$fSyncPassword" -t "$fSyncTarget"
             if [[ $? -ne 0 ]]; then
                 echo "$USER_NOTATION Please check the server status manually."
                 exit 1
@@ -636,6 +643,57 @@ if [[ "$fSyncTarget" != false ]]; then
         $EMAXTRIES)
             echo "$USER_NOTATION Failed to sync $fSyncFile to $fSyncTarget after $maxSyncRetries attempts"
             exit $EMAXTRIES
+            ;;
+        $EPERMDENIED)
+            echo -e "$USER_NOTATION ${LIGHTYELLOW}Enable the admin-scp for you intelligently${RESET}"
+            expect -c "
+                set has_vdom 0
+                spawn -noecho ssh -p $fSyncPort $fSyncUsername@$fSyncTarget
+                expect {
+                    -nocase {Password:} {
+                        send \"$fSyncPassword\r\"
+                        exp_continue
+                    }
+                    -re {$fPoundPattern} {
+                        # just pass
+                    }
+                    timeout {
+                        puts stderr \"$USER_NOTATION Timeout. Action aborted.\"
+                        exit $ETIMEOUT
+                    }
+                }
+
+                send \"config global\r\"
+                expect {
+                    -re {Command fail.|not found,} {
+                        puts stderr \"$USER_NOTATION This device does not support has_vdom. Roll back to normal mode.\"
+                    }
+                    -re {$fPoundPattern} {
+                        set has_vdom 1
+                    }
+                    timeout {
+                        puts stderr \"$USER_NOTATION Timeout. Action aborted.\"
+                        exit $ETIMEOUT
+                    }
+                }
+
+                send \"config system global\r\"
+                expect -re {$fPoundPattern}
+                send \"set admin-scp enable\r\"
+                expect -re {$fPoundPattern}
+
+                send \"end\r\"
+                expect -re {$fPoundPattern}
+                if {\$has_vdom != 0} {
+                    send \"end\r\"
+                    expect -re {$fPoundPattern}
+                }
+
+                send \"exit\r\"
+                expect eof
+            "
+            echo -e "$USER_NOTATION ${MAGENTA}Please re-run the sync command again.${RESET}"
+            exit $ESUCCESS
             ;;
         $ETIMEOUT)
             echo "$USER_NOTATION Timeout to sync $fSyncFile to $fSyncTarget"

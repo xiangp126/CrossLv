@@ -633,8 +633,8 @@ dumpPreTips() {
 dumpForwarderTips() {
     # Port Forwarding only works when $fNeedJumpServer is set
     local COLOR=$1
-    echo -e "${BOLD}Local Port Forwarding Command Tips:${RESET}" >&2
     if [ -n "$fNeedJumpServer" ]; then
+        echo -e "${BOLD}Local Port Forwarding Command Tips:${RESET}" >&2
         if [ -n "$fForwarderMode" ]; then
             echo -e "${COLOR}ssh -p $fLFLocalPort -l $fTargetUser localhost${RESET}" >&2
             echo -e "${COLOR}${SCRIPT_NAME} -t $fTargetUser@$fLFLocalAddr:$fLFLocalPort -p \"$fTargetPwd\"${RESET}" >&2
@@ -644,8 +644,8 @@ dumpForwarderTips() {
     fi
 
     COLOR=$BLUE
-    echo -e "${BOLD}Reverse Port Forwarding Command Tips:${RESET}" >&2
     if [ -n "$fNeedJumpServer" ]; then
+        echo -e "${BOLD}Reverse Port Forwarding Command Tips:${RESET}" >&2
         if [ -n "$fForwarderMode" ]; then
             echo -e "${COLOR}ssh -p $fRFRemotePort -l $fTargetUser localhost${RESET}" >&2
             echo -e "${COLOR}${SCRIPT_NAME} -t $fTargetUser@$fRFRemoteAddr:$fRFRemotePort -p \"$fTargetPwd\"${RESET}" >&2
