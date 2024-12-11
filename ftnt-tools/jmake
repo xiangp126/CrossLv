@@ -630,7 +630,7 @@ if [[ "$fSyncTarget" != false ]]; then
         $ESUCCESS)
             COLOR=$GREY
             echo -e "$USER_NOTATION You have synced $fSyncFile to $fSyncTarget successfully at $(getCurrentTime)"
-            echo -e "$USER_NOTATION ${BLUE}Login to the server and wait for it to reboot${RESET} ..."
+            echo -e "$USER_NOTATION ${NORMAL}Login to the server and wait for it to reboot${RESET} ..."
             jssh -P "$fSyncPort" -l "$fSyncUsername" -p "$fSyncPassword" -t "$fSyncTarget"
             if [[ $? -ne 0 ]]; then
                 echo "$USER_NOTATION Please check the server status manually."
