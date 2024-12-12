@@ -916,7 +916,7 @@ expect -c "
                 exp_continue
             }
             {No route to host} {
-                puts stderr \"$USER_NOTATION \${COLOR}No route to host.\${RESET}\"
+                puts stderr \"$USER_NOTATION \${COLOR}No route to host\${RESET}\"
                 exit 1
             }
             timeout {

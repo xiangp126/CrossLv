@@ -2,13 +2,14 @@
 # set -x
 
 # Build flags & Options
+FTNTBUILDTARGET="image.out"
 fPoundPattern='#\s*$'
-ftntUser=""
-ftntPasswd=""
+ftntUser=
+ftntPasswd=
+fRebuildKernel=false
 fPlatform="FOS" # Default platform
-ftntBuildTarget="image.out"
-fBuildTarget="$ftntBuildTarget"
-fBuildModel=""
+fBuildTarget="$FTNTBUILDTARGET"
+fBuildModel=
 fNumOfJobs=$(nproc)
 fWorkingDir=$(pwd)
 fMaxBuildAttempt=1
@@ -18,7 +19,7 @@ fNeedBuild=false
 fPrintBuildFlags=false # Print build flags
 fGitClean=false
 fRMCompileCommandsJson=false
-fInputCmd=""
+fInputCmd=
 # Sync Options
 fSyncTarget=false
 fSyncFile=$fBuildTarget
@@ -71,7 +72,7 @@ Usage: $SCRIPT_NAME [options]
        $SCRIPT_NAME [-m model] [-w working_dir] [-j num_of_jobs] [-T max_attempt]
              [-s sync_target] [-S sync_file] [-P sync_port] [-l/-u username] [-p password]
              [-B build_target]
-             [-bcCohf]
+             [-bcCohfk1]
 
 Build Flags:
     -c      Clean the repo (default: $fGitClean)
@@ -85,6 +86,7 @@ Build Options:
     -m      Set the build model  (default: $fBuildModel)
     -j      Set the number of jobs (default: $fNumOfJobs)
     -w      Set working directory  (default: $fWorkingDir)
+    -k      Rebuild the kernel (default: $fRebuildKernel)
 Sync Options:
     -s      Set the sync source file (default: $fSyncFile)
     -t      Set the sync target machine (default: $fSyncTarget)
@@ -108,7 +110,7 @@ _EOF
 
 # Parse command line options
 fInputCmd="$SCRIPT_NAME $*"
-while getopts "hm:w:j:cCbB:ofT:t:s:P:p:u:l:" opt; do
+while getopts "hm:w:j:cCbB:ofT:t:s:P:p:u:l:k" opt; do
     case $opt in
         m)
             fBuildModel=$OPTARG
@@ -124,6 +126,10 @@ while getopts "hm:w:j:cCbB:ofT:t:s:P:p:u:l:" opt; do
             ;;
         T)
             fMaxBuildAttempt=$OPTARG
+            fNeedBuild=true
+            ;;
+        k)
+            fRebuildKernel=true
             fNeedBuild=true
             ;;
         b)
@@ -278,6 +284,7 @@ if [[ "$fPrintBuildFlags" != false ]]; then
     [[ "$fGitClean"     == true ]] && echo -e "$USER_NOTATION [c] ${COLOR}Clean${RESET} the repo"
     [[ "$fRunConfigure" == true ]] && echo -e "$USER_NOTATION [C] ${COLOR}Configure${RESET} the project"
     [[ "$fNeedBuild"    == true ]] && echo -e "$USER_NOTATION [o] ${COLOR}Build${RESET} the project"
+    [[ "$fRebuildKernel" == true ]] && echo -e "$USER_NOTATION [k] ${COLOR}Kernel${RESET} Rebuild"
     [[ "$fUseBear"      == true ]] && echo -e "$USER_NOTATION [b] ${COLOR}Generate${RESET} compile_commands.json using bear"
     [[ "$fRMCompileCommandsJson" == true ]] && echo -e "$USER_NOTATION [f] ${COLOR}Remove${RESET} the existing $compileCommandsFile"
 fi
@@ -373,8 +380,7 @@ if [[ "$fRunConfigure" == true ]]; then
     COLOR=$BLUE
     # -d y  Build debug image
     # -c    Enable code coverage
-    # -B    Install and boot into BusyBox shell instead of init
-    CONFIGURE_CMD="./Configure -m $fBuildModel -d y -c -B"
+    CONFIGURE_CMD="./Configure -m $fBuildModel -d y -c"
     echo -e "$USER_NOTATION Running Configure: ${COLOR}$CONFIGURE_CMD${RESET}"
     COLOR=$MAGENTA
     echo -e "$USER_NOTATION ${COLOR}Spawning a new bash session.${RESET}"
@@ -426,9 +432,12 @@ fi
 
 # Step 2: Run build commands
 if [[ "$fNeedBuild" != false ]]; then
-    # Make make command
     cd "$fWorkingDir" || exit
+
     makeCommand="make -j$fNumOfJobs $fBuildTarget"
+    if [[ "$fRebuildKernel" == true ]]; then
+        makeCommand="make kernel_only && $makeCommand"
+    fi
 
     # Use Bear to generate compile_commands.json
     if [[ "$fUseBear" == true ]]; then
@@ -458,7 +467,7 @@ if [[ "$fNeedBuild" != false ]]; then
     maxAttempt=$fMaxBuildAttempt
     while [[ $attempt -le $maxAttempt ]]; do
         COLOR="$GREEN"
-        echo -e "$USER_NOTATION Running build commands: ${COLOR}$makeCommand${RESET}"
+        echo -e "$USER_NOTATION Running build commands: ${LIGHTYELLOW}$makeCommand${RESET}"
         echo -e "$USER_NOTATION ${COLOR}Build attempt $attempt/$maxAttempt${RESET}"
         # [[ $attempt -gt 1 ]] && sleep 2
         sleep 2

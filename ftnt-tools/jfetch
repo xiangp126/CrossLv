@@ -100,6 +100,10 @@ expect -c "
                 puts \"$USER_NOTATION Pattern \$fa_pattern\ Found in the output.\"
                 set pattern_found true
             }
+            {Connection reset by peer} {
+                puts \"$USER_NOTATION Connection reset by peer.\"
+                exit 1
+            }
             {OTP: } {
                 # Promption for reading the FortiToken from the user
                 expect_user -re \"(.*)\n\"
