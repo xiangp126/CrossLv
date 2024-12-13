@@ -482,9 +482,9 @@ if [[ "$fNeedBuild" != false ]]; then
     done
 
     if [[ $eval_status -ne 0 ]]; then
-        COLOR="$RED"
-        echo "$USER_NOTATION Build projects failed."
-        echo -e "$USER_NOTATION ${COLOR}Suggest to clean the working directory and try again.${RESET}"
+        COLOR="$LIGHTYELLOW"
+        echo -e "$USER_NOTATION ${COLOR}Build projects failed${RESET}"
+        echo -e "$USER_NOTATION ${COLOR}Suggest to clean the working directory and try again${RESET}"
         exit 1
     fi
 
