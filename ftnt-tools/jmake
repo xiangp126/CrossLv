@@ -482,9 +482,10 @@ if [[ "$fNeedBuild" != false ]]; then
     done
 
     if [[ $eval_status -ne 0 ]]; then
-        COLOR="$LIGHTYELLOW"
+        COLOR="$MAGENTA"
         echo -e "$USER_NOTATION ${COLOR}Build projects failed${RESET}"
-        echo -e "$USER_NOTATION ${COLOR}Suggest to clean the working directory and try again${RESET}"
+        echo -e "$USER_NOTATION ${COLOR}You can run the following command to clean the repo and rebuild again${RESET}"
+        echo -e "$USER_NOTATION ${COLOR}$fInputCmd -c${RESET}"
         exit 1
     fi
 

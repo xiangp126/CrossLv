@@ -2,7 +2,7 @@
 set -x
 
 echo "Setting up bridge"
-cd $HOME/Templates
+cd "$HOME"/Templates || exit
 ./create_bridge.sh
 
 echo "Setting up vscode max user watches"
@@ -24,7 +24,7 @@ then
     # vncserver -kill :9
     set -x
 else
-    cd $HOME/.vnc
+    cd "$HOME"/.vnc || exit
     # vncserver :9
     vncserver :9 -geometry $vnc_resolution
 fi
@@ -37,3 +37,6 @@ if command -v callIndexer &> /dev/null
 then
     callIndexer -s
 fi
+
+echo "Reset the DNS Server"
+sudo resolvectl dns enp0s31f6 172.16.100.80 172.16.100.100
