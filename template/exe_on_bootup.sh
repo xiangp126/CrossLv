@@ -39,4 +39,7 @@ then
 fi
 
 echo "Reset the DNS Server"
-sudo resolvectl dns enp0s31f6 172.16.100.80 172.16.100.100
+if command -v resetdns &> /dev/null
+then
+    resetdns
+fi

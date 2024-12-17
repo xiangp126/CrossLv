@@ -106,7 +106,7 @@ ftnt_password=${credentials[1]}
 
 echo -e "${COLOR}Starting the VPN connection${RESET}"
 spawnCmd="sudo $fVpnCmdPath -s scm.van.corp.fortinet.com:443 -u $ftnt_username -p"
-echo -e "${COLOR}Spawned command: $spawnCmd${RESET}"
+echo -e "Spawned command: ${COLOR}$spawnCmd${RESET}"
 
 expect -c "
     set timeout 60
@@ -134,11 +134,11 @@ expect -c "
                 send \"y\r\"
                 exp_continue
             }
-            -re {[Uu]sername} {
+            -nocase {username} {
                 send \"$ftnt_username\r\"
                 exp_continue
             }
-            -re {[Pp]assword} {
+            -nocase {password} {
                 send \"$ftnt_password\r\"
                 exp_continue
             }
