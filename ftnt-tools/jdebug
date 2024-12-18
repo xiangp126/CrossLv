@@ -254,7 +254,7 @@ expect -c "
         send \"exit\r\"
         expect eof {
             set COLOR \$MAGENTA
-            puts stderr \"$USER_NOTATION \${COLOR}WAD worker count has been set to $fWADWorkerCnt successfully.\${RESET}\"
+            puts stderr \"$USER_NOTATION \${COLOR}The worker count of WAD has been set to $fWADWorkerCnt successfully.\${RESET}\"
             exit 0
         }
     }
