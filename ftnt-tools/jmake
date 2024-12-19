@@ -83,7 +83,7 @@ Build Flags:
 Build Options:
     -T      Set the maximum number of build attempts (default: $fMaxBuildAttempt)
     -B      Set the build target (default: $fBuildTarget)
-    -m      Set the build model  (default: $fBuildModel)
+    -m      Set the build model  (default: ${fBuildModel:-KVM})
     -j      Set the number of jobs (default: $fNumOfJobs)
     -w      Set working directory  (default: $fWorkingDir)
     -k      Rebuild the kernel (default: $fRebuildKernel)
@@ -344,10 +344,10 @@ if [[ "$fGitClean" == true ]]; then
     COLOR="$RED"
     eval "$gitCleanCmd"
     if [[ $? -ne 0 ]]; then
-        echo -e "$USER_NOTATION ${COLOR}Failed to clean the working directory.${RESET}"
-        exit 1
+        echo -e "$USER_NOTATION ${COLOR}There seems to be some errors during the clean process${RESET}"
+        echo -e "$USER_NOTATION ${COLOR}But going on anyway${RESET}"
     else
-        echo -e "$USER_NOTATION ${COLOR}Cleaned the working directory successfully.${RESET}"
+        echo -e "$USER_NOTATION ${COLOR}Cleaned the working directory successfully${RESET}"
     fi
 fi
 
