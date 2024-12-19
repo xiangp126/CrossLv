@@ -521,7 +521,7 @@ if [[ "$fSyncTarget" != false ]]; then
     # The -t option tells mapfile to strip the trailing newlines from each line it reads.
     mapfile -t syncFiles < <(find "$fWorkingDir" -name "$fSyncFile")
     if [[ ${#syncFiles[@]} -eq 0 ]]; then
-        echo "$USER_NOTATION $fSyncFile not found in $fWorkingDir"
+        echo -e "$USER_NOTATION ${MAGENTA}$fSyncFile not found in $fWorkingDir${RESET}"
         exit 1
     fi
 

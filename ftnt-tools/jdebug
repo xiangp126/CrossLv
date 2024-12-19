@@ -6,12 +6,13 @@
 # FPX (global) # end
 
 # Variables
-fTarget="fgt1"
+fTarget=""
 fWorkerType="worker"
 fSSHConnPort=22
 fUsername="admin"
 fPasswd="password"
 fExpectRoot="# "
+fKillExisting="" # Kill the existing gdbserver process attached to the worker PID
 fNoDebug=""
 # GDB Server listen port
 fGDBSrvLisPort=444
@@ -31,10 +32,11 @@ $SCRIPT_NAME 0.1
 
 Usage: $SCRIPT_NAME [-t target] [-w worker_type] [-P gdbserver_listen_port] [-T max_attempts]
               [-u/-l username] [-p password] [-P ssh_conn_port] [-h]
-              [-n]
+              [-N wad_worker_count]
+              [-n] [-k ]
 
 Options:
-    -t      Target device name or IP address(default: $fTarget)
+    -t      Target device name or IP address(must be set)
     -w      Worker type(default: $fWorkerType)
     -d      GDB Server listen port(default: $fGDBSrvLisPort)
     -l/-u   Username(default: $fUsername)
@@ -42,7 +44,8 @@ Options:
     -P      SSH connection port(default: $fSSHConnPort)
     -N      Set wad worker count(default: $fWADWorkerCnt)
             0: unlimited, 1: 1 worker to make life easier, -1: keep the original value
-    -n      No debug(default: $fNoDebug), only display the wad process info
+    -n      No debug, only display the wad process info
+    -k      Kill the existing gdbserver process attached to the worker PID
     -T      Maximum attempt(default: $fMaxAttempts)
     -h      Print this help message
 
@@ -61,7 +64,7 @@ _EOF
 [[ $# -eq 0 ]] && usage
 
 # Parse the options
-while getopts "t:w:d:T:l:u:p:P:N:nh" opt; do
+while getopts "t:w:d:T:l:u:p:P:N:nkh" opt; do
     case $opt in
         t)
             fTarget=$OPTARG
@@ -91,7 +94,10 @@ while getopts "t:w:d:T:l:u:p:P:N:nh" opt; do
             fWADWorkerCnt=$OPTARG
             ;;
         n)
-            fNoDebug="true"
+            fNoDebug=true
+            ;;
+        k)
+            fKillExisting=true
             ;;
         h)
             usage
@@ -114,6 +120,15 @@ RED='\033[31m'
 MAGENTA='\033[35m'
 RESET='\033[0m'
 COLOR="$RED"
+
+parseOptions() {
+    # ftarget must be set
+    if [ "$fTarget" == "" ]; then
+        echo -e "$USER_NOTATION ${MAGENTA}Target device name or IP address must be set.${RESET}"
+        exit 1
+    fi
+}
+parseOptions
 
 fSearchPatt="type=.*$fWorkerType"
 echo $SEPARATOR_LT
@@ -154,10 +169,11 @@ expect -c "
     set WHITE   \"\033\[37m\"
 
     while {\$i <= $fMaxAttempts} {
-        # ssh -o StrictHostKeyChecking=no $fTarget
         if {\$i > 1} {
             puts stderr \"$USER_NOTATION Login attempt \$i/$fMaxAttempts\"
         }
+
+        # exp_internal 1
         spawn -noecho ssh -p $fSSHConnPort $fUsername@$fTarget
 
         set session_id \$spawn_id
@@ -269,7 +285,7 @@ expect -c "
         {Command fail.} {
             # The device has VDOM
             set COLOR \$MAGENTA
-            puts stderr \"\${COLOR}Warning: The device has VDOM. Switch to the global configuration mode.\${RESET}\"
+            puts stderr \"\${COLOR}Warning: The device has VDOM. Switch to the global configuration mode\${RESET}\"
             expect \"$fExpectRoot\"
             send \"\r\"
             expect \"$fExpectRoot\"
@@ -339,7 +355,7 @@ $USER_NOTATION Simply retry the same command with -N1
         }
     } elseif {\$worker_cnt == 1} {
         set COLOR \$MAGENTA
-        puts stderr \"\n$USER_NOTATION \${COLOR}Exact matched PID: \$worker_pid found for WAD process of type $fWorkerType.\${RESET}\"
+        puts stderr \"\n$USER_NOTATION \${COLOR}Find single PID: \$worker_pids for WAD process of type $fWorkerType\${RESET}\"
     } else {
         puts stderr \"\n$USER_NOTATION \${COLOR}Could not find WAD process of type $fWorkerType.\${RESET}\"
         exit 1
@@ -365,6 +381,29 @@ $USER_NOTATION Simply retry the same command with -N1
         }
     }
 
+    if {\"$fKillExisting\" != \"\"} {
+        set COLOR \$MAGENTA
+        # The output maybe like:
+        # ps aux | grep gdbserver | grep 4527 | grep -v grep\r\r\n
+        # 7304      0       0       S       gdbserver 0.0.0.0:444 --attach 4527\r\n
+
+        send \"ps aux | grep gdbserver | grep \$worker_pid | grep -v grep\r\"
+        expect {
+            -re {\r\n(\d+)} {
+                # Find an existing gdbserver process attached to the worker PID
+                set process_id \$expect_out(1,string)
+                puts stderr \"$USER_NOTATION \${COLOR}Sending kill signal to gdbserver process \$process_id\${RESET}\"
+                set gdbserver_pid \$expect_out(1,string)
+                send \"kill \$gdbserver_pid\r\"
+                exp_continue
+            }
+            \"$fExpectRoot\" {
+                puts stderr \"$USER_NOTATION \${COLOR}All existing gdbserver processes have been killed\${RESET}\"
+                exit 1
+            }
+        }
+    }
+
     # start gdbserver
     set timeout -1
     send \"gdbserver 0.0.0.0:$fGDBSrvLisPort --attach \$worker_pid\r\"
@@ -374,15 +413,20 @@ $USER_NOTATION Simply retry the same command with -N1
         # Disable console logging. The output may contain multiple blank lines starts with '/ # '.
         log_user 0
         set COLOR \$RED
-        puts stderr \"\n$USER_NOTATION \${COLOR}CTRL+C captured; sending SIGINT to gdbserver as well.\${RESET}\"
+        puts stderr \"\n$USER_NOTATION \${COLOR}CTRL+C captured; sending SIGINT to gdbserver as well\${RESET}\"
         send \x03
         set COLOR \$MAGENTA
-        puts stderr \"$USER_NOTATION \${COLOR}Debugging session terminated.\${RESET}\"
+        puts stderr \"$USER_NOTATION \${COLOR}Debugging session terminated\${RESET}\"
     } SIGINT
 
-    # interact
     log_user 1
     expect {
+        {Address already in use} {
+            set COLOR \$RED
+            puts stderr \"\n$USER_NOTATION \${COLOR}Error: Address already in use\${RESET}\"
+            puts stderr \"$USER_NOTATION \${COLOR}Please retry the command with -k option to kill the existing gdbserver process.\${RESET}\"
+            exit 1
+        }
         {Detaching from process} {
             set COLOR \$MAGENTA
             puts stderr \"$USER_NOTATION \${COLOR}Bye-bye.\${RESET}\"
@@ -394,11 +438,11 @@ $USER_NOTATION Simply retry the same command with -N1
     }
 "
 
-# Process [0]: WAD manager type=manager(0) pid=1014 diagnosis=yes.
-# Process [1]: type=worker(2) index=0 pid=18369 state=running
-#               diagnosis=no debug=enable valgrind=supported/disabled
-# Process [2]: type=algo(3) index=0 pid=1061 state=running
-#               diagnosis=no debug=enable valgrind=unsupported/disabled
+# Process [0]: WAD manager type=manager(0) pid=1014 diagnosis=yes.\r\n
+# Process [1]: type=worker(2) index=0 pid=18369 state=running\r\n
+#               diagnosis=no debug=enable valgrind=supported/disabled\r\n
+# Process [2]: type=algo(3) index=0 pid=1061 state=running\r\n
+#               diagnosis=no debug=enable valgrind=unsupported/disabled\r\n
 # Process [3]: type=informer(4) index=0 pid=1051 state=running
 #               diagnosis=no debug=enable valgrind=unsupported/disabled
 # Process [4]: type=user-info(5) index=0 pid=1052 state=running
