@@ -38,13 +38,10 @@ COLOR=$MAGENTA
 
 usage() {
     cat << _EOF
-
-Persist the environment settings and tools for the current user
-
 Usage: ./$SCRIPT_NAME [uth]
 
 Options:
-    -t, --tools     Link tools into $HOME/.usr/bin
+    -t, --tools     Link tools into \$HOME/.usr/bin
     -u, --update    Force an update of prerequisites
     -h, --help      Print this help message
 

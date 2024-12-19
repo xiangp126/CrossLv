@@ -80,6 +80,7 @@ Build Flags:
     -o      Run build commands (set automatically if any of the [bmjwT] options is set)
     -b      Use Bear to generate $compileCommandsFile (default: $fUseBear)
     -f      Remove $compileCommandsFile (default: $fRMCompileCommandsJson)
+
 Build Options:
     -T      Set the maximum number of build attempts (default: $fMaxBuildAttempt)
     -B      Set the build target (default: $fBuildTarget)
@@ -87,12 +88,14 @@ Build Options:
     -j      Set the number of jobs (default: $fNumOfJobs)
     -w      Set working directory  (default: $fWorkingDir)
     -k      Rebuild the kernel (default: $fRebuildKernel)
+
 Sync Options:
     -s      Set the sync source file (default: $fSyncFile)
     -t      Set the sync target machine (default: $fSyncTarget)
     -P      Set the sync ssh port (default: $fSyncPort)
     -l/-u   Set the sync username (default: $fSyncUsername)
     -p      Set the sync password (default: $fSyncPassword)
+
 Other Options:
     -h      Print this help message
 
