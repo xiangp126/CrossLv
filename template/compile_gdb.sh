@@ -8,11 +8,49 @@
 # Codename:       focal
 
 # Define the target GDB version
-GDB_TARG_VERSION="14.1"
+GDB_TARG_VERSION="15.2"
+GDB_SOURCE_URL="https://ftp.gnu.org/gnu/gdb/gdb-$GDB_TARG_VERSION.tar.gz"
+
+# Define installation directory
+INSTALL_DIR="$HOME/.usr/"
+DOWNLOAD_DIR="$HOME/Downloads"
+PATCH_NAME="gdb-12.1-archswitch.patch"
+PATCH_URL="https://github.com/mduft/tachyon3/raw/master/tools/patches/$PATCH_NAME"
+MAGENTA='\033[0;35m'
+RESET='\033[0m'
 USER_NOTATION="@@@@"
 
+usage() {
+    cat << _EOF_
+
+Install GDB $GDB_TARG_VERSION with the patch applied into $INSTALL_DIR
+
+Usage: $(basename $0) [-f] [-h]
+    -f: Force the installation
+    -h: Display this help message
+
+_EOF_
+    exit 0
+}
+
+# use getopt to process the arguments -f and -h
+while getopts "fh" opt; do
+    case $opt in
+        f)
+            echo "$USER_NOTATION Forcing the installation"
+            ;;
+        h)
+            usage
+            ;;
+        ?)
+            echo "$USER_NOTATION Invalid option: -$OPTARG" >&2
+            exit 1
+            ;;
+    esac
+done
+
 # Get the current GDB version and check if the passed argument is not -f
-echo "$USER_NOTATION Checking the current GDB version"
+echo -e "${MAGENTA}Checking the current GDB version${RESET}"
 if [ -x "$(command -v gdb)" ] && [ "$1" != "-f" ]; then
     gdb_path=$(which gdb)
     if [ $? -ne 0 ]; then
@@ -39,15 +77,7 @@ _EOF_
     fi
 fi
 
-GDB_SOURCE_URL="https://ftp.gnu.org/gnu/gdb/gdb-$GDB_TARG_VERSION.tar.gz"
-
-# Define installation directory
-INSTALL_DIR="$HOME/.usr/"
-DOWNLOAD_DIR="$HOME/Downloads"
-PATCH_NAME="gdb-12.1-archswitch.patch"
-PATCH_URL="https://github.com/mduft/tachyon3/raw/master/tools/patches/$PATCH_NAME"
-
-echo "$USER_NOTATION Installing necessary build tools"
+echo -e "${MAGENTA}Installing necessary build tools${RESET}"
 # Ensure you have necessary build tools installed
 sudo apt-get update
 sudo apt-get install -y build-essential \
@@ -61,39 +91,39 @@ sudo apt-get install -y build-essential \
                         libmpfr-dev
 
 # Navigate to the download directory
-cd "$DOWNLOAD_DIR"
+cd "$DOWNLOAD_DIR" || exit
 
-echo "$USER_NOTATION Downloading GDB source code"
 if [ ! -f "gdb-$GDB_TARG_VERSION.tar.gz" ]; then
+    echo -e "${MAGENTA}Downloading GDB source code${RESET}"
     wget "$GDB_SOURCE_URL"
 fi
 
-echo "$USER_NOTATION Extracting GDB source code"
 if [ ! -d "gdb-$GDB_TARG_VERSION" ]; then
+    echo -e "${MAGENTA}Extracting GDB source code${RESET}"
     tar -xzvf "gdb-$GDB_TARG_VERSION.tar.gz"
 fi
 
-cd $DOWNLOAD_DIR/gdb-$GDB_TARG_VERSION
+cd "$DOWNLOAD_DIR"/gdb-$GDB_TARG_VERSION || exit
 if [ ! -f "$PATCH_NAME" ]; then
-    echo "$USER_NOTATION Downloading the patch"
+    echo -e "${MAGENTA}Downloading the patch${RESET}"
     wget "$PATCH_URL" -O "$PATCH_NAME"
     if [ $? -ne 0 ]; then
-        echo "$USER_NOTATION Failed to download the patch"
+        echo -e "${USER_NOTATION} Failed to download the patch"
         exit 1
     fi
 
-    echo "$USER_NOTATION Patching $PATCH_NAME"
+    echo -e "${MAGENTA}Applying the patch${RESET}"
     set -x
     patch -p1 < $PATCH_NAME
     set +x
     if [ $? -ne 0 ]; then
-        echo "$USER_NOTATION Failed to apply the patch"
+        echo -e "${USER_NOTATION} Failed to apply the patch"
         exit 1
     fi
 fi
 
-echo "$USER_NOTATION Cleaning up the build directory"
 if [ "$1" == "-f" ]; then
+    echo -e "${MAGENTA}Cleaning up the build directory${RESET}"
     make distclean
 fi
 
@@ -107,7 +137,7 @@ python3_path=$(which python3)
   --disable-gold \
   --disable-gas \
   --disable-gprof \
-  --with-python=$python3_path \
+  --with-python="$python3_path" \
   --enable-source-highlight \
   --enable-sim \
   --enable-gdb-stub \
@@ -119,16 +149,20 @@ python3_path=$(which python3)
 
 # Compile and install GDB
 if [ $? -ne 0 ]; then
-    echo "$USER_NOTATION Failed to configure GDB"
+    echo -e "${USER_NOTATION} Failed to configure GDB"
     exit 1
 fi
+
 # Make full use of all CPU cores
+echo -e "${MAGENTA}Compiling GDB${RESET}"
 make -j$(nproc)
 
 if [ $? -ne 0 ]; then
-    echo "$USER_NOTATION Failed to compile GDB"
+    echo -e "${USER_NOTATION} Failed to compile GDB"
     exit 1
 fi
+
+echo -e "${MAGENTA}Installing GDB${RESET}"
 make install
 
 # Clean up downloaded files and patch
@@ -138,13 +172,13 @@ make install
 
 # Verify GDB installation
 if [ $? -ne 0 ]; then
-    echo "$USER_NOTATION Failed to install GDB"
+    echo -e "${USER_NOTATION} Failed to install GDB"
     exit 1
 fi
 
-echo "$USER_NOTATION GDB $GDB_TARG_VERSION with the patch applied has been installed to $INSTALL_DIR"
+echo "$USER_NOTATION ${MAGENTA}GDB $GDB_TARG_VERSION with the patch applied has been installed to $INSTALL_DIR${RESET}"
 
-cd $INSTALL_DIR/bin
+cd "$INSTALL_DIR"/bin || exit
 ./gdb --version
 ./gdb -configuration
 ldd gdb

@@ -641,10 +641,15 @@ if [[ "$fSyncTarget" != false ]]; then
 
     case $retValue in
         $ESUCCESS)
-            COLOR=$GREY
+            COLOR=$MAGENTA
             echo -e "$USER_NOTATION You have synced $fSyncFile to $fSyncTarget successfully at $(getCurrentTime)"
-            echo -e "$USER_NOTATION ${NORMAL}Login to the server and wait for it to reboot${RESET} ..."
-            jssh -P "$fSyncPort" -l "$fSyncUsername" -p "$fSyncPassword" -t "$fSyncTarget"
+            loginTool="jssh"
+            if ! command -v $loginTool &> /dev/null; then
+                echo -e "$USER_NOTATION ${COLOR}Login tool $loginTool not found${RESET}"
+                exit 1
+            fi
+            echo -e "$USER_NOTATION ${NORMAL}Calling $loginTool to login to $fSyncTarget and wait for it to reboot${RESET}"
+            $loginTool -P "$fSyncPort" -l "$fSyncUsername" -p "$fSyncPassword" -t "$fSyncTarget"
             if [[ $? -ne 0 ]]; then
                 echo "$USER_NOTATION Please check the server status manually."
                 exit 1
