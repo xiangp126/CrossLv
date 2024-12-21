@@ -28,6 +28,7 @@ fTargetUser="admin"
 fTargetPwd="password"
 fTargetPort=22
 fVdom=""
+fDebug=""
 fSSHCmd="" # The command to execute remotely without opening an interactive login session
 fNoLoginShell=""
 fSpawnCmd=""
@@ -96,7 +97,7 @@ $SCRIPT_NAME 1.0
 
 usage:
     $SCRIPT_NAME [options]
-    $SCRIPT_NAME [-l/-u user] [-p passwd] [-P ssh_port] [-v vdom] [-h] -t [user@]target[:port]
+    $SCRIPT_NAME [-l/-u user] [-p passwd] [-P ssh_port] [-v vdom] [-d] [-h] -t [user@]target[:port]
          [-c command] [-C]
          [-J user@jumpserver[:port]] [-W jump_passwd]
          [-L [local_listen_addr:]local_listen_port:target_addr:target_port]
@@ -111,6 +112,7 @@ Basic Options:
     -P     Port          SSH Port to connect to (default: $fTargetPort)
     -c     Command       Execute commands remotely without opening an interactive login session
     -C     Capture       Live capture packets from the remote device
+    -d     Debug         Enable debug mode (-vvv)
     -h     Help          Print this help message
 
 Forwarder Options:
@@ -126,7 +128,7 @@ Advanced Options:
     -S     SFTP Mode     Connect to the target device via SFTP
     -T     Telnet Mode   Auth to the target device via Telnet
 
-Example:
+Examples:
     # SSH Connection
     $SCRIPT_NAME -t fpx1
     $SCRIPT_NAME -t 172.18.20.214 -l admin -p 1
@@ -165,7 +167,7 @@ _EOF
 
 # Parse command-line options
 fInputCmd="$SCRIPT_NAME $*"
-while getopts "t:l:u:p:P:J:W:v:c:TSM:CL:R:Xh" opt; do
+while getopts "t:l:u:p:P:J:W:v:c:TSM:CL:R:Xdh" opt; do
     case ${opt} in
         t)
             fTarget=$OPTARG
@@ -212,6 +214,9 @@ while getopts "t:l:u:p:P:J:W:v:c:TSM:CL:R:Xh" opt; do
             ;;
         v)
             fVdom=$OPTARG
+            ;;
+        d)
+            fDebug=true
             ;;
         X)
             fX11Forwarding=true
@@ -530,6 +535,10 @@ makeSpawnCmd() {
             fSpawnCmd="ssh -p $fTargetPort -l $fTargetUser $fTarget"
             if [ -n "$fX11Forwarding" ]; then
                 fSpawnCmd="$fSpawnCmd -X"
+            fi
+
+            if [ -n "$fDebug" ]; then
+                fSpawnCmd="$fSpawnCmd -vvv"
             fi
 
             # Via a Jump Server
