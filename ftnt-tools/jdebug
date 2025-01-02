@@ -355,7 +355,7 @@ $USER_NOTATION Simply retry the same command with -N1
         }
     } elseif {\$worker_cnt == 1} {
         set COLOR \$MAGENTA
-        puts stderr \"\n$USER_NOTATION \${COLOR}Find single PID: \$worker_pids for WAD process of type $fWorkerType\${RESET}\"
+        puts stderr \"\n$USER_NOTATION \${COLOR}Found single PID: \$worker_pids for WAD process of type $fWorkerType\${RESET}\"
     } else {
         puts stderr \"\n$USER_NOTATION \${COLOR}Could not find WAD process of type $fWorkerType.\${RESET}\"
         exit 1
@@ -373,7 +373,7 @@ $USER_NOTATION Simply retry the same command with -N1
     send \"sys sh\r\"
     expect {
         \"Unknown action\" {
-            puts stderr \"\n$USER_NOTATION \${MAGENTA}No Shell supported. Please use debug image.\${RESET}\"
+            puts stderr \"\n$USER_NOTATION \${MAGENTA}This image does not support 'sys sh' command, use a debug image instead\${RESET}\"
             exit 1
         }
         \"$fExpectRoot\" {
